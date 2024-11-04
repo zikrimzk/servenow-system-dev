@@ -33,6 +33,12 @@
 <body data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr"
     data-pc-theme_contrast="" data-pc-theme="light">
 
+    <!-- [ Pre-loader ] start -->
+    <div class="page-loader">
+        <div class="bar"></div>
+    </div>
+    <!-- [ Pre-loader ] End -->
+
     <!-- Includes File (Header,Sidebar)-->
     @include('administrator.layouts.header')
     @include('administrator.layouts.sidebar')
@@ -49,7 +55,7 @@
     <!-- Includes File (Footer) end -->
 
 
-    
+
     <!-- Theme Setting start [To be Deleted] -->
     <div class="pct-c-btn">
         <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_pc_layout">

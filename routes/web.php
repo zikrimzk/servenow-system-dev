@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthenticateController;
+use App\Http\Controllers\AdministratorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,8 +15,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('administrator.index',[
-        'title'=>'Test'
-    ]);
-});
+Route::get('/admin/login',[AdministratorController::class,'loginNav'])->name('admin-login');
+Route::get('/admin/home',[AdministratorController::class,'homeNav'])->name('admin-home');
+Route::get('/admin/admin-management',[AdministratorController::class,'adminManagementNav'])->name('admin-management');
+Route::post('/admin/create-admin',[AdministratorController::class,'createAdmin'])->name('admin-create');
+
+

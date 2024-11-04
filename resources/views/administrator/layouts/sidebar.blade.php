@@ -46,7 +46,7 @@
                     <label>Main</label>
                 </li>
                 <li class="pc-item">
-                    <a href="##" class="pc-link">
+                    <a href="{{ route('admin-home') }}" class="pc-link">
                         <span class="pc-micon">
                             <svg class="pc-icon">
                                 <use xlink:href="#custom-story"></use>
@@ -71,7 +71,7 @@
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="../dashboard/finance.html">Administrator Management</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-management') }}">Administrator Management</a></li>
                         <li class="pc-item"><a class="pc-link" href="../dashboard/index.html">Client Management</a></li>
                         <li class="pc-item"><a class="pc-link" href="../dashboard/analytics.html">Tasker Management</a></li>
                     </ul>
