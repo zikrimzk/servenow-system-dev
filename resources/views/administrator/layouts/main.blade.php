@@ -27,6 +27,17 @@
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
     <link rel="stylesheet" href="../assets/css/style-preset.css" />
 
+    <link rel="stylesheet" href="../assets/css/plugins/dataTables.bootstrap5.min.css" />
+    <link rel="stylesheet" href="../assets/css/plugins/responsive.bootstrap5.min.css" />
+    <link href="../assets/css/plugins/animate.min.css" rel="stylesheet" type="text/css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="../assets/js/plugins/dataTables.min.js"></script>
+    <script src="../assets/js/plugins/dataTables.bootstrap5.min.js"></script>
+    <script src="../assets/js/plugins/dataTables.responsive.min.js"></script>
+    <script src="../assets/js/plugins/responsive.bootstrap5.min.js"></script>
+    <script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
+
 
 </head>
 
@@ -289,8 +300,8 @@
 
 
     <!-- [Page Specific JS] start -->
-    <script src="../assets/js/plugins/apexcharts.min.js"></script>
-    <script src="../assets/js/pages/dashboard-analytics.js"></script>
+    {{-- <script src="../assets/js/plugins/apexcharts.min.js"></script>
+    <script src="../assets/js/pages/dashboard-analytics.js"></script> --}}
     <!-- [Page Specific JS] end -->
 
 
@@ -301,6 +312,13 @@
     <script src="../assets/js/fonts/custom-font.js"></script>
     <script src="../assets/js/pcoded.js"></script>
     <script src="../assets/js/plugins/feather.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="../assets/js/plugins/dataTables.min.js"></script>
+    <script src="../assets/js/plugins/dataTables.bootstrap5.min.js"></script>
+    <script src="../assets/js/plugins/dataTables.responsive.min.js"></script>
+    <script src="../assets/js/plugins/responsive.bootstrap5.min.js"></script>
+    <script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
 
     {{-- <script>
         layout_change('light');
