@@ -10,14 +10,29 @@ use Yajra\DataTables\Facades\DataTables;
 
 class RouteController extends Controller
 {
-    public function loginNav()
+
+    public function taskerLoginNav()
     {
-        return view('administrator.login', [
-            'title' => 'Admin Dashboard'
+        return view('tasker.login', [
+            'title' => 'Tasker Login'
         ]);
     }
 
-    public function homeNav()
+    public function taskerRegisterFormNav()
+    {
+        return view('tasker.register-tasker', [
+            'title' => 'Tasker Registration'
+        ]);
+    }
+
+    public function adminLoginNav()
+    {
+        return view('administrator.login', [
+            'title' => 'Admin Login'
+        ]);
+    }
+
+    public function adminHomeNav()
     {
         return view('administrator.index', [
             'title' => 'Admin Dashboard'
@@ -176,6 +191,96 @@ class RouteController extends Controller
         return view('administrator.service.servicetype-index', [
             'title' => 'Service Type Management',
             'stypes' => ServiceType::get(),
+        ]);
+    }
+
+    public function taskerManagementNav(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $data = DB::table('taskers')
+                ->select('id','tasker_code','tasker_firstname','tasker_lastname','tasker_email','tasker_status','tasker_phoneno')
+                ->get();
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('tasker_status', function ($row) {
+
+                if ($row->tasker_status == 0) {
+                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Not Activated</span>';
+                } else if ($row->tasker_status == 1) {
+                    $status = '<span class="text-success"><i class="fas fa-circle f-10 m-r-10"></i>Active</span>';
+                } else {
+                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i>Inactive</span>';
+                }
+
+                return $status;
+            });
+
+            $table->addColumn('action', function ($row) {
+
+                $button = 
+                    '
+                          <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#updateAdminModal-'.$row->id.'">
+                            <i class="ti ti-edit f-20"></i>
+                          </a>
+                          <a href="#" class="avtar avtar-xs  btn-light-danger deleteAdmin-'.$row->id.'" data-bs-toggle="modal"
+                            data-bs-target="#deleteAdmin">
+                            <i class="ti ti-trash f-20"></i>
+                          </a>
+
+                            <script>
+                                document.querySelector(".deleteAdmin-'.$row->id.'").addEventListener("click", function () {
+                                const swalWithBootstrapButtons = Swal.mixin({
+                                customClass: {
+                                    confirmButton: "btn btn-success",
+                                    cancelButton: "btn btn-danger"
+                                },
+                                buttonsStyling: false
+                                });
+                                swalWithBootstrapButtons
+                                .fire({
+                                    title: "Are you sure?",
+                                    text: "Once deleted, the admin will permanently lose access to the system, and all related data will be removed. This action cannot be undone.",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Yes, delete it!",
+                                    cancelButtonText: "No, cancel!",
+                                    reverseButtons: true
+                                })
+                                .then((result) => {
+                                    if (result.isConfirmed) {
+                                        setTimeout(function() {
+                                            location.href="'.route("admin-delete",$row->id).'";
+                                        }, 1000);
+                                    } 
+                                });
+                            });
+                        </script>
+                    ';
+
+                return $button;
+            });
+
+            $table->rawColumns(['tasker_status', 'action']);
+
+            return $table->make(true);
+        }
+        return view('administrator.tasker.index', [
+            'title' => 'Tasker Management',
+            'admins' => Administrator::get()
+        ]);
+    }
+
+
+
+
+
+    public function taskerhomeNav()
+    {
+        return view('tasker.index', [
+            'title' => 'Tasker Dashboard'
         ]);
     }
 }

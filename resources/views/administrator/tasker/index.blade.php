@@ -12,13 +12,13 @@
                         <div class="col-md-12">
                             <ul class="breadcrumb">
                                 <li class="breadcrumb-item">Users</li>
-                                <li class="breadcrumb-item" aria-current="page">Administrator Management</li>
+                                <li class="breadcrumb-item" aria-current="page">Tasker Management</li>
 
                             </ul>
                         </div>
                         <div class="col-md-12">
                             <div class="page-header-title">
-                                <h2 class="mb-0">Administrator Management</h2>
+                                <h2 class="mb-0">Tasker Management</h2>
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                             <div class="d-sm-flex align-items-center justify-content-between">
                                 <div>
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#addAdminModal">Add Administrator</button>
+                                        data-bs-target="#addAdminModal">Add Tasker</button>
                                 </div>
                             </div>
                         </div>
@@ -78,6 +78,7 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">No</th>
+                                            <th scope="col">Tasker Code</th>
                                             <th scope="col">First Name</th>
                                             <th scope="col">Last Name</th>
                                             <th scope="col">Phone No.</th>
@@ -100,7 +101,7 @@
                         @csrf
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="mb-0">Add Administrator</h5>
+                                <h5 class="mb-0">Add Tasker</h5>
                                 <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
                                     data-bs-dismiss="modal">
                                     <i class="ti ti-x f-20"></i>
@@ -277,7 +278,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
 
-            // DATATABLE : ADMINISTRATORS
+            // DATATABLE : TASKERS
             $(function() {
 
                 var table = $('.data-table').DataTable({
@@ -290,31 +291,35 @@
                             type: ''
                         }
                     },
-                    ajax: "{{ route('admin-management') }}",
+                    ajax: "{{ route('admin-tasker-management') }}",
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
                             searchable: false
                         },
                         {
-                            data: 'admin_firstname',
-                            name: 'admin_firstname'
+                            data: 'tasker_code',
+                            name: 'tasker_code'
                         },
                         {
-                            data: 'admin_lastname',
-                            name: 'admin_lastname'
+                            data: 'tasker_firstname',
+                            name: 'tasker_firstname'
                         },
                         {
-                            data: 'admin_phoneno',
-                            name: 'admin_phoneno'
+                            data: 'tasker_lastname',
+                            name: 'tasker_lastname'
                         },
                         {
-                            data: 'email',
-                            name: 'email'
+                            data: 'tasker_phoneno',
+                            name: 'tasker_phoneno'
                         },
                         {
-                            data: 'admin_status',
-                            name: 'admin_status'
+                            data: 'tasker_email',
+                            name: 'tasker_email'
+                        },
+                        {
+                            data: 'tasker_status',
+                            name: 'tasker_status'
                         },
                         {
                             data: 'action',
@@ -331,5 +336,4 @@
     </script>
     
 @endsection
-
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->

@@ -1,10 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RouteController;
+use App\Http\Controllers\TaskerController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AuthenticateController;
 use App\Http\Controllers\AdministratorController;
-use App\Http\Controllers\RouteController;
-use App\Http\Controllers\ServiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,13 +21,13 @@ use App\Http\Controllers\ServiceController;
 /* Admin Route Start */
 Route::prefix('admin')->group(function () {
     // Admin Login
-    Route::get('/login', [RouteController::class, 'loginNav'])->name('admin-login');
+    Route::get('/login', [RouteController::class, 'adminLoginNav'])->name('admin-login');
 });
 
 Route::prefix('admin')->group(function () {
 
     // Admin - Dashboard
-    Route::get('/home', [RouteController::class, 'homeNav'])->name('admin-home');
+    Route::get('/home', [RouteController::class, 'adminHomeNav'])->name('admin-home');
 
     // Admin - Administrator Management
     Route::get('/admin-management', [RouteController::class, 'adminManagementNav'])->name('admin-management');
@@ -39,6 +40,24 @@ Route::prefix('admin')->group(function () {
     Route::post('/create-service-type', [ServiceController::class, 'createServiceType'])->name('admin-servicetype-create');
     Route::post('/update-service-type-{id}', [ServiceController::class, 'updateServiceType'])->name('admin-servicetype-update');
     Route::get('/delete-service-type-{id}', [ServiceController::class, 'deleteServiceType'])->name('admin-servicetype-delete');
+
+    // Admin - Tasker Management
+    Route::get('/tasker-management', [RouteController::class, 'taskerManagementNav'])->name('admin-tasker-management');
     
 });
 /* Admin Route End */
+
+
+
+/* Tasker Route Start */
+Route::get('/login-tasker', [RouteController::class, 'taskerLoginNav'])->name('tasker-login');
+Route::get('/register-tasker', [RouteController::class, 'taskerRegisterFormNav'])->name('tasker-register-form');
+Route::post('/tasker-registration', [TaskerController::class, 'createTasker'])->name('tasker-create');
+
+Route::prefix('tasker')->group(function () {
+
+    // Tasker - Dashboard
+    Route::get('/home', [RouteController::class, 'taskerhomeNav'])->name('tasker-home');
+
+});
+/* Tasker Route End */

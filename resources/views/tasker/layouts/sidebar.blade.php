@@ -15,8 +15,8 @@
                                 class="user-avtar wid-45 rounded-circle" />
                         </div>
                         <div class="flex-grow-1 ms-3 me-2">
-                            <h6 class="mb-0">Zikri Mzk</h6>
-                            <small>Administrator</small>
+                            <h6 class="mb-0">Muhammad Qiwamuddin</h6>
+                            <small>Tasker</small>
                         </div>
                         <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse"
                             href="#pc_sidebar_userlink">
@@ -57,24 +57,7 @@
                 </li>
 
                 <li class="pc-item pc-caption">
-                    <label>Administrator</label>
-                </li>
-
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon">
-                            <svg class="pc-icon">
-                                <use xlink:href="#custom-status-up"></use>
-                            </svg>
-                        </span>
-                        <span class="pc-mtext">Users</span>
-                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-management') }}">Administrator Management</a></li>
-                        <li class="pc-item"><a class="pc-link" href="../dashboard/index.html">Client Management</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-tasker-management') }}">Tasker Management</a></li>
-                    </ul>
+                    <label>Manager</label>
                 </li>
 
                 <li class="pc-item pc-hasmenu">
@@ -88,7 +71,6 @@
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-service-type-management') }}">Services Type </a></li>
                         <li class="pc-item"><a class="pc-link" href="../dashboard/index.html">Services Management</a></li>
                     </ul>
                 </li>

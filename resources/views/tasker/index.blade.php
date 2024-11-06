@@ -1,4 +1,4 @@
-@extends('administrator.layouts.main')
+@extends('tasker.layouts.main')
 
 @section('content')
  <!-- [ Main Content ] start -->
