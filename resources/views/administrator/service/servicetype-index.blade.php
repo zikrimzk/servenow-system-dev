@@ -1,3 +1,5 @@
+{{-- servicetype-index.blade.php --}}
+
 @extends('administrator.layouts.main')
 
 @section('content')
@@ -11,14 +13,13 @@
                     <div class="row align-items-center">
                         <div class="col-md-12">
                             <ul class="breadcrumb">
-                                <li class="breadcrumb-item">Users</li>
-                                <li class="breadcrumb-item" aria-current="page">Administrator Management</li>
-
+                                <li class="breadcrumb-item">Services</li>
+                                <li class="breadcrumb-item" aria-current="page">Service Type Management</li>
                             </ul>
                         </div>
                         <div class="col-md-12">
                             <div class="page-header-title">
-                                <h2 class="mb-0">Administrator Management</h2>
+                                <h2 class="mb-0">Service Type Management</h2>
                             </div>
                         </div>
                     </div>
@@ -69,7 +70,7 @@
                             <div class="d-sm-flex align-items-center justify-content-between">
                                 <div>
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#addAdminModal">Add Administrator</button>
+                                        data-bs-target="#addTypeModal">Add Type</button>
                                 </div>
                             </div>
                         </div>
@@ -94,14 +95,14 @@
                 </div>
             </div>
 
-            <!-- Modal Administrator Create Start Here -->
-            <div class="modal fade" id="addAdminModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <!-- Modal Service Type Create Start Here -->
+            <div class="modal fade" id="addTypeModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                     <form action="{{ route('admin-create') }}" method="POST">
                         @csrf
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="mb-0">Add Administrator</h5>
+                                <h5 class="mb-0">Add Service Type</h5>
                                 <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
                                     data-bs-dismiss="modal">
                                     <i class="ti ti-x f-20"></i>
@@ -109,59 +110,17 @@
                             </div>
                             <div class="modal-body">
                                 <div class="row">
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-12">
                                         <div class="mb-3">
-                                            <label class="form-label">Admin Code</label>
-                                            <input type="text" class="form-control" name="admin_code"
-                                                value="SNA<?php echo rand(1, 1000000); ?>" readonly />
+                                            <label class="form-label">Type Name</label>
+                                            <input type="text" class="form-control" placeholder="Type Name"
+                                                name="servicetype_name" />
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-12">
                                         <div class="mb-3">
-                                            <label class="form-label">First Name</label>
-                                            <input type="text" class="form-control" placeholder="First Name"
-                                                name="admin_firstname" />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Last Name</label>
-                                            <input type="text" class="form-control" placeholder="Last Name"
-                                                name="admin_lastname" />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Phone Number</label>
-                                            <input type="text" class="form-control" placeholder="Phone No."
-                                                name="admin_phoneno" />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input type="email" class="form-control" placeholder="Email"
-                                                name="email" />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Account Status</label>
-                                            <select class="form-select" name="admin_status">
-                                                <option value ="0">Not-Activated (default)</option>
-                                                <option value ="1" disabled>Active</option>
-                                                <option value = "2" disabled>Inactive</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Password </label>
-                                            <input type="password" class="form-control" placeholder="Password"
-                                                name="admin_password" value="servenow@1234" />
-                                            <span class="text-muted" style="font-size: 9pt">[Default: servenow@1234]</span>
+                                            <label class="form-label">Description</label>
+                                            <textarea class="form-control" rows="3" placeholder="Description" name="servicetype_desc"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -170,8 +129,7 @@
                                 <div class="flex-grow-1 text-end">
                                     <button type="reset" class="btn btn-link-danger btn-pc-default"
                                         data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Add
-                                        Administrator</button>
+                                    <button type="submit" class="btn btn-primary">Add Type</button>
                                 </div>
                             </div>
                         </div>
@@ -179,9 +137,9 @@
 
                 </div>
             </div>
-            <!-- Modal Administrator Create End  Here -->
+            <!-- Modal Service Type Create End  Here -->
 
-            <!-- Modal Administrator Edit Start Here -->
+            <!-- Modal Service Type Edit Start Here -->
             @foreach ($admins as $admin)
                 <div class="modal fade" id="updateAdminModal-{{ $admin->id }}" data-bs-keyboard="false"
                     tabindex="-1" aria-hidden="true">
@@ -267,7 +225,7 @@
                     </div>
                 </div>
             @endforeach
-            <!-- Modal Administrator Edit End  Here -->
+            <!-- Modal Service Type Edit End  Here -->
 
         </div>
 
