@@ -1,5 +1,3 @@
-{{-- servicetype-index.blade.php --}}
-
 @extends('administrator.layouts.main')
 
 @section('content')
@@ -70,21 +68,19 @@
                             <div class="d-sm-flex align-items-center justify-content-between">
                                 <div>
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#addTypeModal">Add Type</button>
+                                        data-bs-target="#addTypeModal">Add Service Type</button>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body pt-3">
                             <div class="dt-responsive table-responsive m-3">
-                                <table class="table data-table table-striped nowrap">
+                                <table class="table data-table table-hover nowrap">
                                     <thead>
                                         <tr>
                                             <th scope="col">No</th>
-                                            <th scope="col">First Name</th>
-                                            <th scope="col">Last Name</th>
-                                            <th scope="col">Phone No.</th>
-                                            <th scope="col">Email</th>
-                                            <th scope="col">Status</th>
+                                            <th scope="col">Type Name</th>
+                                            <th scope="col">Description</th>
+                                            <th scope="col">Availability</th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -98,7 +94,7 @@
             <!-- Modal Service Type Create Start Here -->
             <div class="modal fade" id="addTypeModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
-                    <form action="{{ route('admin-create') }}" method="POST">
+                    <form action="{{ route('admin-servicetype-create') }}" method="POST">
                         @csrf
                         <div class="modal-content">
                             <div class="modal-header">
@@ -123,13 +119,22 @@
                                             <textarea class="form-control" rows="3" placeholder="Description" name="servicetype_desc"></textarea>
                                         </div>
                                     </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Availability</label>
+                                            <select class="form-select" name="servicetype_status">
+                                                <option value ="1" selected>Show</option>
+                                                <option value = "2">Hide</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-footer justify-content-end">
                                 <div class="flex-grow-1 text-end">
                                     <button type="reset" class="btn btn-link-danger btn-pc-default"
                                         data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Add Type</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
                             </div>
                         </div>
@@ -140,15 +145,15 @@
             <!-- Modal Service Type Create End  Here -->
 
             <!-- Modal Service Type Edit Start Here -->
-            @foreach ($admins as $admin)
-                <div class="modal fade" id="updateAdminModal-{{ $admin->id }}" data-bs-keyboard="false"
+            @foreach ($stypes as $stype)
+                <div class="modal fade" id="updateServiceTypeModal-{{ $stype->id }}" data-bs-keyboard="false"
                     tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                        <form action="{{ route('admin-update', $admin->id) }}" method="POST">
+                    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+                        <form action="{{ route('admin-servicetype-update', $stype->id) }}" method="POST">
                             @csrf
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="mb-0">Update Administrator Details</h5>
+                                    <h5 class="mb-0">Update Service Type Details</h5>
                                     <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
                                         data-bs-dismiss="modal">
                                         <i class="ti ti-x f-20"></i>
@@ -156,57 +161,30 @@
                                 </div>
                                 <div class="modal-body">
                                     <div class="row">
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-12">
                                             <div class="mb-3">
-                                                <label class="form-label">Admin Code</label>
-                                                <input type="text" class="form-control" name="admin_code"
-                                                    value="{{ $admin->admin_code }}" readonly />
+                                                <label class="form-label">Type Name</label>
+                                                <input type="text" class="form-control" name="servicetype_name"
+                                                    value="{{ $stype->servicetype_name }}" />
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-6">
+                                        <div class="col-sm-12">
                                             <div class="mb-3">
-                                                <label class="form-label">First Name</label>
-                                                <input type="text" class="form-control" placeholder="First Name"
-                                                    name="admin_firstname" value="{{ $admin->admin_firstname }}" />
+                                                <label class="form-label">Description</label>
+                                                <textarea class="form-control" rows="3" placeholder="Description" name="servicetype_desc">{{ $stype->servicetype_desc }}</textarea>
                                             </div>
                                         </div>
-                                        <div class="col-sm-6">
+                                        <div class="col-sm-12">
                                             <div class="mb-3">
-                                                <label class="form-label">Last Name</label>
-                                                <input type="text" class="form-control" placeholder="Last Name"
-                                                    name="admin_lastname" value="{{ $admin->admin_lastname }}" />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Phone Number</label>
-                                                <input type="text" class="form-control" placeholder="Phone No."
-                                                    name="admin_phoneno" value="{{ $admin->admin_phoneno }}" />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Email</label>
-                                                <input type="email" class="form-control" placeholder="Email"
-                                                    name="email" value="{{ $admin->email }}" />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Account Status</label>
-                                                <select class="form-select" name="admin_status">
-                                                    @if ($admin->admin_status == 0)
-                                                        <option value ="0">Not-Activated (default)</option>
-                                                    @elseif($admin->admin_status == 1)
-                                                        <option value ="1" selected>Active</option>
-                                                        <option value = "2">Inactive</option>
-                                                    @elseif($admin->admin_status == 2)
-                                                        <option value ="1">Active</option>
-                                                        <option value = "2" selected>Inactive</option>
+                                                <label class="form-label">Availability</label>
+                                                <select class="form-select" name="servicetype_status">
+                                                    @if ($stype->servicetype_status == 1)
+                                                        <option value ="1" selected>Show</option>
+                                                        <option value = "2">Hide</option>
+                                                    @elseif($stype->servicetype_status == 2)
+                                                        <option value ="1">Show</option>
+                                                        <option value = "2" selected>Hide</option>
                                                     @endif
-
                                                 </select>
                                             </div>
                                         </div>
@@ -236,7 +214,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
 
-            // DATATABLE : ADMINISTRATORS
+            // DATATABLE : SERVICE_TYPES
             $(function() {
 
                 var table = $('.data-table').DataTable({
@@ -249,31 +227,23 @@
                             type: ''
                         }
                     },
-                    ajax: "{{ route('admin-management') }}",
+                    ajax: "{{ route('admin-service-type-management') }}",
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
                             searchable: false
                         },
                         {
-                            data: 'admin_firstname',
-                            name: 'admin_firstname'
+                            data: 'servicetype_name',
+                            name: 'servicetype_name'
                         },
                         {
-                            data: 'admin_lastname',
-                            name: 'admin_lastname'
+                            data: 'servicetype_desc',
+                            name: 'servicetype_desc'
                         },
                         {
-                            data: 'admin_phoneno',
-                            name: 'admin_phoneno'
-                        },
-                        {
-                            data: 'email',
-                            name: 'email'
-                        },
-                        {
-                            data: 'admin_status',
-                            name: 'admin_status'
+                            data: 'servicetype_status',
+                            name: 'servicetype_status'
                         },
                         {
                             data: 'action',
@@ -288,7 +258,5 @@
             });
         });
     </script>
-    
 @endsection
-
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->

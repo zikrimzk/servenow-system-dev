@@ -54,7 +54,7 @@ class AdministratorController extends Controller
     }
 
 
-    public function deleteAdmin(Request $req, $adminId)
+    public function deleteAdmin($adminId)
     {
         try {
             Administrator::where('id', $adminId)->delete();
