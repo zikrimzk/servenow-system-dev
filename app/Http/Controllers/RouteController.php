@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
 use App\Models\ServiceType;
+use App\Models\Tasker;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -37,6 +38,34 @@ class RouteController extends Controller
         return view('administrator.index', [
             'title' => 'Admin Dashboard'
         ]);
+    }
+    
+    public function taskerhomeNav()
+    {
+        return view('tasker.index', [
+            'title' => 'Tasker Dashboard'
+        ]);
+    }
+
+    // public function getStates($loc)
+    // {
+    //     $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+    //     return view($loc, compact('states'));
+    // }
+
+    public function getAreas($state)
+    {
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+        $areas = [];
+
+        foreach ($states['states'] as $item) {
+            if (strtolower($item['name']) == strtolower($state)) {
+                $areas = $item['areas'];
+                break;
+            }
+        }
+
+        return response()->json($areas);
     }
 
     public function adminManagementNav(Request $request)
@@ -199,7 +228,7 @@ class RouteController extends Controller
         if ($request->ajax()) {
 
             $data = DB::table('taskers')
-                ->select('id','tasker_code','tasker_firstname','tasker_lastname','tasker_email','tasker_status','tasker_phoneno')
+                ->select('id','tasker_code','tasker_firstname','tasker_lastname','email','tasker_status','tasker_phoneno')
                 ->get();
 
             $table = DataTables::of($data)->addIndexColumn();
@@ -207,11 +236,17 @@ class RouteController extends Controller
             $table->addColumn('tasker_status', function ($row) {
 
                 if ($row->tasker_status == 0) {
-                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Not Activated</span>';
-                } else if ($row->tasker_status == 1) {
+                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Incomplete Profile</span>';
+                }else if ($row->tasker_status == 1) {
+                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Not Verified</span>';
+                } else if ($row->tasker_status == 2) {
                     $status = '<span class="text-success"><i class="fas fa-circle f-10 m-r-10"></i>Active</span>';
-                } else {
+                } else if ($row->tasker_status == 3) {
                     $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i>Inactive</span>';
+                }else if ($row->tasker_status == 4) {
+                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Password Reset Needed</span>';
+                }else if ($row->tasker_status == 5) {
+                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i>Banned</span>';
                 }
 
                 return $status;
@@ -222,7 +257,7 @@ class RouteController extends Controller
                 $button = 
                     '
                           <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#updateAdminModal-'.$row->id.'">
+                            data-bs-target="#updateTaskerModal-'.$row->id.'">
                             <i class="ti ti-edit f-20"></i>
                           </a>
                           <a href="#" class="avtar avtar-xs  btn-light-danger deleteAdmin-'.$row->id.'" data-bs-toggle="modal"
@@ -267,9 +302,13 @@ class RouteController extends Controller
 
             return $table->make(true);
         }
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+
         return view('administrator.tasker.index', [
             'title' => 'Tasker Management',
-            'admins' => Administrator::get()
+            'taskers' => Tasker::get(),
+            'taskerCount' => Tasker::count(),
+            'states'=> $states
         ]);
     }
 
@@ -277,10 +316,5 @@ class RouteController extends Controller
 
 
 
-    public function taskerhomeNav()
-    {
-        return view('tasker.index', [
-            'title' => 'Tasker Dashboard'
-        ]);
-    }
+   
 }

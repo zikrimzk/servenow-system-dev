@@ -159,7 +159,7 @@
                                         <div class="mb-3">
                                             <label class="form-label">Password </label>
                                             <input type="password" class="form-control" placeholder="Password"
-                                                name="admin_password" value="servenow@1234" />
+                                                name="password" value="servenow@1234" />
                                             <span class="text-muted" style="font-size: 9pt">[Default: servenow@1234]</span>
                                         </div>
                                     </div>
@@ -169,8 +169,7 @@
                                 <div class="flex-grow-1 text-end">
                                     <button type="reset" class="btn btn-link-danger btn-pc-default"
                                         data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Add
-                                        Administrator</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
                             </div>
                         </div>

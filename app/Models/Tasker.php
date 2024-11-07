@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Tasker extends Model
+class Tasker extends Authenticatable
 {
     use HasFactory;
 
@@ -14,8 +15,9 @@ class Tasker extends Model
         'tasker_firstname',
         'tasker_lastname',
         'tasker_phoneno',
-        'tasker_email',
-        'tasker_password',
+        'email',
+        'tasker_status',
+        'password',
         'tasker_icno',
         'tasker_dob',
         'tasker_photo',

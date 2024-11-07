@@ -19,7 +19,7 @@ class AdministratorController extends Controller
                 'admin_phoneno' => 'required | min:10',
                 'email' => 'required | unique:administrators',
                 'admin_status' => 'required',
-                'admin_password' => 'required',
+                'password' => 'required',
             ],[], 
             [
                 'admin_code'=> 'Admin Code',
@@ -28,12 +28,12 @@ class AdministratorController extends Controller
                 'admin_phoneno' => 'Phone Number',
                 'email' => 'Email Address',
                 'admin_status' => 'Account Status',
-                'admin_password' => 'Password'
+                'password' => 'Password'
             ]);
             
             $data['admin_firstname'] = Str::upper($data['admin_firstname']);
             $data['admin_lastname'] = Str::upper($data['admin_lastname']);
-            $data['admin_password'] = bcrypt($data['admin_password']);
+            $data['password'] = bcrypt($data['password']);
             Administrator::create($data);
 
             return redirect(route('admin-management'))->with('success', 'Administrator has been registered successfully !');

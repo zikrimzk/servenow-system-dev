@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('admin_phoneno');
             $table->string('email')->unique();
             $table->integer('admin_status')->default(0);
-            $table->string('admin_password');
+            $table->string('password');
             $table->rememberToken();
             $table->timestamps();
         });

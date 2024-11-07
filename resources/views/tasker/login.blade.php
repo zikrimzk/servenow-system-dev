@@ -65,37 +65,44 @@
                     </div>
                 @endif
                 <!-- End Alert -->
-                <div class="card my-4 border border-2">
-                    <div class="card-body">
-                        <div class="text-center">
-                            <a href="#"><img src="../assets/images/logo-dark.svg" alt="img" /></a>
-                        </div>
-                        <h4 class="text-center f-w-500 mb-3 mt-3"><span class="text-primary">Tasker </span>Login</h4>
-                        <div class="mb-3">
-                            <input type="email" class="form-control" id="floatingInput" placeholder="Email Address" />
-                        </div>
-                        <div class="mb-3">
-                            <input type="password" class="form-control" id="floatingInput1" placeholder="Password" />
-                        </div>
-                        <div class="d-flex mt-1 justify-content-between align-items-center">
-                            <div class="form-check">
-                                <input class="form-check-input input-primary" type="checkbox" id="customCheckc1"
-                                    checked="" />
-                                <label class="form-check-label text-muted" for="customCheckc1">Remember me?</label>
+                <form action="{{ route('auth-tasker') }}" method="POST">
+                    @csrf
+                    <div class="card my-4 border border-2">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <a href="#"><img src="../assets/images/logo-dark.svg" alt="img" /></a>
                             </div>
-                            <h6 class="text-secondary f-w-400 mb-0">
-                                <a href="forgot-password-v2.html"> Forgot Password? </a>
-                            </h6>
-                        </div>
-                        <div class="d-grid mt-4">
-                            <button type="button" class="btn btn-primary">Login</button>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-end mt-4">
-                            <h6 class="f-w-500 mb-0">Don't have an Account?</h6>
-                            <a href="{{ route('tasker-register-form') }}" class="link-primary">Create Account</a>
+                            <h4 class="text-center f-w-500 mb-3 mt-3"><span class="text-primary">Tasker </span>Login
+                            </h4>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" id="floatingInput"
+                                    placeholder="Email" name="email"/>
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" class="form-control" id="floatingInput1"
+                                    placeholder="Password" name="password"/>
+                            </div>
+                            <div class="d-flex mt-1 justify-content-between align-items-center">
+                                <div class="form-check">
+                                    <input class="form-check-input input-primary" type="checkbox" id="customCheckc1"
+                                        checked="" />
+                                    <label class="form-check-label text-muted" for="customCheckc1">Remember me?</label>
+                                </div>
+                                <h6 class="text-secondary f-w-400 mb-0">
+                                    <a href="#"> Forgot Password? </a>
+                                </h6>
+                            </div>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-end mt-4">
+                                <h6 class="f-w-500 mb-0">Don't have an Account?</h6>
+                                <a href="{{ route('tasker-register-form') }}" class="link-primary">Create Account</a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </form>
+
             </div>
         </div>
     </div>

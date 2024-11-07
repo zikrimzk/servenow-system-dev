@@ -68,7 +68,7 @@
                             <div class="d-sm-flex align-items-center justify-content-between">
                                 <div>
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#addAdminModal">Add Tasker</button>
+                                        data-bs-target="#addTaskerModal">Add Tasker</button>
                                 </div>
                             </div>
                         </div>
@@ -94,10 +94,10 @@
                 </div>
             </div>
 
-            <!-- Modal Administrator Create Start Here -->
-            <div class="modal fade" id="addAdminModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+            <!-- Modal Tasker Create Start Here -->
+            <div class="modal fade" id="addTaskerModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                    <form action="{{ route('admin-create') }}" method="POST">
+                    <form action="{{ route('admin-tasker-create') }}" method="POST">
                         @csrf
                         <div class="modal-content">
                             <div class="modal-header">
@@ -111,9 +111,9 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="mb-3">
-                                            <label class="form-label">Admin Code</label>
-                                            <input type="text" class="form-control" name="admin_code"
-                                                value="SNA<?php echo rand(1, 1000000); ?>" readonly />
+                                            <label class="form-label">Tasker Code</label>
+                                            <input type="text" class="form-control" name="tasker_code"
+                                                value="SNT<?php echo rand(1, 1000000); ?>" readonly />
                                         </div>
                                     </div>
                                 </div>
@@ -122,21 +122,24 @@
                                         <div class="mb-3">
                                             <label class="form-label">First Name</label>
                                             <input type="text" class="form-control" placeholder="First Name"
-                                                name="admin_firstname" />
+                                                name="tasker_firstname" />
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Last Name</label>
                                             <input type="text" class="form-control" placeholder="Last Name"
-                                                name="admin_lastname" />
+                                                name="tasker_lastname" />
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Phone Number</label>
-                                            <input type="text" class="form-control" placeholder="Phone No."
-                                                name="admin_phoneno" />
+                                            <div class="input-group">
+                                                <span class="input-group-text">+60</span>
+                                                <input type="text" class="form-control" placeholder="Phone No."
+                                                    name="tasker_phoneno" />
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
@@ -149,10 +152,8 @@
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Account Status</label>
-                                            <select class="form-select" name="admin_status">
-                                                <option value ="0">Not-Activated (default)</option>
-                                                <option value ="1" disabled>Active</option>
-                                                <option value = "2" disabled>Inactive</option>
+                                            <select class="form-select" name="tasker_status">
+                                                <option value ="4">Password Need Update</option>
                                             </select>
                                         </div>
                                     </div>
@@ -160,8 +161,9 @@
                                         <div class="mb-3">
                                             <label class="form-label">Password </label>
                                             <input type="password" class="form-control" placeholder="Password"
-                                                name="admin_password" value="servenow@1234" />
-                                            <span class="text-muted" style="font-size: 9pt">[Default: servenow@1234]</span>
+                                                name="password" value="servenow@1234" />
+                                            <span class="text-muted" style="font-size: 9pt">[Default:
+                                                servenow@1234]</span>
                                         </div>
                                     </div>
                                 </div>
@@ -170,8 +172,7 @@
                                 <div class="flex-grow-1 text-end">
                                     <button type="reset" class="btn btn-link-danger btn-pc-default"
                                         data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Add
-                                        Administrator</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
                             </div>
                         </div>
@@ -179,95 +180,195 @@
 
                 </div>
             </div>
-            <!-- Modal Administrator Create End  Here -->
+            <!-- Modal Tasker Create End  Here -->
 
-            <!-- Modal Administrator Edit Start Here -->
-            @foreach ($admins as $admin)
-                <div class="modal fade" id="updateAdminModal-{{ $admin->id }}" data-bs-keyboard="false"
-                    tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                        <form action="{{ route('admin-update', $admin->id) }}" method="POST">
-                            @csrf
+            <!-- Modal Tasker Edit Start Here -->
+            @foreach ($taskers as $tasker)
+                <form action="{{ route('admin-tasker-update',$tasker->id) }}" method="POST">
+                    @csrf
+                    <div class="modal fade" id="updateTaskerModal-{{ $tasker->id }}" data-bs-keyboard="false"
+                        tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="mb-0">Update Administrator Details</h5>
+                                    <h5 class="mb-0">Update Tasker Details</h5>
                                     <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
                                         data-bs-dismiss="modal">
                                         <i class="ti ti-x f-20"></i>
                                     </a>
                                 </div>
                                 <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Admin Code</label>
-                                                <input type="text" class="form-control" name="admin_code"
-                                                    value="{{ $admin->admin_code }}" readonly />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">First Name</label>
-                                                <input type="text" class="form-control" placeholder="First Name"
-                                                    name="admin_firstname" value="{{ $admin->admin_firstname }}" />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Last Name</label>
-                                                <input type="text" class="form-control" placeholder="Last Name"
-                                                    name="admin_lastname" value="{{ $admin->admin_lastname }}" />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Phone Number</label>
-                                                <input type="text" class="form-control" placeholder="Phone No."
-                                                    name="admin_phoneno" value="{{ $admin->admin_phoneno }}" />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Email</label>
-                                                <input type="email" class="form-control" placeholder="Email"
-                                                    name="email" value="{{ $admin->email }}" />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Account Status</label>
-                                                <select class="form-select" name="admin_status">
-                                                    @if ($admin->admin_status == 0)
-                                                        <option value ="0">Not-Activated (default)</option>
-                                                    @elseif($admin->admin_status == 1)
-                                                        <option value ="1" selected>Active</option>
-                                                        <option value = "2">Inactive</option>
-                                                    @elseif($admin->admin_status == 2)
-                                                        <option value ="1">Active</option>
-                                                        <option value = "2" selected>Inactive</option>
-                                                    @endif
 
-                                                </select>
+                                    <div class="row">
+                                        <div class="col-sm-3 text-center">
+                                            <div class="mb-3">
+                                                <img src="../assets/images/user/avatar-1.jpg" alt="user-image"
+                                                    class="user-avtar wid-100 rounded-circle" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <h5 class="mb-2">A. Personal Details:</h5>
+
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">First Name</label>
+                                                        <input type="text" class="form-control"
+                                                            placeholder="First Name" name="tasker_firstname"
+                                                            value="{{ $tasker->tasker_firstname }}" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Last Name</label>
+                                                        <input type="text" class="form-control"
+                                                            placeholder="Last Name" name="tasker_lastname"
+                                                            value="{{ $tasker->tasker_lastname }}" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">IC Number</label>
+                                                        <input type="text" class="form-control" placeholder="IC No."
+                                                            name="tasker_icno" value="{{ $tasker->tasker_icno }}" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Date of Birth</label>
+                                                        <input type="date" class="form-control" placeholder="IC No."
+                                                            name="tasker_dob" value="{{ $tasker->tasker_dob }}" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="mb-5">
+                                                        <label class="form-label">Phone Number</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">+60</span>
+                                                            <input type="text" class="form-control"
+                                                                placeholder="Phone No." name="tasker_phoneno"
+                                                                value="{{ $tasker->tasker_phoneno }}" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h5 class="mb-2">B. Account Details:</h5>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Tasker Code</label>
+                                                        <input type="text" class="form-control" name="tasker_code"
+                                                            value="{{ $tasker->tasker_code }}" readonly />
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Email</label>
+                                                        <input type="email" class="form-control" placeholder="Email"
+                                                            name="email" value="{{ $tasker->email }}" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Account Status</label>
+                                                        <select class="form-select" name="tasker_status">
+                                                            @if ($tasker->tasker_status == 0)
+                                                                <option value ="0">Incomplete Profile</option>
+                                                            @elseif($tasker->tasker_status == 1)
+                                                                <option value ="1" selected>Not Verified</option>
+                                                                <option value ="2">Active</option>
+                                                                <option value ="3">Inactive</option>
+                                                            @elseif($tasker->tasker_status == 2)
+                                                                <option value ="2"selected>Active</option>
+                                                                <option value ="3">Inactive</option>
+                                                                <option value ="5">Banned</option>
+                                                            @elseif($tasker->tasker_status == 3)
+                                                                <option value ="2">Active</option>
+                                                                <option value ="3"selected>Inactive</option>
+                                                                <option value ="5">Banned</option>
+                                                            @elseif($tasker->tasker_status == 4)
+                                                                <option value ="4">Password Need Update</option>
+                                                            @elseif($tasker->tasker_status == 5)
+                                                                <option value ="2">Active</option>
+                                                                <option value ="3">Inactive</option>
+                                                                <option value ="5"selected>Banned</option>
+                                                            @endif
+                                                        </select>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Working State</label>
+                                                        <select class="form-select" name="tasker_workingloc_state"
+                                                            id="state">
+                                                            @if ($tasker->tasker_workingloc_state == '')
+                                                                <option value="-" selected>Select State</option>
+                                                                @foreach ($states['states'] as $state)
+                                                                    <option value="{{ strtolower($state['name']) }}">
+                                                                        {{ $state['name'] }}</option>
+                                                                @endforeach
+                                                            @else
+                                                                @foreach ($states['states'] as $state)
+                                                                    @if ($tasker->tasker_workingloc_state == strtolower($state['name']))
+                                                                        <option value="{{ strtolower($state['name']) }}"
+                                                                            selected>
+                                                                            {{ $state['name'] }}</option>
+                                                                    @else
+                                                                        <option value="{{ strtolower($state['name']) }}">
+                                                                            {{ $state['name'] }}</option>
+                                                                    @endif
+                                                                @endforeach
+                                                            @endif
+
+
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Working Area **</label>
+                                                        <select class="form-select" name="tasker_workingloc_area">
+                                                            @if ($tasker->tasker_workingloc_area == '')
+                                                                <option value="-" selected>Select Area</option>
+                                                            @else
+                                                                <option value="-" selected>
+                                                                    {{ $tasker->tasker_workingloc_area }}</option>
+                                                            @endif
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Current Rating</label>
+                                                        <input type="text" class="form-control" name="tasker_rating"
+                                                            value="{{ $tasker->tasker_rating }}" readonly />
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" class="form-control"
+                                                    value="{{ $taskerCount }}" id="totalcount" />
                                             </div>
                                         </div>
                                     </div>
+
+
                                 </div>
                                 <div class="modal-footer justify-content-end">
                                     <div class="flex-grow-1 text-end">
                                         <button type="reset" class="btn btn-link-danger btn-pc-default"
                                             data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        <button type="submit" class="btn btn-primary">Save</button>
                                     </div>
                                 </div>
                             </div>
-                        </form>
-
+                        </div>
                     </div>
-                </div>
+                </form>
             @endforeach
-            <!-- Modal Administrator Edit End  Here -->
+            <!-- Modal Tasker Edit End  Here -->
 
         </div>
 
@@ -314,8 +415,8 @@
                             name: 'tasker_phoneno'
                         },
                         {
-                            data: 'tasker_email',
-                            name: 'tasker_email'
+                            data: 'email',
+                            name: 'email'
                         },
                         {
                             data: 'tasker_status',
@@ -332,8 +433,45 @@
                 });
 
             });
+
+            //SELECT STATE AND AREA FUNCTION
+            // $('#state').on('change', function() {
+            //     var state = $(this).val();
+            //     var areas = $('#area').val();
+            //     var number = $('#totalcount').val();
+            //     alert(number);
+            //     var i;
+            //     for (i = 1; i <= number; ++i) {
+            //         console.log('area'+i);
+            //         if (state) {
+            //             $.ajax({
+            //                 url: '/get-areas/' + state,
+            //                 type: 'GET',
+            //                 success: function(data) {
+            //                     $('#area' + i).empty();
+            //                     $('#area' + i).append('<option value="">Select Area</option>');
+            //                     $.each(data, function(index, area) {
+            //                         if (areas == area) {
+            //                             $('#area' + i).append('<option value="' + area +
+            //                                 '" selected>' +
+            //                                 area + '</option>');
+            //                         } else {
+            //                             $('#area' + i).append('<option value="' + area +
+            //                                 '">' +
+            //                                 area + '</option>');
+            //                         }
+
+            //                     });
+            //                 }
+            //             });
+            //         } else {
+            //             $('#area'+i).empty();
+            //             $('#area'+i).append('<option value="">Select Area</option>');
+            //         }
+            //     }
+            // });
+
         });
     </script>
-    
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->

@@ -92,7 +92,7 @@
                                     aria-label="Close"></button>
                             </div>
                         @endif
-                        <!-- End Alert -->
+                        <!-- End Alert --> 
                         <form action="{{ route('tasker-create') }}" method="POST">
                             @csrf
                             <div class="row">
@@ -120,19 +120,19 @@
                                 <div class="col-sm-12">
                                     <div class="mb-3">
                                         <input type="email" class="form-control" placeholder="Email"
-                                            name="tasker_email" />
+                                            name="email" />
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="mb-3">
                                         <input type="password" class="form-control" placeholder="Password"
-                                            name="tasker_password" />
+                                            name="password" />
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="mb-3">
                                         <input type="password" class="form-control" placeholder="Confirm Password"
-                                            name="tasker_cpassword" />
+                                            name="cpassword" />
                                     </div>
                                 </div>
                                 <div class="col-sm-12">

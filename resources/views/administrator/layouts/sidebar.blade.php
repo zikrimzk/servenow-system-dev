@@ -15,7 +15,7 @@
                                 class="user-avtar wid-45 rounded-circle" />
                         </div>
                         <div class="flex-grow-1 ms-3 me-2">
-                            <h6 class="mb-0">Zikri Mzk</h6>
+                            <h6 class="mb-0">{{ explode(' ', Auth::user()->admin_firstname)[0];}}.</h6>
                             <small>Administrator</small>
                         </div>
                         <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse"
@@ -31,7 +31,7 @@
                                 <i class="ti ti-user"></i>
                                 <span>My Account</span>
                             </a>
-                            <a href="#!">
+                            <a href="{{ route('admin-logout') }}">
                                 <i class="ti ti-power"></i>
                                 <span>Logout</span>
                             </a>

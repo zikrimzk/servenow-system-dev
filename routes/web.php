@@ -20,14 +20,22 @@ use App\Http\Controllers\AdministratorController;
 
 /* Admin Route Start */
 Route::prefix('admin')->group(function () {
-    // Admin Login
+    // Admin - Login
     Route::get('/login', [RouteController::class, 'adminLoginNav'])->name('admin-login');
+
+    // Admin - Auth Process
+    Route::post('/admin-authentication', [AuthenticateController::class, 'authenticateAdmin'])->name('auth-admin');
+
 });
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     // Admin - Dashboard
     Route::get('/home', [RouteController::class, 'adminHomeNav'])->name('admin-home');
+
+    // Admin - Logout
+    Route::get('/admin-logout', [AuthenticateController::class, 'logoutAdmin'])->name('admin-logout');
+
 
     // Admin - Administrator Management
     Route::get('/admin-management', [RouteController::class, 'adminManagementNav'])->name('admin-management');
@@ -43,6 +51,10 @@ Route::prefix('admin')->group(function () {
 
     // Admin - Tasker Management
     Route::get('/tasker-management', [RouteController::class, 'taskerManagementNav'])->name('admin-tasker-management');
+    Route::post('/create-tasker', [TaskerController::class, 'adminCreateTasker'])->name('admin-tasker-create');
+    Route::post('/update-tasker-{id}', [TaskerController::class, 'adminUpdateTasker'])->name('admin-tasker-update');
+
+
     
 });
 /* Admin Route End */
@@ -50,14 +62,41 @@ Route::prefix('admin')->group(function () {
 
 
 /* Tasker Route Start */
+
+// Tasker - Login 
 Route::get('/login-tasker', [RouteController::class, 'taskerLoginNav'])->name('tasker-login');
+
+// Tasker - Registration Form [General]
 Route::get('/register-tasker', [RouteController::class, 'taskerRegisterFormNav'])->name('tasker-register-form');
+
+// Tasker - Registration Process
 Route::post('/tasker-registration', [TaskerController::class, 'createTasker'])->name('tasker-create');
 
-Route::prefix('tasker')->group(function () {
+// Tasker - Auth Process
+Route::post('/tasker-authentication', [AuthenticateController::class, 'authenticateTasker'])->name('auth-tasker');
+
+Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
     // Tasker - Dashboard
     Route::get('/home', [RouteController::class, 'taskerhomeNav'])->name('tasker-home');
 
+    // Tasker - Logout
+    Route::get('/tasker-logout', [AuthenticateController::class, 'logoutTasker'])->name('tasker-logout');
+
 });
 /* Tasker Route End */
+
+
+
+
+
+
+
+
+
+
+
+
+// Route::get('/get-states', [RouteController::class, 'getStates'])->name('get-states');
+// Route::get('/get-areas/{state}', [RouteController::class, 'getAreas'])->name('get-area');
+

@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Administrator extends Model
+class Administrator extends Authenticatable
 {
     use HasFactory;
 
@@ -16,7 +17,7 @@ class Administrator extends Model
         'admin_phoneno',
         'email',
         'admin_status',
-        'admin_password',
+        'password',
     ];
 
 }
