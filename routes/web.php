@@ -36,7 +36,6 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     // Admin - Logout
     Route::get('/admin-logout', [AuthenticateController::class, 'logoutAdmin'])->name('admin-logout');
 
-
     // Admin - Administrator Management
     Route::get('/admin-management', [RouteController::class, 'adminManagementNav'])->name('admin-management');
     Route::post('/create-admin', [AdministratorController::class, 'createAdmin'])->name('admin-create');
@@ -81,7 +80,13 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::get('/home', [RouteController::class, 'taskerhomeNav'])->name('tasker-home');
 
     // Tasker - Logout
-    Route::get('/tasker-logout', [AuthenticateController::class, 'logoutTasker'])->name('tasker-logout');
+    Route::get('/tasker-logout', [AuthenticateController::class, 'logoutTasker'])->name('tasker-logout'); 
+
+    //Tasker - Service Management
+    Route::get('/service-management', [RouteController::class, 'taskerServiceManagementNav'])->name('tasker-service-management'); 
+    Route::post('/create-service', [ServiceController::class, 'createService'])->name('tasker-service-create'); 
+    Route::post('/update-service-{id}', [ServiceController::class, 'updateService'])->name('tasker-service-update'); 
+    Route::get('/delete-service-{id}', [ServiceController::class, 'deleteService'])->name('tasker-service-delete'); 
 
 });
 /* Tasker Route End */
