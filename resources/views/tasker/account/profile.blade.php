@@ -104,14 +104,14 @@
                                                 <div class="col-sm-6">
                                                     <div class="mb-3">
                                                         <label class="form-label">First Name</label>
-                                                        <input type="text" class="form-control"
+                                                        <input type="text" class="form-control" name="tasker_firstname"
                                                             value="{{ Auth::user()->tasker_firstname }}" />
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <div class="mb-3">
                                                         <label class="form-label">Last Name</label>
-                                                        <input type="text" class="form-control"
+                                                        <input type="text" class="form-control" name="tasker_lastname"
                                                             value="{{ Auth::user()->tasker_lastname }}" />
                                                     </div>
                                                 </div>
@@ -119,7 +119,7 @@
                                                     <div class="mb-3">
                                                         <label class="form-label">IC Number <span
                                                                 class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control"
+                                                        <input type="text" class="form-control" name="tasker_icno"
                                                             value="{{ Auth::user()->tasker_icno }}" />
                                                     </div>
                                                 </div>
@@ -127,28 +127,28 @@
                                                     <div class="mb-3">
                                                         <label class="form-label">Date of Birth <span
                                                                 class="text-danger">*</span></label>
-                                                        <input type="date" class="form-control"
+                                                        <input type="date" class="form-control" name="tasker_dob"
                                                             value="{{ Auth::user()->tasker_icno }}" />
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <div class="mb-3">
                                                         <label class="form-label">Phone Number</label>
-                                                        <input type="text" class="form-control"
+                                                        <input type="text" class="form-control" name="tasker_phoneno"
                                                             value="(+60) {{ Auth::user()->tasker_phoneno }}" />
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <div class="mb-3">
                                                         <label class="form-label">Email</label>
-                                                        <input type="text" class="form-control"
+                                                        <input type="text" class="form-control" name="email"
                                                             value="{{ Auth::user()->email }}" />
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-12">
                                                     <div class="mb-3">
                                                         <label class="form-label">Bio</label>
-                                                        <textarea class="form-control" rows="6" cols="50"></textarea>
+                                                        <textarea class="form-control" rows="4" cols="20" name="tasker_bio">{{ Auth::user()->tasker_bio }}</textarea>
                                                     </div>
                                                 </div>
                                             </div>
