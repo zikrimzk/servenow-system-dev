@@ -122,4 +122,36 @@ class ServiceController extends Controller
             return redirect(route('tasker-service-management'))->with('error', 'Error : ' . $e->getMessage());
         }
     }
+
+    //Tasker - Service Management End
+
+
+    // Admin - Service Management Start
+
+    public function adminApproveService()
+    {
+        try
+        {
+
+        }
+        catch(Exception $e)
+        {
+            return redirect(route('admin-service-management'))->with('error', 'Error : ' . $e->getMessage());
+        }
+
+    }
+
+    public function adminRejectService()
+    {
+        try
+        {
+
+        }
+        catch(Exception $e)
+        {
+            return redirect(route('admin-service-management'))->with('error', 'Error : ' . $e->getMessage());
+        }
+
+    }
+
 }

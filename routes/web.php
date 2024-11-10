@@ -6,6 +6,7 @@ use App\Http\Controllers\TaskerController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AuthenticateController;
 use App\Http\Controllers\AdministratorController;
+use App\Models\Service;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,8 +54,11 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/create-tasker', [TaskerController::class, 'adminCreateTasker'])->name('admin-tasker-create');
     Route::post('/update-tasker-{id}', [TaskerController::class, 'adminUpdateTasker'])->name('admin-tasker-update');
 
+    // Admin - Service Management
+    Route::get('/service-management', [RouteController::class, 'adminServiceManagementNav'])->name('admin-service-management');
+    Route::get('/approve-service', [ServiceController::class, 'adminApproveService'])->name('admin-approve-service');
+    Route::get('/reject-service', [ServiceController::class, 'adminRejectService'])->name('admin-reject-service');
 
-    
 });
 /* Admin Route End */
 
