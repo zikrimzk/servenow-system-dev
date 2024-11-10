@@ -3,7 +3,6 @@
 <!-- [Head] start -->
 
 <head>
-    <title>Register | Able Pro Dashboard Template</title>
     <!-- [Meta] -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

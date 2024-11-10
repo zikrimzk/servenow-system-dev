@@ -56,8 +56,10 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     // Admin - Service Management
     Route::get('/service-management', [RouteController::class, 'adminServiceManagementNav'])->name('admin-service-management');
-    Route::get('/approve-service', [ServiceController::class, 'adminApproveService'])->name('admin-approve-service');
-    Route::get('/reject-service', [ServiceController::class, 'adminRejectService'])->name('admin-reject-service');
+    Route::get('/approve-service-{id}', [ServiceController::class, 'adminApproveService'])->name('admin-approve-service');
+    Route::get('/reject-service-{id}', [ServiceController::class, 'adminRejectService'])->name('admin-reject-service');
+    Route::get('/terminate-service-{id}', [ServiceController::class, 'adminTerminateService'])->name('admin-terminate-service');
+
 
 });
 /* Admin Route End */
@@ -85,6 +87,9 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
     // Tasker - Logout
     Route::get('/tasker-logout', [AuthenticateController::class, 'logoutTasker'])->name('tasker-logout'); 
+
+    // Tasker - Account Profile
+    Route::get('/profile', [RouteController::class, 'taskerprofileNav'])->name('tasker-profile'); 
 
     //Tasker - Service Management
     Route::get('/service-management', [RouteController::class, 'taskerServiceManagementNav'])->name('tasker-service-management'); 

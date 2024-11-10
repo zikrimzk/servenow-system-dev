@@ -228,6 +228,8 @@
                                                         @elseif($sv->service_status == 2)
                                                             <option value="1">Active</option>
                                                             <option value="2"selected>Inactive</option>
+                                                        @elseif($sv->service_status == 3)
+                                                            <option value="3"selected>Terminated</option>
                                                         @endif
                                                     </select>
                                                 </div>

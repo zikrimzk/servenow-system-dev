@@ -27,9 +27,9 @@
                     </div>
                     <div class="collapse pc-user-links" id="pc_sidebar_userlink">
                         <div class="pt-3">
-                            <a href="#!">
+                            <a href="{{ route('tasker-profile') }}">
                                 <i class="ti ti-user"></i>
-                                <span>My Account</span>
+                                <span>My Profile</span>
                             </a>
                             <a href="{{ route('tasker-logout') }}">
                                 <i class="ti ti-power"></i>
@@ -46,7 +46,7 @@
                     <label>Main</label>
                 </li>
                 <li class="pc-item">
-                    <a href="{{ route('admin-home') }}" class="pc-link">
+                    <a href="##" class="pc-link">
                         <span class="pc-micon">
                             <svg class="pc-icon">
                                 <use xlink:href="#custom-story"></use>

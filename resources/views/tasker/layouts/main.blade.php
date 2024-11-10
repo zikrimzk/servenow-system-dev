@@ -320,7 +320,7 @@
     <script src="../assets/js/plugins/responsive.bootstrap5.min.js"></script>
     <script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
 
-    {{-- <script>
+    <script>
         layout_change('light');
     </script>
 
@@ -342,7 +342,7 @@
 
     <script>
         main_layout_change('vertical');
-    </script> --}}
+    </script>
 
 </body>
 

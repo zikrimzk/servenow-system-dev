@@ -338,6 +338,8 @@ class RouteController extends Controller
                     $status = '<span class="badge text-bg-success text-white">Active</span>';
                 } else if ($row->service_status == 2) {
                     $status = '<span class="badge text-bg-danger text-white">Inactive</span>';
+                } else if ($row->service_status == 3) {
+                    $status = '<span class="badge bg-light-danger">Terminated</span>';
                 }
 
                 return $status;
@@ -381,9 +383,9 @@ class RouteController extends Controller
                         });
                         </script>
                     ';
-                }else if($row->service_status == 1 || $row->service_status == 2){
+                } else if ($row->service_status == 1 || $row->service_status == 2 || $row->service_status == 3) {
                     $button =
-                    '
+                        '
                       <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
                         data-bs-target="#updateServiceModal-' . $row->id . '">
                         <i class="ti ti-edit f-20"></i>
@@ -421,7 +423,6 @@ class RouteController extends Controller
                         });
                     </script>
                 ';
-
                 }
 
 
@@ -442,14 +443,22 @@ class RouteController extends Controller
 
     public function adminServiceManagementNav(Request $request)
     {
+
         if ($request->ajax()) {
 
             $data = DB::table('services as a')
                 ->join('service_types as b', 'a.service_type_id', 'b.id')
-                ->select('a.id', 'b.servicetype_name', 'a.service_rate', 'a.service_rate_type', 'a.service_status')
+                ->join('taskers as c', 'a.tasker_id', 'c.id')
+                ->select('a.id', 'b.servicetype_name', 'a.service_rate', 'a.service_rate_type', 'a.service_status', 'c.tasker_code', 'c.tasker_firstname')
                 ->get();
 
             $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('tasker', function ($row) {
+
+                $tasker = '<a href="" class="btn btn-link">'.$row->tasker_code.'</a>';
+                return $tasker;
+            });
 
             $table->addColumn('service_rate', function ($row) {
 
@@ -465,6 +474,8 @@ class RouteController extends Controller
                     $status = '<span class="badge text-bg-success text-white">Active</span>';
                 } else if ($row->service_status == 2) {
                     $status = '<span class="badge text-bg-danger text-white">Inactive</span>';
+                } else if ($row->service_status == 3) {
+                    $status = '<span class="badge bg-light-danger">Terminated</span>';
                 }
 
                 return $status;
@@ -494,7 +505,7 @@ class RouteController extends Controller
                             swalWithBootstrapButtons
                             .fire({
                                 title: "Are you sure?",
-                                text: "This action cannot be undone.",
+                                text: "Approve?",
                                 icon: "warning",
                                 showCancelButton: true,
                                 confirmButtonText: "Yes, delete it!",
@@ -504,8 +515,8 @@ class RouteController extends Controller
                             .then((result) => {
                                 if (result.isConfirmed) {
                                     setTimeout(function() {
-                                        location.href="' . route("tasker-service-delete", $row->id) . '";
-                                    }, 1000);
+                                        location.href="' . route("admin-approve-service", $row->id) . '";
+                                    }, 500);
                                 } 
                             });
                         });
@@ -538,12 +549,52 @@ class RouteController extends Controller
                         });
                         </script>
                     ';
+                } else if ($row->service_status == 1) {
+                    $button =
+                        '
+                    <a href="#" class="avtar avtar-xs btn-light-danger terminateService-' . $row->id . '">
+                        <i class="ti ti-x f-20"></i>
+                    </a>
+
+                    <script>
+                    document.querySelector(".terminateService-' . $row->id . '").addEventListener("click", function () {
+                        const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: "btn btn-success",
+                            cancelButton: "btn btn-danger"
+                        },
+                        buttonsStyling: false
+                        });
+                        swalWithBootstrapButtons
+                        .fire({
+                            title: "Are you sure?",
+                            text: "Terminate ' . $row->tasker_firstname . ' ' . $row->servicetype_name . ' services ?",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonText: "Terminate",
+                            cancelButtonText: "Cancel",
+                            reverseButtons: true
+                        })
+                        .then((result) => {
+                            if (result.isConfirmed) {
+                                setTimeout(function() {
+                                    location.href="' . route("admin-terminate-service", $row->id) . '";
+                                }, 500);
+                            } 
+                        });
+                    });
+                    </script>
+                ';
+                } else if ($row->service_status == 2) {
+                    $button = 'update required !';
+                } else if ($row->service_status == 3) {
+                    $button = '';
                 }
 
                 return $button;
             });
 
-            $table->rawColumns(['service_rate', 'service_status', 'action']);
+            $table->rawColumns(['tasker','service_rate', 'service_status', 'action']);
 
             return $table->make(true);
         }
@@ -552,6 +603,13 @@ class RouteController extends Controller
             'title' => 'Service Management',
             'services' => Service::get(),
             'types' => ServiceType::where('servicetype_status', 1)->get()
+        ]);
+    }
+
+    public function taskerprofileNav()
+    {
+        return view('tasker.account.profile', [
+            'title' => 'Tasker Profile'
         ]);
     }
 }

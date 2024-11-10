@@ -128,10 +128,12 @@ class ServiceController extends Controller
 
     // Admin - Service Management Start
 
-    public function adminApproveService()
+    public function adminApproveService($id)
     {
         try
         {
+            Service::where('id',$id)->update(['service_status'=> 1]);
+            return redirect(route('admin-service-management'))->with('success', 'Service has been approved !');
 
         }
         catch(Exception $e)
@@ -141,11 +143,26 @@ class ServiceController extends Controller
 
     }
 
-    public function adminRejectService()
+    public function adminRejectService($id)
     {
         try
         {
+            Service::where('id',$id)->update(['service_status'=> 2]);
+            return redirect(route('admin-service-management'))->with('success', 'Service has been terminated !');
+        }
+        catch(Exception $e)
+        {
+            return redirect(route('admin-service-management'))->with('error', 'Error : ' . $e->getMessage());
+        }
 
+    }
+
+    public function adminTerminateService($id)
+    {
+        try
+        {
+            Service::where('id',$id)->update(['service_status'=> 3]);
+            return redirect(route('admin-service-management'))->with('success', 'Service has been terminated !');
         }
         catch(Exception $e)
         {

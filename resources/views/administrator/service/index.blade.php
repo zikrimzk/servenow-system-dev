@@ -64,20 +64,14 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card table-card">
-                        <div class="card-header">
-                            <div class="d-sm-flex align-items-center justify-content-between">
-                                <div>
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#addServiceModal">Add Service</button>
-                                </div>
-                            </div>
-                        </div>
+                       
                         <div class="card-body pt-3">
                             <div class="dt-responsive table-responsive m-3">
                                 <table class="table data-table table-hover nowrap">
                                     <thead>
                                         <tr>
                                             <th scope="col">No</th>
+                                            <th scope="col">Tasker</th>
                                             <th scope="col">Service Name</th>
                                             <th scope="col">Rate (RM)</th>
                                             <th scope="col">Status</th>
@@ -276,6 +270,10 @@
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
                             searchable: false
+                        },
+                        {
+                            data: 'tasker',
+                            name: 'tasker'
                         },
                         {
                             data: 'servicetype_name',
