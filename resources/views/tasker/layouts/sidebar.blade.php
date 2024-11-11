@@ -11,8 +11,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="flex-shrink-0">
-                            <img src="../assets/images/user/avatar-1.jpg" alt="user-image"
-                                class="user-avtar wid-45 rounded-circle" />
+                                <img src="{{ asset('storage/' . auth()->user()->tasker_photo) }}" alt="Profile Photo" width="45" height="45" class="user-avtar wid-45 rounded-circle">
                         </div>
                         <div class="flex-grow-1 ms-3 me-2">
                             <h6 class="mb-0">{{ explode(' ', Auth::user()->tasker_firstname)[0];}}.</h6>

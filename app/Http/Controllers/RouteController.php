@@ -257,8 +257,7 @@ class RouteController extends Controller
 
                 $button =
                     '
-                          <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#updateTaskerModal-' . $row->id . '">
+                          <a href="'.route('admin-tasker-update-form', $row->id).'" class="avtar avtar-xs btn-light-primary"">
                             <i class="ti ti-edit f-20"></i>
                           </a>
                           <a href="#" class="avtar avtar-xs  btn-light-danger deleteAdmin-' . $row->id . '" data-bs-toggle="modal"
@@ -303,14 +302,28 @@ class RouteController extends Controller
 
             return $table->make(true);
         }
-        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
 
         return view('administrator.tasker.index', [
             'title' => 'Tasker Management',
             'taskers' => Tasker::get(),
-            'taskerCount' => Tasker::count(),
-            'states' => $states
         ]);
+    }
+
+    public function taskerUpdateNav($id)
+    {
+        $data = Tasker::whereId($id)->first();
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+
+
+        return view ('administrator.tasker.update-tasker',[
+            'title'=>$data->tasker_firstname .' profile',
+            'tasker'=>$data,
+            'states' => $states,
+            'taskerCount' => Tasker::count(),
+
+
+        ]);
+
     }
 
     public function taskerServiceManagementNav(Request $request)

@@ -52,6 +52,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     // Admin - Tasker Management
     Route::get('/tasker-management', [RouteController::class, 'taskerManagementNav'])->name('admin-tasker-management');
     Route::post('/create-tasker', [TaskerController::class, 'adminCreateTasker'])->name('admin-tasker-create');
+    Route::get('/update-tasker-detaiils-{id}', [RouteController::class, 'taskerUpdateNav'])->name('admin-tasker-update-form');
     Route::post('/update-tasker-{id}', [TaskerController::class, 'adminUpdateTasker'])->name('admin-tasker-update');
 
     // Admin - Service Management
@@ -89,7 +90,9 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::get('/tasker-logout', [AuthenticateController::class, 'logoutTasker'])->name('tasker-logout'); 
 
     // Tasker - Account Profile
-    Route::get('/profile', [RouteController::class, 'taskerprofileNav'])->name('tasker-profile'); 
+    Route::get('/profile', [RouteController::class, 'taskerprofileNav'])->name('tasker-profile');
+    Route::post('/update-profile-{id}', [TaskerController::class, 'taskerUpdateProfile'])->name('tasker-update-profile'); 
+
 
     //Tasker - Service Management
     Route::get('/service-management', [RouteController::class, 'taskerServiceManagementNav'])->name('tasker-service-management'); 

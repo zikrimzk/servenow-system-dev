@@ -183,7 +183,7 @@
             <!-- Modal Tasker Create End  Here -->
 
             <!-- Modal Tasker Edit Start Here -->
-            @foreach ($taskers as $tasker)
+            {{-- @foreach ($taskers as $tasker)
                 <form action="{{ route('admin-tasker-update',$tasker->id) }}" method="POST">
                     @csrf
                     <div class="modal fade" id="updateTaskerModal-{{ $tasker->id }}" data-bs-keyboard="false"
@@ -367,7 +367,7 @@
                         </div>
                     </div>
                 </form>
-            @endforeach
+            @endforeach --}}
             <!-- Modal Tasker Edit End  Here -->
 
         </div>
