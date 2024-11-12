@@ -260,11 +260,11 @@
                                                             <label class="form-label">Address Line 1 <span
                                                                     class="text-danger">*</span></label>
                                                             <input type="text"
-                                                                class="form-control @error('tasker_address_no') is-invalid @enderror"
-                                                                name="tasker_address_no"
-                                                                value="{{ Auth::user()->tasker_address_no }}"
+                                                                class="form-control @error('tasker_address_one') is-invalid @enderror"
+                                                                name="tasker_address_one"
+                                                                value="{{ Auth::user()->tasker_address_one }}"
                                                                 placeholder="Building number and street name" />
-                                                            @error('tasker_address_no')
+                                                            @error('tasker_address_one')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
                                                         </div>
@@ -276,11 +276,11 @@
                                                             <label class="form-label">Address Line 2 <span
                                                                     class="text-danger">*</span></label>
                                                             <input type="text"
-                                                                class="form-control @error('tasker_address_road') is-invalid @enderror"
-                                                                name="tasker_address_road"
-                                                                value="{{ Auth::user()->tasker_address_road }}"
+                                                                class="form-control @error('tasker_address_two') is-invalid @enderror"
+                                                                name="tasker_address_two"
+                                                                value="{{ Auth::user()->tasker_address_two }}"
                                                                 placeholder="Building name" />
-                                                            @error('tasker_address_road')
+                                                            @error('tasker_address_two')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
                                                         </div>
@@ -338,21 +338,21 @@
                                                         </div>
                                                     </div>
 
-                                                    <!-- City Field -->
+                                                    <!-- Area Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Area <span
                                                                     class="text-danger">*</span></label>
-                                                            <select name="tasker_address_city"
-                                                                class="form-control @error('tasker_address_city') is-invalid @enderror"
+                                                            <select name="tasker_address_area"
+                                                                class="form-control @error('tasker_address_area') is-invalid @enderror"
                                                                 id="addCity">
-                                                                @if(Auth::user()->tasker_address_city == '')
+                                                                @if(Auth::user()->tasker_address_area == '')
                                                                     <option value="" selected>Select Area</option>
                                                                 @else
-                                                                    <option value="{{ Auth::user()->tasker_address_city }}" selected>{{ Auth::user()->tasker_address_city }}</option>
+                                                                    <option value="{{ Auth::user()->tasker_address_area }}" selected>{{ Auth::user()->tasker_address_area }}</option>
                                                                 @endif
                                                             </select>
-                                                            @error('tasker_address_city')
+                                                            @error('tasker_address_area')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
                                                         </div>

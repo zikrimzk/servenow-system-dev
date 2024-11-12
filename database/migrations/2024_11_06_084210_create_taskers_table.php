@@ -24,11 +24,11 @@ return new class extends Migration
             $table->date('tasker_dob')->nullable();
             $table->string('tasker_photo')->nullable();
             $table->string('tasker_bio')->nullable();
-            $table->string('tasker_address_no')->nullable();
-            $table->string('tasker_address_road')->nullable();
-            $table->string('tasker_address_city')->nullable();
+            $table->string('tasker_address_one')->nullable();
+            $table->string('tasker_address_two')->nullable();
             $table->string('tasker_address_poscode')->nullable();
             $table->string('tasker_address_state')->nullable();
+            $table->string('tasker_address_area')->nullable();
             $table->string('tasker_workingloc_state')->nullable();
             $table->string('tasker_workingloc_area')->nullable();
             $table->integer('tasker_rating')->nullable();

@@ -15,6 +15,7 @@ class Administrator extends Authenticatable
         'admin_firstname',
         'admin_lastname',
         'admin_phoneno',
+        'admin_photo',
         'email',
         'admin_status',
         'password',

@@ -92,11 +92,11 @@ class TaskerController extends Controller
                     'tasker_bio' => '',
                     'tasker_icno' => 'required',
                     'tasker_dob' => 'required',
-                    'tasker_address_no' => 'required',
-                    'tasker_address_road' => 'required',
+                    'tasker_address_one' => 'required',
+                    'tasker_address_two' => 'required',
                     'tasker_address_poscode' => 'required',
                     'tasker_address_state' => 'required',
-                    'tasker_address_city' => 'required',
+                    'tasker_address_area' => 'required',
                     'tasker_workingloc_state' => 'required',
                     'tasker_workingloc_area' => 'required',
                     'tasker_status' => '',
@@ -111,14 +111,15 @@ class TaskerController extends Controller
                     'tasker_bio' => 'Tasker Bio',
                     'tasker_icno' => 'IC number',
                     'tasker_dob' => 'Date of Birth',
-                    'tasker_address_no' => 'Building Number',
-                    'tasker_address_road' => 'Road Name',
+                    'tasker_address_one' => 'Address Line 1',
+                    'tasker_address_two' => 'Address Line 2',
                     'tasker_address_poscode' => 'Postal Code',
                     'tasker_address_state' => 'State',
-                    'tasker_address_city' => 'City',
+                    'tasker_address_area' => 'Area',
                     'tasker_workingloc_state' => 'Working State',
                     'tasker_workingloc_area' => 'Working Area',
                     'tasker_status' => 'Status',
+
                 ]);
 
             Tasker::whereId($id)->update($taskers);
@@ -138,11 +139,11 @@ class TaskerController extends Controller
                     'tasker_bio' => '',
                     'tasker_icno' => 'required',
                     'tasker_dob' => 'required',
-                    'tasker_address_no' => 'required',
-                    'tasker_address_road' => 'required',
+                    'tasker_address_one' => 'required',
+                    'tasker_address_two' => 'required',
                     'tasker_address_poscode' => 'required',
                     'tasker_address_state' => 'required',
-                    'tasker_address_city' => 'required',
+                    'tasker_address_area' => 'required',
                     'tasker_workingloc_state' => 'required',
                     'tasker_workingloc_area' => 'required',
                     'tasker_status' => '',
@@ -159,11 +160,11 @@ class TaskerController extends Controller
                     'tasker_bio' => 'Tasker Bio',
                     'tasker_icno' => 'IC number',
                     'tasker_dob' => 'Date of Birth',
-                    'tasker_address_no' => 'Building Number',
-                    'tasker_address_road' => 'Road Name',
+                    'tasker_address_one' => 'Address Line 1',
+                    'tasker_address_two' => 'Address Line 2',
                     'tasker_address_poscode' => 'Postal Code',
                     'tasker_address_state' => 'State',
-                    'tasker_address_city' => 'City',
+                    'tasker_address_area' => 'Area',
                     'tasker_workingloc_state' => 'Working State',
                     'tasker_workingloc_area' => 'Working Area',
                     'tasker_status' => 'Status',
@@ -193,18 +194,18 @@ class TaskerController extends Controller
                     'tasker_bio' => '',
                     'tasker_icno' => 'required',
                     'tasker_dob' => 'required',
-                    'tasker_address_no' => 'required',
-                    'tasker_address_road' => 'required',
+                    'tasker_address_one' => 'required',
+                    'tasker_address_two' => 'required',
                     'tasker_address_poscode' => 'required',
                     'tasker_address_state' => 'required',
-                    'tasker_address_city' => 'required',
+                    'tasker_address_area' => 'required',
                     'tasker_workingloc_state' => 'required',
                     'tasker_workingloc_area' => 'required',
                     'tasker_status' => '',
                 ],
                 [],
                 [
-                    'tasker_code' => 'Tasker Code',
+                   'tasker_code' => 'Tasker Code',
                     'tasker_firstname' => 'First Name',
                     'tasker_lastname' => 'Last Name',
                     'tasker_phoneno' => 'Phone Number',
@@ -212,14 +213,16 @@ class TaskerController extends Controller
                     'tasker_bio' => 'Tasker Bio',
                     'tasker_icno' => 'IC number',
                     'tasker_dob' => 'Date of Birth',
-                    'tasker_address_no' => 'Building Number',
-                    'tasker_address_road' => 'Road Name',
+                    'tasker_address_one' => 'Address Line 1',
+                    'tasker_address_two' => 'Address Line 2',
                     'tasker_address_poscode' => 'Postal Code',
                     'tasker_address_state' => 'State',
-                    'tasker_address_city' => 'City',
+                    'tasker_address_area' => 'Area',
                     'tasker_workingloc_state' => 'Working State',
                     'tasker_workingloc_area' => 'Working Area',
                     'tasker_status' => 'Status',
+                    'tasker_photo' => 'Profile Photo',
+
                 ]
             );
         }
@@ -230,6 +233,8 @@ class TaskerController extends Controller
             $message = 'Tasker profile has been successfully updated. Please proceed to account verification to start earning.';
         } elseif ($ori->tasker_status == 2) {
             $taskers['tasker_status'] = 2;
+            $message = 'Tasker profile has been successfully updated !';
+        }else{
             $message = 'Tasker profile has been successfully updated !';
         }
 

@@ -147,7 +147,7 @@ class ServiceController extends Controller
     {
         try
         {
-            Service::where('id',$id)->update(['service_status'=> 2]);
+            Service::where('id',$id)->update(['service_status'=> 3]);
             return redirect(route('admin-service-management'))->with('success', 'Service has been terminated !');
         }
         catch(Exception $e)
@@ -161,7 +161,7 @@ class ServiceController extends Controller
     {
         try
         {
-            Service::where('id',$id)->update(['service_status'=> 3]);
+            Service::where('id',$id)->update(['service_status'=> 4]);
             return redirect(route('admin-service-management'))->with('success', 'Service has been terminated !');
         }
         catch(Exception $e)

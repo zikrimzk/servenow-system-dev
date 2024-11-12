@@ -34,6 +34,10 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     // Admin - Dashboard
     Route::get('/home', [RouteController::class, 'adminHomeNav'])->name('admin-home');
 
+    // Admin - Account Profile
+    Route::get('/profile', [RouteController::class, 'adminprofileNav'])->name('admin-profile');
+
+
     // Admin - Logout
     Route::get('/admin-logout', [AuthenticateController::class, 'logoutAdmin'])->name('admin-logout');
 

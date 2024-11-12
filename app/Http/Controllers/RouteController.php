@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Administrator;
+use App\Models\Tasker;
 use App\Models\Service;
 use App\Models\ServiceType;
-use App\Models\Tasker;
+use Illuminate\Http\Request;
+use App\Models\Administrator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
 use Yajra\DataTables\Facades\DataTables;
 
 class RouteController extends Controller
@@ -257,42 +258,9 @@ class RouteController extends Controller
 
                 $button =
                     '
-                          <a href="'.route('admin-tasker-update-form', $row->id).'" class="avtar avtar-xs btn-light-primary"">
+                          <a href="'.route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)).'" class="avtar avtar-xs btn-light-primary"">
                             <i class="ti ti-edit f-20"></i>
                           </a>
-                          <a href="#" class="avtar avtar-xs  btn-light-danger deleteAdmin-' . $row->id . '" data-bs-toggle="modal"
-                            data-bs-target="#deleteAdmin">
-                            <i class="ti ti-trash f-20"></i>
-                          </a>
-
-                            <script>
-                                document.querySelector(".deleteAdmin-' . $row->id . '").addEventListener("click", function () {
-                                const swalWithBootstrapButtons = Swal.mixin({
-                                customClass: {
-                                    confirmButton: "btn btn-success",
-                                    cancelButton: "btn btn-danger"
-                                },
-                                buttonsStyling: false
-                                });
-                                swalWithBootstrapButtons
-                                .fire({
-                                    title: "Are you sure?",
-                                    text: "Once deleted, the admin will permanently lose access to the system, and all related data will be removed. This action cannot be undone.",
-                                    icon: "warning",
-                                    showCancelButton: true,
-                                    confirmButtonText: "Yes, delete it!",
-                                    cancelButtonText: "No, cancel!",
-                                    reverseButtons: true
-                                })
-                                .then((result) => {
-                                    if (result.isConfirmed) {
-                                        setTimeout(function() {
-                                            location.href="' . route("admin-delete", $row->id) . '";
-                                        }, 1000);
-                                    } 
-                                });
-                            });
-                        </script>
                     ';
 
                 return $button;
@@ -311,7 +279,7 @@ class RouteController extends Controller
 
     public function taskerUpdateNav($id)
     {
-        $data = Tasker::whereId($id)->first();
+        $data = Tasker::where('tasker_code', Crypt::decrypt($id))->first();
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
 
 
@@ -352,6 +320,8 @@ class RouteController extends Controller
                 } else if ($row->service_status == 2) {
                     $status = '<span class="badge text-bg-danger text-white">Inactive</span>';
                 } else if ($row->service_status == 3) {
+                    $status = '<span class="badge bg-danger">Rejected</span>';
+                }else if ($row->service_status == 4) {
                     $status = '<span class="badge bg-light-danger">Terminated</span>';
                 }
 
@@ -469,7 +439,7 @@ class RouteController extends Controller
 
             $table->addColumn('tasker', function ($row) {
 
-                $tasker = '<a href="" class="btn btn-link">'.$row->tasker_code.'</a>';
+                $tasker = '<a href="'.route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)).'" class="btn btn-link">'.$row->tasker_code.'</a>';
                 return $tasker;
             });
 
@@ -488,6 +458,8 @@ class RouteController extends Controller
                 } else if ($row->service_status == 2) {
                     $status = '<span class="badge text-bg-danger text-white">Inactive</span>';
                 } else if ($row->service_status == 3) {
+                    $status = '<span class="badge bg-danger">Rejected</span>';
+                }else if ($row->service_status == 4) {
                     $status = '<span class="badge bg-light-danger">Terminated</span>';
                 }
 
@@ -521,8 +493,8 @@ class RouteController extends Controller
                                 text: "Approve?",
                                 icon: "warning",
                                 showCancelButton: true,
-                                confirmButtonText: "Yes, delete it!",
-                                cancelButtonText: "No, cancel!",
+                                confirmButtonText: "Approve",
+                                cancelButtonText: "Cancel",
                                 reverseButtons: true
                             })
                             .then((result) => {
@@ -548,14 +520,14 @@ class RouteController extends Controller
                                 text: "This action cannot be undone.",
                                 icon: "warning",
                                 showCancelButton: true,
-                                confirmButtonText: "Yes, delete it!",
-                                cancelButtonText: "No, cancel!",
+                                confirmButtonText: "Reject",
+                                cancelButtonText: "Cancel!",
                                 reverseButtons: true
                             })
                             .then((result) => {
                                 if (result.isConfirmed) {
                                     setTimeout(function() {
-                                        location.href="' . route("tasker-service-delete", $row->id) . '";
+                                        location.href="' . route("admin-reject-service", $row->id) . '";
                                     }, 1000);
                                 } 
                             });
@@ -599,8 +571,10 @@ class RouteController extends Controller
                     </script>
                 ';
                 } else if ($row->service_status == 2) {
-                    $button = 'update required !';
+                    $button = '';
                 } else if ($row->service_status == 3) {
+                    $button = 'Remarks : Update Required !';
+                }else if ($row->service_status == 4) {
                     $button = '';
                 }
 
@@ -625,6 +599,13 @@ class RouteController extends Controller
         return view('tasker.account.profile', [
             'title' => 'Tasker Profile',
             'states' => $states
+        ]);
+    }
+
+    public function adminprofileNav()
+    {
+        return view('administrator.admin.profile', [
+            'title' => 'Administrator Profile',
         ]);
     }
 }

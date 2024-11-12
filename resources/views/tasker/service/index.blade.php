@@ -63,6 +63,17 @@
 
             <div class="row">
                 <div class="col-sm-12">
+                    <div class="alert alert-primary">
+                        <div class="d-flex align-items-center">
+                            <i class="ti ti-info-circle h2 f-w-400 mb-0"></i>
+                            <div class="flex-grow-1 ms-3">
+                                <strong>Note:</strong>
+                                The administrator will review the services within 3 business days to approve your request.
+                                Please ensure that the service amount reflects the actual workload. Overpricing may result
+                                in your request being rejected.
+                            </div>
+                        </div>
+                    </div>
                     <div class="card table-card">
                         <div class="card-header">
                             <div class="d-sm-flex align-items-center justify-content-between">
@@ -158,8 +169,8 @@
             @foreach ($services as $sv)
                 <form action="{{ route('tasker-service-update', $sv->id) }}" method="POST">
                     @csrf
-                    <div class="modal fade" id="updateServiceModal-{{ $sv->id }}" data-bs-keyboard="false" tabindex="-1"
-                        aria-hidden="true">
+                    <div class="modal fade" id="updateServiceModal-{{ $sv->id }}" data-bs-keyboard="false"
+                        tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                             <form action="{{ route('tasker-service-create') }}" method="POST">
                                 @csrf
@@ -229,6 +240,8 @@
                                                             <option value="1">Active</option>
                                                             <option value="2"selected>Inactive</option>
                                                         @elseif($sv->service_status == 3)
+                                                            <option value="3"selected>Rejected</option>
+                                                        @elseif($sv->service_status == 4)
                                                             <option value="3"selected>Terminated</option>
                                                         @endif
                                                     </select>

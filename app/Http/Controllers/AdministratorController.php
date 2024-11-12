@@ -31,8 +31,9 @@ class AdministratorController extends Controller
                 'password' => 'Password'
             ]);
             
-            $data['admin_firstname'] = Str::upper($data['admin_firstname']);
-            $data['admin_lastname'] = Str::upper($data['admin_lastname']);
+            $path = 'profile_photos/default-profile-admin.png';
+            $data ['tasker_photo'] = $path;
+
             $data['password'] = bcrypt($data['password']);
             Administrator::create($data);
 
@@ -62,8 +63,6 @@ class AdministratorController extends Controller
                 'admin_status' => 'Account Status',
             ]);
 
-            $data['admin_firstname'] = Str::upper($data['admin_firstname']);
-            $data['admin_lastname'] = Str::upper($data['admin_lastname']);
             Administrator::where('id', $adminId)->update($data);
 
             return redirect(route('admin-management'))->with('success', 'Administrator details has been updated successfully !');

@@ -12,13 +12,14 @@
                         <div class="col-md-12">
                             <ul class="breadcrumb">
                                 <li class="breadcrumb-item">Users</li>
-                                <li class="breadcrumb-item" aria-current="page">Update Tasker Details</li>
+                                <li class="breadcrumb-item">Tasker Management</li>
+                                <li class="breadcrumb-item" aria-current="page">Tasker Details</li>
 
                             </ul>
                         </div>
                         <div class="col-md-12">
                             <div class="page-header-title">
-                                <h2 class="mb-0">Update Tasker Details</h2>
+                                <h2 class="mb-0">Tasker Details</h2>
                             </div>
                         </div>
                     </div>
@@ -59,6 +60,17 @@
                 </div>
             @endif
             <!-- End Alert -->
+
+            <div class="row">
+                <div class="d-flex flex-wrap justify-content-start align-items-center">
+                    <a href="{{ url()->previous() }}" class="btn btn-light-primary d-inline-flex">
+                        <i class="ti ti-arrow-back-up me-1"></i>
+                        Back
+
+                    </a>
+
+                </div>
+            </div>
 
 
             <div class="row mt-2">
@@ -188,16 +200,17 @@
                             <!-- Tasker Address Section -->
                             <h5 class="mb-2">B. Tasker Address:</h5>
                             <div class="row">
+
                                 <!-- Address Line 1 Field -->
                                 <div class="col-sm-6">
                                     <div class="mb-3">
                                         <label class="form-label">Address Line 1 <span
                                                 class="text-danger">*</span></label>
                                         <input type="text"
-                                            class="form-control @error('tasker_address_no') is-invalid @enderror"
-                                            name="tasker_address_no" placeholder="Building number and street name"
-                                            value="{{ $tasker->tasker_address_no }}" />
-                                        @error('tasker_address_no')
+                                            class="form-control @error('tasker_address_one') is-invalid @enderror"
+                                            name="tasker_address_one" value="{{ $tasker->tasker_address_one }}"
+                                            placeholder="Building number and street name" />
+                                        @error('tasker_address_one')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -209,10 +222,10 @@
                                         <label class="form-label">Address Line 2 <span
                                                 class="text-danger">*</span></label>
                                         <input type="text"
-                                            class="form-control @error('tasker_address_road') is-invalid @enderror"
-                                            name="tasker_address_road" placeholder="Building name"
-                                            value="{{ $tasker->tasker_address_road }}" />
-                                        @error('tasker_address_road')
+                                            class="form-control @error('tasker_address_two') is-invalid @enderror"
+                                            name="tasker_address_two" value="{{ $tasker->tasker_address_two }}"
+                                            placeholder="Building name" />
+                                        @error('tasker_address_two')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -254,22 +267,23 @@
 
                                 <!-- Area Field -->
                                 <div class="col-sm-6">
-                                    <div class="mb-5">
+                                    <div class="mb-3">
                                         <label class="form-label">Area <span class="text-danger">*</span></label>
-                                        <select name="tasker_address_city"
-                                            class="form-control @error('tasker_address_city') is-invalid @enderror"
+                                        <select name="tasker_address_area"
+                                            class="form-control @error('tasker_address_area') is-invalid @enderror"
                                             id="addCity">
-                                            <option value="" selected>Select Area</option>
-                                            <option value="{{ $tasker->tasker_address_city }}" selected>
-                                                {{ $tasker->tasker_address_city }}</option>
+                                            @if ($tasker->tasker_address_area == '')
+                                                <option value="" selected>Select Area</option>
+                                            @else
+                                                <option value="{{ $tasker->tasker_address_area }}" selected>
+                                                    {{ $tasker->tasker_address_area }}</option>
+                                            @endif
                                         </select>
-                                        @error('tasker_address_city')
+                                        @error('tasker_address_area')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
-
-
                             </div>
 
                             <!-- Working Area Section -->
@@ -376,9 +390,9 @@
                     </div>
 
                     <div class="flex-grow-1 text-end">
-                        <button type="reset" class="btn btn-link-danger btn-pc-default"
-                            data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit"
+                            class="btn btn-primary @if ($tasker->tasker_status == 0 || $tasker->tasker_status == 4) disabled @endif">Save
+                            Changes</button>
                     </div>
                 </form>
 
