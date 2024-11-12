@@ -621,8 +621,10 @@ class RouteController extends Controller
 
     public function taskerprofileNav()
     {
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
         return view('tasker.account.profile', [
-            'title' => 'Tasker Profile'
+            'title' => 'Tasker Profile',
+            'states' => $states
         ]);
     }
 }

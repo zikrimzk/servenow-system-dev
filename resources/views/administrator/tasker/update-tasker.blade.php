@@ -68,56 +68,14 @@
                     <div class="row mt-3">
                         <div class="col-sm-3 text-center">
                             <div class="mb-3">
-                                    <img src="{{ asset('storage/' . $tasker->tasker_photo) }}" alt="Profile Photo" width="150" height="150" class="user-avtar rounded-circle">
+                                <img src="{{ asset('storage/' . $tasker->tasker_photo) }}" alt="Profile Photo"
+                                    width="150" height="150" class="user-avtar rounded-circle">
+                                    
                             </div>
                         </div>
                         <div class="col-sm-9">
                             <h5 class="mb-2">A. Personal Details:</h5>
 
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">First Name</label>
-                                        <input type="text" class="form-control" placeholder="First Name"
-                                            name="tasker_firstname"
-                                            value="{{ $tasker->tasker_firstname }}" />
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Last Name</label>
-                                        <input type="text" class="form-control" placeholder="Last Name"
-                                            name="tasker_lastname" value="{{ $tasker->tasker_lastname }}" />
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">IC Number</label>
-                                        <input type="text" class="form-control" placeholder="IC No."
-                                            name="tasker_icno" value="{{ $tasker->tasker_icno }}" />
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Date of Birth</label>
-                                        <input type="date" class="form-control" placeholder="IC No."
-                                            name="tasker_dob" value="{{ $tasker->tasker_dob }}" />
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="mb-5">
-                                        <label class="form-label">Phone Number</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">+60</span>
-                                            <input type="text" class="form-control"
-                                                placeholder="Phone No." name="tasker_phoneno"
-                                                value="{{ $tasker->tasker_phoneno }}" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <h5 class="mb-2">B. Account Details:</h5>
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="mb-3">
@@ -126,13 +84,82 @@
                                             value="{{ $tasker->tasker_code }}" readonly />
                                     </div>
                                 </div>
-                                <div class="col-sm-12">
+
+                                <div class="col-sm-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Email</label>
-                                        <input type="email" class="form-control" placeholder="Email"
-                                            name="email" value="{{ $tasker->email }}" />
+                                        <label class="form-label">First Name</label>
+                                        <input type="text" class="form-control" placeholder="First Name"
+                                            name="tasker_firstname" value="{{ $tasker->tasker_firstname }}" />
                                     </div>
                                 </div>
+
+                                <div class="col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" placeholder="Last Name"
+                                            name="tasker_lastname" value="{{ $tasker->tasker_lastname }}" />
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">IC Number</label>
+                                        <input type="text" class="form-control" placeholder="IC No." name="tasker_icno"
+                                            value="{{ $tasker->tasker_icno }}" />
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input type="date" class="form-control" placeholder="IC No." name="tasker_dob"
+                                            value="{{ $tasker->tasker_dob }}" />
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Phone Number</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">+60</span>
+                                            <input type="text" class="form-control" placeholder="Phone No."
+                                                name="tasker_phoneno" value="{{ $tasker->tasker_phoneno }}" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" placeholder="Email" name="email"
+                                            value="{{ $tasker->email }}" />
+                                    </div>
+                                </div>
+
+                                 <!-- Bio Field -->
+                                 <div class="col-sm-12">
+                                    <div class="mb-5">
+                                        <label class="form-label">Bio</label>
+                                        <textarea class="form-control @error('tasker_bio') is-invalid @enderror" rows="4" cols="20"
+                                            name="tasker_bio" placeholder="Enter your bio here ...">{{ $tasker->tasker_bio }}</textarea>
+                                        @error('tasker_bio')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <h5 class="mb-2">B. Tasker Address:</h5>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Tasker Code</label>
+                                        <input type="text" class="form-control" name="tasker_code"
+                                            value="{{ $tasker->tasker_code }}" readonly />
+                                    </div>
+                                </div>
+                               
                                 <div class="col-sm-12">
                                     <div class="mb-3">
                                         <label class="form-label">Account Status</label>
@@ -165,8 +192,7 @@
                                 <div class="col-sm-6">
                                     <div class="mb-3">
                                         <label class="form-label">Working State</label>
-                                        <select class="form-select" name="tasker_workingloc_state"
-                                            id="state">
+                                        <select class="form-select" name="tasker_workingloc_state" id="state">
                                             @if ($tasker->tasker_workingloc_state == '')
                                                 <option value="-" selected>Select State</option>
                                                 @foreach ($states['states'] as $state)
@@ -176,8 +202,7 @@
                                             @else
                                                 @foreach ($states['states'] as $state)
                                                     @if ($tasker->tasker_workingloc_state == strtolower($state['name']))
-                                                        <option value="{{ strtolower($state['name']) }}"
-                                                            selected>
+                                                        <option value="{{ strtolower($state['name']) }}" selected>
                                                             {{ $state['name'] }}</option>
                                                     @else
                                                         <option value="{{ strtolower($state['name']) }}">
@@ -291,41 +316,36 @@
             });
 
             //SELECT STATE AND AREA FUNCTION
-            // $('#state').on('change', function() {
-            //     var state = $(this).val();
-            //     var areas = $('#area').val();
-            //     var number = $('#totalcount').val();
-            //     alert(number);
-            //     var i;
-            //     for (i = 1; i <= number; ++i) {
-            //         console.log('area'+i);
-            //         if (state) {
-            //             $.ajax({
-            //                 url: '/get-areas/' + state,
-            //                 type: 'GET',
-            //                 success: function(data) {
-            //                     $('#area' + i).empty();
-            //                     $('#area' + i).append('<option value="">Select Area</option>');
-            //                     $.each(data, function(index, area) {
-            //                         if (areas == area) {
-            //                             $('#area' + i).append('<option value="' + area +
-            //                                 '" selected>' +
-            //                                 area + '</option>');
-            //                         } else {
-            //                             $('#area' + i).append('<option value="' + area +
-            //                                 '">' +
-            //                                 area + '</option>');
-            //                         }
+            $('#state').on('change', function() {
+                    var state = $(this).val();
+                    alert(number);
+                    if (state) {
+                        $.ajax({
+                            url: '/get-areas/' + state,
+                            type: 'GET',
+                            success: function(data) {
+                                $('#area').empty();
+                                $('#area').append('<option value="">Select Area</option>');
+                                $.each(data, function(index, area) {
+                                    if (areas == area) {
+                                        $('#area').append('<option value="' + area +
+                                            '" selected>' +
+                                            area + '</option>');
+                                    } else {
+                                        $('#area').append('<option value="' + area +
+                                            '">' +
+                                            area + '</option>');
+                                    }
 
-            //                     });
-            //                 }
-            //             });
-            //         } else {
-            //             $('#area'+i).empty();
-            //             $('#area'+i).append('<option value="">Select Area</option>');
-            //         }
-            //     }
-            // });
+                                });
+                            }
+                        });
+                    } else {
+                        $('#area').empty();
+                        $('#area').append('<option value="">Select Area</option>');
+                    }
+                }
+            });
 
         });
     </script>

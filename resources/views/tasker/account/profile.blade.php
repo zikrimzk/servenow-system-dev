@@ -47,7 +47,8 @@
                     </div>
                     <div class="tab-content">
                         <div class="tab-pane show active" id="profile-2" role="tabpanel" aria-labelledby="profile-tab-2">
-                            <form action="{{ route('tasker-update-profile', Auth::user()->id) }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('tasker-update-profile', Auth::user()->id) }}" method="POST"
+                                enctype="multipart/form-data">
                                 @csrf
 
                                 <div class="row">
@@ -131,165 +132,293 @@
                                                     <h5 class="mb-2 mt-2">A. Personal Information</h5>
                                                     <div class="col-sm-12 text-center mb-3">
                                                         <div class="user-upload">
-                                                                <img src="{{ asset('storage/' . auth()->user()->tasker_photo) }}" alt="Profile Photo" width="150" height="150">
+                                                            <img src="{{ asset('storage/' . auth()->user()->tasker_photo) }}"
+                                                                alt="Profile Photo" width="150" height="150"
+                                                                id="previewImage">
                                                             <label for="profilephoto" class="img-avtar-upload">
                                                                 <i class="ti ti-camera f-24 mb-1"></i>
                                                                 <span>Upload</span>
                                                             </label>
                                                             <input type="file" id="profilephoto" name="tasker_photo"
-                                                                class="d-none" accept="image/*" required />
+                                                                class="d-none" accept="image/*"
+                                                                @if (auth()->user()->tasker_photo == '') required @endif />
+                                                            @error('tasker_photo')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
+                                                        <input type="hidden" name="isUploadPhoto" id="isUploadPhoto"
+                                                            value="false">
                                                     </div>
+
+                                                    <!-- First Name Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">First Name</label>
-                                                            <input type="text" class="form-control"
+                                                            <input type="text"
+                                                                class="form-control @error('tasker_firstname') is-invalid @enderror"
                                                                 name="tasker_firstname"
-                                                                value="{{ Auth::user()->tasker_firstname }}" />
+                                                                value="{{ Auth::user()->tasker_firstname }}"
+                                                                id="tasker_firstname" />
+                                                            @error('tasker_firstname')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
+
+                                                    <!-- Last Name Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Last Name</label>
-                                                            <input type="text" class="form-control"
+                                                            <input type="text"
+                                                                class="form-control @error('tasker_lastname') is-invalid @enderror"
                                                                 name="tasker_lastname"
                                                                 value="{{ Auth::user()->tasker_lastname }}" />
+                                                            @error('tasker_lastname')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
+
+                                                    <!-- IC Number Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">IC Number <span
                                                                     class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control" name="tasker_icno"
+                                                            <input type="text"
+                                                                class="form-control @error('tasker_icno') is-invalid @enderror"
+                                                                name="tasker_icno" placeholder="IC Number"
                                                                 value="{{ Auth::user()->tasker_icno }}" />
+                                                            @error('tasker_icno')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
+
+                                                    <!-- Date of Birth Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Date of Birth <span
                                                                     class="text-danger">*</span></label>
-                                                            <input type="date" class="form-control" name="tasker_dob"
+                                                            <input type="date"
+                                                                class="form-control @error('tasker_dob') is-invalid @enderror"
+                                                                name="tasker_dob"
                                                                 value="{{ Auth::user()->tasker_dob }}" />
+                                                            @error('tasker_dob')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
+
+                                                    <!-- Phone Number Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Phone Number</label>
                                                             <div class="input-group">
                                                                 <span class="input-group-text">+60</span>
-                                                                <input type="text" class="form-control"
+                                                                <input type="text"
+                                                                    class="form-control @error('tasker_phoneno') is-invalid @enderror"
                                                                     placeholder="Phone No." name="tasker_phoneno"
                                                                     value="{{ Auth::user()->tasker_phoneno }}" />
+                                                                @error('tasker_phoneno')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                @enderror
                                                             </div>
                                                         </div>
                                                     </div>
+
+                                                    <!-- Email Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Email</label>
-                                                            <input type="text" class="form-control" name="email"
-                                                                value="{{ Auth::user()->email }}" />
+                                                            <input type="text"
+                                                                class="form-control @error('email') is-invalid @enderror"
+                                                                name="email" value="{{ Auth::user()->email }}" />
+                                                            @error('email')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
+
+                                                    <!-- Bio Field -->
                                                     <div class="col-sm-12">
                                                         <div class="mb-3">
                                                             <label class="form-label">Bio</label>
-                                                            <textarea class="form-control" rows="4" cols="20" name="tasker_bio">{{ Auth::user()->tasker_bio }}</textarea>
+                                                            <textarea class="form-control @error('tasker_bio') is-invalid @enderror" rows="4" cols="20"
+                                                                name="tasker_bio" placeholder="Enter your bio here ...">{{ Auth::user()->tasker_bio }}</textarea>
+                                                            @error('tasker_bio')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="row">
+
+                                                    <!-- Tasker Address Section -->
                                                     <h5 class="mb-2 mt-2">B. Tasker Address</h5>
+
+                                                    <!-- Address Line 1 Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Address Line 1 <span
                                                                     class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control"
+                                                            <input type="text"
+                                                                class="form-control @error('tasker_address_no') is-invalid @enderror"
                                                                 name="tasker_address_no"
                                                                 value="{{ Auth::user()->tasker_address_no }}"
-                                                                placeholder="Building Number" />
+                                                                placeholder="Building number and street name" />
+                                                            @error('tasker_address_no')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
+
+                                                    <!-- Address Line 2 Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Address Line 2 <span
                                                                     class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control"
+                                                            <input type="text"
+                                                                class="form-control @error('tasker_address_road') is-invalid @enderror"
                                                                 name="tasker_address_road"
                                                                 value="{{ Auth::user()->tasker_address_road }}"
-                                                                placeholder="Road name" />
+                                                                placeholder="Building name" />
+                                                            @error('tasker_address_road')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
+
+                                                    <!-- Postal Code Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">Postal Code <span
                                                                     class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control"
+                                                            <input type="text"
+                                                                class="form-control @error('tasker_address_poscode') is-invalid @enderror"
                                                                 name="tasker_address_poscode"
                                                                 value="{{ Auth::user()->tasker_address_poscode }}"
                                                                 placeholder="Postal Code" />
+                                                            @error('tasker_address_poscode')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
+
+                                                    <!-- State Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">State <span
                                                                     class="text-danger">*</span></label>
-                                                            <select name="tasker_address_state" class="form-control">
-                                                                <option value="" selected>Select</option>
-                                                                <option value="">
-                                                                    {{ Auth::user()->tasker_address_state }}</option>
-                                                                <option value="Melaka" selected>Melaka</option>
-
+                                                            <select name="tasker_address_state"
+                                                                class="form-control @error('tasker_address_state') is-invalid @enderror"
+                                                                id="addState">
+                                                                @if (Auth::user()->tasker_address_state == '')
+                                                                    <option value="" selected>Select State</option>
+                                                                    @foreach ($states['states'] as $state)
+                                                                        <option value="{{ strtolower($state['name']) }}">
+                                                                            {{ $state['name'] }}</option>
+                                                                    @endforeach
+                                                                @else
+                                                                    @foreach ($states['states'] as $state)
+                                                                        @if (Auth::user()->tasker_address_state == strtolower($state['name']))
+                                                                            <option
+                                                                                value="{{ strtolower($state['name']) }}"
+                                                                                selected>
+                                                                                {{ $state['name'] }}</option>
+                                                                        @else
+                                                                            <option
+                                                                                value="{{ strtolower($state['name']) }}">
+                                                                                {{ $state['name'] }}</option>
+                                                                        @endif
+                                                                    @endforeach
+                                                                @endif
                                                             </select>
+
+                                                            @error('tasker_address_state')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
+
+                                                    <!-- City Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
-                                                            <label class="form-label">City <span
+                                                            <label class="form-label">Area <span
                                                                     class="text-danger">*</span></label>
-                                                            <select name="tasker_address_city" class="form-control">
-                                                                <option value="" selected>Select</option>
-                                                                <option value="">
-                                                                    {{ Auth::user()->tasker_address_city }}</option>
-                                                                <option value="Batu Berendam" selected>Batu Berendam
-                                                                </option>
-
+                                                            <select name="tasker_address_city"
+                                                                class="form-control @error('tasker_address_city') is-invalid @enderror"
+                                                                id="addCity">
+                                                                @if(Auth::user()->tasker_address_city == '')
+                                                                    <option value="" selected>Select Area</option>
+                                                                @else
+                                                                    <option value="{{ Auth::user()->tasker_address_city }}" selected>{{ Auth::user()->tasker_address_city }}</option>
+                                                                @endif
                                                             </select>
+                                                            @error('tasker_address_city')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
 
-                                                </div>
-                                                <div class="row">
+                                                    <!-- Working Area Section -->
                                                     <h5 class="mb-2 mt-2">C. Working Area</h5>
+
+                                                    <!-- Working Area State Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
                                                             <label class="form-label">State <span
                                                                     class="text-danger">*</span></label>
-                                                            <select name="tasker_workingloc_state" class="form-control">
-                                                                <option value="" selected>Select</option>
-                                                                <option value="">
-                                                                    {{ Auth::user()->tasker_workingloc_state }}</option>
-                                                                <option value="Melaka" selected>Melaka</option>
-
+                                                            <select name="tasker_workingloc_state"
+                                                                class="form-control @error('tasker_workingloc_state') is-invalid @enderror"
+                                                                id="workState">
+                                                                @if (Auth::user()->tasker_workingloc_state == '')
+                                                                    <option value="" selected>Select State</option>
+                                                                    @foreach ($states['states'] as $state)
+                                                                        <option value="{{ strtolower($state['name']) }}">
+                                                                            {{ $state['name'] }}</option>
+                                                                    @endforeach
+                                                                @else
+                                                                    @foreach ($states['states'] as $state)
+                                                                        @if (Auth::user()->tasker_workingloc_state == strtolower($state['name']))
+                                                                            <option
+                                                                                value="{{ strtolower($state['name']) }}"
+                                                                                selected>
+                                                                                {{ $state['name'] }}</option>
+                                                                        @else
+                                                                            <option
+                                                                                value="{{ strtolower($state['name']) }}">
+                                                                                {{ $state['name'] }}</option>
+                                                                        @endif
+                                                                    @endforeach
+                                                                @endif
                                                             </select>
+                                                            @error('tasker_workingloc_state')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
+
+                                                    <!-- Working Area Area Field -->
                                                     <div class="col-sm-6">
                                                         <div class="mb-3">
-                                                            <label class="form-label">Area<span
+                                                            <label class="form-label">Area <span
                                                                     class="text-danger">*</span></label>
-                                                            <select name="tasker_workingloc_area" class="form-control">
-                                                                <option value="" selected>Select</option>
-                                                                <option value="">
-                                                                    {{ Auth::user()->tasker_workingloc_area }}</option>
-                                                                <option value="Batu Berendam" selected>Batu Berendam
-                                                                </option>
-
+                                                            <select name="tasker_workingloc_area"
+                                                                class="form-control @error('tasker_workingloc_area') is-invalid @enderror"
+                                                                id="workCity">
+                                                                @if(Auth::user()->tasker_workingloc_area == '')
+                                                                    <option value="" selected>Select Area</option>
+                                                                @else
+                                                                    <option value="{{ Auth::user()->tasker_workingloc_area }}" selected>{{ Auth::user()->tasker_workingloc_area }}</option>
+                                                                @endif
                                                             </select>
+                                                            @error('tasker_workingloc_area')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
                                     <div class="col-12 text-end btn-page">
                                         <button type="submit" class="btn btn-primary">Update Profile</button>
@@ -359,5 +488,76 @@
 
         </div>
     </div>
+    <script>
+        $(document).ready(function() {
+            $('#profilephoto').on('change', function() {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+
+                    // When the file is loaded, set the src of the img tag
+                    reader.onload = function(e) {
+                        $('#previewImage').attr('src', e.target.result).show();
+                    };
+
+                    // Read the file as a data URL
+                    reader.readAsDataURL(file);
+                }
+                $('#isUploadPhoto').val('true');
+            });
+
+            $('#addState').on('change', function() {
+                var state = $(this).val();
+                if (state) {
+                    $.ajax({
+                        url: '/get-areas/' + state, // Ensure this matches the route
+                        type: 'GET',
+                        success: function(data) {
+                            $('#addCity').empty().append(
+                                '<option value="">Select Area</option>');
+                            $.each(data, function(index, area) {
+                                $('#addCity').append('<option value="' + area + '">' +
+                                    area + '</option>');
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error fetching areas: " +
+                            error); // For debugging if request fails
+                        }
+                    });
+                } else {
+                    $('#addCity').empty().append('<option value="">Select Area</option>');
+                }
+            });
+
+            $('#workState').on('change', function() {
+                var state = $(this).val();
+                if (state) {
+                    $.ajax({
+                        url: '/get-areas/' + state, // Ensure this matches the route
+                        type: 'GET',
+                        success: function(data) {
+                            $('#workCity').empty().append(
+                                '<option value="">Select Area</option>');
+                            $.each(data, function(index, area) {
+                                $('#workCity').append('<option value="' + area + '">' +
+                                    area + '</option>');
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error fetching areas: " +
+                            error); // For debugging if request fails
+                        }
+                    });
+                } else {
+                    $('#workCity').empty().append('<option value="">Select Area</option>');
+                }
+            });
+
+
+
+
+        });
+    </script>
     <!-- [ Main Content ] end -->
 @endsection

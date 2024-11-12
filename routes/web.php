@@ -27,7 +27,7 @@ Route::prefix('admin')->group(function () {
     // Admin - Auth Process
     Route::post('/admin-authentication', [AuthenticateController::class, 'authenticateAdmin'])->name('auth-admin');
 
-});
+}); 
 
 Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
@@ -115,5 +115,5 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
 
 // Route::get('/get-states', [RouteController::class, 'getStates'])->name('get-states');
-// Route::get('/get-areas/{state}', [RouteController::class, 'getAreas'])->name('get-area');
+Route::get('/get-areas/{state}', [RouteController::class, 'getAreas'])->name('get-area');
 
