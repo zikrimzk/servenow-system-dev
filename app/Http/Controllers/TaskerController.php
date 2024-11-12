@@ -81,46 +81,50 @@ class TaskerController extends Controller
         }
     }
 
-    // public function adminUpdateTasker(Request $req, $id)
-    // {
-    //     try {
-    //         $taskers = $req->validate(
-    //             [
-    //                 'tasker_code' => 'required',
-    //                 'tasker_firstname' => 'required|string',
-    //                 'tasker_lastname' => 'required|string',
-    //                 'tasker_phoneno' => 'required|string|min:10',
-    //                 'email' => 'required|email',
-    //                 'tasker_status' => 'required',
-    //                 'tasker_icno' => '',
-    //                 'tasker_dob' => '',
-    //                 'tasker_workingloc_state' => '',
-    //                 'tasker_workingloc_area' => '',
+    public function adminUpdateTasker(Request $req, $id)
+    {
+            $taskers = $req->validate(
+                [
+                    'tasker_firstname' => 'required|string',
+                    'tasker_lastname' => 'required|string',
+                    'tasker_phoneno' => 'required|string|min:10',
+                    'email' => 'required|email',
+                    'tasker_bio' => '',
+                    'tasker_icno' => 'required',
+                    'tasker_dob' => 'required',
+                    'tasker_address_no' => 'required',
+                    'tasker_address_road' => 'required',
+                    'tasker_address_poscode' => 'required',
+                    'tasker_address_state' => 'required',
+                    'tasker_address_city' => 'required',
+                    'tasker_workingloc_state' => 'required',
+                    'tasker_workingloc_area' => 'required',
+                    'tasker_status' => '',
+                ],
+                [],
+                [
+                    'tasker_code' => 'Tasker Code',
+                    'tasker_firstname' => 'First Name',
+                    'tasker_lastname' => 'Last Name',
+                    'tasker_phoneno' => 'Phone Number',
+                    'email' => 'Email Address',
+                    'tasker_bio' => 'Tasker Bio',
+                    'tasker_icno' => 'IC number',
+                    'tasker_dob' => 'Date of Birth',
+                    'tasker_address_no' => 'Building Number',
+                    'tasker_address_road' => 'Road Name',
+                    'tasker_address_poscode' => 'Postal Code',
+                    'tasker_address_state' => 'State',
+                    'tasker_address_city' => 'City',
+                    'tasker_workingloc_state' => 'Working State',
+                    'tasker_workingloc_area' => 'Working Area',
+                    'tasker_status' => 'Status',
+                ]);
 
-    //             ],
-    //             [],
-    //             [
-    //                 'tasker_code' => 'Tasker Code',
-    //                 'tasker_firstname' => 'First Name',
-    //                 'tasker_lastname' => 'Last Name',
-    //                 'tasker_phoneno' => 'Phone Number',
-    //                 'email' => 'Email Address',
-    //                 'tasker_status' => 'Tasker Status',
-    //                 'tasker_icno' => 'IC number',
-    //                 'tasker_dob' => 'Date of Birth',
-    //                 'tasker_workingloc_state' => 'Working State',
-    //                 'tasker_workingloc_area' => 'Working Area',
+            Tasker::whereId($id)->update($taskers);
 
-    //             ]
-    //         );
-
-    //         Tasker::whereId($id)->update($taskers);
-
-    //         return redirect(route('admin-tasker-management'))->with('success', 'The Tasker details has been successfully updated !');
-    //     } catch (Exception $e) {
-    //         return redirect(route('admin-tasker-management'))->with('error', 'Error : ' . $e->getMessage());
-    //     }
-    // }
+            return redirect(route('admin-tasker-management'))->with('success', 'The Tasker details has been successfully updated !');
+    }
 
     public function taskerUpdateProfile(Request $req, $id)
     {
