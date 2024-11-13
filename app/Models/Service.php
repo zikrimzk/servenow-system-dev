@@ -12,6 +12,7 @@ class Service extends Model
     protected $fillable =[
         'service_rate',
         'service_rate_type',
+        'service_desc',
         'service_status',
         'service_type_id',
         'tasker_id',

@@ -57,7 +57,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     // Admin - Tasker Management
     Route::get('/tasker-management', [RouteController::class, 'taskerManagementNav'])->name('admin-tasker-management');
     Route::post('/create-tasker', [TaskerController::class, 'adminCreateTasker'])->name('admin-tasker-create');
-    Route::get('/update-tasker-detaiils-{id}', [RouteController::class, 'taskerUpdateNav'])->name('admin-tasker-update-form');
+    Route::get('/tasker-details-{id}', [RouteController::class, 'taskerUpdateNav'])->name('admin-tasker-update-form');
     Route::post('/update-tasker-{id}', [TaskerController::class, 'adminUpdateTasker'])->name('admin-tasker-update');
 
     // Admin - Service Management

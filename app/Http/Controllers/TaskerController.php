@@ -13,74 +13,67 @@ class TaskerController extends Controller
 {
     public function createTasker(Request $req)
     {
-        try {
-            $taskers = $req->validate(
-                [
-                    'tasker_firstname' => 'required|string',
-                    'tasker_lastname' => 'required|string',
-                    'tasker_phoneno' => 'required|string|min:10',
-                    'email' => 'required|email',
-                    'password' => 'required|same:cpassword|min:8|max:15',
-                    'cpassword' => 'required|min:8|max:15',
-                ],
-                [],
-                [
-                    'tasker_firstname' => 'First Name',
-                    'tasker_lastname' => 'Last Name',
-                    'tasker_phoneno' => 'Phone Number',
-                    'email' => 'Email Address',
-                    'password' => 'Password',
-                    'cpassword' => 'Confirm Password'
-                ]
-            );
+        $taskers = $req->validate(
+            [
+                'tasker_firstname' => 'required|string',
+                'tasker_lastname' => 'required|string',
+                'tasker_phoneno' => 'required|string|min:10',
+                'email' => 'required|email',
+                'password' => 'required|same:cpassword|min:8|max:15',
+                'cpassword' => 'required|min:8|max:15',
+            ],
+            [],
+            [
+                'tasker_firstname' => 'First Name',
+                'tasker_lastname' => 'Last Name',
+                'tasker_phoneno' => 'Phone Number',
+                'email' => 'Email Address',
+                'password' => 'Password',
+                'cpassword' => 'Confirm Password'
+            ]
+        );
 
-            $taskers['password'] = bcrypt($taskers['password']);
-            $taskers['tasker_code'] = 'SNT' . rand(1, 10000);
-            $path = 'profile_photos/default-profile.png';
-            $taskers['tasker_photo'] = $path;
-            Tasker::create($taskers);
+        $taskers['password'] = bcrypt($taskers['password']);
+        $taskers['tasker_code'] = 'SNT' . rand(1, 10000);
+        $path = 'profile_photos/default-profile.png';
+        $taskers['tasker_photo'] = $path;
+        Tasker::create($taskers);
 
-            return redirect(route('tasker-login'))->with('success', 'Your Tasker account has been successfully created! Please log in with your registered credentials.');
-        } catch (Exception $e) {
-            return redirect(route('tasker-register-form'))->with('error', 'Error : ' . $e->getMessage());
-        }
+        return redirect(route('tasker-login'))->with('success', 'Your Tasker account has been successfully created! Please log in with your registered credentials.');
     }
 
     public function adminCreateTasker(Request $req)
     {
-        try {
-            $taskers = $req->validate(
-                [
-                    'tasker_code' => 'required',
-                    'tasker_firstname' => 'required|string',
-                    'tasker_lastname' => 'required|string',
-                    'tasker_phoneno' => 'required|string|min:10',
-                    'email' => 'required|email',
-                    'password' => 'required|min:8|max:15',
-                    'tasker_status' => 'required'
-                ],
-                [],
-                [
-                    'tasker_code' => 'Tasker Code',
-                    'tasker_firstname' => 'First Name',
-                    'tasker_lastname' => 'Last Name',
-                    'tasker_phoneno' => 'Phone Number',
-                    'email' => 'Email Address',
-                    'password' => 'Password',
-                    'tasker_status' => 'Tasker Status'
 
-                ]
-            );
-            $path = 'profile_photos/default-profile.png';
-            $taskers['tasker_photo'] = $path;
-            $taskers['password'] = bcrypt($taskers['password']);
+        $taskers = $req->validate(
+            [
+                'tasker_code' => 'required',
+                'tasker_firstname' => 'required|string',
+                'tasker_lastname' => 'required|string',
+                'tasker_phoneno' => 'required|string|min:10',
+                'email' => 'required|email',
+                'password' => 'required|min:8|max:15',
+                'tasker_status' => 'required'
+            ],
+            [],
+            [
+                'tasker_code' => 'Tasker Code',
+                'tasker_firstname' => 'First Name',
+                'tasker_lastname' => 'Last Name',
+                'tasker_phoneno' => 'Phone Number',
+                'email' => 'Email Address',
+                'password' => 'Password',
+                'tasker_status' => 'Tasker Status'
 
-            Tasker::create($taskers);
+            ]
+        );
+        $path = 'profile_photos/default-profile.png';
+        $taskers['tasker_photo'] = $path;
+        $taskers['password'] = bcrypt($taskers['password']);
 
-            return redirect(route('admin-tasker-management'))->with('success', 'The Tasker account has been successfully created! Please remind the Tasker to complete their profile and update their password upon logging in.');
-        } catch (Exception $e) {
-            return redirect(route('admin-tasker-management'))->with('error', 'Error : ' . $e->getMessage());
-        }
+        Tasker::create($taskers);
+
+        return redirect(route('admin-tasker-management'))->with('success', 'The Tasker account has been successfully created! Please remind the Tasker to complete their profile and update their password upon logging in.');
     }
 
     public function adminUpdateTasker(Request $req, $id)

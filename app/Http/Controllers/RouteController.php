@@ -66,12 +66,6 @@ class RouteController extends Controller
         ]);
     }
 
-    // public function getStates($loc)
-    // {
-    //     $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
-    //     return view($loc, compact('states'));
-    // }
-
     public function getAreas($state)
     {
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
@@ -489,6 +483,10 @@ class RouteController extends Controller
                 if ($row->service_status == 0) {
                     $button =
                         '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#viewDescModal-' . $row->id . '">
+                            <i class="ti ti-eye f-20"></i>
+                        </a>
                         <a href="#" class="avtar avtar-xs btn-light-success approveService-' . $row->id . '">
                             <i class="ti ti-check f-20"></i>
                         </a>
@@ -555,38 +553,42 @@ class RouteController extends Controller
                 } else if ($row->service_status == 1) {
                     $button =
                         '
-                    <a href="#" class="avtar avtar-xs btn-light-danger terminateService-' . $row->id . '">
-                        <i class="ti ti-x f-20"></i>
-                    </a>
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#viewDescModal-' . $row->id . '">
+                            <i class="ti ti-eye f-20"></i>
+                        </a>
+                        <a href="#" class="avtar avtar-xs btn-light-danger terminateService-' . $row->id . '">
+                            <i class="ti ti-x f-20"></i>
+                        </a>
 
-                    <script>
-                    document.querySelector(".terminateService-' . $row->id . '").addEventListener("click", function () {
-                        const swalWithBootstrapButtons = Swal.mixin({
-                        customClass: {
-                            confirmButton: "btn btn-success",
-                            cancelButton: "btn btn-danger"
-                        },
-                        buttonsStyling: false
+                        <script>
+                        document.querySelector(".terminateService-' . $row->id . '").addEventListener("click", function () {
+                            const swalWithBootstrapButtons = Swal.mixin({
+                            customClass: {
+                                confirmButton: "btn btn-success",
+                                cancelButton: "btn btn-danger"
+                            },
+                            buttonsStyling: false
+                            });
+                            swalWithBootstrapButtons
+                            .fire({
+                                title: "Are you sure?",
+                                text: "Terminate ' . $row->tasker_firstname . ' ' . $row->servicetype_name . ' services ?",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonText: "Terminate",
+                                cancelButtonText: "Cancel",
+                                reverseButtons: true
+                            })
+                            .then((result) => {
+                                if (result.isConfirmed) {
+                                    setTimeout(function() {
+                                        location.href="' . route("admin-terminate-service", $row->id) . '";
+                                    }, 500);
+                                } 
+                            });
                         });
-                        swalWithBootstrapButtons
-                        .fire({
-                            title: "Are you sure?",
-                            text: "Terminate ' . $row->tasker_firstname . ' ' . $row->servicetype_name . ' services ?",
-                            icon: "warning",
-                            showCancelButton: true,
-                            confirmButtonText: "Terminate",
-                            cancelButtonText: "Cancel",
-                            reverseButtons: true
-                        })
-                        .then((result) => {
-                            if (result.isConfirmed) {
-                                setTimeout(function() {
-                                    location.href="' . route("admin-terminate-service", $row->id) . '";
-                                }, 500);
-                            } 
-                        });
-                    });
-                    </script>
+                        </script>
                 ';
                 } else if ($row->service_status == 2) {
                     $button = '';

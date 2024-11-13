@@ -66,10 +66,13 @@ class ServiceController extends Controller
                 'service_rate' => 'required',
                 'service_rate_type' => 'required',
                 'service_type_id' => 'required',
+                'service_desc'=> ''
+                
             ], [], [
                 'service_rate' => 'Service Rate',
                 'service_rate_type' => 'Service Rate Type',
                 'service_type_id' => 'Service Type',
+                'service_desc'=> 'Description'
             ]);
             $data['service_status'] = 0;
             $data['tasker_id'] = Auth::user()->id;
@@ -89,11 +92,15 @@ class ServiceController extends Controller
                 'service_rate_type' => 'required',
                 'service_type_id' => 'required',
                 'service_status' => 'required',
+                'service_desc'=> ''
+
             ], [], [
                 'service_rate' => 'Service Rate',
                 'service_rate_type' => 'Service Rate Type',
                 'service_type_id' => 'Service Type',
                 'service_status' => 'Status',
+                'service_desc'=> 'Description'
+
             ]);
             $oridata = Service::whereId($id)->first();
             $message = null;

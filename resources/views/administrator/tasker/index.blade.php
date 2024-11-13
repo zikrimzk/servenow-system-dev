@@ -118,52 +118,91 @@
                                     </div>
                                 </div>
                                 <div class="row">
+
+                                    <!-- First Name Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">First Name</label>
-                                            <input type="text" class="form-control" placeholder="First Name"
-                                                name="tasker_firstname" />
+                                            <input type="text"
+                                                class="form-control @error('tasker_firstname') is-invalid @enderror"
+                                                placeholder="First Name" name="tasker_firstname"
+                                                value="{{ old('tasker_firstname') }}" />
+                                            @error('tasker_firstname')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
+
+                                    <!-- Last Name Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Last Name</label>
-                                            <input type="text" class="form-control" placeholder="Last Name"
-                                                name="tasker_lastname" />
+                                            <input type="text"
+                                                class="form-control @error('tasker_lastname') is-invalid @enderror"
+                                                placeholder="Last Name" name="tasker_lastname"
+                                                value="{{ old('tasker_lastname') }}" />
+                                            @error('tasker_lastname')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
+
+                                    <!-- Phone Number Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Phone Number</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">+60</span>
-                                                <input type="text" class="form-control" placeholder="Phone No."
-                                                    name="tasker_phoneno" />
+                                                <input type="text"
+                                                    class="form-control @error('tasker_phoneno') is-invalid @enderror"
+                                                    placeholder="Phone No." name="tasker_phoneno"
+                                                    value="{{ old('tasker_phoneno') }}" />
+                                                @error('tasker_phoneno')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Email Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Email</label>
-                                            <input type="email" class="form-control" placeholder="Email"
-                                                name="email" />
+                                            <input type="email"
+                                                class="form-control @error('email') is-invalid @enderror"
+                                                placeholder="Email" name="email" value="{{ old('email') }}" />
+                                            @error('email')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
+
+                                    <!-- Account Status Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Account Status</label>
-                                            <select class="form-select" name="tasker_status">
-                                                <option value ="4">Password Need Update</option>
+                                            <select class="form-select @error('tasker_status') is-invalid @enderror"
+                                                name="tasker_status">
+                                                <option value="4" selected> Password Need Update</option>
                                             </select>
+                                            @error('tasker_status')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
+
+                                    <!-- Password Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Password </label>
-                                            <input type="password" class="form-control" placeholder="Password"
-                                                name="password" value="servenow@1234" />
+                                            <label class="form-label">Password</label>
+                                            <input type="password"
+                                                class="form-control @error('password') is-invalid @enderror"
+                                                placeholder="Password" name="password" value="servenow@1234" />
                                             <span class="text-muted" style="font-size: 9pt">[Default:
                                                 servenow@1234]</span>
+                                            @error('password')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                 </div>
@@ -182,193 +221,6 @@
             </div>
             <!-- Modal Tasker Create End  Here -->
 
-            <!-- Modal Tasker Edit Start Here -->
-            {{-- @foreach ($taskers as $tasker)
-                <form action="{{ route('admin-tasker-update',$tasker->id) }}" method="POST">
-                    @csrf
-                    <div class="modal fade" id="updateTaskerModal-{{ $tasker->id }}" data-bs-keyboard="false"
-                        tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="mb-0">Update Tasker Details</h5>
-                                    <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
-                                        data-bs-dismiss="modal">
-                                        <i class="ti ti-x f-20"></i>
-                                    </a>
-                                </div>
-                                <div class="modal-body">
-
-                                    <div class="row">
-                                        <div class="col-sm-3 text-center">
-                                            <div class="mb-3">
-                                                <img src="../assets/images/user/avatar-1.jpg" alt="user-image"
-                                                    class="user-avtar wid-100 rounded-circle" />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <h5 class="mb-2">A. Personal Details:</h5>
-
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">First Name</label>
-                                                        <input type="text" class="form-control"
-                                                            placeholder="First Name" name="tasker_firstname"
-                                                            value="{{ $tasker->tasker_firstname }}" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Last Name</label>
-                                                        <input type="text" class="form-control"
-                                                            placeholder="Last Name" name="tasker_lastname"
-                                                            value="{{ $tasker->tasker_lastname }}" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">IC Number</label>
-                                                        <input type="text" class="form-control" placeholder="IC No."
-                                                            name="tasker_icno" value="{{ $tasker->tasker_icno }}" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Date of Birth</label>
-                                                        <input type="date" class="form-control" placeholder="IC No."
-                                                            name="tasker_dob" value="{{ $tasker->tasker_dob }}" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="mb-5">
-                                                        <label class="form-label">Phone Number</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">+60</span>
-                                                            <input type="text" class="form-control"
-                                                                placeholder="Phone No." name="tasker_phoneno"
-                                                                value="{{ $tasker->tasker_phoneno }}" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <h5 class="mb-2">B. Account Details:</h5>
-                                            <div class="row">
-                                                <div class="col-sm-12">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Tasker Code</label>
-                                                        <input type="text" class="form-control" name="tasker_code"
-                                                            value="{{ $tasker->tasker_code }}" readonly />
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-12">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Email</label>
-                                                        <input type="email" class="form-control" placeholder="Email"
-                                                            name="email" value="{{ $tasker->email }}" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-12">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Account Status</label>
-                                                        <select class="form-select" name="tasker_status">
-                                                            @if ($tasker->tasker_status == 0)
-                                                                <option value ="0">Incomplete Profile</option>
-                                                            @elseif($tasker->tasker_status == 1)
-                                                                <option value ="1" selected>Not Verified</option>
-                                                                <option value ="2">Active</option>
-                                                                <option value ="3">Inactive</option>
-                                                            @elseif($tasker->tasker_status == 2)
-                                                                <option value ="2"selected>Active</option>
-                                                                <option value ="3">Inactive</option>
-                                                                <option value ="5">Banned</option>
-                                                            @elseif($tasker->tasker_status == 3)
-                                                                <option value ="2">Active</option>
-                                                                <option value ="3"selected>Inactive</option>
-                                                                <option value ="5">Banned</option>
-                                                            @elseif($tasker->tasker_status == 4)
-                                                                <option value ="4">Password Need Update</option>
-                                                            @elseif($tasker->tasker_status == 5)
-                                                                <option value ="2">Active</option>
-                                                                <option value ="3">Inactive</option>
-                                                                <option value ="5"selected>Banned</option>
-                                                            @endif
-                                                        </select>
-                                                    </div>
-
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Working State</label>
-                                                        <select class="form-select" name="tasker_workingloc_state"
-                                                            id="state">
-                                                            @if ($tasker->tasker_workingloc_state == '')
-                                                                <option value="-" selected>Select State</option>
-                                                                @foreach ($states['states'] as $state)
-                                                                    <option value="{{ strtolower($state['name']) }}">
-                                                                        {{ $state['name'] }}</option>
-                                                                @endforeach
-                                                            @else
-                                                                @foreach ($states['states'] as $state)
-                                                                    @if ($tasker->tasker_workingloc_state == strtolower($state['name']))
-                                                                        <option value="{{ strtolower($state['name']) }}"
-                                                                            selected>
-                                                                            {{ $state['name'] }}</option>
-                                                                    @else
-                                                                        <option value="{{ strtolower($state['name']) }}">
-                                                                            {{ $state['name'] }}</option>
-                                                                    @endif
-                                                                @endforeach
-                                                            @endif
-
-
-
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Working Area **</label>
-                                                        <select class="form-select" name="tasker_workingloc_area">
-                                                            @if ($tasker->tasker_workingloc_area == '')
-                                                                <option value="-" selected>Select Area</option>
-                                                            @else
-                                                                <option value="-" selected>
-                                                                    {{ $tasker->tasker_workingloc_area }}</option>
-                                                            @endif
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-12">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Current Rating</label>
-                                                        <input type="text" class="form-control" name="tasker_rating"
-                                                            value="{{ $tasker->tasker_rating }}" readonly />
-                                                    </div>
-                                                </div>
-                                                <input type="hidden" class="form-control"
-                                                    value="{{ $taskerCount }}" id="totalcount" />
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                                <div class="modal-footer justify-content-end">
-                                    <div class="flex-grow-1 text-end">
-                                        <button type="reset" class="btn btn-link-danger btn-pc-default"
-                                            data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Save</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            @endforeach --}}
-            <!-- Modal Tasker Edit End  Here -->
 
         </div>
 
@@ -377,6 +229,12 @@
 
 
     <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            @if ($errors->any())
+                var modal = new bootstrap.Modal(document.getElementById('addTaskerModal'));
+                modal.show();
+            @endif
+        });
         $(document).ready(function() {
 
             // DATATABLE : TASKERS

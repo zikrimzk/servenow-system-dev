@@ -149,6 +149,12 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Service Description</label>
+                                            <textarea name="service_desc" class="form-control" cols="20" rows="4" placeholder="Enter your description ..."></textarea>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-footer justify-content-end">
@@ -245,6 +251,12 @@
                                                             <option value="3"selected>Terminated</option>
                                                         @endif
                                                     </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Service Description</label>
+                                                    <textarea name="service_desc" class="form-control" cols="20" rows="4" placeholder="Enter your description ...">{{ $sv->service_desc }}</textarea>
                                                 </div>
                                             </div>
                                         </div>

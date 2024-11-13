@@ -64,7 +64,7 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card table-card">
-                       
+
                         <div class="card-body pt-3">
                             <div class="dt-responsive table-responsive m-3">
                                 <table class="table data-table table-hover nowrap">
@@ -85,161 +85,78 @@
                 </div>
             </div>
 
-            <!-- Modal Service Create Start Here -->
-            <div class="modal fade" id="addServiceModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
-                    <form action="{{ route('tasker-service-create') }}" method="POST">
-                        @csrf
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="mb-0">Add Service</h5>
-                                <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
-                                    data-bs-dismiss="modal">
-                                    <i class="ti ti-x f-20"></i>
-                                </a>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label">Service Type</label>
-                                            <select class="form-select" name="service_type_id">
-                                                <option value="" selected>Select Service Type</option>
-                                                @foreach ($types as $type)
-                                                    <option value="{{ $type->id }}">{{ $type->servicetype_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Rate</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">RM</span>
-                                                <input type="text" class="form-control" placeholder="Service Rate"
-                                                    name="service_rate" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Rate Type</label>
-                                            <select class="form-select" name="service_rate_type">
-                                                <option value="" selected>Select Rate Type</option>
-                                                <option value="per job">Per Job</option>
-                                                <option value="per hour">Per Hour</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer justify-content-end">
-                                <div class="flex-grow-1 text-end">
-                                    <button type="reset" class="btn btn-link-danger btn-pc-default"
-                                        data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Save</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-            <!-- Modal Service Create End  Here -->
-
             <!-- Modal Service Edit Start Here -->
             @foreach ($services as $sv)
-                <form action="{{ route('tasker-service-update', $sv->id) }}" method="POST">
-                    @csrf
-                    <div class="modal fade" id="updateServiceModal-{{ $sv->id }}" data-bs-keyboard="false" tabindex="-1"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
-                            <form action="{{ route('tasker-service-create') }}" method="POST">
-                                @csrf
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="mb-0">Update Service Details</h5>
-                                        <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
-                                            data-bs-dismiss="modal">
-                                            <i class="ti ti-x f-20"></i>
-                                        </a>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Service Type</label>
-                                                    <select class="form-select" name="service_type_id">
-                                                        @foreach ($types as $type)
-                                                            @if ($sv->service_type_id == $type->id)
-                                                                <option value="{{ $type->id }}" selected>
-                                                                    {{ $type->servicetype_name }}
-                                                                </option>
-                                                            @else
-                                                                <option value="{{ $type->id }}" disabled>
-                                                                    {{ $type->servicetype_name }}
-                                                                </option>
-                                                            @endif
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Rate</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">RM</span>
-                                                        <input type="text" class="form-control"
-                                                            placeholder="Service Rate" name="service_rate"
-                                                            value="{{ $sv->service_rate }}" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Rate Type</label>
-                                                    <select class="form-select" name="service_rate_type">
-                                                        @if ($sv->service_rate_type == 'per hour')
-                                                            <option value="per job">Per Job</option>
-                                                            <option value="per hour" selected>Per Hour</option>
-                                                        @elseif($sv->service_rate_type == 'per job')
-                                                            <option value="per job" selected>Per Job</option>
-                                                            <option value="per hour">Per Hour</option>
+                <div class="modal fade" id="viewDescModal-{{ $sv->id }}" data-bs-keyboard="false" tabindex="-1"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+                        <form action="{{ route('tasker-service-create') }}" method="POST">
+                            @csrf
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="mb-0">Service Details</h5>
+                                    <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
+                                        data-bs-dismiss="modal">
+                                        <i class="ti ti-x f-20"></i>
+                                    </a>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Service Type</label>
+                                                <select class="form-select" name="service_type_id">
+                                                    @foreach ($types as $type)
+                                                        @if ($sv->service_type_id == $type->id)
+                                                            <option value="{{ $type->id }}" selected>
+                                                                {{ $type->servicetype_name }}
+                                                            </option>
+                                                        @else
+                                                            <option value="{{ $type->id }}" disabled>
+                                                                {{ $type->servicetype_name }}
+                                                            </option>
                                                         @endif
-                                                    </select>
-                                                </div>
+                                                    @endforeach
+                                                </select>
                                             </div>
-                                            <div class="col-sm-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Status</label>
-                                                    <select class="form-select" name="service_status">
-                                                        @if ($sv->service_status == 0)
-                                                            <option value="0" selected>Pending</option>
-                                                        @elseif($sv->service_status == 1)
-                                                            <option value="1" selected>Active</option>
-                                                            <option value="2">Inactive</option>
-                                                        @elseif($sv->service_status == 2)
-                                                            <option value="1">Active</option>
-                                                            <option value="2"selected>Inactive</option>
-                                                        @endif
-                                                    </select>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Rate</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">RM</span>
+                                                    <input type="text" class="form-control" placeholder="Service Rate"
+                                                        name="service_rate" value="{{ $sv->service_rate }}" />
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="modal-footer justify-content-end">
-                                        <div class="flex-grow-1 text-end">
-                                            <button type="reset" class="btn btn-link-danger btn-pc-default"
-                                                data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Rate Type</label>
+                                                <select class="form-select" name="service_rate_type">
+                                                    @if ($sv->service_rate_type == 'per hour')
+                                                        <option value="per job" disabled>Per Job</option>
+                                                        <option value="per hour" selected>Per Hour</option>
+                                                    @elseif($sv->service_rate_type == 'per job')
+                                                        <option value="per job" selected>Per Job</option>
+                                                        <option value="per hour" disabled>Per Hour</option>
+                                                    @endif
+                                                </select>
+                                            </div>
                                         </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Service Description</label>
+                                                <textarea name="service_desc" class="form-control" cols="20" rows="4" placeholder="Enter your description ...">{{ $sv->service_desc }}</textarea>
+                                            </div>
+                                        </div>
+                                  
                                     </div>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
-                </form>
+                </div>
             @endforeach
             <!-- Modal Service Edit End  Here -->
 

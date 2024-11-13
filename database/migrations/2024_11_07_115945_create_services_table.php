@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->double('service_rate');
             $table->string('service_rate_type');
+            $table->string('service_desc')->nullable();
             $table->integer('service_status')->default(0);
             $table->foreignId('service_type_id')->references('id')->on('service_types');
             $table->foreignId('tasker_id')->references('id')->on('taskers');
