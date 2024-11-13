@@ -49,9 +49,8 @@ class AuthenticateController extends Controller
     {
         Auth::guard('tasker')->logout();
 
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
+        // $request->session()->invalidate();
+        // $request->session()->regenerateToken();
 
         return redirect(route('tasker-login'))->with('success', 'You have successfully logged out.');
     }
@@ -60,9 +59,8 @@ class AuthenticateController extends Controller
     {
         Auth::guard('admin')->logout();
 
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
+        // $request->session()->invalidate();
+        // $request->session()->regenerateToken();
 
         return redirect(route('admin-login'))->with('success', 'You have successfully logged out.');
     }
