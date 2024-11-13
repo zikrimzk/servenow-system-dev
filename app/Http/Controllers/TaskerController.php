@@ -6,6 +6,8 @@ use Exception;
 use App\Models\Tasker;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class TaskerController extends Controller
 {
@@ -83,48 +85,49 @@ class TaskerController extends Controller
 
     public function adminUpdateTasker(Request $req, $id)
     {
-            $taskers = $req->validate(
-                [
-                    'tasker_firstname' => 'required|string',
-                    'tasker_lastname' => 'required|string',
-                    'tasker_phoneno' => 'required|string|min:10',
-                    'email' => 'required|email',
-                    'tasker_bio' => '',
-                    'tasker_icno' => 'required',
-                    'tasker_dob' => 'required',
-                    'tasker_address_one' => 'required',
-                    'tasker_address_two' => 'required',
-                    'tasker_address_poscode' => 'required',
-                    'tasker_address_state' => 'required',
-                    'tasker_address_area' => 'required',
-                    'tasker_workingloc_state' => 'required',
-                    'tasker_workingloc_area' => 'required',
-                    'tasker_status' => '',
-                ],
-                [],
-                [
-                    'tasker_code' => 'Tasker Code',
-                    'tasker_firstname' => 'First Name',
-                    'tasker_lastname' => 'Last Name',
-                    'tasker_phoneno' => 'Phone Number',
-                    'email' => 'Email Address',
-                    'tasker_bio' => 'Tasker Bio',
-                    'tasker_icno' => 'IC number',
-                    'tasker_dob' => 'Date of Birth',
-                    'tasker_address_one' => 'Address Line 1',
-                    'tasker_address_two' => 'Address Line 2',
-                    'tasker_address_poscode' => 'Postal Code',
-                    'tasker_address_state' => 'State',
-                    'tasker_address_area' => 'Area',
-                    'tasker_workingloc_state' => 'Working State',
-                    'tasker_workingloc_area' => 'Working Area',
-                    'tasker_status' => 'Status',
+        $taskers = $req->validate(
+            [
+                'tasker_firstname' => 'required|string',
+                'tasker_lastname' => 'required|string',
+                'tasker_phoneno' => 'required|string|min:10',
+                'email' => 'required|email',
+                'tasker_bio' => '',
+                'tasker_icno' => 'required',
+                'tasker_dob' => 'required',
+                'tasker_address_one' => 'required',
+                'tasker_address_two' => 'required',
+                'tasker_address_poscode' => 'required',
+                'tasker_address_state' => 'required',
+                'tasker_address_area' => 'required',
+                'tasker_workingloc_state' => 'required',
+                'tasker_workingloc_area' => 'required',
+                'tasker_status' => '',
+            ],
+            [],
+            [
+                'tasker_code' => 'Tasker Code',
+                'tasker_firstname' => 'First Name',
+                'tasker_lastname' => 'Last Name',
+                'tasker_phoneno' => 'Phone Number',
+                'email' => 'Email Address',
+                'tasker_bio' => 'Tasker Bio',
+                'tasker_icno' => 'IC number',
+                'tasker_dob' => 'Date of Birth',
+                'tasker_address_one' => 'Address Line 1',
+                'tasker_address_two' => 'Address Line 2',
+                'tasker_address_poscode' => 'Postal Code',
+                'tasker_address_state' => 'State',
+                'tasker_address_area' => 'Area',
+                'tasker_workingloc_state' => 'Working State',
+                'tasker_workingloc_area' => 'Working Area',
+                'tasker_status' => 'Status',
 
-                ]);
+            ]
+        );
 
-            Tasker::whereId($id)->update($taskers);
+        Tasker::whereId($id)->update($taskers);
 
-            return redirect(route('admin-tasker-management'))->with('success', 'The Tasker details has been successfully updated !');
+        return redirect(route('admin-tasker-management'))->with('success', 'The Tasker details has been successfully updated !');
     }
 
     public function taskerUpdateProfile(Request $req, $id)
@@ -177,10 +180,10 @@ class TaskerController extends Controller
 
             // Generate a custom name for the file
             $file = $req->file('tasker_photo');
-            $filename = $user->id . '_profile' . '.' . $file->getClientOriginalExtension();
+            $filename = $user->tasker_code . '_profile' . '.' . $file->getClientOriginalExtension();
 
             // Store the file with the custom filename
-            $path = $file->storeAs('profile_photos', $filename, 'public');
+            $path = $file->storeAs('profile_photos/taskers', $filename, 'public');
 
             // Save the file path in the database
             $taskers['tasker_photo'] = $path;
@@ -205,7 +208,7 @@ class TaskerController extends Controller
                 ],
                 [],
                 [
-                   'tasker_code' => 'Tasker Code',
+                    'tasker_code' => 'Tasker Code',
                     'tasker_firstname' => 'First Name',
                     'tasker_lastname' => 'Last Name',
                     'tasker_phoneno' => 'Phone Number',
@@ -234,12 +237,37 @@ class TaskerController extends Controller
         } elseif ($ori->tasker_status == 2) {
             $taskers['tasker_status'] = 2;
             $message = 'Tasker profile has been successfully updated !';
-        }else{
+        } else {
             $message = 'Tasker profile has been successfully updated !';
         }
 
         Tasker::whereId($id)->update($taskers);
 
         return redirect(route('tasker-profile'))->with('success', $message);
+    }
+
+    public function taskerUpdatePassword(Request $req, $id)
+    {
+        $validated = $req->validate(
+            [
+                'oldPass' => 'required | min:8',
+                'newPass' => 'required | min:8',
+                'renewPass' => 'required | same:newPass',
+            ],
+            [],
+            [
+                'oldPass' => 'Old Password',
+                'newPass' => 'New Password',
+                'renewPass' => 'Comfirm Password',
+
+            ]
+        );
+        $check = Hash::check($validated['oldPass'], Auth::user()->password, []);
+        if ($check) {
+            Tasker::where('id', $id)->update(['password' => bcrypt($validated['renewPass'])]);
+            return back()->with('success', 'Password has been updated successfully !');
+        } else {
+            return back()->with('error', 'Please enter the correct password !');
+        }
     }
 }

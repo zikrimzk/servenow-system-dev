@@ -10,6 +10,9 @@ class Tasker extends Authenticatable
 {
     use HasFactory;
 
+    protected $guard = "tasker";
+
+
     protected $fillable = [
         'tasker_code',
         'tasker_firstname',

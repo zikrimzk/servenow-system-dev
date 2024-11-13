@@ -43,10 +43,12 @@ return [
         'tasker' => [
             'driver' => 'session',
             'provider' => 'taskers',
+            'session' => config('session.tasker_session'),
         ],
         'admin' => [
             'driver' => 'session',
             'provider' => 'admins',
+            'session' => config('session.admin_session'),
         ],
     ],
 

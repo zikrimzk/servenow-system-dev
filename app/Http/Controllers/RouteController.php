@@ -8,6 +8,7 @@ use App\Models\ServiceType;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -16,9 +17,17 @@ class RouteController extends Controller
 
     public function taskerLoginNav()
     {
-        return view('tasker.login', [
-            'title' => 'Tasker Login'
-        ]);
+        if(!Auth::guard('tasker')->check())
+        {
+            return view('tasker.login', [
+                'title' => 'Tasker Login'
+            ]);
+        }
+        else
+        {
+           return redirect(route('tasker-home'));
+        }
+       
     }
 
     public function taskerRegisterFormNav()
@@ -30,9 +39,17 @@ class RouteController extends Controller
 
     public function adminLoginNav()
     {
-        return view('administrator.login', [
-            'title' => 'Admin Login'
-        ]);
+        if(!Auth::guard('admin')->check())
+        {
+            return view('administrator.login', [
+                'title' => 'Admin Login'
+            ]);
+        }
+        else
+        {
+            return redirect(route('admin-home'));
+        }
+       
     }
 
     public function adminHomeNav()
@@ -406,8 +423,9 @@ class RouteController extends Controller
                         });
                     </script>
                 ';
+                }else if ($row->service_status == 4) {
+                    $button = 'Remarks : Make new application';
                 }
-
 
                 return $button;
             });

@@ -117,54 +117,94 @@
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <!-- First Name Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">First Name</label>
-                                            <input type="text" class="form-control" placeholder="First Name"
-                                                name="admin_firstname" />
+                                            <input type="text"
+                                                class="form-control @error('admin_firstname') is-invalid @enderror"
+                                                name="admin_firstname" placeholder="First Name" value="{{ old('admin_firstname') }}" />
+                                            @error('admin_firstname')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
+
+                                    <!-- Last Name Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Last Name</label>
-                                            <input type="text" class="form-control" placeholder="Last Name"
-                                                name="admin_lastname" />
+                                            <input type="text"
+                                                class="form-control @error('admin_lastname') is-invalid @enderror"
+                                                name="admin_lastname" placeholder="Last Name" value="{{ old('admin_lastname') }}"   />
+                                            @error('admin_lastname')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
+
+                                    <!-- Phone Number Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Phone Number</label>
-                                            <input type="text" class="form-control" placeholder="Phone No."
-                                                name="admin_phoneno" />
+                                            <div class="input-group">
+                                                <span class="input-group-text">+60</span>
+                                                <input type="text"
+                                                    class="form-control @error('admin_phoneno') is-invalid @enderror"
+                                                    placeholder="Phone No." name="admin_phoneno" value="{{ old('admin_phoneno') }}" />
+                                                @error('admin_phoneno')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                         </div>
                                     </div>
+
+                                    <!-- Email Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Email</label>
-                                            <input type="email" class="form-control" placeholder="Email"
-                                                name="email" />
+                                            <input type="text"
+                                                class="form-control @error('email') is-invalid @enderror"
+                                                name="email"placeholder="Email" value="{{ old('email') }}"/>
+                                            @error('email')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
+
+                                    <!-- Account Status Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Account Status</label>
-                                            <select class="form-select" name="admin_status">
+                                            <select class="form-select @error('admin_status') is-invalid @enderror"
+                                                name="admin_status">
                                                 <option value ="0">Not-Activated (default)</option>
                                                 <option value ="1" disabled>Active</option>
                                                 <option value = "2" disabled>Inactive</option>
                                             </select>
+                                            @error('admin_status')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
+
+                                    <!-- Password Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label class="form-label">Password </label>
-                                            <input type="password" class="form-control" placeholder="Password"
-                                                name="password" value="servenow@1234" />
-                                            <span class="text-muted" style="font-size: 9pt">[Default: servenow@1234]</span>
+                                            <input type="password"
+                                                class="form-control @error('password') is-invalid @enderror"
+                                                placeholder="Password" name="password" value="servenow@1234" />
+                                            <span class="text-muted" style="font-size: 9pt">[Default:
+                                                servenow@1234]</span>
+                                            @error('password')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="modal-footer justify-content-end">
                                 <div class="flex-grow-1 text-end">
                                     <button type="reset" class="btn btn-link-danger btn-pc-default"
@@ -271,9 +311,15 @@
 
     </div>
     <!-- [ Main Content ] end -->
-
+   
 
     <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            @if ($errors->any())
+                var modal = new bootstrap.Modal(document.getElementById('addAdminModal'));
+                modal.show();
+            @endif
+        });
         $(document).ready(function() {
 
             // DATATABLE : ADMINISTRATORS
@@ -328,7 +374,6 @@
             });
         });
     </script>
-    
 @endsection
 
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->

@@ -36,7 +36,8 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     // Admin - Account Profile
     Route::get('/profile', [RouteController::class, 'adminprofileNav'])->name('admin-profile');
-
+    Route::post('/update-profile-{id}', [AdministratorController::class, 'adminUpdateProfile'])->name('admin-update-profile');
+    Route::post('/update-password-{id}', [AdministratorController::class, 'adminUpdatePassword'])->name('admin-update-password');
 
     // Admin - Logout
     Route::get('/admin-logout', [AuthenticateController::class, 'logoutAdmin'])->name('admin-logout');
@@ -65,7 +66,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/reject-service-{id}', [ServiceController::class, 'adminRejectService'])->name('admin-reject-service');
     Route::get('/terminate-service-{id}', [ServiceController::class, 'adminTerminateService'])->name('admin-terminate-service');
 
-
+ 
 });
 /* Admin Route End */
 
@@ -96,6 +97,8 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     // Tasker - Account Profile
     Route::get('/profile', [RouteController::class, 'taskerprofileNav'])->name('tasker-profile');
     Route::post('/update-profile-{id}', [TaskerController::class, 'taskerUpdateProfile'])->name('tasker-update-profile'); 
+    Route::post('/update-password-{id}', [TaskerController::class, 'taskerUpdatePassword'])->name('tasker-update-password');
+
 
 
     //Tasker - Service Management

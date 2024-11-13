@@ -346,10 +346,13 @@
                                                             <select name="tasker_address_area"
                                                                 class="form-control @error('tasker_address_area') is-invalid @enderror"
                                                                 id="addCity">
-                                                                @if(Auth::user()->tasker_address_area == '')
+                                                                @if (Auth::user()->tasker_address_area == '')
                                                                     <option value="" selected>Select Area</option>
                                                                 @else
-                                                                    <option value="{{ Auth::user()->tasker_address_area }}" selected>{{ Auth::user()->tasker_address_area }}</option>
+                                                                    <option
+                                                                        value="{{ Auth::user()->tasker_address_area }}"
+                                                                        selected>{{ Auth::user()->tasker_address_area }}
+                                                                    </option>
                                                                 @endif
                                                             </select>
                                                             @error('tasker_address_area')
@@ -404,10 +407,13 @@
                                                             <select name="tasker_workingloc_area"
                                                                 class="form-control @error('tasker_workingloc_area') is-invalid @enderror"
                                                                 id="workCity">
-                                                                @if(Auth::user()->tasker_workingloc_area == '')
+                                                                @if (Auth::user()->tasker_workingloc_area == '')
                                                                     <option value="" selected>Select Area</option>
                                                                 @else
-                                                                    <option value="{{ Auth::user()->tasker_workingloc_area }}" selected>{{ Auth::user()->tasker_workingloc_area }}</option>
+                                                                    <option
+                                                                        value="{{ Auth::user()->tasker_workingloc_area }}"
+                                                                        selected>{{ Auth::user()->tasker_workingloc_area }}
+                                                                    </option>
                                                                 @endif
                                                             </select>
                                                             @error('tasker_workingloc_area')
@@ -426,58 +432,82 @@
                                 </div>
                             </form>
                         </div>
+                        <!-- Update Password Tab -->
                         <div class="tab-pane" id="profile-4" role="tabpanel" aria-labelledby="profile-tab-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Change Password</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Old Password</label>
-                                                <input type="password" class="form-control" />
+                            <form action="{{ route('tasker-update-password', Auth::user()->id) }}" method="POST">
+                                @csrf
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Change Password</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Old Password</label>
+                                                    <div class="input-group mb-3">
+                                                        <input type="password" class="form-control" name="oldPass"
+                                                            id="oldpassword" />
+                                                        <button class="btn btn-light border border-1 border-secondary"
+                                                            type="button" id="show-old-password">
+                                                            <i id="toggle-icon-old-password" class="ti ti-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">New Password</label>
+                                                    <div class="input-group mb-3">
+                                                        <input type="password" class="form-control" id="passwords"
+                                                            name="newPass" />
+                                                        <button class="btn btn-light border border-1 border-secondary"
+                                                            type="button" id="show-password">
+                                                            <i id="toggle-icon-password" class="ti ti-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label">Confirm Password</label>
+                                                    <div class="input-group mb-3">
+                                                        <input type="password" class="form-control" name="renewPass"
+                                                            id="cpassword" />
+                                                        <button class="btn btn-light border border-1 border-secondary"
+                                                            type="button" id="show-password-confirm">
+                                                            <i id="toggle-icon-confirm-password" class="ti ti-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">New Password</label>
-                                                <input type="password" class="form-control" />
+                                            <div class="col-sm-6">
+                                                <h5>New password must contain:</h5>
+                                                <ul class="list-group list-group-flush">
+                                                    <li class="list-group-item" id="min-char"><i></i> At least
+                                                        8
+                                                        characters</li>
+                                                    <li class="list-group-item" id="lower-char"><i></i> At least
+                                                        1
+                                                        lower letter (a-z)</li>
+                                                    <li class="list-group-item" id="upper-char"><i></i> At least
+                                                        1
+                                                        uppercase letter(A-Z)</li>
+                                                    <li class="list-group-item" id="number-char"><i></i> At least
+                                                        1
+                                                        number (0-9)</li>
+                                                    <li class="list-group-item" id="special-char"><i></i> At least
+                                                        1
+                                                        special characters</li>
+                                                </ul>
                                             </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Confirm Password</label>
-                                                <input type="password" class="form-control" />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <h5>New password must contain:</h5>
-                                            <ul class="list-group list-group-flush">
-                                                <li class="list-group-item"><i
-                                                        class="ti ti-circle-check text-success f-16 me-2"></i> At least
-                                                    8
-                                                    characters</li>
-                                                <li class="list-group-item"><i
-                                                        class="ti ti-circle-check text-success f-16 me-2"></i> At least
-                                                    1
-                                                    lower letter (a-z)</li>
-                                                <li class="list-group-item"><i
-                                                        class="ti ti-circle-check text-success f-16 me-2"></i> At least
-                                                    1
-                                                    uppercase letter(A-Z)</li>
-                                                <li class="list-group-item"><i
-                                                        class="ti ti-circle-check text-success f-16 me-2"></i> At least
-                                                    1
-                                                    number (0-9)</li>
-                                                <li class="list-group-item"><i
-                                                        class="ti ti-circle-check text-success f-16 me-2"></i> At least
-                                                    1
-                                                    special characters</li>
-                                            </ul>
                                         </div>
                                     </div>
+                                    <div class="card-footer text-end btn-page">
+                                        <button type="submit" class="btn btn-primary disabled" id="submit-btn">Update
+                                            Password</button>
+                                    </div>
                                 </div>
-                                <div class="card-footer text-end btn-page">
-                                    <button type="submit" class="btn btn-primary">Update Profile</button>
-                                </div>
-                            </div>
+
+                            </form>
+
                         </div>
                     </div>
 
@@ -522,7 +552,7 @@
                         },
                         error: function(xhr, status, error) {
                             console.error("Error fetching areas: " +
-                            error); // For debugging if request fails
+                                error); // For debugging if request fails
                         }
                     });
                 } else {
@@ -546,13 +576,117 @@
                         },
                         error: function(xhr, status, error) {
                             console.error("Error fetching areas: " +
-                            error); // For debugging if request fails
+                                error); // For debugging if request fails
                         }
                     });
                 } else {
                     $('#workCity').empty().append('<option value="">Select Area</option>');
                 }
             });
+
+            document.getElementById('passwords').addEventListener('input', function() {
+                const password = this.value;
+                const submitbtn = document.getElementById('submit-btn');
+                const confirmPasswordInput = document.getElementById('cpassword');
+
+
+                // Regular expressions for each requirement
+                const minChar = /.{8,}/;
+                const lowerChar = /[a-z]/;
+                const upperChar = /[A-Z]/;
+                const numberChar = /[0-9]/;
+                const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+
+
+                // Function to update each requirement's status
+                function validateRequirement(regex, elementId) {
+                    const element = document.getElementById(elementId);
+                    if (regex.test(password)) {
+                        element.classList.remove('ti', 'ti-circle-x', 'text-danger', 'f-16', 'me-2');
+                        element.classList.add('ti', 'ti-circle-check', 'text-success', 'f-16', 'me-2');
+                    } else {
+                        element.classList.remove('ti', 'ti-circle-check', 'text-success', 'f-16', 'me-2');
+                        element.classList.add('ti', 'ti-circle-x', 'text-danger', 'f-16', 'me-2');
+                    }
+                }
+
+                // Validate each requirement
+                validateRequirement(minChar, 'min-char');
+                validateRequirement(lowerChar, 'lower-char');
+                validateRequirement(upperChar, 'upper-char');
+                validateRequirement(numberChar, 'number-char');
+                validateRequirement(specialChar, 'special-char');
+
+                // Check if all requirements are met
+                const allRequirementsMet = (
+                    minChar.test(password) &&
+                    lowerChar.test(password) &&
+                    upperChar.test(password) &&
+                    numberChar.test(password) &&
+                    specialChar.test(password)
+                );
+
+                // Only check the confirm password if all new password requirements are met
+                if (allRequirementsMet) {
+                    confirmPasswordInput.disabled = false;
+                    checkPasswordsMatch();
+                } else {
+                    submitbtn.classList.add('disabled');
+                    confirmPasswordInput.disabled =
+                        true;
+                }
+
+                // Function to check if passwords match
+                function checkPasswordsMatch() {
+                    const confirmPassword = confirmPasswordInput.value;
+                    if (password === confirmPassword) {
+                        submitbtn.classList.remove(
+                            'disabled');
+                    } else {
+                        submitbtn.classList.add(
+                            'disabled');
+                    }
+                }
+            });
+
+            // Confirm Password Match Check
+            document.getElementById('cpassword').addEventListener('input', function() {
+                const newPassword = document.getElementById('passwords').value;
+                const confirmPassword = this.value;
+                const submitbtn = document.getElementById('submit-btn');
+
+                function checkPasswordsMatch() {
+                    if (newPassword === confirmPassword) {
+                        submitbtn.classList.remove('disabled');
+                    } else {
+                        submitbtn.classList.add('disabled');
+                    }
+                }
+
+                checkPasswordsMatch();
+            });
+
+            function showpassword(buttonName, txtName, iconName) {
+                document.getElementById(buttonName).addEventListener('click', function() {
+                    const passwordInput = document.getElementById(txtName);
+                    const icon = document.getElementById(iconName);
+
+                    // Toggle password visibility
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text'; // Change to text to show password
+                        icon.classList.remove('ti-eye'); // Remove eye icon
+                        icon.classList.add('ti-eye-off'); // Add eye-slash icon
+                    } else {
+                        passwordInput.type = 'password'; // Change to password to hide it
+                        icon.classList.remove('ti-eye-off'); // Remove eye-slash icon
+                        icon.classList.add('ti-eye'); // Add eye icon
+                    }
+                });
+            }
+
+            showpassword('show-old-password', 'oldpassword', 'toggle-icon-old-password');
+            showpassword('show-password', 'passwords', 'toggle-icon-password');
+            showpassword('show-password-confirm', 'cpassword', 'toggle-icon-confirm-password');
 
 
 

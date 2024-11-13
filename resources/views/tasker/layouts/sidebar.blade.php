@@ -45,7 +45,7 @@
                     <label>Main</label>
                 </li>
                 <li class="pc-item">
-                    <a href="##" class="pc-link">
+                    <a href="{{ route('tasker-home') }}" class="pc-link">
                         <span class="pc-micon">
                             <svg class="pc-icon">
                                 <use xlink:href="#custom-story"></use>

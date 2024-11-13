@@ -19,6 +19,10 @@ return [
     */
 
     'driver' => env('SESSION_DRIVER', 'file'),
+    'session' => [
+        'tasker_session' => env('TASKER_SESSION_NAME', 'tasker_session'),
+        'admin_session' => env('ADMIN_SESSION_NAME', 'admin_session'),
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -128,8 +132,9 @@ return [
 
     'cookie' => env(
         'SESSION_COOKIE',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_session'
+        Str::slug(env('APP_NAME', 'laravel'), '_') . '_session'
     ),
+    'cookie' => env('SESSION_COOKIE', 'laravel_session'),
 
     /*
     |--------------------------------------------------------------------------

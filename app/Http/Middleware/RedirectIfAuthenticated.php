@@ -20,6 +20,12 @@ class RedirectIfAuthenticated
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
+            if ($guard=="admin" && Auth::guard($guard)->check()) {
+                return redirect(RouteServiceProvider::ADMIN_DASHBOARD);
+            }
+            if ($guard=="tasker" && Auth::guard($guard)->check()) {
+                return redirect(RouteServiceProvider::TASKER_DASHBOARD);
+            }
             if (Auth::guard($guard)->check()) {
                 return redirect(RouteServiceProvider::HOME);
             }
