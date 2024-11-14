@@ -127,9 +127,14 @@
                                 </h6>
                             </div>
 
-                            <div class="d-grid mt-4 mb-3">
+                            <div class="d-grid mt-4 mb-4">
                                 <button type="submit" class="btn btn-lg btn-primary">Log In</button>
                             </div>
+
+                            <div class="d-flex justify-content-center align-items-center mt-4">
+                                <h6 class="f-w-500 mb-0">Don't have an Account?  <a href="register-v2.html" class="link-primary text-decoration-underline">Register Now</a></h6>
+                               
+                              </div>
                         </div>
                     </div>
                 </div>
