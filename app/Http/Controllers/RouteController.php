@@ -622,6 +622,16 @@ class RouteController extends Controller
         ]);
     }
 
+    public function adminFirstTimeNav($id)
+    {
+        $admin = Administrator::where('id',Crypt::decrypt($id))->first();
+
+        return view('administrator.first-time', [
+            'title' => 'First Time Login',
+            'admin'=> $admin
+        ]);
+    }
+
     public function adminprofileNav()
     {
         return view('administrator.admin.profile', [

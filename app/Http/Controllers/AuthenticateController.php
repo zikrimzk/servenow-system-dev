@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Administrator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Crypt;
 
 class AuthenticateController extends Controller
 {
@@ -35,9 +37,19 @@ class AuthenticateController extends Controller
 
         if (Auth::guard('admin')->attempt([
             'email' => $credentials['email'],
-            'password' => $credentials['password']
+            'password' => $credentials['password'],
+            'admin_status'=> 0
         ])) {
-            $request->session()->regenerate();
+            Auth::guard('admin')->logout();
+            
+            $admin = Administrator::where('email',$credentials['email'])->first();
+            return redirect()->route('admin-first-time',Crypt::encrypt($admin->id));
+
+        }elseif(Auth::guard('admin')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'admin_status'=> 1
+        ])){
             return redirect()->intended(route('admin-home'));
         }
 

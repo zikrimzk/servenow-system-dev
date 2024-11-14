@@ -27,6 +27,9 @@ Route::prefix('admin')->group(function () {
     // Admin - Auth Process
     Route::post('/admin-authentication', [AuthenticateController::class, 'authenticateAdmin'])->name('auth-admin');
 
+    // Admin - First Time Login
+    Route::get('/admin-first-time-login-{id}', [RouteController::class, 'adminFirstTimeNav'])->name('admin-first-time');
+
 }); 
 
 Route::prefix('admin')->middleware('auth:admin')->group(function () {
