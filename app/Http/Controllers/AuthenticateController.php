@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Crypt;
 
@@ -21,8 +22,8 @@ class AuthenticateController extends Controller
             'email' => $credentials['email'],
             'password' => $credentials['password']
         ])) {
-            $request->session()->regenerate();
-            return redirect()->intended(route('tasker-home'));
+
+            return redirect()->route('tasker-home');
         }
 
         return redirect(route('tasker-login'))->with('error', 'The provided credentials do not match our records. Please try again !');
@@ -41,7 +42,6 @@ class AuthenticateController extends Controller
             'admin_status'=> 0
         ])) {
             Auth::guard('admin')->logout();
-            
             $admin = Administrator::where('email',$credentials['email'])->first();
             return redirect()->route('admin-first-time',Crypt::encrypt($admin->id));
 
@@ -50,7 +50,7 @@ class AuthenticateController extends Controller
             'password' => $credentials['password'],
             'admin_status'=> 1
         ])){
-            return redirect()->intended(route('admin-home'));
+            return redirect()->route('admin-home');
         }
 
         return redirect(route('admin-login'))->with('error', 'The provided credentials do not match our records. Please try again !');
@@ -75,5 +75,31 @@ class AuthenticateController extends Controller
         // $request->session()->regenerateToken();
 
         return redirect(route('admin-login'))->with('success', 'You have successfully logged out.');
+    }
+
+    public function adminFirstTimeLogin(Request $req,$id)
+    {
+        $validated = $req->validate([
+            'oldPass' => 'required | min:8',
+            'newPass' => 'required | min:8',
+            'renewPass' => 'required | same:newPass',
+        ],[],
+        [
+            'oldPass' => 'Old Password',
+            'newPass' => 'New Password',
+            'renewPass' => 'Comfirm Password',
+
+        ]);
+        $admin = Administrator::where('id', Crypt::decrypt($id))->first();
+
+        $check = Hash::check($validated['oldPass'], $admin->password, []);
+        if($check)
+        {
+            Administrator::where('id', Crypt::decrypt($id))->update(['password'=> bcrypt($validated['renewPass']), 'admin_status'=> 1]);
+            return redirect()->route('admin-login')->with('success','Password has been updated successfully. Please log in using your new credentials.');
+        }
+        else{
+            return back()->with('error','Please enter the correct password !');
+        }
     }
 }

@@ -29,6 +29,8 @@ Route::prefix('admin')->group(function () {
 
     // Admin - First Time Login
     Route::get('/admin-first-time-login-{id}', [RouteController::class, 'adminFirstTimeNav'])->name('admin-first-time');
+    Route::post('/admin-first-time-login-process-{id}', [AuthenticateController::class, 'adminFirstTimeLogin'])->name('admin-first-time-update');
+
 
 }); 
 
