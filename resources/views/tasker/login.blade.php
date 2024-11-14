@@ -132,7 +132,7 @@
                             </div>
 
                             <div class="d-flex justify-content-center align-items-center mt-4">
-                                <h6 class="f-w-500 mb-0">Don't have an Account?  <a href="register-v2.html" class="link-primary text-decoration-underline">Register Now</a></h6>
+                                <h6 class="f-w-500 mb-0">Don't have an Account?  <a href="{{ route('tasker-register-form') }}" class="link-primary text-decoration-underline">Register Now</a></h6>
                                
                               </div>
                         </div>
