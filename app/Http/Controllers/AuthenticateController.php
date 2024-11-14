@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tasker;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
 use Illuminate\Support\Facades\Auth;
@@ -20,13 +21,54 @@ class AuthenticateController extends Controller
 
         if (Auth::guard('tasker')->attempt([
             'email' => $credentials['email'],
-            'password' => $credentials['password']
+            'password' => $credentials['password'],
+            'tasker_status'=> 4 // Tasker Password Need To Change
         ])) {
 
+            Auth::guard('tasker')->logout();
+            $tasker = Tasker::where('email',$credentials['email'])->first();
+            return redirect()->route('tasker-first-time',Crypt::encrypt($tasker->id));
+
+        }elseif(Auth::guard('tasker')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'tasker_status'=> 0 //Tasker Incomplete Profile
+        ])){
             return redirect()->route('tasker-home');
+
+        }elseif(Auth::guard('tasker')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'tasker_status'=> 1 //Tasker Not Verified
+        ])){
+            return redirect()->route('tasker-home');
+
+        }elseif(Auth::guard('tasker')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'tasker_status'=> 2 //Tasker Active
+        ])){
+            return redirect()->route('tasker-home');
+
+
+        }elseif(Auth::guard('tasker')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'tasker_status'=> 3 // Tasker Inactive
+        ])){
+            Auth::guard('tasker')->logout();
+            return redirect()->route('tasker-login')->with('error', 'The provided credentials are inactive. Please contact the administrator for further details.');
+
+        }elseif(Auth::guard('tasker')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'tasker_status'=> 5 // Tasker Banned
+        ])){
+            Auth::guard('tasker')->logout();
+            return redirect(route('tasker-login'))->with('error', 'The provided credentials are banned. Please contact the administrator for further details.');
         }
 
-        return redirect(route('tasker-login'))->with('error', 'The provided credentials do not match our records. Please try again !');
+        return redirect()->route('tasker-login')->with('error', 'The provided credentials do not match our records. Please try again !');
     }
 
     public function authenticateAdmin(Request $request): RedirectResponse
@@ -53,7 +95,7 @@ class AuthenticateController extends Controller
             return redirect()->route('admin-home');
         }
 
-        return redirect(route('admin-login'))->with('error', 'The provided credentials do not match our records. Please try again !');
+        return redirect()->route('admin-login')->with('error', 'The provided credentials do not match our records. Please try again !');
     }
 
 
@@ -64,7 +106,7 @@ class AuthenticateController extends Controller
         // $request->session()->invalidate();
         // $request->session()->regenerateToken();
 
-        return redirect(route('tasker-login'))->with('success', 'You have successfully logged out.');
+        return redirect()->route('tasker-login')->with('success', 'You have successfully logged out.');
     }
     
     public function logoutAdmin(Request $request): RedirectResponse
@@ -74,7 +116,7 @@ class AuthenticateController extends Controller
         // $request->session()->invalidate();
         // $request->session()->regenerateToken();
 
-        return redirect(route('admin-login'))->with('success', 'You have successfully logged out.');
+        return redirect()->route('admin-login')->with('success', 'You have successfully logged out.');
     }
 
     public function adminFirstTimeLogin(Request $req,$id)
@@ -97,6 +139,32 @@ class AuthenticateController extends Controller
         {
             Administrator::where('id', Crypt::decrypt($id))->update(['password'=> bcrypt($validated['renewPass']), 'admin_status'=> 1]);
             return redirect()->route('admin-login')->with('success','Password has been updated successfully. Please log in using your new credentials.');
+        }
+        else{
+            return back()->with('error','Please enter the correct password !');
+        }
+    }
+
+    public function taskerFirstTimeLogin(Request $req,$id)
+    {
+        $validated = $req->validate([
+            'oldPass' => 'required | min:8',
+            'newPass' => 'required | min:8',
+            'renewPass' => 'required | same:newPass',
+        ],[],
+        [
+            'oldPass' => 'Old Password',
+            'newPass' => 'New Password',
+            'renewPass' => 'Comfirm Password',
+
+        ]);
+        $tasker = Tasker::where('id', Crypt::decrypt($id))->first();
+
+        $check = Hash::check($validated['oldPass'], $tasker->password, []);
+        if($check)
+        {
+            Tasker::where('id', Crypt::decrypt($id))->update(['password'=> bcrypt($validated['renewPass']), 'tasker_status'=> 0]);
+            return redirect()->route('tasker-login')->with('success','Password has been updated successfully. Please log in using your new credentials.');
         }
         else{
             return back()->with('error','Please enter the correct password !');

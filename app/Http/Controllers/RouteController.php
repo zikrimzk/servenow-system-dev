@@ -613,6 +613,16 @@ class RouteController extends Controller
         ]);
     }
 
+    public function taskerFirstTimeNav($id)
+    {
+        $tasker = Tasker::where('id',Crypt::decrypt($id))->first();
+
+        return view('tasker.first-time', [
+            'title' => 'First Time Login',
+            'tasker'=> $tasker
+        ]);
+    }
+
     public function taskerprofileNav()
     {
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);

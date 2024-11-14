@@ -227,13 +227,11 @@ class TaskerController extends Controller
         if ($ori->tasker_status == 0 || $ori->tasker_status == 1) {
             $taskers['tasker_status'] = 1;
             $message = 'Tasker profile has been successfully updated. Please proceed to account verification to start earning.';
-        } elseif ($ori->tasker_status == 2) {
+        } elseif ($ori->tasker_status == 2 || $ori->tasker_status == 3 ) {
             $taskers['tasker_status'] = 2;
             $message = 'Tasker profile has been successfully updated !';
-        } else {
-            $message = 'Tasker profile has been successfully updated !';
-        }
-
+        } 
+        
         Tasker::whereId($id)->update($taskers);
 
         return redirect(route('tasker-profile'))->with('success', $message);

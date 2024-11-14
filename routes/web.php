@@ -88,6 +88,10 @@ Route::get('/register-tasker', [RouteController::class, 'taskerRegisterFormNav']
 // Tasker - Registration Process
 Route::post('/tasker-registration', [TaskerController::class, 'createTasker'])->name('tasker-create');
 
+// Admin - First Time Login
+Route::get('/tasker-first-time-login-{id}', [RouteController::class, 'taskerFirstTimeNav'])->name('tasker-first-time');
+Route::post('/tasker-first-time-login-process-{id}', [AuthenticateController::class, 'taskerFirstTimeLogin'])->name('tasker-first-time-update');
+
 // Tasker - Auth Process
 Route::post('/tasker-authentication', [AuthenticateController::class, 'authenticateTasker'])->name('auth-tasker');
 
