@@ -15,57 +15,9 @@ use Yajra\DataTables\Facades\DataTables;
 class RouteController extends Controller
 {
 
-    public function taskerLoginNav()
-    {
-        if(!Auth::guard('tasker')->check())
-        {
-            return view('tasker.login', [
-                'title' => 'Tasker Login'
-            ]);
-        }
-        else
-        {
-           return redirect(route('tasker-home'));
-        }
-       
-    }
+    /**** General Route Function - Start ****/
 
-    public function taskerRegisterFormNav()
-    {
-        return view('tasker.register-tasker', [
-            'title' => 'Tasker Registration'
-        ]);
-    }
-
-    public function adminLoginNav()
-    {
-        if(!Auth::guard('admin')->check())
-        {
-            return view('administrator.login', [
-                'title' => 'Admin Login'
-            ]);
-        }
-        else
-        {
-            return redirect(route('admin-home'));
-        }
-       
-    }
-
-    public function adminHomeNav()
-    {
-        return view('administrator.index', [
-            'title' => 'Admin Dashboard'
-        ]);
-    }
-
-    public function taskerhomeNav()
-    {
-        return view('tasker.index', [
-            'title' => 'Tasker Dashboard'
-        ]);
-    }
-
+    // Get State API
     public function getAreas($state)
     {
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
@@ -81,230 +33,72 @@ class RouteController extends Controller
         return response()->json($areas);
     }
 
-    public function adminManagementNav(Request $request)
+    /**** General Route Function - End ****/
+
+
+
+
+    /**** Client Route Function - Start ****/
+
+    //All Client Route Here ....
+
+    /**** Client Route Function - End ****/
+
+
+
+
+    /**** Tasker Route Function - Start ****/
+
+    // Tasker - Registration Form Navigation
+    public function taskerRegisterFormNav()
     {
-        if ($request->ajax()) {
-
-            $data = DB::table('administrators')
-                ->select('id', 'admin_firstname', 'admin_lastname', 'admin_phoneno', 'email', 'admin_status')
-                ->get();
-
-            $table = DataTables::of($data)->addIndexColumn();
-
-            $table->addColumn('admin_status', function ($row) {
-
-                if ($row->admin_status == 0) {
-                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i> Not Activated</span>';
-                } else if ($row->admin_status == 1) {
-                    $status = '<span class="text-success"><i class="fas fa-circle f-10 m-r-10"></i> Active</span>';
-                } else {
-                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i> Inactive</span>';
-                }
-
-                return $status;
-            });
-
-            $table->addColumn('action', function ($row) {
-
-                $button =
-                    '
-                          <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#updateAdminModal-' . $row->id . '">
-                            <i class="ti ti-edit f-20"></i>
-                          </a>
-                          <a href="#" class="avtar avtar-xs  btn-light-danger deleteAdmin-' . $row->id . '" data-bs-toggle="modal"
-                            data-bs-target="#deleteAdmin">
-                            <i class="ti ti-trash f-20"></i>
-                          </a>
-
-                            <script>
-                                document.querySelector(".deleteAdmin-' . $row->id . '").addEventListener("click", function () {
-                                const swalWithBootstrapButtons = Swal.mixin({
-                                customClass: {
-                                    confirmButton: "btn btn-success",
-                                    cancelButton: "btn btn-danger"
-                                },
-                                buttonsStyling: false
-                                });
-                                swalWithBootstrapButtons
-                                .fire({
-                                    title: "Are you sure?",
-                                    text: "Once deleted, the admin will permanently lose access to the system, and all related data will be removed. This action cannot be undone.",
-                                    icon: "warning",
-                                    showCancelButton: true,
-                                    confirmButtonText: "Yes, delete it!",
-                                    cancelButtonText: "No, cancel!",
-                                    reverseButtons: true
-                                })
-                                .then((result) => {
-                                    if (result.isConfirmed) {
-                                        setTimeout(function() {
-                                            location.href="' . route("admin-delete", $row->id) . '";
-                                        }, 1000);
-                                    } 
-                                });
-                            });
-                        </script>
-                    ';
-
-                return $button;
-            });
-
-            $table->rawColumns(['admin_status', 'action']);
-
-            return $table->make(true);
-        }
-        return view('administrator.admin.index', [
-            'title' => 'Admin Management',
-            'admins' => Administrator::get()
+        return view('tasker.register-tasker', [
+            'title' => 'Tasker Registration'
         ]);
     }
 
-    public function serviceTypeManagementNav(Request $request)
+    // Tasker - First Time Login Form Navigation
+    public function taskerFirstTimeNav($id)
     {
-        if ($request->ajax()) {
+        $tasker = Tasker::where('id', Crypt::decrypt($id))->first();
 
-            $data = DB::table('service_types')
-                ->select('id', 'servicetype_name', 'servicetype_desc', 'servicetype_status')
-                ->get();
-
-            $table = DataTables::of($data)->addIndexColumn();
-
-            $table->addColumn('servicetype_status', function ($row) {
-
-                if ($row->servicetype_status == 1) {
-                    $status = '<span class="badge rounded-pill text-bg-success">Show</span>';
-                } else if ($row->servicetype_status == 2) {
-                    $status = '<span class="badge rounded-pill text-bg-danger">Hide</span>';
-                }
-                return $status;
-            });
-
-            $table->addColumn('action', function ($row) {
-
-                $button =
-                    '
-                          <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#updateServiceTypeModal-' . $row->id . '">
-                            <i class="ti ti-edit f-20"></i>
-                          </a>
-                          <a href="#" class="avtar avtar-xs  btn-light-danger deleteServiceType-' . $row->id . '" data-bs-toggle="modal"
-                            data-bs-target="#deleteAdmin">
-                            <i class="ti ti-trash f-20"></i>
-                          </a>
-
-                            <script>
-                                document.querySelector(".deleteServiceType-' . $row->id . '").addEventListener("click", function () {
-                                const swalWithBootstrapButtons = Swal.mixin({
-                                customClass: {
-                                    confirmButton: "btn btn-success",
-                                    cancelButton: "btn btn-danger"
-                                },
-                                buttonsStyling: false
-                                });
-                                swalWithBootstrapButtons
-                                .fire({
-                                    title: "Are you sure?",
-                                    text: "This action cannot be undone.",
-                                    icon: "warning",
-                                    showCancelButton: true,
-                                    confirmButtonText: "Yes, delete it!",
-                                    cancelButtonText: "No, cancel!",
-                                    reverseButtons: true
-                                })
-                                .then((result) => {
-                                    if (result.isConfirmed) {
-                                        setTimeout(function() {
-                                            location.href="' . route("admin-servicetype-delete", $row->id) . '";
-                                        }, 1000);
-                                    } 
-                                });
-                            });
-                        </script>
-                    ';
-
-                return $button;
-            });
-
-            $table->rawColumns(['servicetype_status', 'action']);
-
-            return $table->make(true);
-        }
-        return view('administrator.service.servicetype-index', [
-            'title' => 'Service Type Management',
-            'stypes' => ServiceType::get(),
+        return view('tasker.first-time', [
+            'title' => 'First Time Login',
+            'tasker' => $tasker
         ]);
     }
 
-    public function taskerManagementNav(Request $request)
+    // Tasker - Login Form Navigation
+    public function taskerLoginNav()
     {
-        if ($request->ajax()) {
-
-            $data = DB::table('taskers')
-                ->select('id', 'tasker_code', 'tasker_firstname', 'tasker_lastname', 'email', 'tasker_status', 'tasker_phoneno')
-                ->get();
-
-            $table = DataTables::of($data)->addIndexColumn();
-
-            $table->addColumn('tasker_status', function ($row) {
-
-                if ($row->tasker_status == 0) {
-                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Incomplete Profile</span>';
-                } else if ($row->tasker_status == 1) {
-                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Not Verified</span>';
-                } else if ($row->tasker_status == 2) {
-                    $status = '<span class="text-success"><i class="fas fa-circle f-10 m-r-10"></i>Active</span>';
-                } else if ($row->tasker_status == 3) {
-                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i>Inactive</span>';
-                } else if ($row->tasker_status == 4) {
-                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Password Reset Needed</span>';
-                } else if ($row->tasker_status == 5) {
-                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i>Banned</span>';
-                }
-
-                return $status;
-            });
-
-            $table->addColumn('action', function ($row) {
-
-                $button =
-                    '
-                          <a href="'.route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)).'" class="avtar avtar-xs btn-light-primary"">
-                            <i class="ti ti-edit f-20"></i>
-                          </a>
-                    ';
-
-                return $button;
-            });
-
-            $table->rawColumns(['tasker_status', 'action']);
-
-            return $table->make(true);
+        if (!Auth::guard('tasker')->check()) {
+            return view('tasker.login', [
+                'title' => 'Tasker Login'
+            ]);
+        } else {
+            return redirect(route('tasker-home'));
         }
+    }
 
-        return view('administrator.tasker.index', [
-            'title' => 'Tasker Management',
-            'taskers' => Tasker::get(),
+    // Tasker - Dashboard Navigation
+    public function taskerhomeNav()
+    {
+        return view('tasker.index', [
+            'title' => 'Tasker Dashboard'
         ]);
     }
 
-    public function taskerUpdateNav($id)
+    // Tasker - Profile Navigation
+    public function taskerprofileNav()
     {
-        $data = Tasker::where('tasker_code', Crypt::decrypt($id))->first();
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
-
-
-        return view ('administrator.tasker.update-tasker',[
-            'title'=>$data->tasker_firstname .' profile',
-            'tasker'=>$data,
-            'states' => $states,
-            'taskerCount' => Tasker::count(),
-
-
+        return view('tasker.account.profile', [
+            'title' => 'Tasker Profile',
+            'states' => $states
         ]);
-
     }
 
+    // Tasker - Service Management Navigation
     public function taskerServiceManagementNav(Request $request)
     {
         if ($request->ajax()) {
@@ -332,7 +126,7 @@ class RouteController extends Controller
                     $status = '<span class="badge text-bg-danger text-white">Inactive</span>';
                 } else if ($row->service_status == 3) {
                     $status = '<span class="badge bg-danger">Rejected</span>';
-                }else if ($row->service_status == 4) {
+                } else if ($row->service_status == 4) {
                     $status = '<span class="badge bg-light-danger">Terminated</span>';
                 }
 
@@ -417,7 +211,7 @@ class RouteController extends Controller
                         });
                     </script>
                 ';
-                }else if ($row->service_status == 4) {
+                } else if ($row->service_status == 4) {
                     $button = 'Remarks : Make new application';
                 }
 
@@ -436,6 +230,281 @@ class RouteController extends Controller
         ]);
     }
 
+
+    /**** Tasker Route Function - End ****/
+
+
+
+
+    /**** Administrator Route Function - Start ****/
+
+    // Admin - First Time Login Navigation
+    public function adminFirstTimeNav($id)
+    {
+        $admin = Administrator::where('id', Crypt::decrypt($id))->first();
+
+        return view('administrator.first-time', [
+            'title' => 'First Time Login',
+            'admin' => $admin
+        ]);
+    }
+
+    // Admin - Login Navigation
+    public function adminLoginNav()
+    {
+        if (!Auth::guard('admin')->check()) {
+            return view('administrator.login', [
+                'title' => 'Admin Login'
+            ]);
+        } else {
+            return redirect(route('admin-home'));
+        }
+    }
+
+    // Admin - Dashboard Navigation
+    public function adminHomeNav()
+    {
+        return view('administrator.index', [
+            'title' => 'Admin Dashboard'
+        ]);
+    }
+
+    // Admin - Profile Navigation
+    public function adminprofileNav()
+    {
+        return view('administrator.admin.profile', [
+            'title' => 'Administrator Profile',
+        ]);
+    }
+
+    // Admin - Admin Management Navigation
+    public function adminManagementNav(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $data = DB::table('administrators')
+                ->select('id', 'admin_firstname', 'admin_lastname', 'admin_phoneno', 'email', 'admin_status')
+                ->get();
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('admin_status', function ($row) {
+
+                if ($row->admin_status == 0) {
+                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i> Not Activated</span>';
+                } else if ($row->admin_status == 1) {
+                    $status = '<span class="text-success"><i class="fas fa-circle f-10 m-r-10"></i> Active</span>';
+                } else {
+                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i> Inactive</span>';
+                }
+
+                return $status;
+            });
+
+            $table->addColumn('action', function ($row) {
+
+                $button =
+                    '
+                          <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#updateAdminModal-' . $row->id . '">
+                            <i class="ti ti-edit f-20"></i>
+                          </a>
+                          <a href="#" class="avtar avtar-xs  btn-light-danger deleteAdmin-' . $row->id . '" data-bs-toggle="modal"
+                            data-bs-target="#deleteAdmin">
+                            <i class="ti ti-trash f-20"></i>
+                          </a>
+
+                            <script>
+                                document.querySelector(".deleteAdmin-' . $row->id . '").addEventListener("click", function () {
+                                const swalWithBootstrapButtons = Swal.mixin({
+                                customClass: {
+                                    confirmButton: "btn btn-success",
+                                    cancelButton: "btn btn-danger"
+                                },
+                                buttonsStyling: false
+                                });
+                                swalWithBootstrapButtons
+                                .fire({
+                                    title: "Are you sure?",
+                                    text: "Once deleted, the admin will permanently lose access to the system, and all related data will be removed. This action cannot be undone.",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Yes, delete it!",
+                                    cancelButtonText: "No, cancel!",
+                                    reverseButtons: true
+                                })
+                                .then((result) => {
+                                    if (result.isConfirmed) {
+                                        setTimeout(function() {
+                                            location.href="' . route("admin-delete", $row->id) . '";
+                                        }, 1000);
+                                    } 
+                                });
+                            });
+                        </script>
+                    ';
+
+                return $button;
+            });
+
+            $table->rawColumns(['admin_status', 'action']);
+
+            return $table->make(true);
+        }
+        return view('administrator.admin.index', [
+            'title' => 'Admin Management',
+            'admins' => Administrator::get()
+        ]);
+    }
+
+    // Admin - Tasker Management Navigation
+    public function taskerManagementNav(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $data = DB::table('taskers')
+                ->select('id', 'tasker_code', 'tasker_firstname', 'tasker_lastname', 'email', 'tasker_status', 'tasker_phoneno')
+                ->get();
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('tasker_status', function ($row) {
+
+                if ($row->tasker_status == 0) {
+                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Incomplete Profile</span>';
+                } else if ($row->tasker_status == 1) {
+                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Not Verified</span>';
+                } else if ($row->tasker_status == 2) {
+                    $status = '<span class="text-success"><i class="fas fa-circle f-10 m-r-10"></i>Active</span>';
+                } else if ($row->tasker_status == 3) {
+                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i>Inactive</span>';
+                } else if ($row->tasker_status == 4) {
+                    $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Password Reset Needed</span>';
+                } else if ($row->tasker_status == 5) {
+                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i>Banned</span>';
+                }
+
+                return $status;
+            });
+
+            $table->addColumn('action', function ($row) {
+
+                $button =
+                    '
+                          <a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="avtar avtar-xs btn-light-primary"">
+                            <i class="ti ti-edit f-20"></i>
+                          </a>
+                    ';
+
+                return $button;
+            });
+
+            $table->rawColumns(['tasker_status', 'action']);
+
+            return $table->make(true);
+        }
+
+        return view('administrator.tasker.index', [
+            'title' => 'Tasker Management',
+            'taskers' => Tasker::get(),
+        ]);
+    }
+
+    // Admin - Tasker Profile Navigation
+    public function taskerUpdateNav($id)
+    {
+        $data = Tasker::where('tasker_code', Crypt::decrypt($id))->first();
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+
+
+        return view('administrator.tasker.update-tasker', [
+            'title' => $data->tasker_firstname . ' profile',
+            'tasker' => $data,
+            'states' => $states,
+            'taskerCount' => Tasker::count(),
+
+
+        ]);
+    }
+
+    // Admin - Service Type Management Navigation
+    public function serviceTypeManagementNav(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $data = DB::table('service_types')
+                ->select('id', 'servicetype_name', 'servicetype_desc', 'servicetype_status')
+                ->get();
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('servicetype_status', function ($row) {
+
+                if ($row->servicetype_status == 1) {
+                    $status = '<span class="badge rounded-pill text-bg-success">Show</span>';
+                } else if ($row->servicetype_status == 2) {
+                    $status = '<span class="badge rounded-pill text-bg-danger">Hide</span>';
+                }
+                return $status;
+            });
+
+            $table->addColumn('action', function ($row) {
+
+                $button =
+                    '
+                          <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#updateServiceTypeModal-' . $row->id . '">
+                            <i class="ti ti-edit f-20"></i>
+                          </a>
+                          <a href="#" class="avtar avtar-xs  btn-light-danger deleteServiceType-' . $row->id . '" data-bs-toggle="modal"
+                            data-bs-target="#deleteAdmin">
+                            <i class="ti ti-trash f-20"></i>
+                          </a>
+
+                            <script>
+                                document.querySelector(".deleteServiceType-' . $row->id . '").addEventListener("click", function () {
+                                const swalWithBootstrapButtons = Swal.mixin({
+                                customClass: {
+                                    confirmButton: "btn btn-success",
+                                    cancelButton: "btn btn-danger"
+                                },
+                                buttonsStyling: false
+                                });
+                                swalWithBootstrapButtons
+                                .fire({
+                                    title: "Are you sure?",
+                                    text: "This action cannot be undone.",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Yes, delete it!",
+                                    cancelButtonText: "No, cancel!",
+                                    reverseButtons: true
+                                })
+                                .then((result) => {
+                                    if (result.isConfirmed) {
+                                        setTimeout(function() {
+                                            location.href="' . route("admin-servicetype-delete", $row->id) . '";
+                                        }, 1000);
+                                    } 
+                                });
+                            });
+                        </script>
+                    ';
+
+                return $button;
+            });
+
+            $table->rawColumns(['servicetype_status', 'action']);
+
+            return $table->make(true);
+        }
+        return view('administrator.service.servicetype-index', [
+            'title' => 'Service Type Management',
+            'stypes' => ServiceType::get(),
+        ]);
+    }
+
+    // Admin - Service Management Navigation
     public function adminServiceManagementNav(Request $request)
     {
 
@@ -451,7 +520,7 @@ class RouteController extends Controller
 
             $table->addColumn('tasker', function ($row) {
 
-                $tasker = '<a href="'.route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)).'" class="btn btn-link">'.$row->tasker_code.'</a>';
+                $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
                 return $tasker;
             });
 
@@ -471,7 +540,7 @@ class RouteController extends Controller
                     $status = '<span class="badge text-bg-danger text-white">Inactive</span>';
                 } else if ($row->service_status == 3) {
                     $status = '<span class="badge bg-danger">Rejected</span>';
-                }else if ($row->service_status == 4) {
+                } else if ($row->service_status == 4) {
                     $status = '<span class="badge bg-light-danger">Terminated</span>';
                 }
 
@@ -594,14 +663,14 @@ class RouteController extends Controller
                     $button = '';
                 } else if ($row->service_status == 3) {
                     $button = 'Remarks : Update Required !';
-                }else if ($row->service_status == 4) {
+                } else if ($row->service_status == 4) {
                     $button = '';
                 }
 
                 return $button;
             });
 
-            $table->rawColumns(['tasker','service_rate', 'service_status', 'action']);
+            $table->rawColumns(['tasker', 'service_rate', 'service_status', 'action']);
 
             return $table->make(true);
         }
@@ -613,39 +682,12 @@ class RouteController extends Controller
         ]);
     }
 
-    public function taskerFirstTimeNav($id)
-    {
-        $tasker = Tasker::where('id',Crypt::decrypt($id))->first();
+    /**** Administrator Route Function - End ****/
 
-        return view('tasker.first-time', [
-            'title' => 'First Time Login',
-            'tasker'=> $tasker
-        ]);
-    }
 
-    public function taskerprofileNav()
-    {
-        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
-        return view('tasker.account.profile', [
-            'title' => 'Tasker Profile',
-            'states' => $states
-        ]);
-    }
 
-    public function adminFirstTimeNav($id)
-    {
-        $admin = Administrator::where('id',Crypt::decrypt($id))->first();
 
-        return view('administrator.first-time', [
-            'title' => 'First Time Login',
-            'admin'=> $admin
-        ]);
-    }
 
-    public function adminprofileNav()
-    {
-        return view('administrator.admin.profile', [
-            'title' => 'Administrator Profile',
-        ]);
-    }
+
+  
 }
