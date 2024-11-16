@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Crypt;
 
 class AuthenticateController extends Controller
 {
+    // Tasker - Login Web Process
     public function authenticateTasker(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
@@ -71,6 +72,64 @@ class AuthenticateController extends Controller
         return redirect()->route('tasker-login')->with('error', 'The provided credentials do not match our records. Please try again !');
     }
 
+
+    // Tasker - Login API Process
+    public function authenticateTaskerApi(Request $request)
+    {
+        // Validate the request data
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+    
+        // Attempt to authenticate the tasker
+        if (Auth::guard('tasker')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'tasker_status'=> 4 // Tasker Password Need To Change
+        ])) {
+            // Return a success response with the tasker's data
+            $tasker = Tasker::where('email', $credentials['email'])->first();
+            return response()->json([
+                'success' => true,
+                'tasker' => $tasker,
+                'token' => $tasker->createToken('tasker-token')->plainTextToken,
+            ]);
+        } elseif (Auth::guard('tasker')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'tasker_status'=> 0 //Tasker Incomplete Profile
+        ])) {
+            // Return a success response with the tasker's data
+            $tasker = Tasker::where('email', $credentials['email'])->first();
+            return response()->json([
+                'success' => true,
+                'tasker' => $tasker,
+                'token' => $tasker->createToken('tasker-token')->plainTextToken,
+            ]);
+        }elseif(Auth::guard('tasker')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'tasker_status'=> 1 //Tasker Not Verified
+        ])){
+            // Return a success response with the tasker's data
+            $tasker = Tasker::where('email', $credentials['email'])->first();
+            return response()->json([
+                'success' => true,
+                'tasker' => $tasker,
+                'token' => $tasker->createToken('tasker-token')->plainTextToken,
+            ]);
+
+        } else {
+            // Return an error response
+            return response()->json([
+                'success' => false,
+                'error' => 'Invalid credentials',
+            ], 401);
+        }
+    }
+
+    // Admin - Login Web Process
     public function authenticateAdmin(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
@@ -99,6 +158,7 @@ class AuthenticateController extends Controller
     }
 
 
+    // Tasker - Logout Process
     public function logoutTasker(Request $request): RedirectResponse
     {
         Auth::guard('tasker')->logout();
@@ -109,6 +169,7 @@ class AuthenticateController extends Controller
         return redirect()->route('tasker-login')->with('success', 'You have successfully logged out.');
     }
     
+    // Admin - Logout Process
     public function logoutAdmin(Request $request): RedirectResponse
     {
         Auth::guard('admin')->logout();
@@ -119,6 +180,7 @@ class AuthenticateController extends Controller
         return redirect()->route('admin-login')->with('success', 'You have successfully logged out.');
     }
 
+    // Admin - First Time Login Process
     public function adminFirstTimeLogin(Request $req,$id)
     {
         $validated = $req->validate([
@@ -145,6 +207,7 @@ class AuthenticateController extends Controller
         }
     }
 
+    // Tasker - First Time Login Process
     public function taskerFirstTimeLogin(Request $req,$id)
     {
         $validated = $req->validate([

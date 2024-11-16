@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TaskerAPIController;
+use App\Http\Controllers\AuthenticateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,34 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+
+Route::get('/testapi',function(){
+    return response([
+        'message' => 'Api is working'
+    ],200 );
 });
+
+Route::middleware('auth:sanctum')->get('/testapi-token',function(){
+    return response([
+        'message' => 'Api is working'
+    ],200 );
+});
+
+
+// Tasker - Auth Process
+Route::post('/authenticate-tasker', [AuthenticateController::class, 'authenticateTaskerApi']);
+
+// Tasker - Profile Management API
+
+
+// Tasker - Service Management API
+Route::middleware('auth:sanctum')->post('/create-service', [TaskerAPIController::class, 'createServiceAPI']);
+Route::middleware('auth:sanctum')->post('/update-service-{id}', [TaskerAPIController::class, 'updateServiceAPI']);
+Route::middleware('auth:sanctum')->get('/delete-service-{id}', [TaskerAPIController::class, 'deleteServiceAPI']);
+
+
+
+
+
+
+
