@@ -3,7 +3,7 @@
         <div class="m-header">
             <a href="../dashboard/index.html" class="b-brand text-primary">
                 <!-- ========   Change your logo from here   ============ -->
-                <img src="../assets/images/logo-dark.svg" class="img-fluid logo-lg" alt="logo" />
+                <img src="../assets/images/logo-test.png" class="img-fluid" width="140" height="70" alt="logo" />
             </a>
         </div>
         <div class="navbar-content">
@@ -11,10 +11,11 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="flex-shrink-0">
-                            <img src="{{ asset('storage/' . auth()->user()->admin_photo) }}" alt="Profile Photo" width="45" height="45" class="user-avtar wid-45 rounded-circle">
+                            <img src="{{ asset('storage/' . auth()->user()->admin_photo) }}" alt="Profile Photo"
+                                width="45" height="45" class="user-avtar wid-45 rounded-circle">
                         </div>
                         <div class="flex-grow-1 ms-3 me-2">
-                            <h6 class="mb-0">{{ explode(' ', Auth::user()->admin_firstname)[0];}}.</h6>
+                            <h6 class="mb-0">{{ explode(' ', Auth::user()->admin_firstname)[0] }}.</h6>
                             <small>Administrator</small>
                         </div>
                         <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse"
@@ -70,9 +71,11 @@
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-management') }}">Administrator Management</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-management') }}">Administrator
+                                Management</a></li>
                         <li class="pc-item"><a class="pc-link" href="../dashboard/index.html">Client Management</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-tasker-management') }}">Tasker Management</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-tasker-management') }}">Tasker
+                                Management</a></li>
                     </ul>
                 </li>
 
@@ -87,8 +90,10 @@
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-service-type-management') }}">Services Type </a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-service-management') }}">Services Management</a></li>
+                        <li class="pc-item"><a class="pc-link"
+                                href="{{ route('admin-service-type-management') }}">Services Type </a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-service-management') }}">Services
+                                Management</a></li>
                     </ul>
                 </li>
 

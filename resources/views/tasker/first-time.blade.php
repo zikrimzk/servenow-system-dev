@@ -34,7 +34,8 @@
     <nav class="navbar navbar-expand-md navbar-light default shadow shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <img src="../assets/images/logo-dark.svg" alt="logo" />
+                <img src="../assets/images/logo-test.png" class="img-fluid" width="80" height="50"
+                    alt="logo" />
             </a>
         </div>
     </nav>
@@ -45,7 +46,7 @@
             <div class="row justify-content-center align-items-center" style="height: 135vh;">
 
                 <div class="col-md-6 d-sm-block d-none">
-                    <h5><span class="text-primary">Hi </span> {{ $tasker->tasker_firstname }} !</h5>
+                    <h5><span class="link-primary">Hi </span> {{ $tasker->tasker_firstname }} !</h5>
                     <h1 class="wow fadeInUp" data-wow-delay="0.1s">
                         First Time Login
                     </h1>
@@ -164,7 +165,8 @@
                             </div>
 
                             <div class="d-grid mt-4 mb-3">
-                                <button type="submit" class="btn btn-lg btn-primary" id="submit-btn">Change Password</button>
+                                <button type="submit" class="btn btn-lg btn-primary" id="submit-btn">Change
+                                    Password</button>
                             </div>
                         </div>
                     </div>
@@ -179,7 +181,7 @@
             <div class="row align-items-center">
                 <div class="col my-1 wow fadeInUp" data-wow-delay="0.4s">
                     <p class="mb-0 text-center">
-                        <a href= "##"> ServeNow</a>
+                        <a class="link-primary" href= "##"> ServeNow</a>
                         Copyright © 2024 All rights reserved
                     </p>
                 </div>

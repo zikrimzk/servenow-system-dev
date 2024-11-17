@@ -1,13 +1,10 @@
 <nav class="pc-sidebar">
     <div class="navbar-wrapper">
         <div class="m-header d-flex  align-items-center">
-
             <a href="../dashboard/index.html" class="b-brand text-primary">
                 <!-- ========   Change your logo from here   ============ -->
-                <img src="../assets/images/logo-test-2.png" class="img-fluid" width="80" height="80" alt="logo" />
+                <img src="../assets/images/logo-test.png" class="img-fluid" width="140" height="70" alt="logo" />
             </a>
-            <h4>ServeNow</h4>
-
         </div>
         <div class="navbar-content">
             <div class="card pc-user-card">

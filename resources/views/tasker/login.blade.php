@@ -34,7 +34,9 @@
     <nav class="navbar navbar-expand-md navbar-light default shadow shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <img src="../assets/images/logo-dark.svg" alt="logo" />
+                <img src="../assets/images/logo-test.png" class="img-fluid" width="80" height="50"
+                    alt="logo" />
+
             </a>
         </div>
     </nav>
@@ -122,8 +124,9 @@
 
 
                             <div class="d-flex mt-1 justify-content-end align-items-center">
-                                <h6 class="text-secondary f-w-400 mb-0">
-                                    <a href="forgot-password-v2.html"> Forgot Password? </a>
+                                <h6 class="text-primary f-w-400 mb-0">
+
+                                    <a href="forgot-password-v2.html" class="link-primary"> Forgot Password? </a>
                                 </h6>
                             </div>
 
@@ -132,9 +135,11 @@
                             </div>
 
                             <div class="d-flex justify-content-center align-items-center mt-4">
-                                <h6 class="f-w-500 mb-0">Don't have an Account?  <a href="{{ route('tasker-register-form') }}" class="link-primary text-decoration-underline">Register Now</a></h6>
-                               
-                              </div>
+                                <h6 class="f-w-500 mb-0">Don't have an Account? <a
+                                        href="{{ route('tasker-register-form') }}"
+                                        class="link-primary text-decoration-underline">Register Now</a></h6>
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -148,7 +153,7 @@
             <div class="row align-items-center">
                 <div class="col my-1 wow fadeInUp" data-wow-delay="0.4s">
                     <p class="mb-0 text-center">
-                        <a href= "##"> ServeNow</a>
+                        <a class="link-primary" href= "##"> ServeNow</a>
                         Copyright © 2024 All rights reserved
                     </p>
                 </div>

@@ -34,7 +34,8 @@
     <nav class="navbar navbar-expand-md navbar-light default shadow shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <img src="../assets/images/logo-dark.svg" alt="logo" />
+                <img src="../assets/images/logo-test.png" class="img-fluid" width="80" height="50"
+                    alt="logo" />
             </a>
         </div>
     </nav>
@@ -144,7 +145,7 @@
             <div class="row align-items-center">
                 <div class="col my-1 wow fadeInUp" data-wow-delay="0.4s">
                     <p class="mb-0 text-center">
-                        <a href= "##"> ServeNow</a>
+                        <a class="link-primary" href= "##"> ServeNow</a>
                         Copyright © 2024 All rights reserved
                     </p>
                 </div>
