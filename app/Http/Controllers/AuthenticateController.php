@@ -100,7 +100,6 @@ class AuthenticateController extends Controller
             'password' => $credentials['password'],
             'tasker_status'=> 0 //Tasker Incomplete Profile
         ])) {
-            // Return a success response with the tasker's data
             $tasker = Tasker::where('email', $credentials['email'])->first();
             return response()->json([
                 'success' => true,
@@ -112,19 +111,49 @@ class AuthenticateController extends Controller
             'password' => $credentials['password'],
             'tasker_status'=> 1 //Tasker Not Verified
         ])){
-            // Return a success response with the tasker's data
             $tasker = Tasker::where('email', $credentials['email'])->first();
             return response()->json([
                 'success' => true,
                 'tasker' => $tasker,
                 'token' => $tasker->createToken('tasker-token')->plainTextToken,
             ]);
+        }elseif(Auth::guard('tasker')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'tasker_status'=> 2 //Tasker Active
+        ])){
+            $tasker = Tasker::where('email', $credentials['email'])->first();
+            return response()->json([
+                'success' => true,
+                'tasker' => $tasker,
+                'token' => $tasker->createToken('tasker-token')->plainTextToken,
+            ]);
+        }elseif(Auth::guard('tasker')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'tasker_status'=> 3 // Tasker Inactive
+        ])){
+            Auth::guard('tasker')->logout();
+            return response()->json([
+                'success' => false,
+                'error' => 'The provided credentials are inactive. Please contact the administrator for further details.',
+            ], 401);
 
+        }elseif(Auth::guard('tasker')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'tasker_status'=> 5 // Tasker Banned
+        ])){
+            Auth::guard('tasker')->logout();
+            return response()->json([
+                'success' => false,
+                'error' => 'The provided credentials are banned. Please contact the administrator for further details.',
+            ], 401);
         } else {
             // Return an error response
             return response()->json([
                 'success' => false,
-                'error' => 'Invalid credentials',
+                'error' => 'Please enter the correct credentials !',
             ], 401);
         }
     }

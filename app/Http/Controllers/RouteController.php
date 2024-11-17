@@ -17,7 +17,7 @@ class RouteController extends Controller
 
     /**** General Route Function - Start ****/
 
-    // Get State API
+    // Get Area API
     public function getAreas($state)
     {
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
@@ -105,7 +105,8 @@ class RouteController extends Controller
 
             $data = DB::table('services as a')
                 ->join('service_types as b', 'a.service_type_id', 'b.id')
-                ->select('a.id', 'b.servicetype_name', 'a.service_rate', 'a.service_rate_type', 'a.service_status')
+                ->select('a.id', 'b.servicetype_name', 'a.service_rate', 'a.service_rate_type', 'a.service_status','a.tasker_id')
+                ->where('a.tasker_id','=',Auth::user()->id)
                 ->get();
 
             $table = DataTables::of($data)->addIndexColumn();

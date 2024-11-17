@@ -30,16 +30,25 @@ Route::middleware('auth:sanctum')->get('/testapi-token',function(){
 });
 
 
+// Get State & Area 
+Route::get('/get-state', [TaskerAPIController::class, 'getStateAPI']);
+Route::get('/get-area-{state}', [TaskerAPIController::class, 'getAreasAPI']);
+
 // Tasker - Auth Process
 Route::post('/authenticate-tasker', [AuthenticateController::class, 'authenticateTaskerApi']);
 
 // Tasker - Profile Management API
+Route::middleware('auth:sanctum')->post('/update-password-{id}', [TaskerAPIController::class, 'taskerUpdatePasswordAPI']);
+Route::middleware('auth:sanctum')->post('/update-profile-{id}', [TaskerAPIController::class, 'taskerUpdateProfileAPI']);
 
 
 // Tasker - Service Management API
 Route::middleware('auth:sanctum')->post('/create-service', [TaskerAPIController::class, 'createServiceAPI']);
+Route::middleware('auth:sanctum')->get('/get-service-list', [TaskerAPIController::class, 'getAllServiceAPI']);
+Route::middleware('auth:sanctum')->get('/get-service-{id}', [TaskerAPIController::class, 'getSingleServiceAPI']);
 Route::middleware('auth:sanctum')->post('/update-service-{id}', [TaskerAPIController::class, 'updateServiceAPI']);
 Route::middleware('auth:sanctum')->get('/delete-service-{id}', [TaskerAPIController::class, 'deleteServiceAPI']);
+
 
 
 

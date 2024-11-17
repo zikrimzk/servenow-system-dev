@@ -1,20 +1,24 @@
 <nav class="pc-sidebar">
     <div class="navbar-wrapper">
-        <div class="m-header">
+        <div class="m-header d-flex  align-items-center">
+
             <a href="../dashboard/index.html" class="b-brand text-primary">
                 <!-- ========   Change your logo from here   ============ -->
-                <img src="../assets/images/logo-dark.svg" class="img-fluid logo-lg" alt="logo" />
+                <img src="../assets/images/logo-test-2.png" class="img-fluid" width="80" height="80" alt="logo" />
             </a>
+            <h4>ServeNow</h4>
+
         </div>
         <div class="navbar-content">
             <div class="card pc-user-card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="flex-shrink-0">
-                                <img src="{{ asset('storage/' . auth()->user()->tasker_photo) }}" alt="Profile Photo" width="45" height="45" class="user-avtar wid-45 rounded-circle">
+                            <img src="{{ asset('storage/' . auth()->user()->tasker_photo) }}" alt="Profile Photo"
+                                width="45" height="45" class="user-avtar wid-45 rounded-circle">
                         </div>
                         <div class="flex-grow-1 ms-3 me-2">
-                            <h6 class="mb-0">{{ explode(' ', Auth::user()->tasker_firstname)[0];}}.</h6>
+                            <h6 class="mb-0">{{ explode(' ', Auth::user()->tasker_firstname)[0] }}.</h6>
                             <small>Tasker</small>
                         </div>
                         <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse"
@@ -70,7 +74,8 @@
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-service-management') }}">Services Management</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-service-management') }}">Services
+                                Management</a></li>
                     </ul>
                 </li>
 
