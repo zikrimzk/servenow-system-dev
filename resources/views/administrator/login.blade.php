@@ -125,7 +125,7 @@
 
                             <div class="d-flex mt-1 justify-content-end align-items-center">
                                 <h6 class="text-secondary f-w-400 mb-0">
-                                    <a href="forgot-password-v2.html"> Forgot Password? </a>
+                                    <a href="forgot-password-v2.html" class="link-primary"> Forgot Password? </a>
                                 </h6>
                             </div>
 
