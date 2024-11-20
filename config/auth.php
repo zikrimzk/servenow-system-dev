@@ -50,6 +50,11 @@ return [
             'provider' => 'admins',
             'session' => config('session.admin_session'),
         ],
+        'client' => [
+            'driver' => 'session',
+            'provider' => 'clients',
+            'session' => config('session.client_session'),
+        ],
     ],
 
     /*
@@ -81,6 +86,10 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model' => App\Models\Administrator::class,
+        ],
+        'clients' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Client::class,
         ],
 
         // 'users' => [

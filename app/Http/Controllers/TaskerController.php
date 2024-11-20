@@ -19,8 +19,8 @@ class TaskerController extends Controller
                 'tasker_lastname' => 'required|string',
                 'tasker_phoneno' => 'required|string|min:10',
                 'email' => 'required|email',
-                'password' => 'required|same:cpassword|min:8|max:15',
-                'cpassword' => 'required|min:8|max:15',
+                'password' => 'required|same:cpassword|min:8',
+                'cpassword' => 'required|min:8',
             ],
             [],
             [

@@ -20,5 +20,9 @@ class Authenticate extends Middleware
         if ($request->is('tasker/*') && !Auth::guard('tasker')->check()) {
             return route('tasker-login'); // Redirect to tasker login if not authenticated as tasker
         }
+
+        if ($request->is('client/*') && !Auth::guard('client')->check()) {
+            return route('client-login'); // Redirect to client login if not authenticated as client
+        }
     }
 }

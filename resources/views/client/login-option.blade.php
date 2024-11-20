@@ -51,9 +51,9 @@
                 <div class="card my-5 shadow shadow-lg">
                     <div class="card-body">
                         <div class="text-center">
-                            <a href="/register"><img src="../assets/images/logo-test.png" alt="img" class="img-fluid" width="150" height="100" /></a>
+                            <a href="{{ route('tasker-home') }}"><img src="../assets/images/logo-test.png" alt="img" class="img-fluid" width="150" height="100" /></a>
                             <div class="d-grid mb-3  my-3">
-                                <a href="" class="btn btn-outline-primary btn-lg">
+                                <a href="{{ route('client-login') }}" class="btn btn-outline-primary btn-lg">
                                     <span>Log In</span>
                                 </a>
                             </div>

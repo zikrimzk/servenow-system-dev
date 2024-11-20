@@ -6,6 +6,7 @@ use App\Http\Controllers\TaskerController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AuthenticateController;
 use App\Http\Controllers\AdministratorController;
+use App\Http\Controllers\ClientController;
 use App\Models\Service;
 
 /*
@@ -125,16 +126,25 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 /* Tasker Route End */
 
 Route::get('/', [RouteController::class, 'gotoIndex'])->name('serve-now-home');
+
 Route::get('/login-option', [RouteController::class, 'loginOptionNav'])->name('servenow-login-option');
+
 Route::get('/register-client', [RouteController::class, 'clientRegisterFormNav'])->name('client-register-form');
 
+Route::post('/create-client', [ClientController::class, 'createClient'])->name('client-create');
+
+Route::get('/login', [RouteController::class, 'clientLoginNav'])->name('client-login');
+
+Route::post('/client-authentication', [AuthenticateController::class, 'authenticateClient'])->name('client-auth');
 
 
 
-Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
-    // Tasker - Dashboard
-    Route::get('/home', [RouteController::class, 'taskerhomeNav'])->name('tasker-home');
+Route::prefix('client')->middleware('auth:client')->group(function () {
+
+    // Client - Dashboard
+    Route::get('/search-services', [RouteController::class, 'clientSearchServicesNav'])->name('client-home');
+
 
 
     

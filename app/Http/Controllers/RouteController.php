@@ -58,8 +58,24 @@ class RouteController extends Controller
 
     public function clientRegisterFormNav()
     {
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
         return view('client.register-client',[
-            'title'=>'Sign Up Now !'
+            'title'=>'Sign Up Now !',
+            'states' => $states
+        ]);
+    }
+    public function clientLoginNav()
+    {
+        
+        return view('client.login',[
+            'title'=>'Login to your account'
+        ]);
+    }
+
+    public function clientSearchServicesNav()
+    {
+        return view('client.search-auth',[
+            'title'=>'Search Your Services'
         ]);
     }
 
