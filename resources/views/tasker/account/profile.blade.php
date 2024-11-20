@@ -109,7 +109,7 @@
                                                         <div class="d-flex justify-content-between align-items-center">
                                                             <div> Step 2 : Complete your account verification
                                                                 to start earning! </div>
-                                                            <a href="" class="btn btn-link">Verify now</a>
+                                                            <a href="" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#verifyQrModal">Verify now</a>
 
                                                         </div>
                                                     </div>
@@ -508,6 +508,24 @@
 
                             </form>
 
+                        </div>
+                    </div>
+
+                    <div id="verifyQrModal" class="modal fade" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalLiveLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLiveLabel">Modal Title</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={{ route('tasker-card-ver', Auth::user()->tasker_icno) }}" class="img-fluid" alt="qrcode">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

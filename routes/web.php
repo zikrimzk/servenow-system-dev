@@ -116,6 +116,11 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::post('/update-service-{id}', [ServiceController::class, 'updateService'])->name('tasker-service-update'); 
     Route::get('/delete-service-{id}', [ServiceController::class, 'deleteService'])->name('tasker-service-delete'); 
 
+    Route::get('/card-verification-{id}', [TaskerController::class, 'taskerCardVerification'])->name('tasker-card-ver');
+    Route::get('/face-verification', [TaskerController::class, 'taskerFaceVerification'])->name('tasker-face-ver');
+    Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
+
+
 });
 /* Tasker Route End */
 

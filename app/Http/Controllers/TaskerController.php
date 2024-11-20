@@ -261,4 +261,30 @@ class TaskerController extends Controller
             return back()->with('error', 'Please enter the correct password !');
         }
     }
+
+    public function taskerCardVerification($id)
+    {
+       return view('ekyc.card-verification',[
+        'title' => 'Card Verification'
+       ]);
+    }
+
+    public function taskerFaceVerification()
+    {
+       return view('ekyc.face-verification',[
+        'title' => 'Face Verification'
+       ]);
+    }
+
+    public function verificationSuccess()
+    {
+       try
+       {    
+        Tasker::where('id', Auth::user()->id)->update(['tasker_status' => 2]);
+        return redirect(route('tasker-profile'))->with('success', 'Verification has been successfully completed !');
+       }
+       catch (Exception) {
+        return back()->with('error', 'Something went wrong !');
+       }
+    }
 }
