@@ -109,7 +109,8 @@
                                                         <div class="d-flex justify-content-between align-items-center">
                                                             <div> Step 2 : Complete your account verification
                                                                 to start earning! </div>
-                                                            <a href="" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#verifyQrModal">Verify now</a>
+                                                            <a href="" class="btn btn-link" data-bs-toggle="modal"
+                                                                data-bs-target="#verifyQrModal">Verify now</a>
 
                                                         </div>
                                                     </div>
@@ -515,14 +516,45 @@
                         aria-labelledby="exampleModalLiveLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLiveLabel">Modal Title</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
                                 <div class="modal-body">
-                                    <div class="d-flex justify-content-center align-items-center">
-                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={{ route('tasker-card-ver', Auth::user()->tasker_icno) }}" class="img-fluid" alt="qrcode">
+                                    <div class="d-flex justify-content-end align-items-center m-2">
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+
+                                    <div class="d-none d-md-block">
+                                        <div class="alert alert-primary">
+                                            <div class="d-flex align-items-center">
+                                                <i class="ti ti-info-circle h2 f-w-400 mb-0"></i>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <strong>Important:</strong>
+                                                    Please scan the QR code below using your smartphone to verify your
+                                                    account. This
+                                                    step is essential to complete your account verification.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-center align-items-center my-3">
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={{ route('tasker-card-ver', Auth::user()->tasker_icno) }}"
+                                                class="img-fluid" alt="qrcode">
+                                        </div>
+
+                                    </div>
+
+                                    <div class="d-sm-block d-md-none">
+                                        <div class="alert alert-primary">
+                                            <div class="d-flex align-items-center">
+                                                <i class="ti ti-info-circle h2 f-w-400 mb-0"></i>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <strong>Tips:</strong> Please have your MyKad ready and ensure your
+                                                    camera lens is clean for a smooth verification process.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-grid my-3">
+                                            <a href="{{ route('tasker-card-ver', Auth::user()->tasker_icno) }}"
+                                                class="btn btn-primary">Verify Account</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
