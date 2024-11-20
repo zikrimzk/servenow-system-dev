@@ -95,7 +95,7 @@
                                                 <div class="d-flex align-items-center">
                                                     <i class="ti ti-info-circle h2 f-w-400 mb-0"></i>
                                                     <div class="flex-grow-1 ms-3">
-                                                        Step 1 : Please fill in all required fields to continue with the
+                                                        <strong>Step 1 :</strong> Please fill in all required fields to continue with the
                                                         verification process. <strong>Important:</strong> Ensure you upload
                                                         a clear photo.
                                                     </div>
@@ -106,13 +106,8 @@
                                                 <div class="d-flex align-items-center">
                                                     <i class="ti ti-info-circle h2 f-w-400 mb-0"></i>
                                                     <div class="flex-grow-1 ms-3">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <div> Step 2 : Complete your account verification
-                                                                to start earning! </div>
-                                                            <a href="" class="btn btn-link" data-bs-toggle="modal"
-                                                                data-bs-target="#verifyQrModal">Verify now</a>
-
-                                                        </div>
+                                                        <strong>Step 2 :</strong> Please make sure to complete your account verification
+                                                        to start earning! 
                                                     </div>
                                                 </div>
                                             </div>
@@ -123,7 +118,14 @@
                                                 @if (Auth::user()->tasker_status == 0)
                                                     <span class="badge bg-warning">Incomplete Profile</span>
                                                 @elseif(Auth::user()->tasker_status == 1)
+                                                <div class="">
                                                     <span class="badge bg-light-danger">Not Verified</span>
+                                                
+                                                        <a href="" class="btn btn-link" data-bs-toggle="modal"
+                                                            data-bs-target="#verifyQrModal">Verify now</a>
+                                                  
+                                                </div>
+                                                   
                                                 @elseif(Auth::user()->tasker_status == 2)
                                                     <span class="badge bg-success">Verified & Active</span>
                                                 @endif
