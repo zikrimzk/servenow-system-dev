@@ -124,6 +124,22 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 });
 /* Tasker Route End */
 
+Route::get('/', [RouteController::class, 'gotoIndex'])->name('serve-now-home');
+Route::get('/login-option', [RouteController::class, 'loginOptionNav'])->name('servenow-login-option');
+Route::get('/register-client', [RouteController::class, 'clientRegisterFormNav'])->name('client-register-form');
+
+
+
+
+Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
+
+    // Tasker - Dashboard
+    Route::get('/home', [RouteController::class, 'taskerhomeNav'])->name('tasker-home');
+
+
+    
+
+});
 
 
 
@@ -137,4 +153,6 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
 // Route::get('/get-states', [RouteController::class, 'getStates'])->name('get-states');
 Route::get('/get-areas/{state}', [RouteController::class, 'getAreas'])->name('get-area');
+
+
 

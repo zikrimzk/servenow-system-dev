@@ -42,6 +42,27 @@ class RouteController extends Controller
 
     //All Client Route Here ....
 
+    public function gotoIndex()
+    {
+        return view('client.index',[
+            'title'=>'Welcome !'
+        ]);
+    }
+
+    public function loginOptionNav()
+    {
+        return view('client.login-option',[
+            'title'=>'Select Your Option'
+        ]);
+    }
+
+    public function clientRegisterFormNav()
+    {
+        return view('client.register-client',[
+            'title'=>'Sign Up Now !'
+        ]);
+    }
+
     /**** Client Route Function - End ****/
 
 
