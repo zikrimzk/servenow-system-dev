@@ -1,2 +1,10 @@
-<h1>HAI TEMAN TEMAN</h1>
-{{ Auth::user()->client_firstname }}
+@extends('client.layouts.main')
+
+@section('header')
+    @include('client.layouts.header')
+@endsection
+
+@section('content')
+
+
+@endsection

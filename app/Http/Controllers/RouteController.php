@@ -76,7 +76,16 @@ class RouteController extends Controller
     public function clientSearchServicesNav()
     {
         return view('client.search-auth',[
-            'title'=>'Search Your Services'
+            'title'=>'Search Your Services',
+            'service'=> ServiceType::all()
+
+        ]);
+    }
+
+    public function clientprofileNav()
+    {
+        return view('client.account.profile-client',[
+            'title' => 'My Profile'
         ]);
     }
 

@@ -145,6 +145,10 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     // Client - Dashboard
     Route::get('/search-services', [RouteController::class, 'clientSearchServicesNav'])->name('client-home');
 
+    //Client Account Profile
+    Route::get('/profile', [RouteController::class, 'clientprofileNav'])->name('client-profile');
+
+
 
 
     
