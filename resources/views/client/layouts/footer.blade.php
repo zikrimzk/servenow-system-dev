@@ -25,7 +25,7 @@
       <div class="container">
         <div class="row">
           <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
-            <img src="../assets/images/logo-dark.svg" alt="image" class="img-fluid mb-3" />
+            <img src="../../assets/images/logo-test.png" alt="image" class="img-fluid mb-3" />
             <p class="mb-4">
               Phoenixcoded has gained the trust of over 5.5K customers since 2015, thanks to our commitment to delivering high-quality
               products. Our experienced team players are responsible for managing Able Pro.

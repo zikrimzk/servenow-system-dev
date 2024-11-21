@@ -89,9 +89,10 @@
                 <!-- Start Alert -->
 
                 <!-- End Alert -->
-                <form action="{{ route('client-auth') }}" method="POST">
-                    @csrf
-                    <div class="card my-5 shadow shadow-lg">
+
+                <div class="card my-5 shadow shadow-lg">
+                    <form action="{{ route('client-auth') }}" method="POST">
+                        @csrf
                         <div class="card-body">
                             <div class="text-center">
                                 <a href="{{ route('tasker-home') }}"><img src="../assets/images/logo-test.png"
@@ -102,11 +103,13 @@
 
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="email" class="form-control" id="floatingInput" placeholder="Email" name="email" />
+                                <input type="email" class="form-control" id="floatingInput" placeholder="Email"
+                                    name="email" />
                                 <label for="floatingInput">Email</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="password" class="form-control" id="floatingInput" placeholder="Password" name="password" />
+                                <input type="password" class="form-control" id="floatingInput" placeholder="Password"
+                                    name="password" />
                                 <label for="floatingInput">Password</label>
                             </div>
                             <div class="d-flex mt-1 justify-content-between align-items-center">
@@ -129,9 +132,9 @@
                                 <a href="{{ route('client-register-form') }}" class="link-primary">Create Account</a>
                             </div>
                         </div>
-                    </div>
+                    </form>
+                </div>
 
-                </form>
 
             </div>
         </div>

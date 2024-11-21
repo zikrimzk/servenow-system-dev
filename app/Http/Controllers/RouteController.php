@@ -45,7 +45,8 @@ class RouteController extends Controller
     public function gotoIndex()
     {
         return view('client.index',[
-            'title'=>'Welcome !'
+            'title'=>'Welcome !',
+            'service'=> ServiceType::all()
         ]);
     }
 

@@ -44,9 +44,9 @@
             /* Purple background */
             border-radius: 25px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 10px 20px;
-            width: 900px;
-            border: 2px solid #16325b;
+            padding: 5px 20px;
+            width: 500px;
+            border: 1px solid #16325b;
             /* Border width and color */
         }
 
@@ -54,8 +54,7 @@
             border: none;
             outline: none;
             background: transparent;
-            color: ;
-            font-size: 16px;
+            font-size: 14pt;
             flex: 1;
             padding-left: 15px;
         }
@@ -65,13 +64,22 @@
             opacity: 0.8;
         }
 
-        .highlight {
-            color: #16325b;
-            /* Warna teks */
-            background-color: #007bff;
-            /* Warna latar belakang */
-            border-radius: 5px;
-            padding: 5px;
+        
+        .btn-outline-primary {
+            --bs-btn-color: #000000;
+            --bs-btn-border-color: #16325b;
+            --bs-btn-hover-color: #000000;
+            --bs-btn-hover-bg: #e2edfe;
+            --bs-btn-hover-border-color:#0066ff;
+            --bs-btn-focus-shadow-rgb: 13, 110, 253;
+            --bs-btn-active-color: #fff;
+            --bs-btn-active-bg: #0d6efd;
+            --bs-btn-active-border-color: #0d6efd;
+            --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+            --bs-btn-disabled-color: #0d6efd;
+            --bs-btn-disabled-bg: transparent;
+            --bs-btn-disabled-border-color: #0d6efd;
+            --bs-gradient: none
         }
     </style>
 
@@ -143,47 +151,41 @@
                     <!-- [ Text] end -->
                     <!-- [ Search-Text] Start -->
                     <div class="my-4 my-sm-5 wow fadeInUp" data-wow-delay="0.4s">
-                        <div class="d-flex justify-content-center">
-                            <div class="search-bar d-flex align-items-center w-50 col-md-6">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                                <input type="text" class="bg-transparent text-grey w-100" placeholder="Search">
+                        <div class="container ">
+                            <div class="row justify-content-center">
+                                <div class="search-bar d-flex align-items-center col-12 col-sm-8 col-md-6 col-lg-3 border border-1 border-dark">
+                                    <i class="fa-solid fa-magnifying-glass me-2"></i>
+                                    <input type="text" class="form-control bg-transparent text-grey w-100"
+                                        placeholder="What do you need help with?">
+                                </div>
                             </div>
                         </div>
                     </div>
+
+
+
                     <!-- [ Search-Text] End -->
                     <!-- [ Highlight Option] Start -->
-                    <div class="container text-center py-4">
-                        <div class="row justify-content-space-between">
-                            <!-- Assembly -->
-                            <div class="col-4 col-lg-3">
-                                <button href="#" class="btn btn-outline-primary btn-lg">
-                                    <span>Assembly</span>
-                                </button>
-                            </div>
-
-                            <div class="col-4 col-lg-3">
-                                <button href="#" class="btn btn-outline-primary btn-lg">
-                                    <span>Mounting</span>
-                                </button>
-                            </div>
-
-                            <div class="col-4 col-lg-3">
-                                <button href="#" class="btn btn-outline-primary btn-lg">
-                                    <span>Cleaning</span>
-                                </button>
-                            </div>
-
-                            <div class="col-4 col-lg-3">
-                                <button href="#" class="btn btn-outline-primary btn-lg">
-                                    <span>Flooring</span>
-                                </button>
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-md-10 text-center">
+                                <!-- Buttons with spacing -->
+                                <div class="my-2 my-sm-1 d-flex flex-wrap justify-content-center align-items-start gap-2 wow fadeInUp"
+                                    data-wow-delay="0.4s">
+                                    @foreach ($service as $sv)
+                                        <a href="../dashboard/index.html" class="btn btn-outline-primary"
+                                            >{{ $sv->servicetype_name }}</a>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- [ Highlight Option] End -->
+
                 </div>
+                <!-- [ Highlight Option] End -->
             </div>
         </div>
+
     </header>
 
     <!-- [ Header ] End -->
@@ -196,7 +198,7 @@
                 <div class="col-md-8">
                     <h2 class="mb-3">Stay connected with us</h2>
                     <p class="mb-4 mb-md-0">
-                        Simply submit your email, we share you the top news related to Able Pro feature updates,
+                        Simply submit your email, we share you the top news related to ServeNow feature updates,
                         roadmap, and news.
                     </p>
                 </div>
@@ -216,11 +218,12 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
-                        <img src="../assets/images/logo-dark.svg" alt="image" class="img-fluid mb-3" />
+                        <img src="../assets/images/logo-test.png" alt="img" class="img-fluid"
+                            style="max-width: 110px;" />
                         <p class="mb-4">
-                            Phoenixcoded has gained the trust of over 5.5K customers since 2015, thanks to our
+                            ServeNow has gained the trust of over 5.5K customers since 2024, thanks to our
                             commitment to delivering high-quality
-                            products. Our experienced team players are responsible for managing Able Pro.
+                            products. Our experienced team players are responsible for managing ServeNow.
                         </p>
                     </div>
                     <div class="col-md-8">
@@ -288,8 +291,8 @@
             <div class="row align-items-center">
                 <div class="col my-1 wow fadeInUp" data-wow-delay="0.4s">
                     <p class="mb-0">
-                        © Handcrafted by Team
-                        <a href="https://themeforest.net/user/phoenixcoded" target="_blank">Phoenixcoded</a>
+                        ServeNow Copyright © 2024 All rights reserved
+
                     </p>
                 </div>
                 <div class="col-auto my-1">
