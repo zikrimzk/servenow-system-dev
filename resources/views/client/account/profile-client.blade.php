@@ -117,7 +117,7 @@
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
-                                                    <input type="hidden" name="client_photo" id="isUploadPhoto"
+                                                    <input type="hidden" name="isUploadPhoto" id="isUploadPhoto"
                                                         value="false">
                                                 </div>
 

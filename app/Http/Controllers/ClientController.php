@@ -46,6 +46,8 @@ class ClientController extends Controller
     //Client Update Info
     public function clientUpdateProfile(Request $req, $clientId)
     {
+        // dd($req);
+
         if ($req->isUploadPhoto == 'true') {
             $data = $req->validate(
                 [
@@ -72,7 +74,7 @@ class ClientController extends Controller
 
             // Generate a custom name for the file
             $file = $req->file('client_photo');
-            $filename = $user->clientUpdateProfile_code . '_profile' . '.' . $file->getClientOriginalExtension();
+            $filename = $user->id . '_profile' . '.' . $file->getClientOriginalExtension();
 
             // Store the file with the custom filename
             $path = $file->storeAs('profile_photos/clients', $filename, 'public');
