@@ -262,7 +262,7 @@ class TaskerController extends Controller
         }
     }
 
-    public function taskerCardVerification($id)
+    public function taskerCardVerification()
     {
        return view('ekyc.card-verification',[
         'title' => 'Card Verification'

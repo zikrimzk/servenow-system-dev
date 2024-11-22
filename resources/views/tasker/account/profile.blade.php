@@ -537,7 +537,7 @@
                                             </div>
                                         </div>
                                         <div class="d-flex justify-content-center align-items-center my-3">
-                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={{ route('tasker-card-ver', Auth::user()->tasker_icno) }}"
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={{ route('tasker-card-ver') }}"
                                                 class="img-fluid" alt="qrcode">
                                         </div>
 
