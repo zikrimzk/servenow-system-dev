@@ -50,7 +50,7 @@
 
                     <!-- Update Profile Tab -->
                     <div class="tab-pane show active" id="profile-2" role="tabpanel" aria-labelledby="profile-tab-2">
-                        <form action="{{ route('admin-update-profile', Auth::user()->id) }}" method="POST"
+                        <form action="{{ route('client-update-profile', Auth::user()->id) }}" method="POST"
                             enctype="multipart/form-data">
                             @csrf
 
@@ -113,11 +113,11 @@
                                                         <input type="file" id="profilephoto" name="client_photo"
                                                             class="d-none" accept="image/*"
                                                             @if (auth()->user()->client_photo == '') required @endif />
-                                                        @error('admin_photo')
+                                                        @error('client_photo')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
-                                                    <input type="hidden" name="isUploadPhoto" id="isUploadPhoto"
+                                                    <input type="hidden" name="client_photo" id="isUploadPhoto"
                                                         value="false">
                                                 </div>
 
@@ -126,11 +126,11 @@
                                                     <div class="mb-3">
                                                         <label class="form-label">First Name</label>
                                                         <input type="text"
-                                                            class="form-control @error('admin_firstname') is-invalid @enderror"
-                                                            name="admin_firstname"
+                                                            class="form-control @error('client_firstname') is-invalid @enderror"
+                                                            name="client_firstname"
                                                             value="{{ Auth::user()->client_firstname }}"
-                                                            id="admin_firstname" />
-                                                        @error('admin_firstname')
+                                                            id="client_firstname" />
+                                                        @error('client_firstname')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
@@ -141,10 +141,10 @@
                                                     <div class="mb-3">
                                                         <label class="form-label">Last Name</label>
                                                         <input type="text"
-                                                            class="form-control @error('admin_lastname') is-invalid @enderror"
-                                                            name="admin_lastname"
+                                                            class="form-control @error('client_lastname') is-invalid @enderror"
+                                                            name="client_lastname"
                                                             value="{{ Auth::user()->client_lastname }}" />
-                                                        @error('admin_lastname')
+                                                        @error('client_lastname')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
@@ -157,10 +157,10 @@
                                                         <div class="input-group">
                                                             <span class="input-group-text">+60</span>
                                                             <input type="text"
-                                                                class="form-control @error('admin_phoneno') is-invalid @enderror"
-                                                                placeholder="Phone No." name="admin_phoneno"
-                                                                value="{{ Auth::user()->admin_phoneno }}" />
-                                                            @error('admin_phoneno')
+                                                                class="form-control @error('client_phoneno') is-invalid @enderror"
+                                                                placeholder="Phone No." name="client_phoneno"
+                                                                value="{{ Auth::user()->client_phoneno }}" />
+                                                            @error('client_phoneno')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
                                                         </div>
@@ -193,7 +193,7 @@
 
                     <!-- Update Password Tab -->
                     <div class="tab-pane" id="profile-4" role="tabpanel" aria-labelledby="profile-tab-4">
-                        <form action="{{ route('admin-update-password', Auth::user()->id) }}" method="POST">
+                        <form action="{{ route('client-update-password', Auth::user()->id) }}" method="POST">
                             @csrf
                             <div class="card">
                                 <div class="card-header">
@@ -259,7 +259,7 @@
                                     </div>
                                 </div>
                                 <div class="card-footer text-end btn-page">
-                                    <button type="submit" class="btn btn-primary disabled" id="submit-btn">Update
+                                    <button type="submit" class="btn btn-primary " id="submit-btn">Update
                                         Password</button>
                                 </div>
                             </div>

@@ -36,6 +36,8 @@
     <script src="../assets/js/tech-stack.js"></script>
     <link rel="stylesheet" href="../assets/css/landing.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
 
     
 
@@ -137,6 +139,8 @@
     <script src="../assets/js/fonts/custom-font.js"></script>
     <script src="../assets/js/pcoded.js"></script>
     <script src="../assets/js/plugins/feather.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
     <script>
         layout_change('light');
     </script>

@@ -140,6 +140,7 @@ Route::post('/client-authentication', [AuthenticateController::class, 'authentic
 
 
 
+
 Route::prefix('client')->middleware('auth:client')->group(function () {
 
     // Client - Dashboard
@@ -147,11 +148,10 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
 
     //Client Account Profile
     Route::get('/profile', [RouteController::class, 'clientprofileNav'])->name('client-profile');
+    Route::post('/update-profile-client-{id}', [ClientController::class, 'clientUpdateProfile'])->name('client-update-profile');
+    Route::post('/client-update-password-{id}', [ClientController::class, 'clientUpdatePassword'])->name('client-update-password');
 
 
-
-
-    
 
 });
 
