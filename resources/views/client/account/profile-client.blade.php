@@ -32,13 +32,19 @@
                         <ul class="nav nav-tabs profile-tabs" id="myTab" role="tablist">
 
                             <li class="nav-item">
-                                <a class="nav-link active" id="profile-tab-2" data-bs-toggle="tab" href="#profile-2"
+                                <a class="nav-link active" id="profile-tab-1" data-bs-toggle="tab" href="#profile-1"
                                     role="tab" aria-selected="true">
                                     <i class="ti ti-file-text me-2"></i>Personal Details
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="profile-tab-4" data-bs-toggle="tab" href="#profile-4"
+                                <a class="nav-link" id="profile-tab-2" data-bs-toggle="tab" href="#profile-2"
+                                    role="tab" aria-selected="true">
+                                    <i class="ti ti-map-pin me-2"></i>Address
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="profile-tab-3" data-bs-toggle="tab" href="#profile-3"
                                     role="tab" aria-selected="true">
                                     <i class="ti ti-lock me-2"></i>Change Password
                                 </a>
@@ -46,10 +52,10 @@
                         </ul>
                     </div>
                 </div>
-                <div class="tab-content">
+                <div class="tab-content mb-5">
 
                     <!-- Update Profile Tab -->
-                    <div class="tab-pane show active" id="profile-2" role="tabpanel" aria-labelledby="profile-tab-2">
+                    <div class="tab-pane show active" id="profile-1" role="tabpanel" aria-labelledby="profile-tab-1">
                         <form action="{{ route('client-update-profile', Auth::user()->id) }}" method="POST"
                             enctype="multipart/form-data">
                             @csrf
@@ -191,8 +197,123 @@
                         </form>
                     </div>
 
+                    <!-- Update Address -->
+                    <div class="tab-pane show " id="profile-2" role="tabpanel" aria-labelledby="profile-tab-2">
+                        <form action="{{ route('client-update-profile', Auth::user()->id) }}" method="POST"
+                            enctype="multipart/form-data">
+                            @csrf
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <!-- Start Alert -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+                                        <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+                                            <path
+                                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z">
+                                            </path>
+                                        </symbol>
+
+                                        <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+                                            <path
+                                                d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z">
+                                            </path>
+                                        </symbol>
+                                    </svg>
+                                    @if (session()->has('success'))
+                                        <div class="alert alert-success alert-dismissible d-flex align-items-center"
+                                            role="alert">
+                                            <svg class="bi flex-shrink-0 me-2" width="24" height="24">
+                                                <use xlink:href="#check-circle-fill"></use>
+                                            </svg>
+                                            <div> {{ session('success') }} </div>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                        </div>
+                                    @endif
+                                    @if (session()->has('error'))
+                                        <div class="alert alert-danger alert-dismissible d-flex align-items-center"
+                                            role="alert">
+                                            <svg class="bi flex-shrink-0 me-2" width="24" height="24">
+                                                <use xlink:href="#exclamation-triangle-fill"></use>
+                                            </svg>
+                                            <div> {{ session('error') }} </div>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                        </div>
+                                    @endif
+                                    <!-- End Alert -->
+
+
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5>Address</h5>
+                                        </div>
+                                        <div class="card-body">
+
+                                            <div class="row">
+                                                <!-- Address Line 1 Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Address Line 1</label>
+                                                        <input type="text"
+                                                            class="form-control @error('client_address_one') is-invalid @enderror"
+                                                            name="client_address_one"
+                                                            value="{{ Auth::user()->client_address_one }}"
+                                                            id="client_address_one" />
+                                                        @error('client_address_one')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                 <!-- Address Line 2 Field -->
+                                                 <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Address Line 2</label>
+                                                        <input type="text"
+                                                            class="form-control @error('client_address_two') is-invalid @enderror"
+                                                            name="client_address_two"
+                                                            value="{{ Auth::user()->client_address_two }}"
+                                                            id="client_address_two" />
+                                                        @error('client_address_two')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                 <!-- State Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">State</label>
+                                                        <select name="client_state" id="" class="form-select">
+                                                            <option value="" selected>Select State</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Area Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">City</label>
+                                                        <select name="client_city" id="" class="form-select">
+                                                            <option value="" selected>Select City</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-12 text-end btn-page">
+                                    <button type="submit" class="btn btn-primary">Update Address</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
                     <!-- Update Password Tab -->
-                    <div class="tab-pane" id="profile-4" role="tabpanel" aria-labelledby="profile-tab-4">
+                    <div class="tab-pane" id="profile-3" role="tabpanel" aria-labelledby="profile-tab-3">
                         <form action="{{ route('client-update-password', Auth::user()->id) }}" method="POST">
                             @csrf
                             <div class="card">

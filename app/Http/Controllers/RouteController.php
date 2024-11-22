@@ -44,47 +44,55 @@ class RouteController extends Controller
 
     public function gotoIndex()
     {
-        return view('client.index',[
-            'title'=>'Welcome !',
-            'service'=> ServiceType::all()
-        ]);
+        if (!Auth::guard('client')->check()) {
+            return view('client.index', [
+                'title' => 'Welcome !',
+                'service' => ServiceType::all()
+            ]);
+        } else {
+            return redirect(route('client-home'));
+        }
     }
 
     public function loginOptionNav()
     {
-        return view('client.login-option',[
-            'title'=>'Select Your Option'
+        return view('client.login-option', [
+            'title' => 'Select Your Option'
         ]);
     }
 
     public function clientRegisterFormNav()
     {
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
-        return view('client.register-client',[
-            'title'=>'Sign Up Now !',
+        return view('client.register-client', [
+            'title' => 'Sign Up Now !',
             'states' => $states
         ]);
     }
     public function clientLoginNav()
     {
-        
-        return view('client.login',[
-            'title'=>'Login to your account'
-        ]);
+        if (!Auth::guard('client')->check()) {
+
+            return view('client.login', [
+                'title' => 'Login to your account'
+            ]);
+        } else {
+            return redirect(route('client-home'));
+        }
     }
 
     public function clientSearchServicesNav()
     {
-        return view('client.search-auth',[
-            'title'=>'Search Your Services',
-            'service'=> ServiceType::all()
+        return view('client.search-auth', [
+            'title' => 'Search Your Services',
+            'service' => ServiceType::all()
 
         ]);
     }
 
     public function clientprofileNav()
     {
-        return view('client.account.profile-client',[
+        return view('client.account.profile-client', [
             'title' => 'My Profile'
         ]);
     }
@@ -152,8 +160,8 @@ class RouteController extends Controller
 
             $data = DB::table('services as a')
                 ->join('service_types as b', 'a.service_type_id', 'b.id')
-                ->select('a.id', 'b.servicetype_name', 'a.service_rate', 'a.service_rate_type', 'a.service_status','a.tasker_id')
-                ->where('a.tasker_id','=',Auth::user()->id)
+                ->select('a.id', 'b.servicetype_name', 'a.service_rate', 'a.service_rate_type', 'a.service_status', 'a.tasker_id')
+                ->where('a.tasker_id', '=', Auth::user()->id)
                 ->get();
 
             $table = DataTables::of($data)->addIndexColumn();
@@ -731,11 +739,4 @@ class RouteController extends Controller
     }
 
     /**** Administrator Route Function - End ****/
-
-
-
-
-
-
-  
 }

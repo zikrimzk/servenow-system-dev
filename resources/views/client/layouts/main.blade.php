@@ -39,7 +39,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 
-    
+
 
 
     <style>
@@ -111,11 +111,11 @@
     @yield('content')
     <!-- [ Content ] End -->
 
+    <!-- [ Footer ] start -->
+    @yield('footer')
+    <!-- [ Footer ] End -->
 
-    <!-- [ footer apps ] start -->
-    @include('client.layouts.footer')
 
-    <!-- [ footer apps ] End -->
 
     <!-- [ Main Content ] end -->
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
@@ -161,7 +161,7 @@
     </script>
     <script>
         main_layout_change('horizontal');
-    </script> 
+    </script>
     <!-- [Page Specific JS] start -->
     <script src="../assets/js/plugins/wow.min.js"></script>
     <script src="https://cdn.jsdelivr.net/jquery.marquee/1.4.0/jquery.marquee.min.js"></script>
@@ -228,7 +228,6 @@
     <script>
         localStorage.setItem('layout', 'horizontal');
         change_box_container('true');
-
     </script>
     <!-- [Page Specific JS] end -->
 

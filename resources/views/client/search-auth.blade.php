@@ -5,6 +5,11 @@
 @endsection
 
 @section('content')
-
-
+    {{-- content here --}}
 @endsection
+
+<!-- [ footer apps ] start -->
+@section('footer')
+    @include('client.layouts.footer')
+@endsection
+<!-- [ footer apps ] End -->

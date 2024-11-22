@@ -40,7 +40,7 @@
                                         <span>My Profile</span>
                                     </span>
                                 </a>
-                                <a href="#" class="dropdown-item">
+                                <a href="{{ route('client-logout') }}" class="dropdown-item">
                                     <span>
                                         <svg class="pc-icon text-muted me-2">
                                             <use xlink:href="#custom-share-bold"></use>

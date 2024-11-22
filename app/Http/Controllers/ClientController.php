@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -109,6 +110,7 @@ class ClientController extends Controller
 
     public function clientUpdatePassword(Request $req, $id)
     {
+
         $validated = $req->validate(
             [
                 'oldPass' => 'required | min:8',
@@ -131,6 +133,4 @@ class ClientController extends Controller
             return back()->with('error', 'Please enter the correct password !');
         }
     }
-
-    
 }

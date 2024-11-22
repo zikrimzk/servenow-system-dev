@@ -205,6 +205,16 @@ class AuthenticateController extends Controller
         return redirect()->route('admin-login')->with('error', 'The provided credentials do not match our records. Please try again !');
     }
 
+     // Tasker - Logout Process
+     public function logoutClient(Request $request): RedirectResponse
+     {
+         Auth::guard('client')->logout();
+ 
+         // $request->session()->invalidate();
+         // $request->session()->regenerateToken();
+ 
+         return redirect()->route('client-login')->with('success', 'You have successfully logged out.');
+     }
 
     // Tasker - Logout Process
     public function logoutTasker(Request $request): RedirectResponse
