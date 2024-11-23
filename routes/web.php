@@ -150,7 +150,10 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     Route::get('/profile', [RouteController::class, 'clientprofileNav'])->name('client-profile');
     Route::post('/update-profile-client-{id}', [ClientController::class, 'clientUpdateProfile'])->name('client-update-profile');
     Route::post('/client-update-password-{id}', [ClientController::class, 'clientUpdatePassword'])->name('client-update-password');
+    Route::post('/client-update-address-{id}', [ClientController::class, 'clientUpdateAddress'])->name('client-update-address');
 
+
+    
     // Client - Logout
     Route::get('/client-logout', [AuthenticateController::class, 'logoutClient'])->name('client-logout');
 

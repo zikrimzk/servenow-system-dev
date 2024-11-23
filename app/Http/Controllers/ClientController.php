@@ -133,4 +133,42 @@ class ClientController extends Controller
             return back()->with('error', 'Please enter the correct password !');
         }
     }
+
+    public function clientUpdateAddress(Request $req, $id)
+    {
+        // Validate Data
+        $validated = $req->validate(
+            [
+                'client_address_one' => 'required|string',
+                'client_address_two' => 'required|string',
+                'client_state' => 'required|string',
+                'client_city' => 'required|string',
+            ],
+            [],
+            [
+                'client_address_one' => 'Address Line 1',
+                'client_address_two' => 'Address Line 2',
+                'client_state' => 'State',
+                'client_city' => 'City'
+            ]
+        );
+
+        try {
+            //Address Update 
+            Client::where('id', $id)->update([
+                'client_address_one' => $validated['client_address_one'],
+                'client_address_two' => $validated['client_address_two'],
+                'client_state' => $validated['client_state'],
+                'client_city' => $validated['client_city'],
+            ]);
+
+            // Suceess Update Address
+            return back()->with('success', 'Address was successfully updated!');
+        } catch (\Exception $e) {
+            // Failde Update address
+            return back()->with('error', 'Address not updated: ' . $e->getMessage());
+        }
+    }
+
+   
 }

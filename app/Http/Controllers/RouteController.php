@@ -92,8 +92,11 @@ class RouteController extends Controller
 
     public function clientprofileNav()
     {
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+
         return view('client.account.profile-client', [
-            'title' => 'My Profile'
+            'title' => 'My Profile',
+            'states' => $states
         ]);
     }
 
