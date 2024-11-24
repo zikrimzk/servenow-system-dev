@@ -20,10 +20,11 @@ use App\Models\Service;
 |
 */
 
-/* Admin Route Start */
-Route::prefix('admin')->group(function () {
+/* Login User Route Start */
+
+Route::prefix('login')->group(function () {
     // Admin - Login
-    Route::get('/login', [RouteController::class, 'adminLoginNav'])->name('admin-login');
+    Route::get('/admin', [RouteController::class, 'adminLoginNav'])->name('admin-login');
 
     // Admin - Auth Process
     Route::post('/admin-authentication', [AuthenticateController::class, 'authenticateAdmin'])->name('auth-admin');
@@ -32,8 +33,28 @@ Route::prefix('admin')->group(function () {
     Route::get('/admin-first-time-login-{id}', [RouteController::class, 'adminFirstTimeNav'])->name('admin-first-time');
     Route::post('/admin-first-time-login-process-{id}', [AuthenticateController::class, 'adminFirstTimeLogin'])->name('admin-first-time-update');
 
+    // Tasker - Login 
+    Route::get('/tasker', [RouteController::class, 'taskerLoginNav'])->name('tasker-login');
 
-}); 
+    // Tasker - Auth Process
+    Route::post('/tasker-authentication', [AuthenticateController::class, 'authenticateTasker'])->name('auth-tasker');
+
+    // Tasker - First Time Login
+    Route::get('/tasker-first-time-login-{id}', [RouteController::class, 'taskerFirstTimeNav'])->name('tasker-first-time');
+    Route::post('/tasker-first-time-login-process-{id}', [AuthenticateController::class, 'taskerFirstTimeLogin'])->name('tasker-first-time-update');
+
+    // Client - Login 
+    Route::get('/client-option', [RouteController::class, 'loginOptionNav'])->name('servenow-login-option');
+    Route::get('/client', [RouteController::class, 'clientLoginNav'])->name('client-login');
+
+    // Client - Auth Process
+    Route::post('/client-authentication', [AuthenticateController::class, 'authenticateClient'])->name('client-auth');
+});
+
+/* Login User Route End */
+
+
+/* Admin Route Start */
 
 Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
@@ -71,17 +92,13 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/approve-service-{id}', [ServiceController::class, 'adminApproveService'])->name('admin-approve-service');
     Route::get('/reject-service-{id}', [ServiceController::class, 'adminRejectService'])->name('admin-reject-service');
     Route::get('/terminate-service-{id}', [ServiceController::class, 'adminTerminateService'])->name('admin-terminate-service');
-
- 
 });
+
 /* Admin Route End */
 
 
 
 /* Tasker Route Start */
-
-// Tasker - Login 
-Route::get('/login-tasker', [RouteController::class, 'taskerLoginNav'])->name('tasker-login');
 
 // Tasker - Registration Form [General]
 Route::get('/register-tasker', [RouteController::class, 'taskerRegisterFormNav'])->name('tasker-register-form');
@@ -89,12 +106,6 @@ Route::get('/register-tasker', [RouteController::class, 'taskerRegisterFormNav']
 // Tasker - Registration Process
 Route::post('/tasker-registration', [TaskerController::class, 'createTasker'])->name('tasker-create');
 
-// Admin - First Time Login
-Route::get('/tasker-first-time-login-{id}', [RouteController::class, 'taskerFirstTimeNav'])->name('tasker-first-time');
-Route::post('/tasker-first-time-login-process-{id}', [AuthenticateController::class, 'taskerFirstTimeLogin'])->name('tasker-first-time-update');
-
-// Tasker - Auth Process
-Route::post('/tasker-authentication', [AuthenticateController::class, 'authenticateTasker'])->name('auth-tasker');
 
 Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
@@ -102,44 +113,35 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::get('/home', [RouteController::class, 'taskerhomeNav'])->name('tasker-home');
 
     // Tasker - Logout
-    Route::get('/tasker-logout', [AuthenticateController::class, 'logoutTasker'])->name('tasker-logout'); 
+    Route::get('/tasker-logout', [AuthenticateController::class, 'logoutTasker'])->name('tasker-logout');
 
     // Tasker - Account Profile
     Route::get('/profile', [RouteController::class, 'taskerprofileNav'])->name('tasker-profile');
-    Route::post('/update-profile-{id}', [TaskerController::class, 'taskerUpdateProfile'])->name('tasker-update-profile'); 
+    Route::post('/update-profile-{id}', [TaskerController::class, 'taskerUpdateProfile'])->name('tasker-update-profile');
     Route::post('/update-password-{id}', [TaskerController::class, 'taskerUpdatePassword'])->name('tasker-update-password');
 
 
 
     //Tasker - Service Management
-    Route::get('/service-management', [RouteController::class, 'taskerServiceManagementNav'])->name('tasker-service-management'); 
-    Route::post('/create-service', [ServiceController::class, 'createService'])->name('tasker-service-create'); 
-    Route::post('/update-service-{id}', [ServiceController::class, 'updateService'])->name('tasker-service-update'); 
-    Route::get('/delete-service-{id}', [ServiceController::class, 'deleteService'])->name('tasker-service-delete'); 
+    Route::get('/service-management', [RouteController::class, 'taskerServiceManagementNav'])->name('tasker-service-management');
+    Route::post('/create-service', [ServiceController::class, 'createService'])->name('tasker-service-create');
+    Route::post('/update-service-{id}', [ServiceController::class, 'updateService'])->name('tasker-service-update');
+    Route::get('/delete-service-{id}', [ServiceController::class, 'deleteService'])->name('tasker-service-delete');
 
     Route::get('/card-verification', [TaskerController::class, 'taskerCardVerification'])->name('tasker-card-ver');
     Route::get('/face-verification', [TaskerController::class, 'taskerFaceVerification'])->name('tasker-face-ver');
     Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
-
-
 });
+
 /* Tasker Route End */
 
-Route::get('/', [RouteController::class, 'gotoIndex'])->name('serve-now-home');
 
-Route::get('/login-option', [RouteController::class, 'loginOptionNav'])->name('servenow-login-option');
+
+Route::get('/', [RouteController::class, 'gotoIndex'])->name('servenow-home');
 
 Route::get('/register-client', [RouteController::class, 'clientRegisterFormNav'])->name('client-register-form');
 
 Route::post('/create-client', [ClientController::class, 'createClient'])->name('client-create');
-
-Route::get('/login', [RouteController::class, 'clientLoginNav'])->name('client-login');
-
-Route::post('/client-authentication', [AuthenticateController::class, 'authenticateClient'])->name('client-auth');
-
-
-
-
 
 Route::prefix('client')->middleware('auth:client')->group(function () {
 
@@ -153,12 +155,9 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     Route::post('/client-update-address-{id}', [ClientController::class, 'clientUpdateAddress'])->name('client-update-address');
 
 
-    
+
     // Client - Logout
     Route::get('/client-logout', [AuthenticateController::class, 'logoutClient'])->name('client-logout');
-
-
-
 });
 
 
@@ -173,6 +172,3 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
 
 // Route::get('/get-states', [RouteController::class, 'getStates'])->name('get-states');
 Route::get('/get-areas/{state}', [RouteController::class, 'getAreas'])->name('get-area');
-
-
-

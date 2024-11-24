@@ -45,11 +45,12 @@
     </div>
     <!-- [ Pre-loader ] End -->
 
-    <div class="auth-main">
+    <div class="auth-main border">
         <div class="auth-wrapper v1">
             <div class="auth-form">
-                <div class="row d-flex justify-content-center align-items-center">
-                    <div class="col-md-8">
+                <div class="row justify-content-center">
+                    <div class="col-sm-10">
+                        <!-- Start Alert -->
                         <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
                             <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
                                 <path
@@ -83,12 +84,13 @@
                                     aria-label="Close"></button>
                             </div>
                         @endif
+
+                        <!-- End Alert -->
+
                     </div>
-
                 </div>
-                <!-- Start Alert -->
 
-                <!-- End Alert -->
+
 
                 <div class="card my-5 shadow shadow-lg">
                     <form action="{{ route('client-auth') }}" method="POST">

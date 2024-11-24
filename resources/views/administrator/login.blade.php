@@ -31,129 +31,96 @@
 <body data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" data-pc-theme_contrast=""
     data-pc-theme="light" class="landing-page">
 
-    <nav class="navbar navbar-expand-md navbar-light default shadow shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <img src="../assets/images/logo-test.png" class="img-fluid" width="80" height="50"
-                    alt="logo" />
-            </a>
-        </div>
-    </nav>
+    <div class="auth-main">
+        <div class="auth-wrapper v1">
+            <div class="auth-form">
+                <div class="card border border-0" style="background-color: transparent">
+                    <!-- Start Alert -->
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+                        <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+                            <path
+                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z">
+                            </path>
+                        </symbol>
 
-    <div class="container">
-        <form action="{{ route('auth-admin') }}" method="POST">
-            @csrf
-            <div class="row justify-content-center align-items-center" style="height: 100vh;">
+                        <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+                            <path
+                                d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z">
+                            </path>
+                        </symbol>
+                    </svg>
 
-                <div class="col-md-6 d-sm-block d-none">
-                    <p class="card-subtitle text-muted fs-12">Admin Panel</p>
-                    <h1 class="wow fadeInUp" data-wow-delay="0.1s">
-                        Welcome to <span class="hero-text-gradient">ServeNow</span>
-                    </h1>
-                    <p class="card-subtitle text-muted fs-12"></p>
+                    @if (session()->has('success'))
+                        <div class="alert alert-success alert-dismissible d-flex align-items-center" role="alert">
+                            <svg class="bi flex-shrink-0 me-2" width="24" height="24">
+                                <use xlink:href="#check-circle-fill"></use>
+                            </svg>
+                            <div> {{ session('success') }} </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                        </div>
+                    @endif
+                    @if (session()->has('error'))
+                        <div class="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
+                            <svg class="bi flex-shrink-0 me-2" width="24" height="24">
+                                <use xlink:href="#exclamation-triangle-fill"></use>
+                            </svg>
+                            <div> {{ session('error') }} </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                        </div>
+                    @endif
+                    <!-- End Alert -->
                 </div>
 
-                <div class="col-sm-12 col-md-4">
+                <div class="text-center">
+                    <a href="{{ route('servenow-home') }}"><img src="../assets/images/logo-test.png" alt="img"
+                            class="img-fluid" width="150" height="100" /></a>
+                </div>
 
-                    <div aria-label="alert-section">
-                        <!-- Start Alert -->
-                        <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
-                            <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
-                                <path
-                                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z">
-                                </path>
-                            </symbol>
-
-                            <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-                                <path
-                                    d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z">
-                                </path>
-                            </symbol>
-                        </svg>
-                        @if (session()->has('success'))
-                            <div class="alert alert-success alert-dismissible d-flex align-items-center" role="alert">
-                                <svg class="bi flex-shrink-0 me-2" width="24" height="24">
-                                    <use xlink:href="#check-circle-fill"></use>
-                                </svg>
-                                <div> {{ session('success') }} </div>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                        @endif
-                        @if (session()->has('error'))
-                            <div class="alert alert-danger alert-dismissible d-flex align-items-center" role="alert">
-                                <svg class="bi flex-shrink-0 me-2" width="24" height="24">
-                                    <use xlink:href="#exclamation-triangle-fill"></use>
-                                </svg>
-                                <div> {{ session('error') }} </div>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                        @endif
-                        <!-- End Alert -->
-
-                    </div>
-
-                    <div class="card border border-0 shadow shadow-md">
+                <div class="card my-5 shadow shadow-lg">
+                    <form action="{{ route('auth-admin') }}" method="POST">
+                        @csrf
                         <div class="card-body">
-                            <h4 class="mt-3 mb-1 text-center">Log In</h4>
-                            <p class="f-12 text-muted text-center mb-3">Please log in using valid credentials</p>
 
-                            <div class="mb-3">
-                                <div class="form-floating">
-                                    <input type="email" class="form-control" id="emailLabel"
-                                        placeholder="Email address" name="email" required />
-                                    <label for="emailLabel">Email address</label>
-                                </div>
+                            <div class="text-center mt-3 mb-3">
+                                <h3 class="text-center f-w-500 mb-3">Login | <span
+                                        class="text-danger">Administrator</span> </h3>
+                                <div class="text-muted">This portal is restricted to authorized administrators only. <span class="text-danger f-w-600">Unauthorized access is prohibited.</span> </div>
                             </div>
-
-                            <div class="mb-3">
-                                <div class="form-floating">
-                                    <input type="password" class="form-control" id="password" placeholder="Password"
-                                        name="password" required />
-                                    <label for="password">Password</label>
-
-                                    <!-- Show/Hide Button -->
-                                    <button type="button" class="btn position-absolute end-0 top-0 me-2"
-                                        style="background-color: transparent; margin-top:.60rem;" id="show-password">
-                                        <i id="toggle-icon-password" class="ti ti-eye"></i>
-                                    </button>
-
-                                </div>
+                            <div class="saprator my-3 text-primary"></div>
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="email" placeholder="Email"
+                                    name="email" />
+                                <label for="email">Email</label>
                             </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="password" placeholder="Password"
+                                    name="password" />
+                                <label for="password">Password</label>
 
-
+                                <!-- Show/Hide Button -->
+                                <button type="button" class="btn position-absolute end-0 top-0 me-2"
+                                    style="background-color: transparent; margin-top:.60rem;" id="show-password">
+                                    <i id="toggle-icon-password" class="ti ti-eye"></i>
+                                </button>
+                            </div>
                             <div class="d-flex mt-1 justify-content-end align-items-center">
-                                <h6 class="text-secondary f-w-400 mb-0">
-                                    <a href="forgot-password-v2.html" class="link-primary"> Forgot Password? </a>
+                                <h6 class="f-w-400 mb-0">
+                                    <a href="##" class="link-primary"> Forgot Password? </a>
                                 </h6>
                             </div>
-
-                            <div class="d-grid mt-4 mb-3">
-                                <button type="submit" class="btn btn-lg btn-primary">Log In</button>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">Login</button>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </div>
-        </form>
-    </div>
 
-    <!-- [ footer apps ] start -->
-    <footer class="mt-auto py-3 bg-white text-center shadow shadow-sm">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col my-1 wow fadeInUp" data-wow-delay="0.4s">
-                    <p class="mb-0 text-center">
-                        <a class="link-primary" href= "##"> ServeNow</a>
-                        Copyright © 2024 All rights reserved
-                    </p>
-                </div>
+
             </div>
         </div>
-    </footer>
-    <!-- [ footer apps ] End -->
-
+    </div>
 
 
     <!-- Required Js -->
