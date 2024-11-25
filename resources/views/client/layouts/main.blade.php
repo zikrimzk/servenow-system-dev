@@ -15,8 +15,8 @@
     <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon" />
     <!-- [Page specific CSS] start -->
     <link href="../assets/css/plugins/animate.min.css" rel="stylesheet" type="text/css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/../assets/owl.carousel.min.css"
-        rel="stylesheet" />
+    {{-- <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/../assets/owl.carousel.min.css"
+        rel="stylesheet" /> --}}
     <!-- [Page specific CSS] end -->
     <!-- [Font] Family -->
     <link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
@@ -33,8 +33,8 @@
     <!-- [Template CSS Files] -->
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
     <link rel="stylesheet" href="../assets/css/style-preset.css" />
-    <script src="../assets/js/tech-stack.js"></script>
     <link rel="stylesheet" href="../assets/css/landing.css" />
+    <script src="../assets/js/tech-stack.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
@@ -228,6 +228,13 @@
     <script>
         localStorage.setItem('layout', 'horizontal');
         change_box_container('true');
+    </script>
+    <script src="../assets/js/plugins/wizard.min.js"></script>
+    <script>
+        new Wizard('#basicwizard', {
+            validate: true,
+            progress: true
+        });
     </script>
     <!-- [Page Specific JS] end -->
 

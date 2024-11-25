@@ -6,26 +6,10 @@
     <div class="pc-container">
         <div class="pc-content">
 
-            <!-- [ breadcrumb ] start -->
-            <div class="page-header">
-                <div class="page-block">
-                    <div class="row align-items-center">
-                        <div class="col-md-12">
-                            <ul class="breadcrumb">
-                                <li class="breadcrumb-item" aria-current="page">My Profile</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="page-header-title">
-                                <h2 class="mb-0">My Profile</h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- [ breadcrumb ] end -->
+           
 
-            <div class="row mb-5">
+            <div class="row mx-3 ">
+                <h1 class="my-4">My Profile</h1>
                 <div class="col-sm-12">
                     <div class="card">
                         <div class="card-body py-0">

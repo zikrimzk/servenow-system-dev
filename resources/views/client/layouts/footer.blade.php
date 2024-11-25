@@ -1,5 +1,5 @@
 <footer class="footer">
-    <div class="container title mb-0">
+    {{-- <div class="container title mb-0">
         <div class="row align-items-center wow fadeInUp" data-wow-delay="0.2s">
             <div class="col-md-8">
                 <h2 class="mb-3">Stay connected with us</h2>
@@ -19,7 +19,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="border-top border-bottom footer-center">
         <div class="container">
             <div class="row">
