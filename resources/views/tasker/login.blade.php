@@ -120,9 +120,10 @@
                                 <button type="submit" class="btn btn-primary btn-lg">Login</button>
                             </div>
                             <div class="mt-4 text-center">
-                                <h6 class="f-w-500 mb-0">Don't have an Account? <a
-                                        href="{{ route('client-register-form') }}"
-                                        class="link-primary text-decoration-underline">Create Account</a></h6>
+                                <h6 class="f-w-500 mb-0">Don't have an Account?
+                                    <a href="{{ route('tasker-register-form') }}"
+                                        class="link-primary text-decoration-underline">Create Account</a>
+                                </h6>
 
                             </div>
                         </div>
