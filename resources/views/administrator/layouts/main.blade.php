@@ -319,30 +319,11 @@
     <script src="../assets/js/plugins/dataTables.responsive.min.js"></script>
     <script src="../assets/js/plugins/responsive.bootstrap5.min.js"></script>
     <script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
-
-    {{-- <script>
-        layout_change('light');
+    <script>
+        localStorage.setItem('layout', 'vertical');
     </script>
 
-    <script>
-        change_box_container('false');
-    </script>
-
-    <script>
-        layout_caption_change('true');
-    </script>
-
-    <script>
-        layout_rtl_change('false');
-    </script>
-
-    <script>
-        preset_change('preset-1');
-    </script>
-
-    <script>
-        main_layout_change('vertical');
-    </script> --}}
+  
 
 </body>
 

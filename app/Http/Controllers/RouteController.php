@@ -7,6 +7,7 @@ use App\Models\Service;
 use App\Models\ServiceType;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
+use App\Models\TimeSlot;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -286,6 +287,21 @@ class RouteController extends Controller
             'title' => 'Service Management',
             'services' => Service::get(),
             'types' => ServiceType::where('servicetype_status', 1)->get()
+        ]);
+    }
+
+    // Admin - Time Slot Setting
+    public function taskerTimeSlotNav(Request $request)
+    {
+        $data = DB::table('tasker_time_slots as a')
+        ->join('time_slots as b','a.slot_id','=','b.id')
+        ->select('a.id','a.slot_status','a.slot_day','a.slot_id','b.start_time','b.end_time')
+        ->get();
+        
+        return view('tasker.task-preference.time-slot-index', [
+            'title' => 'Manage Time Slot',
+            'slots' => TimeSlot::all(),
+            'data'=>$data
         ]);
     }
 
@@ -738,6 +754,73 @@ class RouteController extends Controller
             'title' => 'Service Management',
             'services' => Service::get(),
             'types' => ServiceType::where('servicetype_status', 1)->get()
+        ]);
+    }
+
+    // Admin - Time Slot Setting
+    public function adminTimeSlotNav(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $data = DB::table('time_slots')
+                ->select('id', 'start_time', 'end_time')
+                ->get();
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+
+            $table->addColumn('action', function ($row) {
+
+                $button =
+                    '
+                          <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#updateSlotModal-' . $row->id . '">
+                            <i class="ti ti-edit f-20"></i>
+                          </a>
+                          <a href="#" class="avtar avtar-xs  btn-light-danger deleteTimeSlot-' . $row->id . '">
+                            <i class="ti ti-trash f-20"></i>
+                          </a>
+
+                            <script>
+                                document.querySelector(".deleteTimeSlot-' . $row->id . '").addEventListener("click", function () {
+                                const swalWithBootstrapButtons = Swal.mixin({
+                                customClass: {
+                                    confirmButton: "btn btn-success",
+                                    cancelButton: "btn btn-danger"
+                                },
+                                buttonsStyling: false
+                                });
+                                swalWithBootstrapButtons
+                                .fire({
+                                    title: "Are you sure?",
+                                    text: "This action cannot be undone.",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Yes, delete it!",
+                                    cancelButtonText: "No, cancel!",
+                                    reverseButtons: true
+                                })
+                                .then((result) => {
+                                    if (result.isConfirmed) {
+                                        setTimeout(function() {
+                                            location.href="' . route("admin-timeslot-remove", $row->id) . '";
+                                        }, 1000);
+                                    } 
+                                });
+                            });
+                        </script>
+                    ';
+
+                return $button;
+            });
+
+            $table->rawColumns(['action']);
+
+            return $table->make(true);
+        }
+        return view('administrator.time.index', [
+            'title' => 'Time Slot Setting',
+            'slots' => TimeSlot::all()
         ]);
     }
 

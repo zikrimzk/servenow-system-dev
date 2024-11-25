@@ -59,6 +59,22 @@
                 <li class="pc-item pc-caption">
                     <label>Manager</label>
                 </li>
+                <li class="pc-item pc-hasmenu">
+                    <a href="#!" class="pc-link">
+                        <span class="pc-micon">
+                            <svg class="pc-icon">
+                                <use xlink:href="#custom-status-up"></use>
+                            </svg>
+                        </span>
+                        <span class="pc-mtext">Task Preferences</span>
+                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                    </a>
+                    <ul class="pc-submenu">
+                        <li class="pc-item"><a class="pc-link" href="">Visibility & Location</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-timeslot-setting') }}">Time
+                                Slot</a></li>
+                    </ul>
+                </li>
 
                 <li class="pc-item pc-hasmenu">
                     <a href="#!" class="pc-link">
@@ -75,7 +91,6 @@
                                 Management</a></li>
                     </ul>
                 </li>
-
             </ul>
             <!-- SideBar Menu Item End -->
         </div>

@@ -1,13 +1,14 @@
 <?php
 
+use App\Models\Service;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RouteController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TaskerController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\AuthenticateController;
 use App\Http\Controllers\AdministratorController;
-use App\Http\Controllers\ClientController;
-use App\Models\Service;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +93,12 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/approve-service-{id}', [ServiceController::class, 'adminApproveService'])->name('admin-approve-service');
     Route::get('/reject-service-{id}', [ServiceController::class, 'adminRejectService'])->name('admin-reject-service');
     Route::get('/terminate-service-{id}', [ServiceController::class, 'adminTerminateService'])->name('admin-terminate-service');
+
+    // Admin - Time Slot Setting
+    Route::get('/time-slot-setting', [RouteController::class, 'adminTimeSlotNav'])->name('admin-timeslot-setting');
+    Route::post('/create-time-slot', [SettingController::class, 'adminCreateTimeSlot'])->name('admin-timeslot-create');
+    Route::post('/update-time-slot-{id}', [SettingController::class, 'adminUpdateTimeSlot'])->name('admin-timeslot-update');
+    Route::get('/delete-time-slot-{id}', [SettingController::class, 'adminDeleteTimeSlot'])->name('admin-timeslot-remove');
 });
 
 /* Admin Route End */
@@ -120,7 +127,10 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::post('/update-profile-{id}', [TaskerController::class, 'taskerUpdateProfile'])->name('tasker-update-profile');
     Route::post('/update-password-{id}', [TaskerController::class, 'taskerUpdatePassword'])->name('tasker-update-password');
 
-
+    // Tasker - Account Verification [e-KYC]
+    Route::get('/card-verification', [TaskerController::class, 'taskerCardVerification'])->name('tasker-card-ver');
+    Route::get('/face-verification', [TaskerController::class, 'taskerFaceVerification'])->name('tasker-face-ver');
+    Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
 
     //Tasker - Service Management
     Route::get('/service-management', [RouteController::class, 'taskerServiceManagementNav'])->name('tasker-service-management');
@@ -128,9 +138,11 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::post('/update-service-{id}', [ServiceController::class, 'updateService'])->name('tasker-service-update');
     Route::get('/delete-service-{id}', [ServiceController::class, 'deleteService'])->name('tasker-service-delete');
 
-    Route::get('/card-verification', [TaskerController::class, 'taskerCardVerification'])->name('tasker-card-ver');
-    Route::get('/face-verification', [TaskerController::class, 'taskerFaceVerification'])->name('tasker-face-ver');
-    Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
+    // Tasker - Time Slot Setting
+    Route::get('/time-slot-setting', [RouteController::class, 'taskerTimeSlotNav'])->name('tasker-timeslot-setting');
+    Route::post('/create-time-slot', [SettingController::class, 'taskerCreateTimeSlot'])->name('tasker-timeslot-create');
+    Route::post('/update-time-slot-{id}', [SettingController::class, 'taskerUpdateTimeSlot'])->name('tasker-timeslot-update');
+    
 });
 
 /* Tasker Route End */

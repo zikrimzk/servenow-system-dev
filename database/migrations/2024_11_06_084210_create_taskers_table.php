@@ -31,6 +31,8 @@ return new class extends Migration
             $table->string('tasker_address_area')->nullable();
             $table->string('tasker_workingloc_state')->nullable();
             $table->string('tasker_workingloc_area')->nullable();
+            $table->string('tasker_working_status')->nullable();
+            $table->integer('tasker_rank')->nullable();
             $table->integer('tasker_rating')->nullable();
             $table->rememberToken();
             $table->timestamps();
