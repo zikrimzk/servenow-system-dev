@@ -133,7 +133,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-10 text-center">
                     <h1 class="wow fadeInUp" data-wow-delay="0.2s">
-                        Easy Solutions for
+                        Easy Solutions for Khairul
 
                     </h1>
                     <h1 class="mb-4 wow fadeInUp" data-wow-delay="0.2s">
