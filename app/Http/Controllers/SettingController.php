@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use App\Models\Tasker;
 use App\Models\TimeSlot;
 use Illuminate\Http\Request;
 use App\Models\TaskerTimeSlot;
@@ -119,5 +120,23 @@ class SettingController extends Controller
 
         TaskerTimeSlot::whereId($id)->update($data);
         return back()->with('success', 'Slot has been updated successfully !');
+    }
+
+    // Tasker - Visibility Change 
+    public function taskerVisibleToggle()
+    {
+        if(Auth::user()->tasker_working_status == 0)
+        {
+            Tasker::whereId(Auth::user()->id)->update(['tasker_working_status'=> 1]);
+            $message ='You are now visible to clients !';
+        }
+        else if(Auth::user()->tasker_working_status == 1)
+        {
+            Tasker::whereId(Auth::user()->id)->update(['tasker_working_status'=> 0]);
+            $message ='You are now invisible to clients !';
+
+        }
+
+        return response()->json(['message' => $message]);
     }
 }

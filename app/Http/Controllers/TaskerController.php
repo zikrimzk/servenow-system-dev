@@ -227,11 +227,11 @@ class TaskerController extends Controller
         if ($ori->tasker_status == 0 || $ori->tasker_status == 1) {
             $taskers['tasker_status'] = 1;
             $message = 'Tasker profile has been successfully updated. Please proceed to account verification to start earning.';
-        } elseif ($ori->tasker_status == 2 || $ori->tasker_status == 3 ) {
+        } elseif ($ori->tasker_status == 2 || $ori->tasker_status == 3) {
             $taskers['tasker_status'] = 2;
             $message = 'Tasker profile has been successfully updated !';
-        } 
-        
+        }
+
         Tasker::whereId($id)->update($taskers);
 
         return redirect(route('tasker-profile'))->with('success', $message);
@@ -262,29 +262,48 @@ class TaskerController extends Controller
         }
     }
 
+    public function taskerUpdateLocation(Request $req, $id)
+    {
+       
+            $taskers = $req->validate(
+                [
+                    'tasker_workingloc_state' => 'required',
+                    'tasker_workingloc_area' => 'required',
+                ],
+                [],
+                [
+                    'tasker_workingloc_state' => 'Working State',
+                    'tasker_workingloc_area' => 'Working Area',
+                ]
+            );
+        
+
+        Tasker::whereId($id)->update($taskers);
+
+        return back()->with('success', 'Tasker location have been saved !');
+    }
+
     public function taskerCardVerification()
     {
-       return view('ekyc.card-verification',[
-        'title' => 'Card Verification'
-       ]);
+        return view('ekyc.card-verification', [
+            'title' => 'Card Verification'
+        ]);
     }
 
     public function taskerFaceVerification()
     {
-       return view('ekyc.face-verification',[
-        'title' => 'Face Verification'
-       ]);
+        return view('ekyc.face-verification', [
+            'title' => 'Face Verification'
+        ]);
     }
 
     public function verificationSuccess()
     {
-       try
-       {    
-        Tasker::where('id', Auth::user()->id)->update(['tasker_status' => 2]);
-        return redirect(route('tasker-profile'))->with('success', 'Verification has been successfully completed !');
-       }
-       catch (Exception) {
-        return back()->with('error', 'Something went wrong !');
-       }
+        try {
+            Tasker::where('id', Auth::user()->id)->update(['tasker_status' => 2]);
+            return redirect(route('tasker-profile'))->with('success', 'Verification has been successfully completed. Please set up your task preferences at Task Preferences > Visibility & Location.');
+        } catch (Exception) {
+            return back()->with('error', 'Something went wrong !');
+        }
     }
 }

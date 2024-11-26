@@ -138,6 +138,14 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::post('/update-service-{id}', [ServiceController::class, 'updateService'])->name('tasker-service-update');
     Route::get('/delete-service-{id}', [ServiceController::class, 'deleteService'])->name('tasker-service-delete');
 
+    // Tasker - Task Preference > Visibility & Location
+    Route::get('/visibility-location', [RouteController::class, 'taskerVisibleLocNav'])->name('tasker-visibleloc-setting');
+    Route::get('/change-tasker-visibility', [SettingController::class, 'taskerVisibleToggle'])->name('tasker-visible-toggle');
+    Route::post('/update-tasker-location-{id}', [TaskerController::class, 'taskerUpdateLocation'])->name('tasker-update-location');
+
+
+    
+
     // Tasker - Time Slot Setting
     Route::get('/time-slot-setting', [RouteController::class, 'taskerTimeSlotNav'])->name('tasker-timeslot-setting');
     Route::post('/create-time-slot', [SettingController::class, 'taskerCreateTimeSlot'])->name('tasker-timeslot-create');

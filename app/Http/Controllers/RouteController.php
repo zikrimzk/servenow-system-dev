@@ -305,6 +305,16 @@ class RouteController extends Controller
         ]);
     }
 
+    public function taskerVisibleLocNav(Request $request)
+    {
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+
+        return view('tasker.task-preference.visibility-location', [
+            'title' => 'Manage Visibility & Location',
+            'states'=> $states
+        ]);
+    }
+
 
     /**** Tasker Route Function - End ****/
 

@@ -27,13 +27,15 @@ class Tasker extends Authenticatable
         'tasker_icno',
         'tasker_dob',
         'tasker_photo',
-        'tasker_address_no',
-        'tasker_address_road',
+        'tasker_address_one',
+        'tasker_address_two',
         'tasker_address_poscode',
         'tasker_address_state',
-        'tasker_address_city',
+        'tasker_address_area',
         'tasker_workingloc_state',
         'tasker_workingloc_area',
+        'tasker_working_status',
+        'tasker_rank',
         'tasker_rating',
     ];
 }

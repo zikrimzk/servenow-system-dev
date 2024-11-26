@@ -70,7 +70,7 @@
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="">Visibility & Location</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-visibleloc-setting') }}">Visibility & Location</a></li>
                         <li class="pc-item"><a class="pc-link" href="{{ route('tasker-timeslot-setting') }}">Time
                                 Slot</a></li>
                     </ul>

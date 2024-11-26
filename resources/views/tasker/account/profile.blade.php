@@ -363,67 +363,6 @@
                                                             @enderror
                                                         </div>
                                                     </div>
-
-                                                    <!-- Working Area Section -->
-                                                    <h5 class="mb-2 mt-2">C. Working Area</h5>
-
-                                                    <!-- Working Area State Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">State <span
-                                                                    class="text-danger">*</span></label>
-                                                            <select name="tasker_workingloc_state"
-                                                                class="form-control @error('tasker_workingloc_state') is-invalid @enderror"
-                                                                id="workState">
-                                                                @if (Auth::user()->tasker_workingloc_state == '')
-                                                                    <option value="" selected>Select State</option>
-                                                                    @foreach ($states['states'] as $state)
-                                                                        <option value="{{ strtolower($state['name']) }}">
-                                                                            {{ $state['name'] }}</option>
-                                                                    @endforeach
-                                                                @else
-                                                                    @foreach ($states['states'] as $state)
-                                                                        @if (Auth::user()->tasker_workingloc_state == strtolower($state['name']))
-                                                                            <option
-                                                                                value="{{ strtolower($state['name']) }}"
-                                                                                selected>
-                                                                                {{ $state['name'] }}</option>
-                                                                        @else
-                                                                            <option
-                                                                                value="{{ strtolower($state['name']) }}">
-                                                                                {{ $state['name'] }}</option>
-                                                                        @endif
-                                                                    @endforeach
-                                                                @endif
-                                                            </select>
-                                                            @error('tasker_workingloc_state')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Working Area Area Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Area <span
-                                                                    class="text-danger">*</span></label>
-                                                            <select name="tasker_workingloc_area"
-                                                                class="form-control @error('tasker_workingloc_area') is-invalid @enderror"
-                                                                id="workCity">
-                                                                @if (Auth::user()->tasker_workingloc_area == '')
-                                                                    <option value="" selected>Select Area</option>
-                                                                @else
-                                                                    <option
-                                                                        value="{{ Auth::user()->tasker_workingloc_area }}"
-                                                                        selected>{{ Auth::user()->tasker_workingloc_area }}
-                                                                    </option>
-                                                                @endif
-                                                            </select>
-                                                            @error('tasker_workingloc_area')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -609,30 +548,6 @@
                     });
                 } else {
                     $('#addCity').empty().append('<option value="">Select Area</option>');
-                }
-            });
-
-            $('#workState').on('change', function() {
-                var state = $(this).val();
-                if (state) {
-                    $.ajax({
-                        url: '/get-areas/' + state, // Ensure this matches the route
-                        type: 'GET',
-                        success: function(data) {
-                            $('#workCity').empty().append(
-                                '<option value="">Select Area</option>');
-                            $.each(data, function(index, area) {
-                                $('#workCity').append('<option value="' + area + '">' +
-                                    area + '</option>');
-                            });
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("Error fetching areas: " +
-                                error); // For debugging if request fails
-                        }
-                    });
-                } else {
-                    $('#workCity').empty().append('<option value="">Select Area</option>');
                 }
             });
 

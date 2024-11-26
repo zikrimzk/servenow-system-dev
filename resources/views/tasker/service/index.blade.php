@@ -65,7 +65,7 @@
                 <div class="col-sm-12">
                     <div class="alert alert-primary">
                         <div class="d-flex align-items-center">
-                            <i class="ti ti-info-circle h2 f-w-400 mb-0"></i>
+                            <i class="ti ti-info-circle h2 f-w-400 mb-0 text-primary"></i>
                             <div class="flex-grow-1 ms-3">
                                 <strong>Note:</strong>
                                 The administrator will review the services within 3 business days to approve your request.
