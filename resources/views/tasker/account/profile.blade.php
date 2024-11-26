@@ -525,7 +525,7 @@
                     reader.readAsDataURL(file);
                 }
                 $('#isUploadPhoto').val('true');
-            });
+            }); 
 
             $('#addState').on('change', function() {
                 var state = $(this).val();

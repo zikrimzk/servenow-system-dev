@@ -140,8 +140,6 @@ class TaskerController extends Controller
                     'tasker_address_poscode' => 'required',
                     'tasker_address_state' => 'required',
                     'tasker_address_area' => 'required',
-                    'tasker_workingloc_state' => 'required',
-                    'tasker_workingloc_area' => 'required',
                     'tasker_status' => '',
                     'tasker_photo' => 'required|image|mimes:jpeg,png,jpg',
 
@@ -161,8 +159,6 @@ class TaskerController extends Controller
                     'tasker_address_poscode' => 'Postal Code',
                     'tasker_address_state' => 'State',
                     'tasker_address_area' => 'Area',
-                    'tasker_workingloc_state' => 'Working State',
-                    'tasker_workingloc_area' => 'Working Area',
                     'tasker_status' => 'Status',
                     'tasker_photo' => 'Profile Photo',
 
@@ -195,8 +191,6 @@ class TaskerController extends Controller
                     'tasker_address_poscode' => 'required',
                     'tasker_address_state' => 'required',
                     'tasker_address_area' => 'required',
-                    'tasker_workingloc_state' => 'required',
-                    'tasker_workingloc_area' => 'required',
                     'tasker_status' => '',
                 ],
                 [],
@@ -214,8 +208,6 @@ class TaskerController extends Controller
                     'tasker_address_poscode' => 'Postal Code',
                     'tasker_address_state' => 'State',
                     'tasker_address_area' => 'Area',
-                    'tasker_workingloc_state' => 'Working State',
-                    'tasker_workingloc_area' => 'Working Area',
                     'tasker_status' => 'Status',
                     'tasker_photo' => 'Profile Photo',
 
