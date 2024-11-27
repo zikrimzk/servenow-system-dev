@@ -12,6 +12,20 @@ use Illuminate\Support\Facades\Hash;
 class TaskerAPIController extends Controller
 {
 
+    public function getTaskerDetail()
+    {
+        try {
+            $data = Tasker::where('id', Auth::user()->id)->get();
+            return response([
+                'data' => $data
+            ], 201);
+        } catch (Exception $e) {
+            return response([
+                'message' => 'Error : ' . $e->getMessage()
+            ], 301);
+        }
+
+    }
     // Tasker Update Profile
     // NOTE : API ni ada function file() untuk upload profile photo, implementation flutter tak pasti macamana 
     public function taskerUpdateProfileAPI(Request $req, $id)

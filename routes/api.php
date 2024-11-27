@@ -37,6 +37,9 @@ Route::get('/get-area-{state}', [TaskerAPIController::class, 'getAreasAPI']);
 // Tasker - Auth Process
 Route::post('/authenticate-tasker', [AuthenticateController::class, 'authenticateTaskerApi']);
 
+// Tasker - Fetch Tasker Details
+Route::middleware('auth:sanctum')->get('/get-tasker-details', [TaskerAPIController::class, 'getTaskerDetail']);
+
 // Tasker - Profile Management API
 Route::middleware('auth:sanctum')->post('/update-password-{id}', [TaskerAPIController::class, 'taskerUpdatePasswordAPI']);
 Route::middleware('auth:sanctum')->post('/update-profile-{id}', [TaskerAPIController::class, 'taskerUpdateProfileAPI']);
