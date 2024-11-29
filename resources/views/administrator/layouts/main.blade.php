@@ -4,14 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta meta name="viewport" content= 
+    "width=device-width, user-scalable=no" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta meta name="viewport" content= "width=device-width, user-scalable=no" />
     <meta name="description" content="ServeNow System Admin Layout" />
     <meta name="author" content="WorkshopSqualII" />
     <title>ServeNow | {{ $title }}</title>
 
     <!-- [Favicon] icon -->
-    <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon" />
+    <link rel="icon" href="../assets/images/logo-test-white.png" type="image/x-icon" />
     <!-- [Font] Family -->
     <link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
     <!-- [phosphor Icons] https://phosphoricons.com/ -->
@@ -31,6 +32,8 @@
     <link rel="stylesheet" href="../assets/css/plugins/dataTables.bootstrap5.min.css" />
     <link rel="stylesheet" href="../assets/css/plugins/responsive.bootstrap5.min.css" />
     <link href="../assets/css/plugins/animate.min.css" rel="stylesheet" type="text/css" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="../assets/js/plugins/dataTables.min.js"></script>
@@ -320,11 +323,34 @@
     <script src="../assets/js/plugins/dataTables.responsive.min.js"></script>
     <script src="../assets/js/plugins/responsive.bootstrap5.min.js"></script>
     <script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
+
     <script>
         localStorage.setItem('layout', 'vertical');
     </script>
 
-  
+    <script>
+        layout_change('light');
+    </script>
+
+    <script>
+        change_box_container('false');
+    </script>
+
+    <script>
+        layout_caption_change('true');
+    </script>
+
+    <script>
+        layout_rtl_change('false');
+    </script>
+
+    <script>
+        preset_change('preset-1');
+    </script>
+
+    <script>
+        main_layout_change('vertical');
+    </script>
 
 </body>
 

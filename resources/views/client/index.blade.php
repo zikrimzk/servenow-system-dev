@@ -13,12 +13,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- [Favicon] icon -->
-    <link rel="icon" href="assets/images/favicon.svg" type="image/x-icon" />
+    <link rel="icon" href="assets/images/logo-test-white.png" type="image/x-icon" />
     <!-- [Page specific CSS] start -->
     <link href="assets/css/plugins/animate.min.css" rel="stylesheet" type="text/css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
-        rel="stylesheet" />
-    <!-- [Page specific CSS] end -->
     <!-- [Font] Family -->
     <link rel="stylesheet" href="assets/fonts/inter/inter.css" id="main-font-link" />
     <!-- [phosphor Icons] https://phosphoricons.com/ -->

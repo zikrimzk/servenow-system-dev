@@ -12,7 +12,7 @@
     <title>ServeNow | {{ $title }}</title>
 
     <!-- [Favicon] icon -->
-    <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon" />
+    <link rel="icon" href="../assets/images/logo-test-white.png" type="image/x-icon" />
     <!-- [Font] Family -->
     <link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
     <!-- [phosphor Icons] https://phosphoricons.com/ -->
@@ -53,7 +53,7 @@
 
 
                             <h2 class="f-w-700 mb-3 mt-3 text-center">Create your account</h2>
-                            <p class="text-muted mb-3">Get started by creating an account. We'll send you a text with a link to download the Tasker app and complete your registration. Standard call, messaging, or data rates may apply.</p>
+                            <p class="text-muted mb-3">Start creating your account and ensure you complete all the steps after logging in before downloading the Servenow app.</p>
 
                             <!-- Start Alert -->
                             <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
@@ -99,7 +99,7 @@
                                         <div class="form-floating mb-3">
                                             <input type="text"
                                                 class="form-control @error('tasker_firstname') is-invalid @enderror"
-                                                id="floatingInput" placeholder="Email" name="tasker_firstname" />
+                                                id="floatingInput" placeholder="Email" name="tasker_firstname" value="{{ old('tasker_firstname') }}" />
                                             <label for="floatingInput">First Name</label>
                                             @error('tasker_firstname')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -110,7 +110,7 @@
                                         <div class="form-floating mb-3">
                                             <input type="text"
                                                 class="form-control @error('tasker_lastname') is-invalid @enderror"
-                                                id="floatingInput" placeholder="Last Name" name="tasker_lastname" />
+                                                id="floatingInput" placeholder="Last Name" name="tasker_lastname" value="{{ old('tasker_lastname') }}" />
                                             <label for="floatingInput">Last Name</label>
                                             @error('tasker_lastname')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -119,10 +119,10 @@
                                     </div>
                                     <div class="col-sm-12">
                                         <div class="form-floating mb-3">
-                                            <input type="number"
+                                            <input type="text"
                                                 class="form-control @error('tasker_phoneno') is-invalid @enderror"
                                                 id="floatingInput" placeholder="Phone Number"
-                                                name="tasker_phoneno" />
+                                                name="tasker_phoneno" value="{{ old('tasker_phoneno') }}" />
                                             <label for="floatingInput">Phone Number</label>
                                             @error('tasker_phoneno')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -134,7 +134,7 @@
                                         <div class="form-floating mb-3">
                                             <input type="email"
                                                 class="form-control @error('email') is-invalid @enderror"
-                                                id="floatingInput" placeholder="Email" name="email" />
+                                                id="floatingInput" placeholder="Email" name="email" value="{{ old('email') }}" />
                                             <label for="floatingInput">Email</label>
                                             @error('email')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -168,13 +168,11 @@
                                             <div class="form-check">
                                                 <input class="form-check-input input-primary" type="checkbox"
                                                     id="confirmbox" />
-                                                <label class="form-check-label text-muted" for="confirmbox">I
-                                                    acknowledge
-                                                    I
-                                                    am a
-                                                    sole proprietor.</label>
+                                                <label class="form-check-label text-muted" for="confirmbox">
+                                                    I acknowledge Iam a sole proprietor.
+                                                </label>
                                             </div>
-                                            <div class="text-muted">By clicking above, I agree to
+                                            <div class="text-muted mt-2">By clicking above, I agree to
                                                 ServeNow’s Terms of Service and Privacy Policy.</div>
                                         </div>
                                     </div>
