@@ -6,7 +6,7 @@
     <div class="pc-container">
         <div class="pc-content">
 
-           
+
 
             <div class="row mx-3 ">
                 <h1 class="my-4">My Profile</h1>
@@ -265,6 +265,21 @@
                                                             @enderror
                                                         </div>
                                                     </div>
+                                                    <!-- Postcode Field -->
+                                                    <div class="col-sm-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Postcode</label>
+                                                            <input type="text"
+                                                                class="form-control @error('client_postcode') is-invalid @enderror"
+                                                                name="client_postcode"
+                                                                value="{{ Auth::user()->client_postcode }}"
+                                                                id="client_postcode" maxlength="5"
+                                                                oninput="validatePostcode(this)" />
+                                                            @error('client_postcode')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
 
                                                     <!-- State Field -->
                                                     <div class="col-sm-6">
@@ -299,6 +314,7 @@
                                                             @error('client_state')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
+
                                                         </div>
                                                     </div>
 
@@ -307,23 +323,23 @@
                                                         <div class="mb-3">
                                                             <label class="form-label">Area <span
                                                                     class="text-danger">*</span></label>
-                                                            <select name="client_city"
-                                                                class="form-control @error('client_city') is-invalid @enderror"
+                                                            <select name="client_area"
+                                                                class="form-control @error('client_area') is-invalid @enderror"
                                                                 id="addCity">
                                                                 @if (Auth::user()->client_state == '')
                                                                     <option value="" selected>Select Area</option>
                                                                 @else
-                                                                    <option
-                                                                        value="{{ Auth::user()->client_city }}"
-                                                                        selected>{{ Auth::user()->client_city }}
+                                                                    <option value="{{ Auth::user()->client_area }}"
+                                                                        selected>{{ Auth::user()->client_area }}
                                                                     </option>
                                                                 @endif
                                                             </select>
-                                                            @error('client_city')
+                                                            @error('client_area')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
                                                         </div>
                                                     </div>
+
 
 
                                                 </div>
@@ -425,6 +441,16 @@
         </div>
     </div>
     <script>
+        function validatePostcode(input) {
+            // Remove any non-numeric characters
+            input.value = input.value.replace(/\D/g, '');
+            // Trim to 5 characters if longer
+            if (input.value.length > 5) {
+                input.value = input.value.slice(0, 5);
+            }
+        }
+
+
         $(document).ready(function() {
             $('#profilephoto').on('change', function() {
                 const file = event.target.files[0];
@@ -603,7 +629,7 @@
         });
     </script>
 
-   
+
 
 
     <!-- [ Main Content ] end -->

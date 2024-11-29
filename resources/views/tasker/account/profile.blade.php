@@ -95,7 +95,8 @@
                                                 <div class="d-flex align-items-center">
                                                     <i class="ti ti-info-circle h2 f-w-400 mb-0"></i>
                                                     <div class="flex-grow-1 ms-3">
-                                                        <strong>Step 1 :</strong> Please fill in all required fields to continue with the
+                                                        <strong>Step 1 :</strong> Please fill in all required fields to
+                                                        continue with the
                                                         verification process. <strong>Important:</strong> Ensure you upload
                                                         a clear photo.
                                                     </div>
@@ -106,8 +107,9 @@
                                                 <div class="d-flex align-items-center">
                                                     <i class="ti ti-info-circle h2 f-w-400 mb-0"></i>
                                                     <div class="flex-grow-1 ms-3">
-                                                        <strong>Step 2 :</strong> Please make sure to complete your account verification
-                                                        to start earning! 
+                                                        <strong>Step 2 :</strong> Please make sure to complete your account
+                                                        verification
+                                                        to start earning!
                                                     </div>
                                                 </div>
                                             </div>
@@ -118,14 +120,13 @@
                                                 @if (Auth::user()->tasker_status == 0)
                                                     <span class="badge bg-warning">Incomplete Profile</span>
                                                 @elseif(Auth::user()->tasker_status == 1)
-                                                <div class="">
-                                                    <span class="badge bg-light-danger">Not Verified</span>
-                                                
+                                                    <div class="">
+                                                        <span class="badge bg-light-danger">Not Verified</span>
+
                                                         <a href="" class="btn btn-link" data-bs-toggle="modal"
                                                             data-bs-target="#verifyQrModal">Verify now</a>
-                                                  
-                                                </div>
-                                                   
+
+                                                    </div>
                                                 @elseif(Auth::user()->tasker_status == 2)
                                                     <span class="badge bg-success">Verified & Active</span>
                                                 @endif
@@ -189,8 +190,12 @@
                                                                     class="text-danger">*</span></label>
                                                             <input type="text"
                                                                 class="form-control @error('tasker_icno') is-invalid @enderror"
-                                                                name="tasker_icno" placeholder="IC Number"
+                                                                name="tasker_icno" id="tasker_icno"
+                                                                placeholder="IC Number" maxlength="12" pattern="^\d{12}$"
                                                                 value="{{ Auth::user()->tasker_icno }}" />
+                                                            <div id="ic-error-message" class="text-danger"
+                                                                style="display: none;">IC Number must be exactly 12 digits!
+                                                            </div>
                                                             @error('tasker_icno')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
@@ -204,13 +209,17 @@
                                                                     class="text-danger">*</span></label>
                                                             <input type="date"
                                                                 class="form-control @error('tasker_dob') is-invalid @enderror"
-                                                                name="tasker_dob"
-                                                                value="{{ Auth::user()->tasker_dob }}" />
+                                                                name="tasker_dob" id="tasker_dob"
+                                                                value="{{ Auth::user()->tasker_dob }}" readonly />
+                                                            <div id="dob-error-message" class="text-danger"
+                                                                style="display: none;">You must be 18 years and above!
+                                                            </div>
                                                             @error('tasker_dob')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
                                                         </div>
                                                     </div>
+
 
                                                     <!-- Phone Number Field -->
                                                     <div class="col-sm-6">
@@ -221,13 +230,19 @@
                                                                 <input type="text"
                                                                     class="form-control @error('tasker_phoneno') is-invalid @enderror"
                                                                     placeholder="Phone No." name="tasker_phoneno"
+                                                                    id="tasker_phoneno" maxlength="13"
                                                                     value="{{ Auth::user()->tasker_phoneno }}" />
                                                                 @error('tasker_phoneno')
                                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                                 @enderror
                                                             </div>
+                                                            <div id="phone-error-message" class="text-danger"
+                                                                style="display: none;">
+                                                                Phone number must be in a valid format (10 or 11 digits)!
+                                                            </div>
                                                         </div>
                                                     </div>
+
 
                                                     <!-- Email Field -->
                                                     <div class="col-sm-6">
@@ -510,6 +525,74 @@
         </div>
     </div>
     <script>
+        document.getElementById('tasker_phoneno').addEventListener('input', function() {
+            const input = this.value.replace(/\D/g, ''); // Remove non-numeric characters
+            const errorMessage = document.getElementById('phone-error-message');
+
+            if (input.length <= 11) {
+                if (input.length === 10) {
+                    // Format for 10 digits: ### ### ####
+                    this.value = input.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+                    errorMessage.style.display = 'none';
+                } else if (input.length === 11) {
+                    // Format for 11 digits: ### #### ####
+                    this.value = input.replace(/(\d{3})(\d{4})(\d{4})/, '$1 $2 $3');
+                    errorMessage.style.display = 'none';
+                } else {
+                    this.value = input; // Unformatted during input
+                    errorMessage.style.display = 'none';
+                }
+            } else {
+                // Show error if more than 11 digits
+                errorMessage.style.display = 'block';
+            }
+        });
+
+
+
+        const icNoField = document.getElementById('tasker_icno');
+        const dobField = document.getElementById('tasker_dob');
+        const icErrorMessage = document.getElementById('ic-error-message');
+        const dobErrorMessage = document.getElementById('dob-error-message');
+
+        icNoField.addEventListener('input', function() {
+            // Remove non-numeric characters
+            this.value = this.value.replace(/\D/g, '');
+
+            const icNo = this.value.trim();
+            const currentYear = new Date().getFullYear();
+
+            // Validate IC Number (exactly 12 digits)
+            if (icNo.length === 12) {
+                const yearPrefix = parseInt(icNo.substring(0, 2), 10);
+                const month = icNo.substring(2, 4);
+                const day = icNo.substring(4, 6);
+
+                // Determine full year
+                let birthYear = yearPrefix <= (currentYear % 100) ? 2000 + yearPrefix : 1900 + yearPrefix;
+
+                // Validate date components and age
+                const birthDate = new Date(`${birthYear}-${month}-${day}`);
+                const age = currentYear - birthYear - (new Date().setFullYear(currentYear) < birthDate ? 1 : 0);
+
+                if (!isNaN(birthDate) && age >= 18) {
+                    dobField.value = birthDate.toISOString().split('T')[0];
+                    dobField.classList.remove('is-invalid');
+                    dobErrorMessage.style.display = 'none';
+                } else {
+                    dobField.value = '';
+                    dobField.classList.add('is-invalid');
+                    dobErrorMessage.style.display = 'block';
+                }
+
+                icErrorMessage.style.display = 'none'; // Hide IC Number error message
+            } else {
+                dobField.value = '';
+                dobField.classList.add('is-invalid');
+                dobErrorMessage.style.display = 'block';
+                icErrorMessage.style.display = 'block'; // Show IC Number error message
+            }
+        });
         $(document).ready(function() {
             $('#profilephoto').on('change', function() {
                 const file = event.target.files[0];
@@ -525,7 +608,7 @@
                     reader.readAsDataURL(file);
                 }
                 $('#isUploadPhoto').val('true');
-            }); 
+            });
 
             $('#addState').on('change', function() {
                 var state = $(this).val();

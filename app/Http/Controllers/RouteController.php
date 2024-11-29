@@ -7,6 +7,7 @@ use App\Models\Service;
 use App\Models\ServiceType;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
+use App\Models\Client;
 use App\Models\TimeSlot;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +44,7 @@ class RouteController extends Controller
 
     //All Client Route Here ....
 
+    //Client -Landing Page
     public function gotoIndex()
     {
         if (!Auth::guard('client')->check()) {
@@ -54,7 +56,7 @@ class RouteController extends Controller
             return redirect(route('client-home'));
         }
     }
-
+     //Client -LoginOrSignUp Option
     public function loginOptionNav()
     {
         return view('client.login-option', [
@@ -62,6 +64,7 @@ class RouteController extends Controller
         ]);
     }
 
+    //Client- Sign Up Form
     public function clientRegisterFormNav()
     {
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
@@ -70,6 +73,8 @@ class RouteController extends Controller
             'states' => $states
         ]);
     }
+
+    //Client - Login Form
     public function clientLoginNav()
     {
         if (!Auth::guard('client')->check()) {
@@ -81,7 +86,7 @@ class RouteController extends Controller
             return redirect(route('client-home'));
         }
     }
-
+    //Client -- Homepage Login
     public function clientSearchServicesNav()
     {
         return view('client.search-auth', [
@@ -90,7 +95,7 @@ class RouteController extends Controller
 
         ]);
     }
-
+    //Client -- Profile Homepage
     public function clientprofileNav()
     {
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
@@ -100,6 +105,25 @@ class RouteController extends Controller
             'states' => $states
         ]);
     }
+
+    public function clientBooking()
+    {
+        $tasker=Tasker::where('tasker_working_status',1)->get();
+        $client=Client::where('id', auth()->id())->first();
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+
+       
+
+        return view('client.booking.index', [
+            'title' => 'Describe your task',
+            'tasker' => $tasker,
+            'client' => $client, // Hantar data klien yang log masuk ke view
+            'states'=>$states
+        ]);
+
+    }
+
+
 
     /**** Client Route Function - End ****/
 

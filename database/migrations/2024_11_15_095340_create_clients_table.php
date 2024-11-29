@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('email');
             $table->string('client_address_one')->nullable();
             $table->string('client_address_two')->nullable();
-            $table->string('client_poscode')->nullable();
+            $table->string('client_postcode')->nullable();
             $table->string('client_state')->nullable();
-            $table->string('client_city')->nullable();
+            $table->string('client_area')->nullable();
             $table->integer('client_status')->default(0);
             $table->string('client_photo')->nullable();
             $table->string('password');

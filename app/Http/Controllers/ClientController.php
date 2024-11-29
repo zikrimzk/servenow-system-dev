@@ -141,15 +141,17 @@ class ClientController extends Controller
             [
                 'client_address_one' => 'required|string',
                 'client_address_two' => 'required|string',
+                'client_postcode' => 'required|string',
                 'client_state' => 'required|string',
-                'client_city' => 'required|string',
+                'client_area' => 'required|string',
             ],
             [],
             [
                 'client_address_one' => 'Address Line 1',
                 'client_address_two' => 'Address Line 2',
+                'client_postcode' => 'required|string',
                 'client_state' => 'State',
-                'client_city' => 'City'
+                'client_area' => 'City'
             ]
         );
 
@@ -158,8 +160,9 @@ class ClientController extends Controller
             Client::where('id', $id)->update([
                 'client_address_one' => $validated['client_address_one'],
                 'client_address_two' => $validated['client_address_two'],
+                'client_postcode' => $validated['client_postcode'],
                 'client_state' => $validated['client_state'],
-                'client_city' => $validated['client_city'],
+                'client_area' => $validated['client_area'],
             ]);
 
             // Suceess Update Address

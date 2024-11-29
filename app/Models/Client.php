@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Client extends Authenticatable
 {
     use HasFactory;
+    protected $table = 'clients';
 
     protected $fillable = [
         'client_firstname',
@@ -18,9 +19,9 @@ class Client extends Authenticatable
         'email',
         'client_address_one',
         'client_address_two',
-        'client_poscode',
+        'client_postcode',
         'client_state',
-        'client_city',
+        'client_area',
         'client_status',
         'client_photo',
         'password',

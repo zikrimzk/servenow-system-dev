@@ -173,7 +173,7 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     Route::post('/update-profile-client-{id}', [ClientController::class, 'clientUpdateProfile'])->name('client-update-profile');
     Route::post('/client-update-password-{id}', [ClientController::class, 'clientUpdatePassword'])->name('client-update-password');
     Route::post('/client-update-address-{id}', [ClientController::class, 'clientUpdateAddress'])->name('client-update-address');
-
+    Route::get('/client-booking',[RouteController::class,'clientBooking'])->name('client-booking');
 
 
     // Client - Logout

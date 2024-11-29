@@ -91,10 +91,10 @@
             </div>
 
             <!-- Modal Time Slot Create Start Here -->
-            <div class="modal fade" id="addSlotModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-sm modal-dialog-centered">
-                    <form action="{{ route('admin-timeslot-create') }}" method="POST">
-                        @csrf
+            <form action="{{ route('admin-timeslot-create') }}" method="POST">
+                @csrf
+                <div class="modal fade" id="addSlotModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog  modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="mb-0">Add Time Slot</h5>
@@ -108,7 +108,7 @@
                                     <div class="col-sm-12">
                                         <div class="mb-3">
                                             <label class="form-label">Slot Start</label>
-                                            <input type="time"
+                                            <input type="time" id="start_time"
                                                 class="form-control @error('start_time') is-invalid @enderror"
                                                 placeholder="Start Time" name="start_time" />
                                             @error('start_time')
@@ -119,7 +119,7 @@
                                     <div class="col-sm-12">
                                         <div class="mb-3">
                                             <label class="form-label">Slot End</label>
-                                            <input type="time"
+                                            <input type="time" id="end_time"
                                                 class="form-control @error('end_time') is-invalid @enderror"
                                                 placeholder="End Time" name="end_time" />
                                             @error('end_time')
@@ -137,19 +137,18 @@
                                 </div>
                             </div>
                         </div>
-                    </form>
-
+                    </div>
                 </div>
-            </div>
+            </form>
             <!-- Modal Time Slot Create End  Here -->
 
             <!-- Modal Time Slot Edit Start Here -->
             @foreach ($slots as $slot)
-                <div class="modal fade" id="updateSlotModal-{{ $slot->id }}" data-bs-keyboard="false" tabindex="-1"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-sm modal-dialog-centered">
-                        <form action="{{ route('admin-timeslot-update', $slot->id) }}" method="POST">
-                            @csrf
+                <form action="{{ route('admin-timeslot-update', $slot->id) }}" method="POST">
+                    @csrf
+                    <div class="modal fade" id="updateSlotModal-{{ $slot->id }}" data-bs-keyboard="false"
+                        tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="mb-0">Update Time Slot</h5>
@@ -163,19 +162,15 @@
                                         <div class="col-sm-12">
                                             <div class="mb-3">
                                                 <label class="form-label">Slot Start</label>
-                                                <input type="time"
-                                                    class="form-control"
-                                                    placeholder="Start Time" name="start_time"
-                                                    value="{{ $slot->start_time }}" />
+                                                <input type="time" class="form-control" placeholder="Start Time"
+                                                    name="start_time" value="{{ $slot->start_time }}" />
                                             </div>
                                         </div>
                                         <div class="col-sm-12">
                                             <div class="mb-3">
                                                 <label class="form-label">Slot End</label>
-                                                <input type="time"
-                                                    class="form-control"
-                                                    placeholder="End Time" name="end_time"
-                                                    value="{{ $slot->end_time }}" />
+                                                <input type="time" class="form-control" placeholder="End Time"
+                                                    name="end_time" value="{{ $slot->end_time }}" />
                                             </div>
                                         </div>
                                     </div>
@@ -189,10 +184,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </form>
-
+                        </div>
                     </div>
-                </div>
+                </form>
             @endforeach
             <!-- Modal Time Slot Edit End  Here -->
 
@@ -203,6 +197,21 @@
 
 
     <script type="text/javascript">
+        document.getElementById('start_time').addEventListener('change', function() {
+            const startTime = this.value;
+            if (startTime) {
+                const [hours, minutes] = startTime.split(':').map(Number);
+                const newEndTime = new Date();
+                newEndTime.setHours(hours + 1, minutes);
+
+                const formattedEndTime = newEndTime.toTimeString().slice(0, 5);
+                document.getElementById('end_time').value = formattedEndTime;
+            }
+        });
+
+
+
+
         document.addEventListener('DOMContentLoaded', function() {
             @if ($errors->any())
                 var modal = new bootstrap.Modal(document.getElementById('addSlotModal'));
