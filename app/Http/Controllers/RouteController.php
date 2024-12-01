@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Administrator;
 use App\Models\Client;
 use App\Models\TimeSlot;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -56,7 +57,7 @@ class RouteController extends Controller
             return redirect(route('client-home'));
         }
     }
-     //Client -LoginOrSignUp Option
+    //Client -LoginOrSignUp Option
     public function loginOptionNav()
     {
         return view('client.login-option', [
@@ -106,21 +107,54 @@ class RouteController extends Controller
         ]);
     }
 
-    public function clientBooking()
+    public function clientBooking($id)
     {
-        $tasker=Tasker::where('tasker_working_status',1)->get();
-        $client=Client::where('id', auth()->id())->first();
+        // try {
+        $tasker = Tasker::where('tasker_working_status', 1)->get();
+        $client = Client::where('id', auth()->id())->first();
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+        $svtasker = DB::table('services as a')
+            ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
+            ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
+            ->where('b.id', '=', $id)
+            ->where('a.service_status', '=', 1)
+            ->select(
+                'a.id as svID',
+                'b.id as typeID',
+                'c.id as taskerID',
+                'a.service_rate_type',
+                'a.service_rate',
+                'a.service_status',
+                'a.service_desc',
+                'b.servicetype_name',
+                'b.servicetype_status',
+                'c.tasker_firstname',
+                'c.tasker_rating',
+                'c.tasker_photo'
+            )
+            ->get();
+        $sv = ServiceType::whereId($id)->first();
 
-       
+        $timeSlot=DB::table('time_slots as a')
+        ->join('tasker_time_slots as b','a.id','=','b.slot_id')
+        ->where('b.slot_status','=',1)
+        ->select('b.slot_id','a.start_time','a.end_time','b.tasker_id')
+        ->get();
+
+
 
         return view('client.booking.index', [
             'title' => 'Describe your task',
-            'tasker' => $tasker,
-            'client' => $client, // Hantar data klien yang log masuk ke view
-            'states'=>$states
+            'tasker' => $svtasker,
+            'sv' => $sv,
+            // 'tasker' => $tasker,
+            'client' => $client,
+            'states' => $states,
+            'time'=>$timeSlot
         ]);
-
+        // } catch (Exception $e) {
+        //     return back();
+        // }
     }
 
 
@@ -318,14 +352,14 @@ class RouteController extends Controller
     public function taskerTimeSlotNav(Request $request)
     {
         $data = DB::table('tasker_time_slots as a')
-        ->join('time_slots as b','a.slot_id','=','b.id')
-        ->select('a.id','a.slot_status','a.slot_day','a.slot_id','b.start_time','b.end_time')
-        ->get();
-        
+            ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+            ->select('a.id', 'a.slot_status', 'a.slot_day', 'a.slot_id', 'b.start_time', 'b.end_time')
+            ->get();
+
         return view('tasker.task-preference.time-slot-index', [
             'title' => 'Manage Time Slot',
             'slots' => TimeSlot::all(),
-            'data'=>$data
+            'data' => $data
         ]);
     }
 
@@ -335,7 +369,7 @@ class RouteController extends Controller
 
         return view('tasker.task-preference.visibility-location', [
             'title' => 'Manage Visibility & Location',
-            'states'=> $states
+            'states' => $states
         ]);
     }
 

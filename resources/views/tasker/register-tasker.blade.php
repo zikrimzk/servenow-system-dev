@@ -53,7 +53,7 @@
 
 
                             <h2 class="f-w-700 mb-3 mt-3 text-center">Create your account</h2>
-                            <p class="text-muted mb-3">Start creating your account and ensure you complete all the steps after logging in before downloading the Servenow app.</p>
+                            <p class="text-muted mb-3 text-center ">Start creating your account and ensure you complete all the steps after logging in before downloading the Servenow app.</p>
 
                             <!-- Start Alert -->
                             <svg xmlns="http://www.w3.org/2000/svg" style="display: none">

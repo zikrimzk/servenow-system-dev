@@ -17,9 +17,13 @@ class ServiceController extends Controller
         try {
             $data = $req->validate([
                 'servicetype_name' => 'required|string',
-                'servicetype_desc' => 'string',
+                'servicetype_desc' => '',
                 'servicetype_status' => 'required'
 
+            ],[],[
+                'servicetype_name' => 'Type Name',
+                'servicetype_desc' => 'Description',
+                'servicetype_status' => 'Status'
             ]);
 
             ServiceType::create($data);
@@ -34,8 +38,13 @@ class ServiceController extends Controller
         try {
             $data = $req->validate([
                 'servicetype_name' => 'required|string',
-                'servicetype_desc' => 'string',
+                'servicetype_desc' => '',
                 'servicetype_status' => 'required'
+
+            ],[],[
+                'servicetype_name' => 'Type Name',
+                'servicetype_desc' => 'Description',
+                'servicetype_status' => 'Status'
             ]);
 
             ServiceType::whereId($id)->update($data);

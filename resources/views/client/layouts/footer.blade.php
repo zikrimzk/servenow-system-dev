@@ -51,30 +51,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="col-sm-4 wow fadeInUp" data-wow-delay="0.8s">
-                            <h5 class="mb-4">Help & Support</h5>
-                            <ul class="list-unstyled footer-link">
-                                <li>
-                                    <a href="https://phoenixcoded.gitbook.io/able-pro/"
-                                        target="_blank">Documentation</a>
-                                </li>
-                                <li>
-                                    <a href="https://phoenixcoded.gitbook.io/able-pro/roadmap/" target="_blank">Feature
-                                        Request</a>
-                                </li>
-                                <li>
-                                    <a href="https://phoenixcoded.gitbook.io/able-pro/roadmap/"
-                                        target="_blank">RoadMap</a>
-                                </li>
-                                <li>
-                                    <a href="https://phoenixcoded.authordesk.app/" target="_blank">Support</a>
-                                </li>
-                                <li>
-                                    <a href="https://themeforest.net/user/phoenixcoded#contact" target="_blank">Email
-                                        Us</a>
-                                </li>
-                            </ul>
-                        </div>
+                       
                         <div class="col-sm-4 wow fadeInUp" data-wow-delay="1s">
                             <h5 class="mb-4">Useful Resources</h5>
                             <ul class="list-unstyled footer-link">

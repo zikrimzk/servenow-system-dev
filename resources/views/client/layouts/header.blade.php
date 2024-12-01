@@ -45,7 +45,7 @@
                             <div class="my-2 my-sm-1 d-flex flex-wrap justify-content-center align-items-start gap-2 wow fadeInUp"
                                 data-wow-delay="0.4s">
                                 @foreach ($service as $sv)
-                                    <a href="../dashboard/index.html"
+                                    <a href="{{ route('client-booking',$sv->id) }}"
                                         class="btn btn-outline-primary">{{ $sv->servicetype_name }}</a>
                                 @endforeach
                             </div>

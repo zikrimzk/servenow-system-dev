@@ -42,7 +42,7 @@
                 <div class="col-sm-8 col-md-12">
                     <div id="basicwizard" class="form-wizard row justify-content-center mx-3 my-1">
                         <div class="col-sm-8 col-md-12">
-                            <h1 class="my-4">Booking</h1>
+                            <h1 class="my-4">{{ $sv->servicetype_name }}</h1>
 
                             <div class="alert alert-primary">
                                 <div class="d-flex">
@@ -63,7 +63,7 @@
                                         <li class="nav-item" data-target-form="#contactDetailForm">
                                             <a href="#contactDetail" data-bs-toggle="tab" data-toggle="tab"
                                                 class="nav-link active ">
-                                                <i class="ph-duotone ph-user-circle"></i>
+                                                <i class="fas fa-location-arrow"></i>
                                                 <span class="d-none d-sm-inline">Location</span>
                                             </a>
                                         </li>
@@ -71,7 +71,7 @@
                                         <li class="nav-item" data-target-form="#jobDetailForm">
                                             <a href="#jobDetail" data-bs-toggle="tab" data-toggle="tab"
                                                 class="nav-link icon-btn">
-                                                <i class="ph-duotone ph-map-pin"></i>
+                                                <i class="fas fa-user-tag"></i>
                                                 <span class="d-none d-sm-inline">Tasker Selection</span>
                                             </a>
                                         </li>
@@ -79,7 +79,7 @@
                                         <li class="nav-item" data-target-form="#educationDetailForm">
                                             <a href="#educationDetail" data-bs-toggle="tab" data-toggle="tab"
                                                 class="nav-link icon-btn">
-                                                <i class="ph-duotone ph-graduation-cap"></i>
+                                                <i class="fas fa-money-check-alt"></i>
                                                 <span class="d-none d-sm-inline">Payment</span>
                                             </a>
                                         </li>
@@ -87,7 +87,7 @@
                                         <li class="nav-item">
                                             <a href="#finish" data-bs-toggle="tab" data-toggle="tab"
                                                 class="nav-link icon-btn">
-                                                <i class="ph-duotone ph-check-circle"></i>
+                                                <i class="fas fa-check-circle"></i>
                                                 <span class="d-none d-sm-inline">Finish</span>
                                             </a>
                                         </li>
@@ -106,178 +106,290 @@
                                             </div>
                                         </div>
                                         <!-- END: Define your progress bar here -->
+
                                         <!-- START: Define your tab pans here -->
                                         <div class="tab-pane show active" id="contactDetail">
-                                            <form id="contactForm" method="get" action="/forms/form2_wizard.html">
-                                                <div class="text-start">
-                                                    <h3 class="mb-2">Start by providing the basic information about your
-                                                        task</h3>
-                                                    <small class="text-muted">This helps us connect you with the right
-                                                        service providers in your area. Be clear and concise about what you
-                                                        need, including any essential details to get started.
+                                            <div class="text-center mb-4 mt-4">
+                                                <h2 class="mb-1">Please Provide Your Preferred Location</h2>
+                                            </div>
+                                            <div class="row mt-4">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <!-- Default Address Checkbox -->
+                                                        <div class="col-sm-12">
+                                                            <div class="mb-3 mt-5">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    id="defaultCheckbox" value="1"
+                                                                    onclick="toggleAddressFields()">
+                                                                <label class="form-check-label"
+                                                                    for="defaultCheckbox">Default Address</label>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Address Fields -->
+                                                        <div class="col-sm-6 mb-3">
+                                                            <label class="form-label">Address 1</label>
+                                                            <input type="text" class="form-control" id="address1"
+                                                                placeholder="Enter Address" name="address1" />
+                                                        </div>
 
-                                                    </small>
-                                                </div>
-                                                <div class="row mt-4">
-                                                    <div class="col-sm-12">
-                                                        <div class="row">
-                                                            <!-- Date Booking -->
-                                                            <div class="col-sm-12 col-md-12">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Date Booking :</label>
-                                                                    <input type="date" class="form-control"
-                                                                        placeholder="Date" />
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Default Address Checkbox -->
-                                                            <div class="col-sm-12">
-                                                                <div class="mb-3 mt-5">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        id="defaultCheckbox" value="1"
-                                                                        onclick="toggleAddressFields()">
-                                                                    <label class="form-check-label"
-                                                                        for="defaultCheckbox">Default Address</label>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Address Fields -->
-                                                            <div class="col-sm-6 mb-3">
-                                                                <label class="form-label">Address 1</label>
-                                                                <input type="text" class="form-control" id="address1"
-                                                                    placeholder="Enter Address" name="address1" />
-                                                            </div>
-
-                                                            <div class="col-sm-6 mb-3">
-                                                                <label class="form-label">Address 2</label>
-                                                                <input type="text" class="form-control" id="address2"
-                                                                    placeholder="Enter Address" name="address2" />
-                                                            </div>
-                                                            <div class="col-sm-6 mb-3">
-                                                                <label class="form-label">Postcode</label>
-                                                                <input type="text" class="form-control" id="postcode"
-                                                                    placeholder="Postcode" name="postcode" />
-                                                            </div>
-                                                            <div class="col-sm-6 mb-3">
-                                                                <label class="form-label">State:</label>
-                                                                <select name="client_state" class="form-control"
-                                                                    id="state">
-                                                                    <option value="" selected>Select State</option>
-                                                                    @foreach ($states['states'] as $state)
-                                                                        <option value="{{ strtolower($state['name']) }}">
-                                                                            {{ $state['name'] }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </div>
-                                                            <div class="col-sm-6 mb-3">
-                                                                <label class="form-label">Area <span
-                                                                        class="text-danger">*</span></label>
-                                                                <select name="client_area"
-                                                                    class="form-control @error('client_area') is-invalid @enderror"
-                                                                    id="addCity">
-                                                                    <option value="" selected>Select Area
-                                                                    </option>
-                                                                </select>
-                                                                @error('client_area')
-                                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
+                                                        <div class="col-sm-6 mb-3">
+                                                            <label class="form-label">Address 2</label>
+                                                            <input type="text" class="form-control" id="address2"
+                                                                placeholder="Enter Address" name="address2" />
+                                                        </div>
+                                                        <div class="col-sm-6 mb-3">
+                                                            <label class="form-label">Postcode</label>
+                                                            <input type="text" class="form-control" id="postcode"
+                                                                placeholder="Postcode" name="postcode" />
+                                                        </div>
+                                                        <div class="col-sm-6 mb-3">
+                                                            <label class="form-label">State:</label>
+                                                            <select name="client_state" class="form-control" id="state">
+                                                                <option value="" selected>Select State</option>
+                                                                @foreach ($states['states'] as $state)
+                                                                    <option value="{{ strtolower($state['name']) }}">
+                                                                        {{ $state['name'] }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-6 mb-3">
+                                                            <label class="form-label">Area <span
+                                                                    class="text-danger">*</span></label>
+                                                            <select name="client_area"
+                                                                class="form-control @error('client_area') is-invalid @enderror"
+                                                                id="addCity">
+                                                                <option value="" selected>Select Area
+                                                                </option>
+                                                            </select>
+                                                            @error('client_area')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </form>
+                                            </div>
                                         </div>
                                         <!-- end contact detail tab pane -->
+
+
+
+
+                                        <!-- START: Define your tab pans here -->
                                         <div class="tab-pane" id="jobDetail">
-                                            <form id="jobForm" method="post" action="#">
-                                                <div class="text-center mb-4 mt-4">
-                                                    <h2 class="mb-1">Select Your Tasker</h2>
-                                                </div>
 
-                                                <!--Tasker Selection-->
-                                                @foreach ($tasker as $tk)
-                                                    <div class="card m-2 border border-0 mb-5">
-                                                        <!--Image Tasker Section [Start]-->
-                                                        <div class="row mt-4">
+                                            <div class="text-center mb-4 mt-4">
+                                                <h2 class="mb-1">Select Your Tasker</h2>
+                                            </div>
 
-                                                            <div class="col-sm-3 col-md-3 col-lg-3">
-                                                                <div
-                                                                    class="d-flex justify-content-center align-items-center">
-                                                                    <img src="{{ asset('storage/' . $tk->tasker_photo) }}"
-                                                                        alt="Profile Photo" width="150" height="150"
-                                                                        class="user-avtar rounded-circle">
+                                            <!--Tasker Selection-->
+                                            @foreach ($tasker as $tk)
+                                                <div class="card m-2 border border-0 mb-5">
+                                                    <!--Image Tasker Section [Start]-->
+                                                    <div class="row mt-4">
 
-                                                                </div>
-                                                            </div>
+                                                        <div class="col-sm-3 col-md-3 col-lg-3">
+                                                            <div class="d-flex justify-content-center align-items-center">
+                                                                <img src="{{ asset('storage/' . $tk->tasker_photo) }}"
+                                                                    alt="Profile Photo" width="150" height="150"
+                                                                    class="user-avtar rounded-circle">
 
-                                                            <div class="col-sm-9 col-md-9 col-lg-9">
-                                                                <div class="p-3">
-                                                                    <div
-                                                                        class="d-flex justify-content-between align-items-center mb-2">
-                                                                        <h5 class="mb-2 f-24">{{ $tk->tasker_firstname }}
-                                                                        </h5>
-                                                                        <h5 class="mb-2">RM 47.49/hr</h5>
-                                                                    </div>
-                                                                    <div class="d-flex align-items-center mb-2">
-                                                                        <span
-                                                                            class="badge bg-success text-white me-2">GREAT
-                                                                            VALUE</span>
-                                                                        <span class="badge text-bg-primary text-dark">2
-                                                                            HOUR
-                                                                            MINIMUM</span>
-                                                                    </div>
-                                                                    <div>
-                                                                        <p class="mb-1">
-                                                                            <span class="fw-bold">★ 4.9</span> (394
-                                                                            reviews)
-                                                                        </p>
-                                                                        <p class="mb-1">695 Cleaning tasks</p>
-                                                                        <p class="mb-0 text-muted">677 Cleaning tasks
-                                                                            overall
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <div class="row flex-sm-row  flex-column-reverse">
-                                                            <div class="col-sm-12 col-md-3 col-lg-3">
-                                                                <div class="d-none d-md-block text-center mt-2 mb-2">
-                                                                    <a href="" class=" mb-2  primary p-1">View
-                                                                        Profile & Review
-                                                                    </a>
-                                                                </div>
-                                                                <div
-                                                                    class="d-grid d-md-flex justify-content-md-center align-items-md-center ">
-                                                                    <button type="button" class="btn btn-primary"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#exampleModalLive">Select &
-                                                                        Continue</button>
-                                                                </div>
-                                                            </div>
 
-                                                            <div class="col-sm-12 col-md-9 col-lg-9">
-                                                                <div class=" bg-light p-3">
-                                                                    <h4> How I can help:</h4>
-                                                                    <p class="text-muted fw-normal f-16">
-                                                                        Hello 🥰 I am cleaner with a 5 years of experience
-                                                                        🧼🧹
-                                                                        I do apartments, Airbnb, offices, etc. 🙌 I have my
-                                                                        basic cleaning supplies with me! I love making the
-                                                                        space
-                                                                        perfect and spotless! I also do organizing, laundry,
-                                                                        ironing, and packing!!!
+                                                        <div class="col-sm-9 col-md-9 col-lg-9">
+                                                            <div class="p-3">
+                                                                <div
+                                                                    class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <h5 class="mb-2 f-24">
+                                                                        {{ explode(' ', $tk->tasker_firstname)[0] }}.
+                                                                    </h5>
+                                                                    <h5 class="mb-2">RM
+                                                                        {{ $tk->service_rate }}/{{ $tk->service_rate_type }}
+                                                                    </h5>
+                                                                </div>
+                                                                <div class="d-flex align-items-center mb-2">
+                                                                    <span class="badge bg-success text-white me-2">GREAT
+                                                                        VALUE</span>
+                                                                    <span class="badge text-bg-primary text-dark">2
+                                                                        HOUR
+                                                                        MINIMUM</span>
+                                                                </div>
+                                                                <div>
+                                                                    <p class="mb-1">
+                                                                        <span class="fw-bold">★ 4.9</span> (394
+                                                                        reviews)
+                                                                    </p>
+                                                                    <p class="mb-1">N/A Cleaning tasks</p>
+                                                                    <p class="mb-0 text-muted">N/A Cleaning tasks
+                                                                        overall
                                                                     </p>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                @endforeach
+                                                    <div class="row flex-sm-row  flex-column-reverse">
+                                                        <div class="col-sm-12 col-md-3 col-lg-3">
+                                                            <div class="d-none d-md-block text-center mt-2 mb-2">
+                                                                <a href="" class=" mb-2  primary p-1">View
+                                                                    Profile & Review
+                                                                </a>
+                                                            </div>
+                                                            <div
+                                                                class="d-grid d-md-flex justify-content-md-center align-items-md-center ">
+                                                                <button type="button" class="btn btn-primary"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#selectdatetime-{{ $tk->taskerID }}">Select
+                                                                    &
+                                                                    Continue</button>
+                                                            </div>
+                                                        </div>
 
+                                                        <div class="col-sm-12 col-md-9 col-lg-9">
+                                                            <div class=" bg-light p-3">
+                                                                <h4> How I can help:</h4>
+                                                                <p class="text-muted fw-normal f-16">
+                                                                    {{ $tk->service_desc }}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <form action="/TEST" method="POST">
+                                                    <div id="selectdatetime-{{ $tk->taskerID }}" class="modal fade"
+                                                        tabindex="-1" role="dialog"
+                                                        aria-labelledby="exampleModalLiveLabel" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="exampleModalLiveLabel">
+                                                                        Plan Your Task with
+                                                                        {{ explode(' ', $tk->tasker_firstname)[0] }}
+                                                                    </h5>
+                                                                    <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal"
+                                                                        aria-label="Close"></button>
 
-                                                <!-- Tasker Selection [End] -->
-                                            </form>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="row">
+                                                                        <div class="col-sm-12 mb-3">
+                                                                            <label class="form-label">Full Address</label>
+                                                                            <input type="text" name="booking_address"
+                                                                                id="booking_address" class="form-control"
+                                                                                readonly>
+                                                                        </div>
+                                                                        <div class="col-md-12 mb-3">
+                                                                            <label class="mb-2"> Service
+                                                                                Options</label>
+                                                                            <select id="task-option" class="form-control"
+                                                                                onchange="updateHours()">
+                                                                                <option value="" selected>Select
+                                                                                    Options</option>
+                                                                                <option value="s">Small</option>
+                                                                                <option value="m">Medium</option>
+                                                                                <option value="l">Large</option>
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <label class="mb-2">Est. hour(s)</label>
+                                                                        <div class="col-md-12 mb-3">
+                                                                            <div class="row mb-3">
+                                                                                <div class="col-sm-12" id="hours-options">
+                                                                                    <!-- Radio Buttons -->
+                                                                                    <div
+                                                                                        class="form-check form-check-inline">
+                                                                                        <input class="form-check-input"
+                                                                                            type="radio" name="group5"
+                                                                                            value="1" id="hour1"
+                                                                                            disabled />
+                                                                                        <label class="form-check-label"
+                                                                                            for="hour1">1</label>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="form-check form-check-inline">
+                                                                                        <input class="form-check-input"
+                                                                                            type="radio" name="group5"
+                                                                                            value="2" id="hour2"
+                                                                                            disabled />
+                                                                                        <label class="form-check-label"
+                                                                                            for="hour2">2</label>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="form-check form-check-inline">
+                                                                                        <input class="form-check-input"
+                                                                                            type="radio" name="group5"
+                                                                                            value="3" id="hour3"
+                                                                                            disabled />
+                                                                                        <label class="form-check-label"
+                                                                                            for="hour3">3</label>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="form-check form-check-inline">
+                                                                                        <input class="form-check-input"
+                                                                                            type="radio" name="group5"
+                                                                                            value="4" id="hour4"
+                                                                                            disabled />
+                                                                                        <label class="form-check-label"
+                                                                                            for="hour4">4</label>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="form-check form-check-inline">
+                                                                                        <input class="form-check-input"
+                                                                                            type="radio" name="group5"
+                                                                                            value="5" id="hour5"
+                                                                                            disabled />
+                                                                                        <label class="form-check-label"
+                                                                                            for="hour5">5</label>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="form-check form-check-inline">
+                                                                                        <input class="form-check-input"
+                                                                                            type="radio" name="group5"
+                                                                                            value="6" id="hour6"
+                                                                                            disabled />
+                                                                                        <label class="form-check-label"
+                                                                                            for="hour6">6</label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="task-date"
+                                                                                class="mb-2">Availability</label>
+                                                                            <input type="text" id="task-date"
+                                                                                class="form-control"
+                                                                                placeholder="Choose Date">
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="task-time"
+                                                                                class="mb-2">Time</label>
+                                                                            <select id="task-time" class="form-control">
+                                                                                @foreach ($time->where('tasker_id', $tk->taskerID) as $t)
+                                                                                    <option value="{{ $t->start_time }}">
+                                                                                        {{ $t->start_time }} -
+                                                                                        {{ $t->end_time }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="d-grid mt-4 mb-2 ">
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary ">Select
+                                                                            & Continue</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            @endforeach
+                                            <!-- Tasker Selection [End] -->
                                         </div>
                                         <!-- end job detail tab pane -->
+
+
+
+                                        <!-- START: Define your tab pans here -->
                                         <div class="tab-pane" id="educationDetail">
                                             <form id="educationForm" method="post" action="#">
                                                 <div class="text-center">
@@ -379,6 +491,8 @@
                                             </form>
                                         </div>
                                         <!-- end education detail tab pane -->
+
+                                        <!-- START: Define your tab pans here -->
                                         <div class="tab-pane" id="finish">
                                             <div class="row d-flex justify-content-center">
                                                 <div class="col-lg-6">
@@ -403,6 +517,7 @@
 
                                         </div>
                                         <!-- END: Define your tab pans here -->
+
                                         <!-- START: Define your controller buttons here-->
                                         <div class="d-flex justify-content-between mt-3">
                                             <button class="btn btn-secondary" id="prevButton"
@@ -424,39 +539,75 @@
     </div>
 
 
-    <div id="exampleModalLive" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLiveLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLiveLabel">Choose your task date and start time</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <script>
+        function updateBookingAddress() {
+            // Ambil nilai dari setiap medan
+            const address1 = document.getElementById('address1').value.trim();
+            const address2 = document.getElementById('address2').value.trim();
+            const postcode = document.getElementById('postcode').value.trim();
+            const state = document.getElementById('state').value.trim();
+            const area = document.getElementById('addCity').value.trim();
 
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="task-date" class="mb-2">Qiwamudin Availlability :</label>
-                            <input type="text" id="task-date" class="form-control" placeholder="Choose Date">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="task-date" class="mb-2">Time :</label>
-                            <select name="" id="" class="form-control">
-                                <option value="" selected>Select Time</option>
-                            </select>
-                        </div>
+            // Gabungkan nilai-nilai tersebut
+            const fullAddress = `${address1}, ${address2}, ${area}, ${state}, ${postcode}`.replace(/(, )+/g, ', ').replace(
+                /, $/, '');
 
+            // Masukkan hasil gabungan ke dalam medan `booking_address`
+            document.getElementById('booking_address').value = fullAddress;
+        }
 
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Select & Continue</button>
-                </div>
-            </div>
-        </div>
-    </div>
+        // Tambahkan event listener pada medan alamat
+        document.addEventListener('DOMContentLoaded', function() {
+            const addressFields = ['address1', 'address2', 'postcode', 'state', 'addCity'];
 
+            addressFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', updateBookingAddress); // Update address on input change
+                }
+            });
+        });
+
+        function updateHours() {
+            const option = document.getElementById('task-option').value;
+
+            const radios = [{
+                    id: 'hour1',
+                    range: ['s']
+                },
+                {
+                    id: 'hour2',
+                    range: ['s']
+                },
+                {
+                    id: 'hour3',
+                    range: ['m']
+                },
+                {
+                    id: 'hour4',
+                    range: ['m']
+                },
+                {
+                    id: 'hour5',
+                    range: ['l']
+                },
+                {
+                    id: 'hour6',
+                    range: ['l']
+                }
+            ];
+
+            radios.forEach(radio => {
+                const el = document.getElementById(radio.id);
+                if (radio.range.includes(option)) {
+                    el.disabled = false;
+                } else {
+                    el.disabled = true;
+                    el.checked = false;
+                }
+            });
+        }
+    </script>
 
     <script>
         // DEFAULT ADDRESS
@@ -488,6 +639,8 @@
 
                 // Trigger state change
                 $('#state').trigger('change');
+                $('#booking_address').val(address1.value + ', ' + address2.value + ', ' + city.value + ', ' + state.value +
+                    ' ' + postcode.value);
             } else {
                 // Clear fields
                 address1.value = "";
@@ -502,24 +655,34 @@
                 postcode.disabled = false;
                 state.disabled = false;
                 city.disabled = false;
+
+                $('#booking_address').val('');
+
             }
         }
 
         // FLATPICKER : CALANDER
         document.addEventListener('DOMContentLoaded', function() {
-            // Inisialisasi Flatpickr
+            // Get today's date
+            const today = new Date();
+            const formattedToday = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+
+            // Initialize Flatpickr
             flatpickr("#task-date", {
                 enableTime: false, // Disable time selection
                 minDate: "today", // Start from today
-                maxDate: new Date(new Date().setDate(new Date().getDate() +
+                maxDate: new Date(new Date().setDate(today.getDate() +
                     7)), // Set max date to one week from today
                 inline: false, // Do not display the calendar inline
+                defaultDate: formattedToday, // Set default date to today
                 onChange: function(selectedDates, dateStr, instance) {
                     // Update the display with the selected date
                     document.getElementById('selected-date').textContent = dateStr;
                 }
             });
 
+            // Set the initial display to today's date
+            document.getElementById('selected-date').textContent = formattedToday;
         });
 
 
@@ -584,15 +747,48 @@
             const prevButton = document.getElementById('prevButton');
             const nextButton = document.getElementById('nextButton');
 
-            // Aktifkan/Nonaktifkan butang berdasarkan kedudukan
+            // Aktifkan/Nonaktifkan butang "Prev"
             prevButton.disabled = currentIndex === 0;
-            nextButton.disabled = currentIndex === tabs.length - 1;
+
+            if (currentIndex === 1) { // Semak jika pengguna berada pada tab Alamat (indeks 1)
+                const address1 = document.getElementById('address1').value.trim();
+                const address2 = document.getElementById('address2').value.trim();
+                const postcode = document.getElementById('postcode').value.trim();
+                const state = document.getElementById('state').value.trim();
+                const area = document.getElementById('addCity').value.trim();
+
+                // Semak jika semua medan alamat diisi
+                const isAddressValid = address1 !== "" && postcode !== "" && state !== "" && area !== "";
+
+                // Aktifkan butang "Next" hanya jika medan alamat diisi
+                nextButton.disabled = !isAddressValid;
+            } else {
+                nextButton.disabled = currentIndex === tabs.length - 1; // Normal behavior for other tabs
+            }
+
             updateProgressBar(currentIndex + 1, tabs.length);
         }
+
+        // Pastikan fungsi ini dipanggil pada setiap perubahan input di medan borang alamat
+        function attachAddressFieldListeners() {
+            const addressFields = ['address1', 'postcode', 'state', 'addCity'];
+
+            addressFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', updateButtons); // Panggil `updateButtons` pada perubahan input
+                }
+            });
+        }
+
+        // Tambahkan pendengar acara apabila DOM telah dimuat
+
+        // Tambahkan pendengar acara untuk mengesan perubahan input
 
         document.addEventListener('DOMContentLoaded', () => {
             // Pastikan butang dan progress bar disesuaikan pada pemuatan halaman
             updateButtons();
+            attachAddressFieldListeners();
 
             // Dengarkan event perubahan tab Bootstrap
             const tabs = document.querySelectorAll('.nav-pills .nav-link');
