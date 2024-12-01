@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->date('booking_date');
-            $table->time('booking_time');
             $table->text('booking_address');
+            $table->time('booking_time_start');
+            $table->time('booking_time_end');
             $table->integer('booking_status');
             $table->text('booking_note');
-            $table->time('booking_time');
             $table->foreignId('client_id')->references('id')->on('clients');
             $table->foreignId('service_id')->references('id')->on('services');
             $table->timestamps();

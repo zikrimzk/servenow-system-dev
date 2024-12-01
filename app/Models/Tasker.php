@@ -35,6 +35,7 @@ class Tasker extends Authenticatable
         'tasker_workingloc_state',
         'tasker_workingloc_area',
         'tasker_working_status',
+        'tasker_worktype',
         'tasker_rank',
         'tasker_rating',
     ];

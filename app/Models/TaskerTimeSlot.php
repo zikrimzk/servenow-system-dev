@@ -11,7 +11,7 @@ class TaskerTimeSlot extends Model
     protected $fillable = [
         'tasker_id',
         'slot_id',
-        'slot_day',
+        'slot_date',
         'slot_status'
     ];
 }

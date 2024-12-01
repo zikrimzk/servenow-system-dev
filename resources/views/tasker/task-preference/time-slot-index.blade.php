@@ -67,7 +67,7 @@
                                 <button class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#offcanvas_mail"
                                     aria-label="Close"></button>
                             </div>
-                            <div class="offcanvas-body p-0">
+                            {{-- <div class="offcanvas-body p-0">
                                 <div id="mail-menulist" class="show collapse collapse-horizontal">
                                     <div class="mail-menulist">
                                         <div class="card">
@@ -133,6 +133,25 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div> --}}
+                            <div class="offcanvas-body p-0">
+                                <div id="mail-menulist" class="show collapse collapse-horizontal">
+                                    <div class="mail-menulist">
+                                        <div class="card">
+                                            <div class="card-header bg-primary ">
+                                                <h5 class="text-white">
+                                                    <i class="ti ti-calendar-time me-2"></i>Days
+                                                </h5>
+                                            </div>
+                                            <div class="card-body ">
+
+                                                <div class="list-group list-group-flush" id="list-tab" role="tablist">
+                                                    <!-- Tabs will be dynamically populated -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -146,6 +165,7 @@
                                         </a>
                                     </li>
                                 </ul>
+
                                 <div class="alert alert-primary">
                                     <div class="d-flex align-items-center">
                                         <i class="ti ti-info-circle h2 f-w-400 mb-0 text-primary"></i>
@@ -157,6 +177,42 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="d-block">
+                                <form action="{{ route('tasker-type-change') }}" method="POST" id="formtoggle">
+                                    @csrf
+                                    <div class="card shadow-sm">
+                                        <div class="card-header bg-primary">
+                                            <h6 class="mb-0 text-white">Preferred Working Type</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row align-items-center">
+                                                <label for="workingtype" class="col-md-6 col-form-label">
+                                                    Choose your working type:
+                                                </label>
+                                                <div class="col-md-6">
+                                                    <select name="tasker_worktype" class="form-select" id="workingtype">
+                                                        @if (Auth::user()->tasker_worktype == null)
+                                                            <option value="" selected>- Select -</option>
+                                                            <option value="1">Full Time</option>
+                                                            <option value="2">Part Time</option>
+                                                        @elseif(Auth::user()->tasker_worktype == 1)
+                                                            <option value="" disabled>- Select -</option>
+                                                            <option value="1" selected>Full Time</option>
+                                                            <option value="2">Part Time</option>
+                                                        @elseif(Auth::user()->tasker_worktype == 2)
+                                                            <option value="" disabled>- Select -</option>
+                                                            <option value="1">Full Time</option>
+                                                            <option value="2"selected>Part Time</option>
+                                                        @endif
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
 
                             <div class="card">
                                 <div class="card-body">
@@ -663,12 +719,81 @@
 
 
     <script type="text/javascript">
+        $(document).ready(function() {
+            $('#formtoggle').on('submit', function(e) {
+                e.preventDefault();
+                jQuery.ajax({
+                    url: "{{ route('tasker-type-change') }}",
+                    data: $('#formtoggle').serialize(),
+                    type: "POST",
+                    success: function(result) {
+                        console.log(result); // Log the JSON response
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", xhr.responseText); // Log error details
+                        alert("Something went wrong: " + xhr
+                            .responseText); // Show error to user
+                    }
+                });
+            });
+
+            $('#workingtype').on('change', function() {
+                $('#formtoggle').submit();
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             @if ($errors->any())
                 var modal = new bootstrap.Modal(document.getElementById('addSlotModal'));
                 modal.show();
             @endif
         });
+
+        function populateWeekTabs() {
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Start from Monday
+            const listGroup = document.getElementById('list-tab');
+            const tabContent = document.getElementById('nav-tabContent');
+
+            // Clear existing content
+            listGroup.innerHTML = '';
+            // tabContent.innerHTML = '';
+
+            // Generate tabs for the week
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(startOfWeek);
+                date.setDate(startOfWeek.getDate() + i);
+                const formattedDate = date.toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                // Create the tab
+                const tabId = `list-${i + 1}`;
+                const tab = document.createElement('a');
+                tab.className = `list-group-item list-group-item-action ${i === 0 ? 'active' : ''}`;
+                tab.id = tabId;
+                tab.dataset.bsToggle = 'list';
+                tab.href = `#list-mail-${i + 1}`;
+                tab.role = 'tab';
+                tab.innerHTML = `<span>${formattedDate} (${days[i]})</span>`;
+                listGroup.appendChild(tab);
+
+                // Create the tab pane
+                const tabPane = document.createElement('div');
+                tabPane.className = `tab-pane fade ${i === 0 ? 'show active' : ''}`;
+                tabPane.id = `list-mail-${i + 1}`;
+                tabPane.role = 'tabpanel';
+                // tabPane.innerHTML = `<p>${days[i]} (${formattedDate})</p>`;
+                // tabContent.appendChild(tabPane);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', populateWeekTabs);
 
         document.addEventListener("DOMContentLoaded", function() {
             const dayInput = document.querySelector('.day'); // Hidden input for day
@@ -700,8 +825,6 @@
                 dayInput.value = savedDay; // Restore the hidden input value
             }
         });
-
-
 
         $('.btn-isnin').on('click', function() {
             $('.day').val('monday');

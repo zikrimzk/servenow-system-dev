@@ -107,22 +107,26 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="mb-3">
-                                            <label class="form-label">Slot Start</label>
-                                            <input type="time" id="start_time"
-                                                class="form-control @error('start_time') is-invalid @enderror"
-                                                placeholder="Start Time" name="start_time" />
-                                            @error('start_time')
+                                            <label class="form-label">Time</label>
+                                            <input type="time" id="time"
+                                                class="form-control @error('time') is-invalid @enderror" name="time" value="{{ old('time') }}" />
+                                            @error('time')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
-                                            <label class="form-label">Slot End</label>
-                                            <input type="time" id="end_time"
-                                                class="form-control @error('end_time') is-invalid @enderror"
-                                                placeholder="End Time" name="end_time" />
-                                            @error('end_time')
+                                            <label class="form-label">Slot Category</label>
+
+
+                                            <select name="slot_category" id=""
+                                                class="form-control @error('slot_category') is-invalid @enderror">
+                                                <option value="">-Select-</option>
+                                                <option value="1">Full Time</option>
+                                                <option value="2">Part Time</option>
+                                            </select>
+                                            @error('slot_category')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -161,16 +165,23 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="mb-3">
-                                                <label class="form-label">Slot Start</label>
-                                                <input type="time" class="form-control" placeholder="Start Time"
-                                                    name="start_time" value="{{ $slot->start_time }}" />
+                                                <label class="form-label">Time</label>
+                                                <input type="time" class="form-control" name="time"
+                                                    value="{{ $slot->time }}" />
                                             </div>
                                         </div>
                                         <div class="col-sm-12">
                                             <div class="mb-3">
-                                                <label class="form-label">Slot End</label>
-                                                <input type="time" class="form-control" placeholder="End Time"
-                                                    name="end_time" value="{{ $slot->end_time }}" />
+                                                <label class="form-label">Slot Category</label>
+                                                <select name="slot_category" id=""
+                                                    class="form-control @error('slot_category') is-invalid @enderror">
+                                                    <option value="">-Select-</option>
+                                                    <option value="1">Full Time</option>
+                                                    <option value="2">Part Time</option>
+                                                </select>
+                                                @error('slot_category')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                     </div>
@@ -197,21 +208,6 @@
 
 
     <script type="text/javascript">
-        document.getElementById('start_time').addEventListener('change', function() {
-            const startTime = this.value;
-            if (startTime) {
-                const [hours, minutes] = startTime.split(':').map(Number);
-                const newEndTime = new Date();
-                newEndTime.setHours(hours + 1, minutes);
-
-                const formattedEndTime = newEndTime.toTimeString().slice(0, 5);
-                document.getElementById('end_time').value = formattedEndTime;
-            }
-        });
-
-
-
-
         document.addEventListener('DOMContentLoaded', function() {
             @if ($errors->any())
                 var modal = new bootstrap.Modal(document.getElementById('addSlotModal'));
@@ -240,12 +236,12 @@
                             searchable: false
                         },
                         {
-                            data: 'start_time',
-                            name: 'start_time'
+                            data: 'time',
+                            name: 'time'
                         },
                         {
-                            data: 'end_time',
-                            name: 'end_time'
+                            data: 'slot_category',
+                            name: 'slot_category'
                         },
                         {
                             data: 'action',

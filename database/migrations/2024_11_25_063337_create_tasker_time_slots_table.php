@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('slot_id')->references('id')->on('time_slots');
             $table->foreignId('tasker_id')->references('id')->on('taskers');
-            $table->string('slot_day');
+            $table->date('slot_date');
             $table->integer('slot_status')->default(0);
             $table->timestamps();
         });

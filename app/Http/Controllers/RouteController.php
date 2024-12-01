@@ -353,7 +353,7 @@ class RouteController extends Controller
     {
         $data = DB::table('tasker_time_slots as a')
             ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
-            ->select('a.id', 'a.slot_status', 'a.slot_day', 'a.slot_id', 'b.start_time', 'b.end_time')
+            ->select('a.id', 'a.slot_status', 'a.slot_date', 'a.slot_id', 'b.time', 'b.slot_category')
             ->get();
 
         return view('tasker.task-preference.time-slot-index', [
@@ -831,11 +831,24 @@ class RouteController extends Controller
         if ($request->ajax()) {
 
             $data = DB::table('time_slots')
-                ->select('id', 'start_time', 'end_time')
+                ->select('id', 'time', 'slot_category')
                 ->get();
 
             $table = DataTables::of($data)->addIndexColumn();
 
+
+            $table->addColumn('slot_category', function ($row) {
+                $cat = null;
+
+                if($row->slot_category == 1){
+                    $cat = '<span class="badge badge text-bg-primary">Full Time</span>';
+                }else if($row->slot_category == 2){
+                    $cat = '<span class="badge badge bg-light-primary">Part Time</span>';
+                }
+
+                return $cat;
+               
+            });
 
             $table->addColumn('action', function ($row) {
 
@@ -882,7 +895,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['action']);
+            $table->rawColumns(['slot_category','action']);
 
             return $table->make(true);
         }

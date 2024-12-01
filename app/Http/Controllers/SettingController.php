@@ -16,17 +16,17 @@ class SettingController extends Controller
     // Admin - Create Time Slot Process
     public function adminCreateTimeSlot(Request $request)
     {
-        $check = TimeSlot::where('start_time', $request->start_time)->where('end_time', $request->end_time)->exists();
+        $check = TimeSlot::where('time', $request->time)->where('slot_category', $request->slot_category)->exists();
         if (!$check) {
             $data = $request->validate(
                 [
-                    'start_time' => 'required',
-                    'end_time' => 'required',
+                    'time' => 'required',
+                    'slot_category' => 'required',
                 ],
                 [],
                 [
-                    'start_time' => 'Start Time',
-                    'end_time' => 'End Time',
+                    'time' => 'Start Time',
+                    'slot_category' => 'Category',
                 ]
             );
 
@@ -40,17 +40,17 @@ class SettingController extends Controller
     // Admin - Update Time Slot Process
     public function adminUpdateTimeSlot(Request $request, $id)
     {
-        $check = TimeSlot::where('start_time', $request->start_time)->where('end_time', $request->end_time)->exists();
+        $check = TimeSlot::where('time', $request->time)->where('slot_category', $request->slot_category)->exists();
         if (!$check) {
             $data = $request->validate(
                 [
-                    'start_time' => 'required',
-                    'end_time' => 'required',
+                    'time' => 'required',
+                    'slot_category' => 'required',
                 ],
                 [],
                 [
-                    'start_time' => 'Start Time',
-                    'end_time' => 'End Time',
+                    'time' => 'Start Time',
+                    'slot_category' => 'Category',
                 ]
             );
 
@@ -125,18 +125,32 @@ class SettingController extends Controller
     // Tasker - Visibility Change 
     public function taskerVisibleToggle()
     {
-        if(Auth::user()->tasker_working_status == 0)
-        {
-            Tasker::whereId(Auth::user()->id)->update(['tasker_working_status'=> 1]);
-            $message ='You are now visible to clients !';
-        }
-        else if(Auth::user()->tasker_working_status == 1)
-        {
-            Tasker::whereId(Auth::user()->id)->update(['tasker_working_status'=> 0]);
-            $message ='You are now invisible to clients !';
-
+        if (Auth::user()->tasker_working_status == 0) {
+            Tasker::whereId(Auth::user()->id)->update(['tasker_working_status' => 1]);
+            $message = 'You are now visible to clients !';
+        } else if (Auth::user()->tasker_working_status == 1) {
+            Tasker::whereId(Auth::user()->id)->update(['tasker_working_status' => 0]);
+            $message = 'You are now invisible to clients !';
         }
 
         return response()->json(['message' => $message]);
+    }
+
+    // Tasker - Working Type Change 
+    public function taskerTypeToggle(Request $req)
+    {
+        try {
+            Tasker::whereId(Auth::user()->id)->update(['tasker_worktype' => $req->tasker_worktype]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Your working type has been successfully updated!'
+            ],200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update your working type. Please try again.'
+            ], 500); // Return a 500 status code for server error
+        }
     }
 }
