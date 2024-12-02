@@ -7,6 +7,7 @@ use App\Models\Tasker;
 use App\Models\TimeSlot;
 use Illuminate\Http\Request;
 use App\Models\TaskerTimeSlot;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class SettingController extends Controller
@@ -74,34 +75,21 @@ class SettingController extends Controller
     }
 
     // Tasker - Create Time Slot Process
-    public function taskerCreateTimeSlot(Request $request)
+    public function taskerCreateTimeSlot($date)
     {
-        $check = TaskerTimeSlot::where('slot_id', $request->slot_id)->where('tasker_id', Auth::user()->id)->where('slot_day', $request->slot_day)->exists();
+        //$check = TaskerTimeSlot::where('slot_id', $request->slot_id)->where('tasker_id', Auth::user()->id)->where('slot_day', $request->slot_day)->exists();
+        $timeslotsFt = TimeSlot::where('slot_category', 1)->get();
+        // $timeslotsPt = TimeSlot::where('slot_category', 2)->get();
 
-        if (!$check) {
-            $data = $request->validate(
-                [
-                    'slot_id' => 'required',
-                    'tasker_id' => '',
-                    'slot_status' => 'required',
-                    'slot_day' => 'required',
-
-                ],
-                [],
-                [
-                    'slot_id' => 'Slot',
-                    'tasker_id' => 'Tasker',
-                    'slot_status' => 'Status',
-                    'slot_day' => 'Day',
-                ]
-            );
-
-            $data['tasker_id'] = Auth::user()->id;
-
-            TaskerTimeSlot::create($data);
-            return back()->with('success', 'Slot has been added successfully !');
-        } else {
-            return back()->with('error', 'Operation failed because of duplicate time slot. Please key in another slot !');
+        foreach ($timeslotsFt as $ft) {
+            $data = new TaskerTimeSlot();
+            $data->slot_id = $ft->id;
+            $data->tasker_id = Auth::user()->id;
+            $date = '12/02/2024';  // Invalid format for 'Y-m-d'
+            $formattedDate = Carbon::createFromFormat('m/d/Y', $date)->toDateString();
+            $data->slot_date = $formattedDate;
+            $data->slot_status = 1;
+            $data->save();
         }
     }
 
@@ -145,7 +133,7 @@ class SettingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Your working type has been successfully updated!'
-            ],200);
+            ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,

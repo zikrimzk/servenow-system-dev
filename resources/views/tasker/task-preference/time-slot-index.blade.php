@@ -203,7 +203,7 @@
                                                         @elseif(Auth::user()->tasker_worktype == 2)
                                                             <option value="" disabled>- Select -</option>
                                                             <option value="1">Full Time</option>
-                                                            <option value="2"selected>Part Time</option>
+                                                            <option value="2" selected>Part Time</option>
                                                         @endif
                                                     </select>
                                                 </div>
@@ -223,50 +223,6 @@
                                             <div class="card table-card">
                                                 <div class="card-body">
 
-                                                    <div class="d-flex justify-content-end align-items-center my-2 mb-3">
-                                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                            data-bs-target="#addSlotModal">Add Slot</button>
-                                                    </div>
-                                                    @if ($data->where('slot_day', 'monday')->count() == 0)
-                                                        <div class="text-muted fst-italic text-center">No slots added ...
-                                                        </div>
-                                                    @endif
-
-                                                    @foreach ($data as $d)
-                                                        @if ($d->slot_day == 'monday')
-                                                            <div class="card p-4 border border-1 mt-3">
-                                                                <div class="card-body">
-                                                                    @if ($d->slot_status == 1)
-                                                                        <span
-                                                                            class="badge text-bg-success">Available</span>
-                                                                    @else
-                                                                        <span
-                                                                            class="badge text-bg-danger">Unavailable</span>
-                                                                    @endif
-
-                                                                    <div
-                                                                        class="d-flex justify-content-between align-items-center">
-                                                                        <div>
-                                                                            <span
-                                                                                class="text-truncate fw-semibold">{{ $d->start_time }}
-                                                                                - {{ $d->end_time }}</span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <a href="#"
-                                                                                class="avtar avtar-s btn-link-secondary"><i
-                                                                                    class="ti ti-edit f-18"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#updateSlotModal-{{ $d->id }}"></i>
-                                                                            </a>
-
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
-
-
                                                 </div>
                                             </div>
                                         </div>
@@ -275,48 +231,8 @@
                                             aria-labelledby="list-mail-2">
                                             <div class="card table-card">
                                                 <div class="card-body">
-                                                    <div class="d-flex justify-content-end align-items-center my-2 mb-3">
-                                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                            data-bs-target="#addSlotModal">Add Slot</button>
-                                                    </div>
-                                                    @if ($data->where('slot_day', 'tuesday')->count() == 0)
-                                                        <div class="text-muted fst-italic text-center">No slots added ...
-                                                        </div>
-                                                    @endif
 
-                                                    @foreach ($data as $d)
-                                                        @if ($d->slot_day == 'tuesday')
-                                                            <div class="card p-4 border border-1 mb-3">
-                                                                <div class="card-body">
-                                                                    @if ($d->slot_status == 1)
-                                                                        <span
-                                                                            class="badge text-bg-success">Available</span>
-                                                                    @else
-                                                                        <span
-                                                                            class="badge text-bg-danger">Unavailable</span>
-                                                                    @endif
 
-                                                                    <div
-                                                                        class="d-flex justify-content-between align-items-center">
-                                                                        <div>
-                                                                            <span
-                                                                                class="text-truncate fw-semibold">{{ $d->start_time }}
-                                                                                - {{ $d->end_time }}</span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <a href="#"
-                                                                                class="avtar avtar-s btn-link-secondary"><i
-                                                                                    class="ti ti-edit f-18"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#updateSlotModal-{{ $d->id }}"></i>
-                                                                            </a>
-
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
                                                 </div>
                                             </div>
                                         </div>
@@ -325,49 +241,7 @@
                                             aria-labelledby="list-mail-3">
                                             <div class="card table-card">
                                                 <div class="card-body">
-                                                    <div class="d-flex justify-content-end align-items-center my-2 mb-3">
-                                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                            data-bs-target="#addSlotModal">Add Slot</button>
-                                                    </div>
 
-                                                    @if ($data->where('slot_day', 'wednesday')->count() == 0)
-                                                        <div class="text-muted fst-italic text-center">No slots added ...
-                                                        </div>
-                                                    @endif
-
-                                                    @foreach ($data as $d)
-                                                        @if ($d->slot_day == 'wednesday')
-                                                            <div class="card p-4 border border-1 mb-3">
-                                                                <div class="card-body">
-                                                                    @if ($d->slot_status == 1)
-                                                                        <span
-                                                                            class="badge text-bg-success">Available</span>
-                                                                    @else
-                                                                        <span
-                                                                            class="badge text-bg-danger">Unavailable</span>
-                                                                    @endif
-
-                                                                    <div
-                                                                        class="d-flex justify-content-between align-items-center">
-                                                                        <div>
-                                                                            <span
-                                                                                class="text-truncate fw-semibold">{{ $d->start_time }}
-                                                                                - {{ $d->end_time }}</span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <a href="#"
-                                                                                class="avtar avtar-s btn-link-secondary"><i
-                                                                                    class="ti ti-edit f-18"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#updateSlotModal-{{ $d->id }}"></i>
-                                                                            </a>
-
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
                                                 </div>
                                             </div>
                                         </div>
@@ -376,49 +250,8 @@
                                             aria-labelledby="list-mail-4">
                                             <div class="card table-card">
                                                 <div class="card-body">
-                                                    <div class="d-flex justify-content-end align-items-center my-2 mb-3">
-                                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                            data-bs-target="#addSlotModal">Add Slot</button>
-                                                    </div>
 
-                                                    @if ($data->where('slot_day', 'thursday')->count() == 0)
-                                                        <div class="text-muted fst-italic text-center">No slots added ...
-                                                        </div>
-                                                    @endif
 
-                                                    @foreach ($data as $d)
-                                                        @if ($d->slot_day == 'thursday')
-                                                            <div class="card p-4 border border-1 mb-3">
-                                                                <div class="card-body">
-                                                                    @if ($d->slot_status == 1)
-                                                                        <span
-                                                                            class="badge text-bg-success">Available</span>
-                                                                    @else
-                                                                        <span
-                                                                            class="badge text-bg-danger">Unavailable</span>
-                                                                    @endif
-
-                                                                    <div
-                                                                        class="d-flex justify-content-between align-items-center">
-                                                                        <div>
-                                                                            <span
-                                                                                class="text-truncate fw-semibold">{{ $d->start_time }}
-                                                                                - {{ $d->end_time }}</span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <a href="#"
-                                                                                class="avtar avtar-s btn-link-secondary"><i
-                                                                                    class="ti ti-edit f-18"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#updateSlotModal-{{ $d->id }}"></i>
-                                                                            </a>
-
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
                                                 </div>
                                             </div>
                                         </div>
@@ -427,47 +260,7 @@
                                             aria-labelledby="list-mail-5">
                                             <div class="card table-card">
                                                 <div class="card-body">
-                                                    <div class="d-flex justify-content-end align-items-center my-2 mb-3">
-                                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                            data-bs-target="#addSlotModal">Add Slot</button>
-                                                    </div>
-                                                    @if ($data->where('slot_day', 'friday')->count() == 0)
-                                                        <div class="text-muted fst-italic text-center">No slots added ...
-                                                        </div>
-                                                    @endif
-                                                    @foreach ($data as $d)
-                                                        @if ($d->slot_day == 'friday')
-                                                            <div class="card p-4 border border-1 mb-3">
-                                                                <div class="card-body">
-                                                                    @if ($d->slot_status == 1)
-                                                                        <span
-                                                                            class="badge text-bg-success">Available</span>
-                                                                    @else
-                                                                        <span
-                                                                            class="badge text-bg-danger">Unavailable</span>
-                                                                    @endif
 
-                                                                    <div
-                                                                        class="d-flex justify-content-between align-items-center">
-                                                                        <div>
-                                                                            <span
-                                                                                class="text-truncate fw-semibold">{{ $d->start_time }}
-                                                                                - {{ $d->end_time }}</span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <a href="#"
-                                                                                class="avtar avtar-s btn-link-secondary"><i
-                                                                                    class="ti ti-edit f-18"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#updateSlotModal-{{ $d->id }}"></i>
-                                                                            </a>
-
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
                                                 </div>
                                             </div>
                                         </div>
@@ -476,47 +269,7 @@
                                             aria-labelledby="list-mail-6">
                                             <div class="card table-card">
                                                 <div class="card-body">
-                                                    <div class="d-flex justify-content-end align-items-center my-2 mb-3">
-                                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                            data-bs-target="#addSlotModal">Add Slot</button>
-                                                    </div>
-                                                    @if ($data->where('slot_day', 'saturday')->count() == 0)
-                                                        <div class="text-muted fst-italic text-center">No slots added ...
-                                                        </div>
-                                                    @endif
-                                                    @foreach ($data as $d)
-                                                        @if ($d->slot_day == 'saturday')
-                                                            <div class="card p-4 border border-1 mb-3">
-                                                                <div class="card-body">
-                                                                    @if ($d->slot_status == 1)
-                                                                        <span
-                                                                            class="badge text-bg-success">Available</span>
-                                                                    @else
-                                                                        <span
-                                                                            class="badge text-bg-danger">Unavailable</span>
-                                                                    @endif
 
-                                                                    <div
-                                                                        class="d-flex justify-content-between align-items-center">
-                                                                        <div>
-                                                                            <span
-                                                                                class="text-truncate fw-semibold">{{ $d->start_time }}
-                                                                                - {{ $d->end_time }}</span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <a href="#"
-                                                                                class="avtar avtar-s btn-link-secondary"><i
-                                                                                    class="ti ti-edit f-18"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#updateSlotModal-{{ $d->id }}"></i>
-                                                                            </a>
-
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
                                                 </div>
                                             </div>
                                         </div>
@@ -525,47 +278,7 @@
                                             aria-labelledby="list-mail-7">
                                             <div class="card table-card">
                                                 <div class="card-body">
-                                                    <div class="d-flex justify-content-end align-items-center my-2 mb-3">
-                                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                                            data-bs-target="#addSlotModal">Add Slot</button>
-                                                    </div>
-                                                    @if ($data->where('slot_day', 'sunday')->count() == 0)
-                                                        <div class="text-muted fst-italic text-center">No slots added ...
-                                                        </div>
-                                                    @endif
-                                                    @foreach ($data as $d)
-                                                        @if ($d->slot_day == 'sunday')
-                                                            <div class="card p-4 border border-1 mb-3">
-                                                                <div class="card-body">
-                                                                    @if ($d->slot_status == 1)
-                                                                        <span
-                                                                            class="badge text-bg-success">Available</span>
-                                                                    @else
-                                                                        <span
-                                                                            class="badge text-bg-danger">Unavailable</span>
-                                                                    @endif
 
-                                                                    <div
-                                                                        class="d-flex justify-content-between align-items-center">
-                                                                        <div>
-                                                                            <span
-                                                                                class="text-truncate fw-semibold">{{ $d->start_time }}
-                                                                                - {{ $d->end_time }}</span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <a href="#"
-                                                                                class="avtar avtar-s btn-link-secondary"><i
-                                                                                    class="ti ti-edit f-18"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#updateSlotModal-{{ $d->id }}"></i>
-                                                                            </a>
-
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
                                                 </div>
                                             </div>
                                         </div>
@@ -580,134 +293,133 @@
             </div>
 
             <!-- Modal Time Slot Create Start Here -->
-            <form action="{{ route('tasker-timeslot-create') }}" method="POST">
-                @csrf
-                <div class="modal fade" id="addSlotModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="mb-0">Add Slot</h5>
-                                <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
-                                    data-bs-dismiss="modal">
-                                    <i class="ti ti-x f-20"></i>
-                                </a>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label">Slot</label>
-                                            <select name="slot_id"
-                                                class="form-control @error('slot_id') is-invalid @enderror">
-                                                <option value="" selected>Select Slot</option>
-                                                @foreach ($slots as $slot)
-                                                    <option value="{{ $slot->id }}"> {{ $slot->start_time }} -
-                                                        {{ $slot->end_time }}</option>
-                                                @endforeach
-                                            </select>
-                                            @error('slot_id')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+            {{-- <form action="" method="POST">
+            @csrf
+            <div class="modal fade" id="addSlotModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="mb-0">Add Slot</h5>
+                            <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
+                                data-bs-dismiss="modal">
+                                <i class="ti ti-x f-20"></i>
+                            </a>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Slot</label>
+                                        <select name="slot_id"
+                                            class="form-control @error('slot_id') is-invalid @enderror">
+                                            <option value="" selected>Select Slot</option>
+                                            @foreach ($slots as $slot)
+                                            <option value="{{ $slot->id }}"> {{ $slot->start_time }} -
+                                                {{ $slot->end_time }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('slot_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
 
-                                        </div>
                                     </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label">Status</label>
-                                            <select name="slot_status"
-                                                class="form-control @error('slot_status') is-invalid @enderror">
-                                                <option value="1" selected>Available</option>
-                                                <option value="0">Unavailable</option>
-                                            </select>
-                                            @error('slot_status')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Status</label>
+                                        <select name="slot_status"
+                                            class="form-control @error('slot_status') is-invalid @enderror">
+                                            <option value="1" selected>Available</option>
+                                            <option value="0">Unavailable</option>
+                                        </select>
+                                        @error('slot_status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
 
-                                        </div>
                                     </div>
+                                </div>
 
-                                    <input type="hidden" class="form-control day" value="monday" name="slot_day">
-                                </div>
-                            </div>
-                            <div class="modal-footer justify-content-end">
-                                <div class="flex-grow-1 text-end">
-                                    <button type="reset" class="btn btn-link-danger btn-pc-default"
-                                        data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Save</button>
-                                </div>
+                                <input type="hidden" class="form-control day" value="monday" name="slot_day">
                             </div>
                         </div>
-
-
+                        <div class="modal-footer justify-content-end">
+                            <div class="flex-grow-1 text-end">
+                                <button type="reset" class="btn btn-link-danger btn-pc-default"
+                                    data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </div>
                     </div>
+
+
                 </div>
-            </form>
+            </div>
+        </form> --}}
 
             <!-- Modal Time Slot Create End  Here -->
 
             <!-- Modal Time Slot Update Start Here -->
             @foreach ($data as $d)
-                <form action="{{ route('tasker-timeslot-update', $d->id) }}" method="POST">
-                    @csrf
-                    <div class="modal fade" id="updateSlotModal-{{ $d->id }}" data-bs-keyboard="false"
-                        tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
+                {{-- <form action="{{ route('tasker-timeslot-update', $d->id) }}" method="POST">
+            @csrf
+            <div class="modal fade" id="updateSlotModal-{{ $d->id }}" data-bs-keyboard="false" tabindex="-1"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
 
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="mb-0">Update Slot</h5>
-                                    <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
-                                        data-bs-dismiss="modal">
-                                        <i class="ti ti-x f-20"></i>
-                                    </a>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Slot</label>
-                                                <select name="slot_id" class="form-control">
-                                                    <option value="{{ $d->slot_id }}" selected>
-                                                        {{ $d->start_time }} - {{ $d->end_time }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Status</label>
-                                                <select name="slot_status"
-                                                    class="form-control @error('slot_status') is-invalid @enderror">
-                                                    @if ($d->slot_status == 1)
-                                                        <option value="1" selected>Available</option>
-                                                        <option value="0">Unavailable</option>
-                                                    @else
-                                                        <option value="1">Available</option>
-                                                        <option value="0"selected>Unavailable</option>
-                                                    @endif
-                                                </select>
-                                                @error('slot_status')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-
-                                            </div>
-                                        </div>
-
-                                        <input type="hidden" class="form-control" value="{{ $d->slot_day }}"
-                                            name="slot_day">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="mb-0">Update Slot</h5>
+                            <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
+                                data-bs-dismiss="modal">
+                                <i class="ti ti-x f-20"></i>
+                            </a>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Slot</label>
+                                        <select name="slot_id" class="form-control">
+                                            <option value="{{ $d->slot_id }}" selected>
+                                                {{ $d->start_time }} - {{ $d->end_time }}</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="modal-footer justify-content-end">
-                                    <div class="flex-grow-1 text-end">
-                                        <button type="reset" class="btn btn-link-danger btn-pc-default"
-                                            data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Status</label>
+                                        <select name="slot_status"
+                                            class="form-control @error('slot_status') is-invalid @enderror">
+                                            @if ($d->slot_status == 1)
+                                            <option value="1" selected>Available</option>
+                                            <option value="0">Unavailable</option>
+                                            @else
+                                            <option value="1">Available</option>
+                                            <option value="0" selected>Unavailable</option>
+                                            @endif
+                                        </select>
+                                        @error('slot_status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+
                                     </div>
                                 </div>
+
+                                <input type="hidden" class="form-control" value="{{ $d->slot_day }}" name="slot_day">
                             </div>
-
+                        </div>
+                        <div class="modal-footer justify-content-end">
+                            <div class="flex-grow-1 text-end">
+                                <button type="reset" class="btn btn-link-danger btn-pc-default"
+                                    data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
                         </div>
                     </div>
-                </form>
+
+                </div>
+            </div>
+        </form> --}}
             @endforeach
 
             <!-- Modal Time Slot Update End  Here -->
@@ -716,6 +428,7 @@
         </div>
     </div>
     <!-- [ Main Content ] end -->
+
 
 
     <script type="text/javascript">
@@ -758,7 +471,7 @@
 
             // Clear existing content
             listGroup.innerHTML = '';
-            // tabContent.innerHTML = '';
+            tabContent.innerHTML = '';
 
             // Generate tabs for the week
             const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -766,10 +479,10 @@
                 const date = new Date(startOfWeek);
                 date.setDate(startOfWeek.getDate() + i);
                 const formattedDate = date.toLocaleDateString('en-US', {
-                    month: 'long',
+                    month: 'numeric',
                     day: 'numeric',
                     year: 'numeric'
-                });
+                }).replace(/\//g, '-'); // Replace all slashes with dashes;
 
                 // Create the tab
                 const tabId = `list-${i + 1}`;
@@ -779,16 +492,57 @@
                 tab.dataset.bsToggle = 'list';
                 tab.href = `#list-mail-${i + 1}`;
                 tab.role = 'tab';
-                tab.innerHTML = `<span>${formattedDate} (${days[i]})</span>`;
+                tab.innerHTML = `<span>${days[i]} (${formattedDate})</span>`;
                 listGroup.appendChild(tab);
+
+                // Parse the date string to a Date object
+                const date = new Date(formattedDate);
+
+                // Format the date to yyyy-mm-dd
+                const formatted =
+                    `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 
                 // Create the tab pane
                 const tabPane = document.createElement('div');
+                const taskerTimeslotCreateUrl = "{{ route('tasker-timeslot-create', ':date') }}";
                 tabPane.className = `tab-pane fade ${i === 0 ? 'show active' : ''}`;
                 tabPane.id = `list-mail-${i + 1}`;
                 tabPane.role = 'tabpanel';
-                // tabPane.innerHTML = `<p>${days[i]} (${formattedDate})</p>`;
-                // tabContent.appendChild(tabPane);
+                const generateUrl = taskerTimeslotCreateUrl.replace(':date', formattedDate);
+            
+                tabPane.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center my-2 mb-3">
+                            <p>${days[i]} (${formattedDate})</p>
+                            <a href="${generateUrl}" class="btn btn-primary">Generate</a>
+                    </div>
+                
+                    @foreach ($data as $d)
+                       @if ($d->slot_date == "{{ ${formatted} }}" )
+                                <div class="card p-4 border border-1 mt-3">
+                                    <div class="card-body">
+                                        @if ($d->slot_status == 1)
+                                            <span class="badge text-bg-success">Available</span>
+                                        @else
+                                            <span class="badge text-bg-danger">Unavailable</span>
+                                        @endif
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="text-truncate fw-semibold">{{ $d->time }}</span>
+                                        </div>
+                                        <div>
+                                            <a href="#" class="avtar avtar-s btn-link-secondary">
+                                                <i class="ti ti-edit f-18" data-bs-toggle="modal"data-bs-target="#updateSlotModal-{{ $d->id }}"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                               </div>
+                             </div>
+                        @endif
+                    @endforeach
+
+                `;
+                tabContent.appendChild(tabPane);
             }
         }
 

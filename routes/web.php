@@ -146,7 +146,7 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     // Tasker - Time Slot Setting
     Route::post('/tasker-working-type-change', [SettingController::class, 'taskerTypeToggle'])->name('tasker-type-change');
     Route::get('/time-slot-setting', [RouteController::class, 'taskerTimeSlotNav'])->name('tasker-timeslot-setting');
-    Route::post('/create-time-slot', [SettingController::class, 'taskerCreateTimeSlot'])->name('tasker-timeslot-create');
+    Route::get('/create-time-slot-{date}', [SettingController::class, 'taskerCreateTimeSlot'])->name('tasker-timeslot-create');
     Route::post('/update-time-slot-{id}', [SettingController::class, 'taskerUpdateTimeSlot'])->name('tasker-timeslot-update');
     
 });
