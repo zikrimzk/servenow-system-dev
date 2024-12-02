@@ -44,6 +44,9 @@ Route::middleware('auth:sanctum')->get('/get-tasker-details', [TaskerAPIControll
 Route::middleware('auth:sanctum')->post('/update-password-{id}', [TaskerAPIController::class, 'taskerUpdatePasswordAPI']);
 Route::middleware('auth:sanctum')->post('/update-profile-{id}', [TaskerAPIController::class, 'taskerUpdateProfileAPI']);
 
+// Tasket - Service Type Fetch
+Route::middleware('auth:sanctum')->get('/get-service-type', [TaskerAPIController::class, 'getAllServiceType']);
+
 
 // Tasker - Service Management API
 Route::middleware('auth:sanctum')->post('/create-service', [TaskerAPIController::class, 'createServiceAPI']);

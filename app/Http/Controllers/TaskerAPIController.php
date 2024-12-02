@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\Tasker;
 use App\Models\Service;
+use App\Models\ServiceType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -199,6 +200,20 @@ class TaskerAPIController extends Controller
                 'message' => 'Your service has been successfully submitted! Please allow up to 3 business days for our administrators to review your application. We’ll notify you once it’s been processed.'
             ], 201);
            
+        } catch (Exception $e) {
+            return response([
+                'message' => 'Error : ' . $e->getMessage()
+            ], 301);
+        }
+    }
+
+    public function getAllServiceType()
+    {
+        try {
+            $servicetype = ServiceType::where('servicetype_status', 1)->get();
+            return response([
+                'servicetype' => $servicetype
+            ], 201);
         } catch (Exception $e) {
             return response([
                 'message' => 'Error : ' . $e->getMessage()
