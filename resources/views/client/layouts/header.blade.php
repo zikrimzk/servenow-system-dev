@@ -46,7 +46,7 @@
                                 data-wow-delay="0.4s">
                                 @foreach ($service as $sv)
                                     <a href="{{ route('client-booking',$sv->id) }}"
-                                        class="btn btn-outline-primary">{{ $sv->servicetype_name }}</a>
+                                        class="btn btn-outline-primary">{{ $sv->servicetype_name }}</a> 
                                 @endforeach
                             </div>
                         </div>

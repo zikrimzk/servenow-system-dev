@@ -109,7 +109,7 @@ class RouteController extends Controller
 
     public function clientBooking($id)
     {
-        // try {
+        try {
         $tasker = Tasker::where('tasker_working_status', 1)->get();
         $client = Client::where('id', auth()->id())->first();
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
@@ -138,7 +138,7 @@ class RouteController extends Controller
         $timeSlot=DB::table('time_slots as a')
         ->join('tasker_time_slots as b','a.id','=','b.slot_id')
         ->where('b.slot_status','=',1)
-        ->select('b.slot_id','a.start_time','a.end_time','b.tasker_id')
+        ->select('b.slot_id','a.time','b.tasker_id')
         ->get();
 
 
@@ -147,14 +147,13 @@ class RouteController extends Controller
             'title' => 'Describe your task',
             'tasker' => $svtasker,
             'sv' => $sv,
-            // 'tasker' => $tasker,
             'client' => $client,
             'states' => $states,
             'time'=>$timeSlot
         ]);
-        // } catch (Exception $e) {
-        //     return back();
-        // }
+        } catch (Exception $e) {
+            return back();
+        }
     }
 
 

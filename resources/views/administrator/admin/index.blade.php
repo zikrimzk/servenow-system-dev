@@ -18,7 +18,7 @@
                         </div>
                         <div class="col-md-12">
                             <div class="page-header-title">
-                                <h2 class="mb-0">Administrator Management</h2>
+                                <h2 class="mb-4">Administrator Management</h2>
                             </div>
                         </div>
                     </div>

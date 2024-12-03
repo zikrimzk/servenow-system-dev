@@ -180,14 +180,4 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
 });
 
 
-
-
-
-
-
-
-
-
-
-// Route::get('/get-states', [RouteController::class, 'getStates'])->name('get-states');
 Route::get('/get-areas/{state}', [RouteController::class, 'getAreas'])->name('get-area');

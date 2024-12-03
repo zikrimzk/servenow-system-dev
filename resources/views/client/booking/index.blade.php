@@ -42,9 +42,9 @@
                 <div class="col-sm-8 col-md-12">
                     <div id="basicwizard" class="form-wizard row justify-content-center mx-3 my-1">
                         <div class="col-sm-8 col-md-12">
-                            <h1 class="my-4">{{ $sv->servicetype_name }}</h1>
+                            <h1 class="my-3 my-md-0">{{ $sv->servicetype_name }}</h1>
 
-                            <div class="alert alert-primary">
+                            <div class="alert alert-primary mt-3 mb-4">
                                 <div class="d-flex">
                                     <i class="ti ti-edit h2 f-w-400 mb-0 text-primary"></i>
                                     <div class="flex-grow-1 ms-3">
@@ -272,13 +272,9 @@
                                                                 </div>
                                                                 <div class="modal-body">
                                                                     <div class="row">
-                                                                        <div class="col-sm-12 mb-3">
-                                                                            <label class="form-label">Full Address</label>
-                                                                            <input type="text" name="booking_address"
-                                                                                id="booking_address" class="form-control"
-                                                                                readonly>
-                                                                        </div>
                                                                         <div class="col-md-12 mb-3">
+                                                                            <input type="hidden" name="booking_address"
+                                                                                id="booking_address" class="form-control">
                                                                             <label class="mb-2"> Service
                                                                                 Options</label>
                                                                             <select id="task-option" class="form-control"
@@ -365,9 +361,9 @@
                                                                                 class="mb-2">Time</label>
                                                                             <select id="task-time" class="form-control">
                                                                                 @foreach ($time->where('tasker_id', $tk->taskerID) as $t)
-                                                                                    <option value="{{ $t->start_time }}">
-                                                                                        {{ $t->start_time }} -
-                                                                                        {{ $t->end_time }}</option>
+                                                                                    <option value="{{ $t->time }}">
+                                                                                        {{ $t->time }}
+                                                                                    </option>
                                                                                 @endforeach
                                                                             </select>
                                                                         </div>

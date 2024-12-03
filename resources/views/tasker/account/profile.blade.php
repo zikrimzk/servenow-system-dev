@@ -192,7 +192,7 @@
                                                                 class="form-control @error('tasker_icno') is-invalid @enderror"
                                                                 name="tasker_icno" id="tasker_icno"
                                                                 placeholder="IC Number" maxlength="12" pattern="^\d{12}$"
-                                                                value="{{ Auth::user()->tasker_icno }}" />
+                                                                value="{{ Auth::user()->tasker_icno }}" @if(Auth::user()->tasker_status == 2) readonly @endif/>
                                                             <div id="ic-error-message" class="text-danger"
                                                                 style="display: none;">IC Number must be exactly 12 digits!
                                                             </div>
@@ -250,7 +250,7 @@
                                                             <label class="form-label">Email</label>
                                                             <input type="text"
                                                                 class="form-control @error('email') is-invalid @enderror"
-                                                                name="email" value="{{ Auth::user()->email }}" />
+                                                                name="email" value="{{ Auth::user()->email }}" readonly/>
                                                             @error('email')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror

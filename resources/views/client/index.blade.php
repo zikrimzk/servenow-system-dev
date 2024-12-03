@@ -62,13 +62,13 @@
             opacity: 0.8;
         }
 
-        
+
         .btn-outline-primary {
             --bs-btn-color: #000000;
             --bs-btn-border-color: #16325b;
             --bs-btn-hover-color: #000000;
             --bs-btn-hover-bg: #e2edfe;
-            --bs-btn-hover-border-color:#0066ff;
+            --bs-btn-hover-border-color: #0066ff;
             --bs-btn-focus-shadow-rgb: 13, 110, 253;
             --bs-btn-active-color: #fff;
             --bs-btn-active-bg: #0d6efd;
@@ -151,7 +151,8 @@
                     <div class="my-4 my-sm-5 wow fadeInUp" data-wow-delay="0.4s">
                         <div class="container ">
                             <div class="row justify-content-center">
-                                <div class="search-bar d-flex align-items-center col-12 col-sm-8 col-md-6 col-lg-3 border border-1 border-dark">
+                                <div
+                                    class="search-bar d-flex align-items-center col-12 col-sm-8 col-md-6 col-lg-3 border border-1 border-dark">
                                     <i class="fa-solid fa-magnifying-glass me-2"></i>
                                     <input type="text" class="form-control bg-transparent text-grey w-100"
                                         placeholder="What do you need help with?">
@@ -171,8 +172,8 @@
                                 <div class="my-2 my-sm-1 d-flex flex-wrap justify-content-center align-items-start gap-2 wow fadeInUp"
                                     data-wow-delay="0.4s">
                                     @foreach ($service as $sv)
-                                        <a href="../dashboard/index.html" class="btn btn-outline-primary"
-                                            >{{ $sv->servicetype_name }}</a>
+                                        <a href="{{ route('client-booking', $sv->id) }}"
+                                            class="btn btn-outline-primary">{{ $sv->servicetype_name }}</a>
                                     @endforeach
                                 </div>
                             </div>
