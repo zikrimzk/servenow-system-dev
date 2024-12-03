@@ -9,6 +9,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\AuthenticateController;
 use App\Http\Controllers\AdministratorController;
+use App\Http\Controllers\BookingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -177,6 +178,11 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
 
     // Client - Logout
     Route::get('/client-logout', [AuthenticateController::class, 'logoutClient'])->name('client-logout');
+
+
+    // Client - Booking
+    Route::get('/tasker-get-time/{date}/{taskerid}', [BookingController::class, 'getBookingTime'])->name('client-tasker-get-time');
+
 });
 
 

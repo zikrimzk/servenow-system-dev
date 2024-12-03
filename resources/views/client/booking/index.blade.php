@@ -236,9 +236,11 @@
                                                             </div>
                                                             <div
                                                                 class="d-grid d-md-flex justify-content-md-center align-items-md-center ">
-                                                                <button type="button" class="btn btn-primary"
+                                                                <button type="button"
+                                                                    class="btn btn-primary select-continue-btn"
                                                                     data-bs-toggle="modal"
-                                                                    data-bs-target="#selectdatetime-{{ $tk->taskerID }}">Select
+                                                                    data-bs-target="#selectdatetime-{{ $tk->taskerID }}"
+                                                                    data-tasker-id="{{ $tk->taskerID }}">Select
                                                                     &
                                                                     Continue</button>
                                                             </div>
@@ -359,12 +361,8 @@
                                                                         <div class="col-md-6 mb-3">
                                                                             <label for="task-time"
                                                                                 class="mb-2">Time</label>
-                                                                            <select id="task-time" class="form-control">
-                                                                                @foreach ($time->where('tasker_id', $tk->taskerID) as $t)
-                                                                                    <option value="{{ $t->time }}">
-                                                                                        {{ $t->time }}
-                                                                                    </option>
-                                                                                @endforeach
+                                                                            <select class="form-control task-time">
+                                                                                <!-- Options akan diisi melalui AJAX -->
                                                                             </select>
                                                                         </div>
                                                                     </div>
@@ -536,6 +534,11 @@
 
 
     <script>
+        
+
+
+
+
         function updateBookingAddress() {
             // Ambil nilai dari setiap medan
             const address1 = document.getElementById('address1').value.trim();
@@ -561,6 +564,21 @@
                 if (field) {
                     field.addEventListener('input', updateBookingAddress); // Update address on input change
                 }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.select-continue-btn');
+
+            buttons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const taskerId = this.getAttribute('data-tasker-id');
+                    if (taskerId) {
+                        localStorage.setItem('selectedTaskerId', taskerId);
+                        console.log('Tasker ID saved to localStorage:', taskerId);
+                        // alert(`Tasker ID ${taskerId} has been saved.`);
+                    }
+                });
             });
         });
 
@@ -600,6 +618,45 @@
                 } else {
                     el.disabled = true;
                     el.checked = false;
+                }
+            });
+        }
+
+        function getTaskerTimeSlots(date) {
+            const taskerid = localStorage.getItem('selectedTaskerId');
+            if (!taskerid) {
+                alert('No Tasker ID selected!');
+                return;
+            }
+            const urlTemplate = "{{ route('client-tasker-get-time', [':date', ':taskerid']) }}";
+            const url = urlTemplate
+                .replace(':date', encodeURIComponent(date))
+                .replace(':taskerid', encodeURIComponent(taskerid));
+
+            jQuery.ajax({
+                url: url,
+                type: "GET",
+                success: function(result) {
+                    console.log("AJAX success:", result); // Debug log
+                    const data = result.data; // Pastikan server mengembalikan data array
+
+                    // Reset isi dropdown
+                    const taskTimeSelect = jQuery('.task-time');
+                    taskTimeSelect.empty(); // Hapus opsi lama
+
+                    if (data.length > 0) {
+                        // Tambahkan opsi baru berdasarkan data
+                        data.forEach(function(item) {
+                            taskTimeSelect.append(`<option value="${item.time}">${item.time}</option>`);
+                        });
+                    } else {
+                        // Tambahkan opsi default jika data kosong
+                        taskTimeSelect.append('<option value="">No times available</option>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                    alert('Failed to fetch time slots. Please try again.');
                 }
             });
         }
@@ -659,26 +716,22 @@
 
         // FLATPICKER : CALANDER
         document.addEventListener('DOMContentLoaded', function() {
-            // Get today's date
             const today = new Date();
             const formattedToday = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-
             // Initialize Flatpickr
             flatpickr("#task-date", {
-                enableTime: false, // Disable time selection
-                minDate: "today", // Start from today
-                maxDate: new Date(new Date().setDate(today.getDate() +
-                    7)), // Set max date to one week from today
-                inline: false, // Do not display the calendar inline
-                defaultDate: formattedToday, // Set default date to today
+                enableTime: false,
+                minDate: "today",
+                maxDate: new Date(new Date().setDate(today.getDate() + 7)),
+                defaultDate: formattedToday,
                 onChange: function(selectedDates, dateStr, instance) {
-                    // Update the display with the selected date
-                    document.getElementById('selected-date').textContent = dateStr;
+                    // Pass the selected date to the AJAX function
+                    getTaskerTimeSlots(dateStr);
                 }
             });
 
-            // Set the initial display to today's date
-            document.getElementById('selected-date').textContent = formattedToday;
+            // Trigger initial fetch for today's date
+            getTaskerTimeSlots(formattedToday);
         });
 
 
@@ -806,12 +859,6 @@
 
     <!-- [ Main Content ] end -->
 @endsection
-
-
-
-
-
-
 
 
 <!-- [ footer apps ] start -->
