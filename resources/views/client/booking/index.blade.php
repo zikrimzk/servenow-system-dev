@@ -68,6 +68,13 @@
                                             </a>
                                         </li>
                                         <!-- end nav item -->
+                                        <li class="nav-item" data-target-form="#optionDetailForm">
+                                            <a href="#jobOption" data-bs-toggle="tab" data-toggle="tab"
+                                                class="nav-link icon-btn">
+                                                <i class="fas fa-cog"></i>
+                                                <span class="d-none d-sm-inline">Option</span>
+                                            </a>
+                                        </li>
                                         <li class="nav-item" data-target-form="#jobDetailForm">
                                             <a href="#jobDetail" data-bs-toggle="tab" data-toggle="tab"
                                                 class="nav-link icon-btn">
@@ -144,7 +151,8 @@
                                                         </div>
                                                         <div class="col-sm-6 mb-3">
                                                             <label class="form-label">State:</label>
-                                                            <select name="client_state" class="form-control" id="state">
+                                                            <select name="client_state" class="form-control"
+                                                                id="state">
                                                                 <option value="" selected>Select State</option>
                                                                 @foreach ($states['states'] as $state)
                                                                     <option value="{{ strtolower($state['name']) }}">
@@ -171,8 +179,80 @@
                                         </div>
                                         <!-- end contact detail tab pane -->
 
+                                        <!-- START: Define your tab pans here -->
+                                        <div class="tab-pane" id="jobOption">
+                                            <div class="text-center mb-4 mt-4">
+                                                <h2 class="mb-1">Service Options</h2>
+                                            </div>
+                                            <div class="row mt-4">
+                                                <div class="col-sm-12 ">
+                                                    <div class="row">
+                                                        <div class="col-sm-12 mb-3">
+                                                            <label class="mb-2"> Service
+                                                                Options</label>
+                                                            <select id="task-option" class="form-control"
+                                                                onchange="updateHours()">
+                                                                <option value="" selected>Select
+                                                                    Options</option>
+                                                                <option value="s">Small</option>
+                                                                <option value="m">Medium</option>
+                                                                <option value="l">Large</option>
+                                                            </select>
+                                                        </div>
 
+                                                        <div class="col-sm-12 mb-3">
+                                                            <label class="mb-2 d-block">Est. hour(s)</label>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="hour" value="1" id="hour1"
+                                                                    disabled />
+                                                                <label class="form-check-label" for="hour1">1</label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="hour" value="2" id="hour2"
+                                                                    disabled />
+                                                                <label class="form-check-label" for="hour2">2</label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="hour" value="3" id="hour3"
+                                                                    disabled />
+                                                                <label class="form-check-label" for="hour3">3</label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="hour" value="4" id="hour4"
+                                                                    disabled />
+                                                                <label class="form-check-label" for="hour4">4</label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="hour" value="5" id="hour5"
+                                                                    disabled />
+                                                                <label class="form-check-label" for="hour5">5</label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="hour" value="6" id="hour6"
+                                                                    disabled />
+                                                                <label class="form-check-label" for="hour6">6</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
+                                                <div class="col-sm-12mb-3">
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="schoolName">Tell us the details of
+                                                            your task</label>
+                                                        <textarea name="booking_note" id="" cols="30" rows="5" class="form-control"
+                                                            placeholder="Provide a summary of what you need done for your Tasker. Be sure to include details like the size of your space, any equipment/tools needed, and how to get in."></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- end contact detail tab pane -->
 
                                         <!-- START: Define your tab pans here -->
                                         <div class="tab-pane" id="jobDetail">
@@ -256,6 +336,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
+
                                                 <form action="/TEST" method="POST">
                                                     <div id="selectdatetime-{{ $tk->taskerID }}" class="modal fade"
                                                         tabindex="-1" role="dialog"
@@ -270,95 +351,25 @@
                                                                     <button type="button" class="btn-close"
                                                                         data-bs-dismiss="modal"
                                                                         aria-label="Close"></button>
-
                                                                 </div>
                                                                 <div class="modal-body">
                                                                     <div class="row">
-                                                                        <div class="col-md-12 mb-3">
-                                                                            <input type="hidden" name="booking_address"
-                                                                                id="booking_address" class="form-control">
-                                                                            <label class="mb-2"> Service
-                                                                                Options</label>
-                                                                            <select id="task-option" class="form-control"
-                                                                                onchange="updateHours()">
-                                                                                <option value="" selected>Select
-                                                                                    Options</option>
-                                                                                <option value="s">Small</option>
-                                                                                <option value="m">Medium</option>
-                                                                                <option value="l">Large</option>
-                                                                            </select>
-                                                                        </div>
+                                                                        <input type="hidden" name="booking_address"
+                                                                            id="booking_address" class="form-control">
 
-                                                                        <label class="mb-2">Est. hour(s)</label>
-                                                                        <div class="col-md-12 mb-3">
-                                                                            <div class="row mb-3">
-                                                                                <div class="col-sm-12" id="hours-options">
-                                                                                    <!-- Radio Buttons -->
-                                                                                    <div
-                                                                                        class="form-check form-check-inline">
-                                                                                        <input class="form-check-input"
-                                                                                            type="radio" name="group5"
-                                                                                            value="1" id="hour1"
-                                                                                            disabled />
-                                                                                        <label class="form-check-label"
-                                                                                            for="hour1">1</label>
-                                                                                    </div>
-                                                                                    <div
-                                                                                        class="form-check form-check-inline">
-                                                                                        <input class="form-check-input"
-                                                                                            type="radio" name="group5"
-                                                                                            value="2" id="hour2"
-                                                                                            disabled />
-                                                                                        <label class="form-check-label"
-                                                                                            for="hour2">2</label>
-                                                                                    </div>
-                                                                                    <div
-                                                                                        class="form-check form-check-inline">
-                                                                                        <input class="form-check-input"
-                                                                                            type="radio" name="group5"
-                                                                                            value="3" id="hour3"
-                                                                                            disabled />
-                                                                                        <label class="form-check-label"
-                                                                                            for="hour3">3</label>
-                                                                                    </div>
-                                                                                    <div
-                                                                                        class="form-check form-check-inline">
-                                                                                        <input class="form-check-input"
-                                                                                            type="radio" name="group5"
-                                                                                            value="4" id="hour4"
-                                                                                            disabled />
-                                                                                        <label class="form-check-label"
-                                                                                            for="hour4">4</label>
-                                                                                    </div>
-                                                                                    <div
-                                                                                        class="form-check form-check-inline">
-                                                                                        <input class="form-check-input"
-                                                                                            type="radio" name="group5"
-                                                                                            value="5" id="hour5"
-                                                                                            disabled />
-                                                                                        <label class="form-check-label"
-                                                                                            for="hour5">5</label>
-                                                                                    </div>
-                                                                                    <div
-                                                                                        class="form-check form-check-inline">
-                                                                                        <input class="form-check-input"
-                                                                                            type="radio" name="group5"
-                                                                                            value="6" id="hour6"
-                                                                                            disabled />
-                                                                                        <label class="form-check-label"
-                                                                                            for="hour6">6</label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
+                                                                        <div class="col-sm-12 mb-3">
+                                                                            <label id="selected-hour" class="fw-bold">No
+                                                                                hour
+                                                                                selected</label>
                                                                         </div>
-                                                                        <div class="col-md-6 mb-3">
+                                                                        <div class="col-sm-12 mb-3">
                                                                             <label for="task-date"
                                                                                 class="mb-2">Availability</label>
                                                                             <input type="text" id="task-date"
                                                                                 class="form-control"
                                                                                 placeholder="Choose Date">
                                                                         </div>
-                                                                        <div class="col-md-6 mb-3">
+                                                                        <div class="col-sm-12 mb-3">
                                                                             <label for="task-time"
                                                                                 class="mb-2">Time</label>
                                                                             <select class="form-control task-time">
@@ -386,21 +397,7 @@
                                         <!-- START: Define your tab pans here -->
                                         <div class="tab-pane" id="educationDetail">
                                             <form id="educationForm" method="post" action="#">
-                                                <div class="text-center">
-                                                    <h3 class="mb-2">Special Request </h3>
-                                                    <small class="text-muted">Let Tasker know did you need add some note
-                                                        for them.</small>
-                                                </div>
-                                                <div class="row mt-4">
-                                                    <div class="col-md-12">
-                                                        <div class="mb-3">
-                                                            <label class="form-label" for="schoolName">Special
-                                                                Request:</label>
-                                                            <input type="text" class="form-control" id="schoolName"
-                                                                placeholder="Special Request" />
-                                                        </div>
-                                                    </div>
-                                                </div>
+
 
                                                 <div class="container mt-5">
                                                     <h3 class="mb-4">Payment</h3>
@@ -534,11 +531,6 @@
 
 
     <script>
-        
-
-
-
-
         function updateBookingAddress() {
             // Ambil nilai dari setiap medan
             const address1 = document.getElementById('address1').value.trim();
@@ -575,8 +567,6 @@
                     const taskerId = this.getAttribute('data-tasker-id');
                     if (taskerId) {
                         localStorage.setItem('selectedTaskerId', taskerId);
-                        console.log('Tasker ID saved to localStorage:', taskerId);
-                        // alert(`Tasker ID ${taskerId} has been saved.`);
                     }
                 });
             });
@@ -620,14 +610,61 @@
                     el.checked = false;
                 }
             });
+
+            // Clear the displayed selected hour if the task option changes
+            document.getElementById('selected-hour').innerText = "No hour selected";
         }
+
+        function saveToLocalStorage(event) {
+            const selectedValue = event.target.value;
+            localStorage.setItem('selectedHour', selectedValue);
+
+            // Update the <p> tag with the selected value
+            document.getElementById('selected-hour').innerText = `Selected Hour(s): ${selectedValue}`;
+        }
+
+        function loadFromLocalStorage() {
+            const savedHour = localStorage.getItem('selectedHour');
+            if (savedHour) {
+                const savedRadio = document.querySelector(`input[name="hour"][value="${savedHour}"]`);
+                if (savedRadio) {
+                    savedRadio.checked = true;
+
+                    // Update the <p> tag with the saved value
+                    document.getElementById('selected-hour').innerText = `Selected Hour: ${savedHour}`;
+
+                    // Enable the appropriate option
+                    const optionMap = {
+                        '1': 's',
+                        '2': 's',
+                        '3': 'm',
+                        '4': 'm',
+                        '5': 'l',
+                        '6': 'l'
+                    };
+                    document.getElementById('task-option').value = optionMap[savedHour];
+                    updateHours();
+                }
+            }
+        }
+
+        // Load the saved radio button on page load
+        window.onload = loadFromLocalStorage;
+
+        // Attach event listeners to all radio buttons
+        document.querySelectorAll('input[name="hour"]').forEach(radio => {
+            radio.addEventListener('change', saveToLocalStorage);
+        });
+
 
         function getTaskerTimeSlots(date) {
             const taskerid = localStorage.getItem('selectedTaskerId');
-            if (!taskerid) {
-                alert('No Tasker ID selected!');
+            const duration = parseInt(localStorage.getItem('selectedHour')); // Duration in hours
+
+            if (!taskerid || !duration) {
                 return;
             }
+
             const urlTemplate = "{{ route('client-tasker-get-time', [':date', ':taskerid']) }}";
             const url = urlTemplate
                 .replace(':date', encodeURIComponent(date))
@@ -638,19 +675,24 @@
                 type: "GET",
                 success: function(result) {
                     console.log("AJAX success:", result); // Debug log
-                    const data = result.data; // Pastikan server mengembalikan data array
+                    const data = result.data; // Assuming the server returns an array of time slots
 
-                    // Reset isi dropdown
+                    // Reset dropdown
                     const taskTimeSelect = jQuery('.task-time');
-                    taskTimeSelect.empty(); // Hapus opsi lama
+                    taskTimeSelect.empty();
 
                     if (data.length > 0) {
-                        // Tambahkan opsi baru berdasarkan data
-                        data.forEach(function(item) {
-                            taskTimeSelect.append(`<option value="${item.time}">${item.time}</option>`);
-                        });
+                        // Validate slots based on duration
+                        const validSlots = validateTimeSlots(data, duration);
+
+                        if (validSlots.length > 0) {
+                            validSlots.forEach(function(time) {
+                                taskTimeSelect.append(`<option value="${time}">${time}</option>`);
+                            });
+                        } else {
+                            taskTimeSelect.append('<option value="">No valid times available</option>');
+                        }
                     } else {
-                        // Tambahkan opsi default jika data kosong
                         taskTimeSelect.append('<option value="">No times available</option>');
                     }
                 },
@@ -659,6 +701,32 @@
                     alert('Failed to fetch time slots. Please try again.');
                 }
             });
+        }
+
+        // Helper function to validate time slots
+        function validateTimeSlots(slots, duration) {
+            const validSlots = [];
+            const timeFormat = "HH:mm:ss"; // Format your time as shown in your dropdown (e.g., "07:30:00")
+            const timeSlots = slots.map(slot => moment(slot.time, timeFormat)); // Convert to Moment.js objects
+
+            for (let i = 0; i < timeSlots.length; i++) {
+                let isValid = true;
+
+                // Check if consecutive slots exist for the required duration
+                for (let j = 1; j < duration; j++) {
+                    const nextTime = timeSlots[i].clone().add(j, 'hours'); // Add 1 hour per step
+                    if (!timeSlots.some(slot => slot.isSame(nextTime))) {
+                        isValid = false; // Invalidate if any required slot is missing
+                        break;
+                    }
+                }
+
+                if (isValid) {
+                    validSlots.push(slots[i].time); // Add valid starting times as string
+                }
+            }
+
+            return validSlots;
         }
     </script>
 
