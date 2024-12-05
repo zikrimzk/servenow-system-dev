@@ -256,7 +256,7 @@ class TaskerController extends Controller
 
     public function taskerUpdateLocation(Request $req, $id)
     {
-       
+            
             $taskers = $req->validate(
                 [
                     'tasker_workingloc_state' => 'required',
