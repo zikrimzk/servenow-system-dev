@@ -77,7 +77,6 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-floating mb-3">
@@ -94,12 +93,19 @@
                             </div>
                             <div class="form-floating mb-3">
                                 <input type="tel" class="form-control @error('client_phoneno') is-invalid @enderror"
-                                    id="floatingInput" placeholder="Phone Number" name="client_phoneno" />
-                                <label for="floatingInput">Phone Number</label>
+                                    id="ClientPhoneNo" placeholder="Phone Number" name="client_phoneno" maxlength="13"
+                                    required />
+                                <label for="ClientPhoneNo">Phone Number</label>
                                 @error('client_phoneno')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <div id="phone-error-message" class="text-danger" style="display: none;">
+                                    Phone number must be in a valid format (10 or 11 digits)!
+                                </div>
                             </div>
+
+
+                            
                             <div class="form-floating mb-3">
                                 <input type="email" class="form-control @error('email') is-invalid @enderror"
                                     id="floatingInput" placeholder="Email" name="email" />
@@ -151,7 +157,7 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-end mt-4">
                                 <h6 class="f-w-500 mb-0">Already have an Account?</h6>
-                                <a href="login-v1.html" class="link-primary">Login here</a>
+                                <a href="{{ route('client-login') }}" class="link-primary">Login here</a>
                             </div>
                         </div>
                     </div>
@@ -183,6 +189,29 @@
                     $('.create-accbtn').prop('disabled', true);
                 }
             });
+        });
+
+        document.getElementById('ClientPhoneNo').addEventListener('input', function() {
+            const input = this.value.replace(/\D/g, ''); // Remove non-numeric characters
+            const errorMessage = document.getElementById('phone-error-message');
+
+            if (input.length <= 11) {
+                if (input.length === 10) {
+                    // Format for 10 digits: ### ### ####
+                    this.value = input.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+                    errorMessage.style.display = 'none';
+                } else if (input.length === 11) {
+                    // Format for 11 digits: ### #### ####
+                    this.value = input.replace(/(\d{3})(\d{4})(\d{4})/, '$1 $2 $3');
+                    errorMessage.style.display = 'none';
+                } else {
+                    this.value = input; // Unformatted during input
+                    errorMessage.style.display = 'none';
+                }
+            } else {
+                // Show error if more than 11 digits
+                errorMessage.style.display = 'block';
+            }
         });
     </script>
 
