@@ -277,15 +277,9 @@ class TaskerController extends Controller
 
     public function taskerCardVerification()
     {
-        if (Auth::guard('tasker')->attempt([
-            'email' => Auth::user()->email,
-            'password' => Auth::user()->password,
-            'tasker_status' => 0 //Tasker Incomplete Profile
-        ])) {
-            return view('ekyc.card-verification', [
-                'title' => 'Card Verification'
-            ]);
-        }
+        return view('ekyc.card-verification', [
+            'title' => 'Card Verification'
+        ]);    
     }
 
     public function taskerFaceVerification()
