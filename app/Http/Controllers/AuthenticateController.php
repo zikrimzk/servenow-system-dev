@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
+use App\Models\Client;
 use App\Models\Tasker;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
@@ -28,12 +30,28 @@ class AuthenticateController extends Controller
 
             return redirect()->route('client-home');
 
-        } elseif (Auth::guard('admin')->attempt([
+        } elseif (Auth::guard('client')->attempt([
             'email' => $credentials['email'],
             'password' => $credentials['password'],
-            'admin_status' => 1
+            'client_status' => 1
         ])) {
-            return redirect()->route('client-home');
+            Auth::guard('client')->logout();
+            $client = Client::where('email', $credentials['email'])->first();
+            return redirect()->route('client-first-time', Crypt::encrypt($client->id));
+        }elseif (Auth::guard('client')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'client_status' => 2
+        ])) {
+            Auth::guard('admin')->logout();
+            return back()->with('error', 'Your account is currently inactive. For further assistance, please contact the administrator.');
+        } elseif (Auth::guard('client')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'client_status' => 3
+        ])) {
+            Auth::guard('client')->logout();
+            return back()->with('error', 'Your account has been deactivated. Please reach out to the administrator for further assistance.');
         }
 
         return redirect()->route('client-login')->with('error', 'The provided credentials do not match our records. Please try again !');
@@ -200,30 +218,36 @@ class AuthenticateController extends Controller
             'admin_status' => 1
         ])) {
             return redirect()->route('admin-home');
+        } elseif (Auth::guard('admin')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'admin_status' => 2
+        ])) {
+            Auth::guard('admin')->logout();
+            return back()->with('error', 'Your account is currently inactive. For further assistance, please contact the administrator.');
+        } elseif (Auth::guard('admin')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'admin_status' => 3
+        ])) {
+            Auth::guard('admin')->logout();
+            return back()->with('error', 'Your account has been deactivated. Please reach out to the administrator for further assistance.');
         }
 
         return redirect()->route('admin-login')->with('error', 'The provided credentials do not match our records. Please try again !');
     }
 
-     // Tasker - Logout Process
-     public function logoutClient(Request $request): RedirectResponse
-     {
-         Auth::guard('client')->logout();
- 
-         // $request->session()->invalidate();
-         // $request->session()->regenerateToken();
- 
-         return redirect()->route('client-login')->with('success', 'You have successfully logged out.');
-     }
+    // Tasker - Logout Process
+    public function logoutClient(Request $request): RedirectResponse
+    {
+        Auth::guard('client')->logout();
+        return redirect()->route('client-login')->with('success', 'You have successfully logged out.');
+    }
 
     // Tasker - Logout Process
     public function logoutTasker(Request $request): RedirectResponse
     {
         Auth::guard('tasker')->logout();
-
-        // $request->session()->invalidate();
-        // $request->session()->regenerateToken();
-
         return redirect()->route('tasker-login')->with('success', 'You have successfully logged out.');
     }
 
@@ -231,66 +255,104 @@ class AuthenticateController extends Controller
     public function logoutAdmin(Request $request): RedirectResponse
     {
         Auth::guard('admin')->logout();
-
-        // $request->session()->invalidate();
-        // $request->session()->regenerateToken();
-
         return redirect()->route('admin-login')->with('success', 'You have successfully logged out.');
     }
 
     // Admin - First Time Login Process
     public function adminFirstTimeLogin(Request $req, $id)
     {
-        $validated = $req->validate(
-            [
-                'oldPass' => 'required | min:8',
-                'newPass' => 'required | min:8',
-                'renewPass' => 'required | same:newPass',
-            ],
-            [],
-            [
-                'oldPass' => 'Old Password',
-                'newPass' => 'New Password',
-                'renewPass' => 'Comfirm Password',
+        try {
+            $validated = $req->validate(
+                [
+                    'oldPass' => 'required | min:8',
+                    'newPass' => 'required | min:8',
+                    'renewPass' => 'required | same:newPass',
+                ],
+                [],
+                [
+                    'oldPass' => 'Old Password',
+                    'newPass' => 'New Password',
+                    'renewPass' => 'Comfirm Password',
 
-            ]
-        );
-        $admin = Administrator::where('id', Crypt::decrypt($id))->first();
+                ]
+            );
+            $admin = Administrator::where('id', Crypt::decrypt($id))->first();
 
-        $check = Hash::check($validated['oldPass'], $admin->password, []);
-        if ($check) {
-            Administrator::where('id', Crypt::decrypt($id))->update(['password' => bcrypt($validated['renewPass']), 'admin_status' => 1]);
-            return redirect()->route('admin-login')->with('success', 'Password has been updated successfully. Please log in using your new credentials.');
-        } else {
-            return back()->with('error', 'Please enter the correct password !');
+            $check = Hash::check($validated['oldPass'], $admin->password, []);
+            if ($check) {
+                Administrator::where('id', Crypt::decrypt($id))->update(['password' => bcrypt($validated['renewPass']), 'admin_status' => 1]);
+                return redirect()->route('admin-login')->with('success', 'Password has been updated successfully. Please log in using your new credentials.');
+            } else {
+                return back()->with('error', 'Please enter the correct password !');
+            }
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
     }
 
     // Tasker - First Time Login Process
     public function taskerFirstTimeLogin(Request $req, $id)
     {
-        $validated = $req->validate(
-            [
-                'oldPass' => 'required | min:8',
-                'newPass' => 'required | min:8',
-                'renewPass' => 'required | same:newPass',
-            ],
-            [],
-            [
-                'oldPass' => 'Old Password',
-                'newPass' => 'New Password',
-                'renewPass' => 'Comfirm Password',
+        try {
 
-            ]
-        );
-        $tasker = Tasker::where('id', Crypt::decrypt($id))->first();
+            $validated = $req->validate(
+                [
+                    'oldPass' => 'required | min:8',
+                    'newPass' => 'required | min:8',
+                    'renewPass' => 'required | same:newPass',
+                ],
+                [],
+                [
+                    'oldPass' => 'Old Password',
+                    'newPass' => 'New Password',
+                    'renewPass' => 'Comfirm Password',
 
-        $check = Hash::check($validated['oldPass'], $tasker->password, []);
-        if ($check) {
-            Tasker::where('id', Crypt::decrypt($id))->update(['password' => bcrypt($validated['renewPass']), 'tasker_status' => 0]);
-            return redirect()->route('tasker-login')->with('success', 'Password has been updated successfully. Please log in using your new credentials.');
-        } else {
-            return back()->with('error', 'Please enter the correct password !');
+                ]
+            );
+            $tasker = Tasker::where('id', Crypt::decrypt($id))->first();
+
+            $check = Hash::check($validated['oldPass'], $tasker->password, []);
+            if ($check) {
+                Tasker::where('id', Crypt::decrypt($id))->update(['password' => bcrypt($validated['renewPass']), 'tasker_status' => 0]);
+                return redirect()->route('tasker-login')->with('success', 'Password has been updated successfully. Please log in using your new credentials.');
+            } else {
+                return back()->with('error', 'Please enter the correct password !');
+            }
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    // Client - First Time Login Process
+    public function clientFirstTimeLogin(Request $req, $id)
+    {
+        try {
+
+            $validated = $req->validate(
+                [
+                    'oldPass' => 'required | min:8',
+                    'newPass' => 'required | min:8',
+                    'renewPass' => 'required | same:newPass',
+                ],
+                [],
+                [
+                    'oldPass' => 'Old Password',
+                    'newPass' => 'New Password',
+                    'renewPass' => 'Comfirm Password',
+
+                ]
+            );
+            $client = Client::where('id', Crypt::decrypt($id))->first();
+
+            $check = Hash::check($validated['oldPass'], $client->password, []);
+            if ($check) {
+                Client::where('id', Crypt::decrypt($id))->update(['password' => bcrypt($validated['renewPass']), 'client_status' => 0]);
+                return redirect()->route('client-login')->with('success', 'Password has been updated successfully. Please log in using your new credentials.');
+            } else {
+                return back()->with('error', 'Please enter the correct password !');
+            }
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
     }
 }

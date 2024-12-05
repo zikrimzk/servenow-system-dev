@@ -51,6 +51,10 @@ Route::prefix('login')->group(function () {
 
     // Client - Auth Process
     Route::post('/client-authentication', [AuthenticateController::class, 'authenticateClient'])->name('client-auth');
+
+    // Client - First Time Login
+    Route::get('/client-first-time-login-{id}', [RouteController::class, 'clientFirstTimeNav'])->name('client-first-time');
+    Route::post('/client-first-time-login-process-{id}', [AuthenticateController::class, 'clientFirstTimeLogin'])->name('client-first-time-update');
 });
 
 /* Login User Route End */
@@ -88,6 +92,13 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/create-tasker', [TaskerController::class, 'adminCreateTasker'])->name('admin-tasker-create');
     Route::get('/tasker-details-{id}', [RouteController::class, 'taskerUpdateNav'])->name('admin-tasker-update-form');
     Route::post('/update-tasker-{id}', [TaskerController::class, 'adminUpdateTasker'])->name('admin-tasker-update');
+
+    // Admin - Tasker Management
+    Route::get('/client-management', [RouteController::class, 'clientManagementNav'])->name('admin-client-management');
+    Route::post('/create-client', [ClientController::class, 'adminCreateClient'])->name('admin-client-create');
+    Route::post('/update-client-{id}', [ClientController::class, 'adminUpdateClient'])->name('admin-client-update');
+    Route::get('/delete-client-{id}', [ClientController::class, 'adminDeleteClient'])->name('admin-client-delete');
+
 
     // Admin - Service Management
     Route::get('/service-management', [RouteController::class, 'adminServiceManagementNav'])->name('admin-service-management');
@@ -150,7 +161,6 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::get('/create-time-slot-{date}', [SettingController::class, 'taskerCreateTimeSlot'])->name('tasker-timeslot-create');
     Route::get('/get-time-slot-{date}', [SettingController::class, 'getTaskerTimeSlot'])->name('get-tasker-timeslot');
     Route::post('/update-time-slot-{id}', [SettingController::class, 'taskerUpdateTimeSlot'])->name('tasker-timeslot-update');
-    
 });
 
 /* Tasker Route End */
@@ -173,7 +183,7 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     Route::post('/update-profile-client-{id}', [ClientController::class, 'clientUpdateProfile'])->name('client-update-profile');
     Route::post('/client-update-password-{id}', [ClientController::class, 'clientUpdatePassword'])->name('client-update-password');
     Route::post('/client-update-address-{id}', [ClientController::class, 'clientUpdateAddress'])->name('client-update-address');
-    Route::get('/booking-{id}',[RouteController::class,'clientBooking'])->name('client-booking');
+    Route::get('/booking-{id}', [RouteController::class, 'clientBooking'])->name('client-booking');
 
 
     // Client - Logout
@@ -182,7 +192,6 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
 
     // Client - Booking
     Route::get('/tasker-get-time/{date}/{taskerid}', [BookingController::class, 'getBookingTime'])->name('client-tasker-get-time');
-
 });
 
 

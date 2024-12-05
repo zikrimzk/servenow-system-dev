@@ -10,7 +10,87 @@ use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
 {
-    //Client Function Here ...
+    public function adminCreateClient(Request $req)
+    {
+
+        $clients = $req->validate(
+            [
+                'client_firstname' => 'required|string',
+                'client_lastname' => 'required|string',
+                'client_phoneno' => 'required|string|min:10|max:11',
+                'email' => 'required|email|unique:clients',
+                'password' => 'required|min:8',
+                'client_state' => 'required',
+                'client_status' => 'required',
+            ],
+            [],
+            [
+                'client_firstname' => 'First name',
+                'client_lastname' => 'Last name',
+                'client_phoneno' => 'Phone number',
+                'email' => 'Email',
+                'password' => 'Password',
+                'client_state' => 'State',
+                'client_status' => 'Status',
+            ]
+        );
+        $path = 'profile_photos/default-profile.png';
+        $clients['client_photo'] = $path;
+        $clients['password'] = bcrypt($clients['password']);
+
+        Client::create($clients);
+        return back()->with('success', 'The Client account has been successfully created! Please remind theClient to update their password upon logging in.');
+    }
+
+    public function adminUpdateClient(Request $req, $id)
+    {
+        try {
+
+            $Clients = $req->validate(
+                [
+                    'client_firstname' => 'required|string',
+                    'client_lastname' => 'required|string',
+                    'client_phoneno' => 'required|string|min:10|max:11',
+                    'email' => 'required|email',
+                    'client_status' => 'required',
+                    'client_address_one' => '',
+                    'client_address_two' => '',
+                    'client_postcode' => '',
+                    'client_state' => '',
+                    'client_area' => '',
+                ],
+                [],
+                [
+                    'client_firstname' => 'First name',
+                    'client_lastname' => 'Last name',
+                    'client_phoneno' => 'Phone number',
+                    'email' => 'Email',
+                    'client_status' => 'Status',
+                    'client_address_one' => 'Address Line 1',
+                    'client_address_two' => 'Address Line 2',
+                    'client_postcode' => 'Postcode',
+                    'client_state' => 'State',
+                    'client_area' => 'Area'
+                ]
+            );
+
+            Client::whereId($id)->update($Clients);
+
+            return back()->with('success', 'The Client details has been successfully updated !');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function adminDeleteClient($id)
+    {
+        try {
+            Client::where('id', $id)->update(['client_status'=>4]);
+            return back()->with('success', 'Client account has been deactivated !');
+        } catch (Exception $e) {
+            return back()->with('error', 'Error : ' . $e->getMessage());
+        }
+    }
     public function createClient(Request $req)
     {
         $client = $req->validate(
@@ -172,6 +252,4 @@ class ClientController extends Controller
             return back()->with('error', 'Address not updated: ' . $e->getMessage());
         }
     }
-
-   
 }

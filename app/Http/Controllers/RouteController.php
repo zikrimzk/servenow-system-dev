@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
+use App\Models\Client;
 use App\Models\Tasker;
 use App\Models\Service;
+use App\Models\TimeSlot;
 use App\Models\ServiceType;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
-use App\Models\Client;
-use App\Models\TimeSlot;
-use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -75,6 +76,17 @@ class RouteController extends Controller
         ]);
     }
 
+    // Client - First Time Login Form Navigation
+    public function clientFirstTimeNav($id)
+    {
+        $client = Client::where('id', Crypt::decrypt($id))->first();
+
+        return view('client.first-time', [
+            'title' => 'First Time Login',
+            'client' => $client
+        ]);
+    }
+
     //Client - Login Form
     public function clientLoginNav()
     {
@@ -110,47 +122,47 @@ class RouteController extends Controller
     public function clientBooking($id)
     {
         try {
-        $tasker = Tasker::where('tasker_working_status', 1)->get();
-        $client = Client::where('id', auth()->id())->first();
-        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
-        $svtasker = DB::table('services as a')
-            ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
-            ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
-            ->where('b.id', '=', $id)
-            ->where('a.service_status', '=', 1)
-            ->select(
-                'a.id as svID',
-                'b.id as typeID',
-                'c.id as taskerID',
-                'a.service_rate_type',
-                'a.service_rate',
-                'a.service_status',
-                'a.service_desc',
-                'b.servicetype_name',
-                'b.servicetype_status',
-                'c.tasker_firstname',
-                'c.tasker_rating',
-                'c.tasker_photo'
-            )
-            ->get();
-        $sv = ServiceType::whereId($id)->first();
+            $tasker = Tasker::where('tasker_working_status', 1)->get();
+            $client = Client::where('id', auth()->id())->first();
+            $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+            $svtasker = DB::table('services as a')
+                ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
+                ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
+                ->where('b.id', '=', $id)
+                ->where('a.service_status', '=', 1)
+                ->select(
+                    'a.id as svID',
+                    'b.id as typeID',
+                    'c.id as taskerID',
+                    'a.service_rate_type',
+                    'a.service_rate',
+                    'a.service_status',
+                    'a.service_desc',
+                    'b.servicetype_name',
+                    'b.servicetype_status',
+                    'c.tasker_firstname',
+                    'c.tasker_rating',
+                    'c.tasker_photo'
+                )
+                ->get();
+            $sv = ServiceType::whereId($id)->first();
 
-        $timeSlot=DB::table('time_slots as a')
-        ->join('tasker_time_slots as b','a.id','=','b.slot_id')
-        ->where('b.slot_status','=',1)
-        ->select('b.slot_id','a.time','b.tasker_id')
-        ->get();
+            $timeSlot = DB::table('time_slots as a')
+                ->join('tasker_time_slots as b', 'a.id', '=', 'b.slot_id')
+                ->where('b.slot_status', '=', 1)
+                ->select('b.slot_id', 'a.time', 'b.tasker_id')
+                ->get();
 
 
 
-        return view('client.booking.index', [
-            'title' => 'Describe your task',
-            'tasker' => $svtasker,
-            'sv' => $sv,
-            'client' => $client,
-            'states' => $states,
-            'time'=>$timeSlot
-        ]);
+            return view('client.booking.index', [
+                'title' => 'Describe your task',
+                'tasker' => $svtasker,
+                'sv' => $sv,
+                'client' => $client,
+                'states' => $states,
+                'time' => $timeSlot
+            ]);
         } catch (Exception $e) {
             return back();
         }
@@ -420,71 +432,50 @@ class RouteController extends Controller
     }
 
     // Admin - Admin Management Navigation
+    //Updated by: Zikri (5/12/2024)
     public function adminManagementNav(Request $request)
     {
         if ($request->ajax()) {
-
             $data = DB::table('administrators')
                 ->select('id', 'admin_firstname', 'admin_lastname', 'admin_phoneno', 'email', 'admin_status')
                 ->get();
-
             $table = DataTables::of($data)->addIndexColumn();
-
             $table->addColumn('admin_status', function ($row) {
 
                 if ($row->admin_status == 0) {
                     $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i> Not Activated</span>';
                 } else if ($row->admin_status == 1) {
                     $status = '<span class="text-success"><i class="fas fa-circle f-10 m-r-10"></i> Active</span>';
-                } else {
+                } else if ($row->admin_status == 2) {
                     $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i> Inactive</span>';
+                } else if ($row->admin_status == 3) {
+                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i> Deactivated</span>';
                 }
-
                 return $status;
             });
 
             $table->addColumn('action', function ($row) {
-
-                $button =
-                    '
-                          <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                if ($row->admin_status == 3) {
+                    $button =
+                        '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
                             data-bs-target="#updateAdminModal-' . $row->id . '">
                             <i class="ti ti-edit f-20"></i>
-                          </a>
-                          <a href="#" class="avtar avtar-xs  btn-light-danger deleteAdmin-' . $row->id . '" data-bs-toggle="modal"
-                            data-bs-target="#deleteAdmin">
-                            <i class="ti ti-trash f-20"></i>
-                          </a>
-
-                            <script>
-                                document.querySelector(".deleteAdmin-' . $row->id . '").addEventListener("click", function () {
-                                const swalWithBootstrapButtons = Swal.mixin({
-                                customClass: {
-                                    confirmButton: "btn btn-success",
-                                    cancelButton: "btn btn-danger"
-                                },
-                                buttonsStyling: false
-                                });
-                                swalWithBootstrapButtons
-                                .fire({
-                                    title: "Are you sure?",
-                                    text: "Once deleted, the admin will permanently lose access to the system, and all related data will be removed. This action cannot be undone.",
-                                    icon: "warning",
-                                    showCancelButton: true,
-                                    confirmButtonText: "Yes, delete it!",
-                                    cancelButtonText: "No, cancel!",
-                                    reverseButtons: true
-                                })
-                                .then((result) => {
-                                    if (result.isConfirmed) {
-                                        setTimeout(function() {
-                                            location.href="' . route("admin-delete", $row->id) . '";
-                                        }, 1000);
-                                    } 
-                                });
-                            });
-                        </script>
+                        </a>
                     ';
+                } else {
+                    $button =
+                        '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#updateAdminModal-' . $row->id . '">
+                            <i class="ti ti-edit f-20"></i>
+                        </a>
+                        <a href="#" class="avtar avtar-xs  btn-light-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal-' . $row->id . '">
+                            <i class="ti ti-trash f-20"></i>
+                        </a>
+                    ';
+                }
 
                 return $button;
             });
@@ -500,6 +491,7 @@ class RouteController extends Controller
     }
 
     // Admin - Tasker Management Navigation
+    //Updated by: Zikri (5/12/2024)
     public function taskerManagementNav(Request $request)
     {
         if ($request->ajax()) {
@@ -511,7 +503,6 @@ class RouteController extends Controller
             $table = DataTables::of($data)->addIndexColumn();
 
             $table->addColumn('tasker_status', function ($row) {
-
                 if ($row->tasker_status == 0) {
                     $status = '<span class="text-warning"><i class="fas fa-circle f-10 m-r-10"></i>Incomplete Profile</span>';
                 } else if ($row->tasker_status == 1) {
@@ -530,19 +521,16 @@ class RouteController extends Controller
             });
 
             $table->addColumn('action', function ($row) {
-
                 $button =
                     '
-                          <a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="avtar avtar-xs btn-light-primary"">
+                        <a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="avtar avtar-xs btn-light-primary"">
                             <i class="ti ti-edit f-20"></i>
-                          </a>
+                        </a>
                     ';
-
                 return $button;
             });
 
             $table->rawColumns(['tasker_status', 'action']);
-
             return $table->make(true);
         }
 
@@ -553,23 +541,21 @@ class RouteController extends Controller
     }
 
     // Admin - Tasker Profile Navigation
+    //Updated by: Zikri (5/12/2024)
     public function taskerUpdateNav($id)
     {
         $data = Tasker::where('tasker_code', Crypt::decrypt($id))->first();
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
 
-
         return view('administrator.tasker.update-tasker', [
             'title' => $data->tasker_firstname . ' profile',
             'tasker' => $data,
             'states' => $states,
-            'taskerCount' => Tasker::count(),
-
-
         ]);
     }
 
     // Admin - Service Type Management Navigation
+    //Updated by: Zikri (5/12/2024)
     public function serviceTypeManagementNav(Request $request)
     {
         if ($request->ajax()) {
@@ -591,49 +577,27 @@ class RouteController extends Controller
             });
 
             $table->addColumn('action', function ($row) {
-
-                $button =
+                $isReferenced = DB::table('services')->where('service_type_id', $row->id)->exists();
+                $buttonEdit =
                     '
-                          <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#updateServiceTypeModal-' . $row->id . '">
-                            <i class="ti ti-edit f-20"></i>
-                          </a>
-                          <a href="#" class="avtar avtar-xs  btn-light-danger deleteServiceType-' . $row->id . '" data-bs-toggle="modal"
-                            data-bs-target="#deleteAdmin">
-                            <i class="ti ti-trash f-20"></i>
-                          </a>
-
-                            <script>
-                                document.querySelector(".deleteServiceType-' . $row->id . '").addEventListener("click", function () {
-                                const swalWithBootstrapButtons = Swal.mixin({
-                                customClass: {
-                                    confirmButton: "btn btn-success",
-                                    cancelButton: "btn btn-danger"
-                                },
-                                buttonsStyling: false
-                                });
-                                swalWithBootstrapButtons
-                                .fire({
-                                    title: "Are you sure?",
-                                    text: "This action cannot be undone.",
-                                    icon: "warning",
-                                    showCancelButton: true,
-                                    confirmButtonText: "Yes, delete it!",
-                                    cancelButtonText: "No, cancel!",
-                                    reverseButtons: true
-                                })
-                                .then((result) => {
-                                    if (result.isConfirmed) {
-                                        setTimeout(function() {
-                                            location.href="' . route("admin-servicetype-delete", $row->id) . '";
-                                        }, 1000);
-                                    } 
-                                });
-                            });
-                        </script>
+                    <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                        data-bs-target="#updateServiceTypeModal-' . $row->id . '">
+                        <i class="ti ti-edit f-20"></i>
+                    </a>
+                ';
+                if (!$isReferenced) {
+                    $buttonRemove =
+                        '
+                    <a href="#" class="avtar avtar-xs  btn-light-danger" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal-' . $row->id . '">
+                        <i class="ti ti-trash f-20"></i>
+                    </a>
                     ';
+                } else {
+                    $buttonRemove = '';
+                }
 
-                return $button;
+                return $buttonEdit . $buttonRemove;
             });
 
             $table->rawColumns(['servicetype_status', 'action']);
@@ -646,7 +610,8 @@ class RouteController extends Controller
         ]);
     }
 
-    // Admin - Service Management Navigation
+    // Admin - Service Approval Navigation
+    //Updated by: Zikri (5/12/2024)
     public function adminServiceManagementNav(Request $request)
     {
 
@@ -655,6 +620,8 @@ class RouteController extends Controller
             $data = DB::table('services as a')
                 ->join('service_types as b', 'a.service_type_id', 'b.id')
                 ->join('taskers as c', 'a.tasker_id', 'c.id')
+                ->where('a.service_status', '!=', 3)
+                ->where('a.service_status', '!=', 4)
                 ->select('a.id', 'b.servicetype_name', 'a.service_rate', 'a.service_rate_type', 'a.service_status', 'c.tasker_code', 'c.tasker_firstname')
                 ->get();
 
@@ -698,68 +665,10 @@ class RouteController extends Controller
                             data-bs-target="#viewDescModal-' . $row->id . '">
                             <i class="ti ti-eye f-20"></i>
                         </a>
-                        <a href="#" class="avtar avtar-xs btn-light-success approveService-' . $row->id . '">
+                        <a href="#" class="avtar avtar-xs btn-light-success" data-bs-toggle="modal" 
+                            data-bs-target="#approveModal-' . $row->id . '">
                             <i class="ti ti-check f-20"></i>
                         </a>
-                        <a href="#" class="avtar avtar-xs btn-light-danger rejectService-' . $row->id . '">
-                            <i class="ti ti-x f-20"></i>
-                        </a>
-
-                        <script>
-                        document.querySelector(".approveService-' . $row->id . '").addEventListener("click", function () {
-                            const swalWithBootstrapButtons = Swal.mixin({
-                            customClass: {
-                                confirmButton: "btn btn-success",
-                                cancelButton: "btn btn-danger"
-                            },
-                            buttonsStyling: false
-                            });
-                            swalWithBootstrapButtons
-                            .fire({
-                                title: "Are you sure?",
-                                text: "Approve?",
-                                icon: "warning",
-                                showCancelButton: true,
-                                confirmButtonText: "Approve",
-                                cancelButtonText: "Cancel",
-                                reverseButtons: true
-                            })
-                            .then((result) => {
-                                if (result.isConfirmed) {
-                                    setTimeout(function() {
-                                        location.href="' . route("admin-approve-service", $row->id) . '";
-                                    }, 500);
-                                } 
-                            });
-                        });
-
-                        document.querySelector(".rejectService-' . $row->id . '").addEventListener("click", function () {
-                            const swalWithBootstrapButtons = Swal.mixin({
-                            customClass: {
-                                confirmButton: "btn btn-success",
-                                cancelButton: "btn btn-danger"
-                            },
-                            buttonsStyling: false
-                            });
-                            swalWithBootstrapButtons
-                            .fire({
-                                title: "Are you sure?",
-                                text: "This action cannot be undone.",
-                                icon: "warning",
-                                showCancelButton: true,
-                                confirmButtonText: "Reject",
-                                cancelButtonText: "Cancel!",
-                                reverseButtons: true
-                            })
-                            .then((result) => {
-                                if (result.isConfirmed) {
-                                    setTimeout(function() {
-                                        location.href="' . route("admin-reject-service", $row->id) . '";
-                                    }, 1000);
-                                } 
-                            });
-                        });
-                        </script>
                     ';
                 } else if ($row->service_status == 1) {
                     $button =
@@ -768,44 +677,12 @@ class RouteController extends Controller
                             data-bs-target="#viewDescModal-' . $row->id . '">
                             <i class="ti ti-eye f-20"></i>
                         </a>
-                        <a href="#" class="avtar avtar-xs btn-light-danger terminateService-' . $row->id . '">
+                        <a href="#" class="avtar avtar-xs btn-light-danger " data-bs-toggle="modal" 
+                            data-bs-target="#terminateModal-' . $row->id . '">
                             <i class="ti ti-x f-20"></i>
                         </a>
-
-                        <script>
-                        document.querySelector(".terminateService-' . $row->id . '").addEventListener("click", function () {
-                            const swalWithBootstrapButtons = Swal.mixin({
-                            customClass: {
-                                confirmButton: "btn btn-success",
-                                cancelButton: "btn btn-danger"
-                            },
-                            buttonsStyling: false
-                            });
-                            swalWithBootstrapButtons
-                            .fire({
-                                title: "Are you sure?",
-                                text: "Terminate ' . $row->tasker_firstname . ' ' . $row->servicetype_name . ' services ?",
-                                icon: "warning",
-                                showCancelButton: true,
-                                confirmButtonText: "Terminate",
-                                cancelButtonText: "Cancel",
-                                reverseButtons: true
-                            })
-                            .then((result) => {
-                                if (result.isConfirmed) {
-                                    setTimeout(function() {
-                                        location.href="' . route("admin-terminate-service", $row->id) . '";
-                                    }, 500);
-                                } 
-                            });
-                        });
-                        </script>
                 ';
-                } else if ($row->service_status == 2) {
-                    $button = '';
-                } else if ($row->service_status == 3) {
-                    $button = 'Remarks : Update Required !';
-                } else if ($row->service_status == 4) {
+                } else if ($row->service_status == 2 || $row->service_status == 4) {
                     $button = '';
                 }
 
@@ -818,13 +695,14 @@ class RouteController extends Controller
         }
 
         return view('administrator.service.index', [
-            'title' => 'Service Management',
+            'title' => 'Service Approval',
             'services' => Service::get(),
             'types' => ServiceType::where('servicetype_status', 1)->get()
         ]);
     }
 
     // Admin - Time Slot Setting
+    //Updated by: Zikri (5/12/2024)
     public function adminTimeSlotNav(Request $request)
     {
         if ($request->ajax()) {
@@ -838,69 +716,113 @@ class RouteController extends Controller
 
             $table->addColumn('slot_category', function ($row) {
                 $cat = null;
-
-                if($row->slot_category == 1){
+                if ($row->slot_category == 1) {
                     $cat = '<span class="badge badge text-bg-primary">Full Time</span>';
-                }else if($row->slot_category == 2){
+                } else if ($row->slot_category == 2) {
                     $cat = '<span class="badge badge bg-light-primary">Part Time</span>';
                 }
 
                 return $cat;
-               
             });
 
             $table->addColumn('action', function ($row) {
+                $isReferenced = DB::table('tasker_time_slots')->where('slot_id', $row->id)->exists();
+                $editButton = '
+                    <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                        data-bs-target="#updateSlotModal-' . $row->id . '">
+                        <i class="ti ti-edit f-20"></i>
+                    </a>';
 
-                $button =
-                    '
-                          <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#updateSlotModal-' . $row->id . '">
-                            <i class="ti ti-edit f-20"></i>
-                          </a>
-                          <a href="#" class="avtar avtar-xs  btn-light-danger deleteTimeSlot-' . $row->id . '">
+                if (!$isReferenced) {
+                    $deleteButton = '
+                        <a href="#" class="avtar avtar-xs btn-light-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal-' . $row->id . '">
                             <i class="ti ti-trash f-20"></i>
-                          </a>
+                        </a>';
+                } else {
+                    $deleteButton = '';
+                }
+                return $editButton . $deleteButton;
+            });
+            $table->rawColumns(['slot_category', 'action']);
 
-                            <script>
-                                document.querySelector(".deleteTimeSlot-' . $row->id . '").addEventListener("click", function () {
-                                const swalWithBootstrapButtons = Swal.mixin({
-                                customClass: {
-                                    confirmButton: "btn btn-success",
-                                    cancelButton: "btn btn-danger"
-                                },
-                                buttonsStyling: false
-                                });
-                                swalWithBootstrapButtons
-                                .fire({
-                                    title: "Are you sure?",
-                                    text: "This action cannot be undone.",
-                                    icon: "warning",
-                                    showCancelButton: true,
-                                    confirmButtonText: "Yes, delete it!",
-                                    cancelButtonText: "No, cancel!",
-                                    reverseButtons: true
-                                })
-                                .then((result) => {
-                                    if (result.isConfirmed) {
-                                        setTimeout(function() {
-                                            location.href="' . route("admin-timeslot-remove", $row->id) . '";
-                                        }, 1000);
-                                    } 
-                                });
-                            });
-                        </script>
+            return $table->make(true);
+        }
+        return view('administrator.setting.time-slot-index', [
+            'title' => 'Time Slot Setting',
+            'slots' => TimeSlot::all()
+        ]);
+    }
+
+    // Admin - Tasker Management Navigation
+    //Updated by: Zikri (5/12/2024)
+    public function ClientManagementNav(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $data = DB::table('clients')
+                ->select('id', 'client_firstname', 'client_lastname', 'client_phoneno', 'email', 'client_status', 'client_state')
+                ->get();
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('client_status', function ($row) {
+                if ($row->client_status == 0) {
+                    $status = '<span class="badge bg-light-success">Newly Registered</span>';
+                } else if ($row->client_status == 1) {
+                    $status = '<span class="badge bg-light-danger">Admin Referal</span>';
+                } else if ($row->client_status == 2) {
+                    $status = '<span class="text-success"><i class="fas fa-circle f-10 m-r-10"></i> Active</span>';
+                } else if ($row->client_status == 3) {
+                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i> Inactive</span>';
+                } else if ($row->client_status == 4) {
+                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i> Deactivated</span>';
+                }
+
+                return $status;
+            });
+
+            $table->addColumn('client_state', function ($row) {
+                $state = Str::ucfirst($row->client_state);
+                return $state;
+            });
+
+            $table->addColumn('action', function ($row) {
+                if ($row->client_status == 4) {
+                    $button =
+                        '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#updateClientModal-' . $row->id . '">
+                            <i class="ti ti-edit f-20"></i>
+                        </a>
                     ';
+                } else {
+                    $button =
+                        '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#updateClientModal-' . $row->id . '">
+                            <i class="ti ti-edit f-20"></i>
+                        </a>
+                        <a href="#" class="avtar avtar-xs  btn-light-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal-' . $row->id . '">
+                            <i class="ti ti-trash f-20"></i>
+                        </a>
+                    ';
+                }
 
                 return $button;
             });
 
-            $table->rawColumns(['slot_category','action']);
-
+            $table->rawColumns(['client_status', 'client_state', 'action']);
             return $table->make(true);
         }
-        return view('administrator.time.index', [
-            'title' => 'Time Slot Setting',
-            'slots' => TimeSlot::all()
+
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+
+        return view('administrator.client.index', [
+            'title' => 'Client Management',
+            'clients' => Client::get(),
+            'states' => $states,
         ]);
     }
 

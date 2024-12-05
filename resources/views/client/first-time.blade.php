@@ -33,12 +33,12 @@
     data-pc-theme="light" class="landing-page">
 
     <div class="container">
-        <form action="{{ route('tasker-first-time-update', Crypt::encrypt($tasker->id)) }}" method="POST">
+        <form action="{{ route('client-first-time-update', Crypt::encrypt($client->id)) }}" method="POST">
             @csrf
             <div class="row justify-content-center align-items-center" style="height: 135vh;">
 
                 <div class="col-md-6 d-sm-block d-none">
-                    <h5><span class="link-primary">Hi </span> {{ $tasker->tasker_firstname }} !</h5>
+                    <h5><span class="link-primary">Hi </span> {{ $client->client_firstname }} !</h5>
                     <h1 class="wow fadeInUp" data-wow-delay="0.1s">
                         First Time Login
                     </h1>

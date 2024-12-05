@@ -14,23 +14,19 @@ class ServiceController extends Controller
     // Admin - Service Type Start
     public function createServiceType(Request $req)
     {
-        try {
-            $data = $req->validate([
-                'servicetype_name' => 'required|string',
-                'servicetype_desc' => '',
-                'servicetype_status' => 'required'
+        $data = $req->validate([
+            'servicetype_name' => 'required|string',
+            'servicetype_desc' => '',
+            'servicetype_status' => 'required'
 
-            ],[],[
-                'servicetype_name' => 'Type Name',
-                'servicetype_desc' => 'Description',
-                'servicetype_status' => 'Status'
-            ]);
+        ], [], [
+            'servicetype_name' => 'Type Name',
+            'servicetype_desc' => 'Description',
+            'servicetype_status' => 'Status'
+        ]);
 
-            ServiceType::create($data);
-            return redirect(route('admin-service-type-management'))->with('success', 'Service type has been added successfully !');
-        } catch (Exception $e) {
-            return redirect(route('admin-service-type-management'))->with('error', 'Error : ' . $e->getMessage());
-        }
+        ServiceType::create($data);
+        return redirect(route('admin-service-type-management'))->with('success', 'Service type has been added successfully !');
     }
 
     public function updateServiceType(Request $req, $id)
@@ -41,7 +37,7 @@ class ServiceController extends Controller
                 'servicetype_desc' => '',
                 'servicetype_status' => 'required'
 
-            ],[],[
+            ], [], [
                 'servicetype_name' => 'Type Name',
                 'servicetype_desc' => 'Description',
                 'servicetype_status' => 'Status'
@@ -75,13 +71,13 @@ class ServiceController extends Controller
                 'service_rate' => 'required',
                 'service_rate_type' => 'required',
                 'service_type_id' => 'required',
-                'service_desc'=> ''
-                
+                'service_desc' => ''
+
             ], [], [
                 'service_rate' => 'Service Rate',
                 'service_rate_type' => 'Service Rate Type',
                 'service_type_id' => 'Service Type',
-                'service_desc'=> 'Description'
+                'service_desc' => 'Description'
             ]);
             $data['service_status'] = 0;
             $data['tasker_id'] = Auth::user()->id;
@@ -95,31 +91,28 @@ class ServiceController extends Controller
     public function updateService(Request $req, $id)
     {
         try {
-           
+
             $data = $req->validate([
                 'service_rate' => 'required',
                 'service_rate_type' => 'required',
                 'service_type_id' => 'required',
                 'service_status' => 'required',
-                'service_desc'=> ''
+                'service_desc' => ''
 
             ], [], [
                 'service_rate' => 'Service Rate',
                 'service_rate_type' => 'Service Rate Type',
                 'service_type_id' => 'Service Type',
                 'service_status' => 'Status',
-                'service_desc'=> 'Description'
+                'service_desc' => 'Description'
 
             ]);
             $oridata = Service::whereId($id)->first();
             $message = null;
-            if( $oridata->service_rate != $data['service_rate'] || $oridata->service_rate_type != $data['service_rate_type'] )
-            {
+            if ($oridata->service_rate != $data['service_rate'] || $oridata->service_rate_type != $data['service_rate_type']) {
                 $data['service_status'] = 0;
                 $message = 'Your service has been successfully submitted! Please allow up to 3 business days for our administrators to review your updated application. We’ll notify you once it’s been processed.';
-            }
-            else
-            {
+            } else {
                 $message = 'Service details has been successfully updated !';
             }
             Service::whereId($id)->update($data);
@@ -146,45 +139,31 @@ class ServiceController extends Controller
 
     public function adminApproveService($id)
     {
-        try
-        {
-            Service::where('id',$id)->update(['service_status'=> 1]);
+        try {
+            Service::where('id', $id)->update(['service_status' => 1]);
             return redirect(route('admin-service-management'))->with('success', 'Service has been approved !');
-
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             return redirect(route('admin-service-management'))->with('error', 'Error : ' . $e->getMessage());
         }
-
     }
 
     public function adminRejectService($id)
     {
-        try
-        {
-            Service::where('id',$id)->update(['service_status'=> 3]);
-            return redirect(route('admin-service-management'))->with('success', 'Service has been terminated !');
-        }
-        catch(Exception $e)
-        {
+        try {
+            Service::where('id', $id)->update(['service_status' => 3]);
+            return redirect(route('admin-service-management'))->with('success', 'Service has been rejected !');
+        } catch (Exception $e) {
             return redirect(route('admin-service-management'))->with('error', 'Error : ' . $e->getMessage());
         }
-
     }
 
     public function adminTerminateService($id)
     {
-        try
-        {
-            Service::where('id',$id)->update(['service_status'=> 4]);
+        try {
+            Service::where('id', $id)->update(['service_status' => 4]);
             return redirect(route('admin-service-management'))->with('success', 'Service has been terminated !');
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             return redirect(route('admin-service-management'))->with('error', 'Error : ' . $e->getMessage());
         }
-
     }
-
 }

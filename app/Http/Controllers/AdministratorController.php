@@ -163,13 +163,13 @@ class AdministratorController extends Controller
 
     }
 
-    public function deleteAdmin($adminId)
+    public function deleteAdmin($adminId) 
     {
         try {
-            Administrator::where('id', $adminId)->delete();
-            return redirect(route('admin-management'))->with('success', 'Administrator has been deleted successfully !');
+            Administrator::where('id', $adminId)->update(['admin_status'=> 3]);
+            return back()->with('success', 'Administrator account has been deactivated !');
         } catch (Exception $e) {
-            return redirect(route('admin-management'))->with('error', 'Error : ' . $e->getMessage());
+            return back()->with('error', 'Error : ' . $e->getMessage());
         }
     }
 }
