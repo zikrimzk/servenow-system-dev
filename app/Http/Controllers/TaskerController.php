@@ -256,19 +256,19 @@ class TaskerController extends Controller
 
     public function taskerUpdateLocation(Request $req, $id)
     {
-            
-            $taskers = $req->validate(
-                [
-                    'tasker_workingloc_state' => 'required',
-                    'tasker_workingloc_area' => 'required',
-                ],
-                [],
-                [
-                    'tasker_workingloc_state' => 'Working State',
-                    'tasker_workingloc_area' => 'Working Area',
-                ]
-            );
-        
+
+        $taskers = $req->validate(
+            [
+                'tasker_workingloc_state' => 'required',
+                'tasker_workingloc_area' => 'required',
+            ],
+            [],
+            [
+                'tasker_workingloc_state' => 'Working State',
+                'tasker_workingloc_area' => 'Working Area',
+            ]
+        );
+
 
         Tasker::whereId($id)->update($taskers);
 
@@ -277,9 +277,15 @@ class TaskerController extends Controller
 
     public function taskerCardVerification()
     {
-        return view('ekyc.card-verification', [
-            'title' => 'Card Verification'
-        ]);
+        if (Auth::guard('tasker')->attempt([
+            'email' => Auth::user()->email,
+            'password' => Auth::user()->password,
+            'tasker_status' => 0 //Tasker Incomplete Profile
+        ])) {
+            return view('ekyc.card-verification', [
+                'title' => 'Card Verification'
+            ]);
+        }
     }
 
     public function taskerFaceVerification()

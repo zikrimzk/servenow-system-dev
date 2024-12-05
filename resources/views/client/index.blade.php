@@ -99,7 +99,7 @@
         <!-- [ Nav ] start -->
         <nav class="navbar navbar-expand-md navbar-light default">
             <div class="container">
-                <a class="navbar-brand" href="../index.html">
+                <a class="navbar-brand" href="{{ route('servenow-home') }}">
                     <img src="../assets/images/logo-test.png" alt="img" class="img-fluid"
                         style="max-width: 110px;" />
                 </a>

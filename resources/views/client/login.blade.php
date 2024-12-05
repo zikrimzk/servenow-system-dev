@@ -99,9 +99,15 @@
                                 <label for="floatingInput">Email</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="password" class="form-control" id="floatingInput" placeholder="Password"
+                                <input type="password" class="form-control" id="password" placeholder="Password"
                                     name="password" />
-                                <label for="floatingInput">Password</label>
+                                <label for="password">Password</label>
+
+                                <!-- Show/Hide Button -->
+                                <button type="button" class="btn position-absolute end-0 top-0 me-2"
+                                    style="background-color: transparent; margin-top:.60rem;" id="show-password">
+                                    <i id="toggle-icon-password" class="ti ti-eye"></i>
+                                </button>
                             </div>
                             <div class="d-flex mt-1 justify-content-between align-items-center">
                                 <div class="form-check">
@@ -133,7 +139,28 @@
         </div>
     </div>
     <!-- [ Main Content ] end -->
+    
     <!-- Required Js -->
+    <script>
+        function showpassword(buttonName, txtName, iconName) {
+            document.getElementById(buttonName).addEventListener('click', function() {
+                const passwordInput = document.getElementById(txtName);
+                const icon = document.getElementById(iconName);
+
+                // Toggle password visibility
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text'; // Change to text to show password
+                    icon.classList.remove('ti-eye'); // Remove eye icon
+                    icon.classList.add('ti-eye-off'); // Add eye-slash icon
+                } else {
+                    passwordInput.type = 'password'; // Change to password to hide it
+                    icon.classList.remove('ti-eye-off'); // Remove eye-slash icon
+                    icon.classList.add('ti-eye'); // Add eye icon
+                }
+            });
+        }
+        showpassword('show-password', 'password', 'toggle-icon-password');
+    </script>
     <script src="../assets/js/plugins/popper.min.js"></script>
     <script src="../assets/js/plugins/simplebar.min.js"></script>
     <script src="../assets/js/plugins/bootstrap.min.js"></script>
@@ -141,31 +168,7 @@
     <script src="../assets/js/pcoded.js"></script>
     <script src="../assets/js/plugins/feather.min.js"></script>
 
-    <script>
-        layout_change('light');
-    </script>
-
-    <script>
-        change_box_container('false');
-    </script>
-
-    <script>
-        layout_caption_change('true');
-    </script>
-
-    <script>
-        layout_rtl_change('false');
-    </script>
-
-    <script>
-        preset_change('preset-1');
-    </script>
-
-    <script>
-        main_layout_change('vertical');
-    </script>
-
-
+   
 </body>
 <!-- [Body] end -->
 
