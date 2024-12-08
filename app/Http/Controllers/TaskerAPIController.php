@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Tasker;
 use App\Models\Service;
+use App\Models\TimeSlot;
 use App\Models\ServiceType;
 use Illuminate\Http\Request;
+use App\Models\TaskerTimeSlot;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -25,7 +29,6 @@ class TaskerAPIController extends Controller
                 'message' => 'Error : ' . $e->getMessage()
             ], 301);
         }
-
     }
     // Tasker Update Profile
     // NOTE : API ni ada function file() untuk upload profile photo, implementation flutter tak pasti macamana 
@@ -46,8 +49,8 @@ class TaskerAPIController extends Controller
                     'tasker_address_poscode' => 'required',
                     'tasker_address_state' => 'required',
                     'tasker_address_area' => 'required',
-                    'tasker_workingloc_state' => 'required',
-                    'tasker_workingloc_area' => 'required',
+                    // 'tasker_workingloc_state' => 'required',
+                    // 'tasker_workingloc_area' => 'required',
                     'tasker_status' => '',
                     'tasker_photo' => 'required|image|mimes:jpeg,png,jpg',
 
@@ -67,8 +70,8 @@ class TaskerAPIController extends Controller
                     'tasker_address_poscode' => 'Postal Code',
                     'tasker_address_state' => 'State',
                     'tasker_address_area' => 'Area',
-                    'tasker_workingloc_state' => 'Working State',
-                    'tasker_workingloc_area' => 'Working Area',
+                    // 'tasker_workingloc_state' => 'Working State',
+                    // 'tasker_workingloc_area' => 'Working Area',
                     'tasker_status' => 'Status',
                     'tasker_photo' => 'Profile Photo',
 
@@ -101,8 +104,8 @@ class TaskerAPIController extends Controller
                     'tasker_address_poscode' => 'required',
                     'tasker_address_state' => 'required',
                     'tasker_address_area' => 'required',
-                    'tasker_workingloc_state' => 'required',
-                    'tasker_workingloc_area' => 'required',
+                    // 'tasker_workingloc_state' => 'required',
+                    // 'tasker_workingloc_area' => 'required',
                     'tasker_status' => '',
                 ],
                 [],
@@ -120,8 +123,8 @@ class TaskerAPIController extends Controller
                     'tasker_address_poscode' => 'Postal Code',
                     'tasker_address_state' => 'State',
                     'tasker_address_area' => 'Area',
-                    'tasker_workingloc_state' => 'Working State',
-                    'tasker_workingloc_area' => 'Working Area',
+                    // 'tasker_workingloc_state' => 'Working State',
+                    // 'tasker_workingloc_area' => 'Working Area',
                     'tasker_status' => 'Status',
                     'tasker_photo' => 'Profile Photo',
 
@@ -133,11 +136,11 @@ class TaskerAPIController extends Controller
         if ($ori->tasker_status == 0 || $ori->tasker_status == 1) {
             $taskers['tasker_status'] = 1;
             $message = 'Tasker profile has been successfully updated. Please proceed to account verification to start earning.';
-        } elseif ($ori->tasker_status == 2 || $ori->tasker_status == 3 ) {
+        } elseif ($ori->tasker_status == 2 || $ori->tasker_status == 3) {
             $taskers['tasker_status'] = 2;
             $message = 'Tasker profile has been successfully updated !';
-        } 
-        
+        }
+
         Tasker::whereId($id)->update($taskers);
 
         return response([
@@ -168,14 +171,13 @@ class TaskerAPIController extends Controller
             return response([
                 'message' => 'Password has been updated successfully !'
             ], 201);
-
         } else {
             return response([
                 'message' => 'Password entered is incorrect. Please try again !'
             ], 301);
         }
     }
-    
+
     // Create Service API
     public function createServiceAPI(Request $req)
     {
@@ -199,7 +201,6 @@ class TaskerAPIController extends Controller
             return response([
                 'message' => 'Your service has been successfully submitted! Please allow up to 3 business days for our administrators to review your application. We’ll notify you once it’s been processed.'
             ], 201);
-           
         } catch (Exception $e) {
             return response([
                 'message' => 'Error : ' . $e->getMessage()
@@ -253,31 +254,28 @@ class TaskerAPIController extends Controller
     public function updateServiceAPI(Request $req, $id)
     {
         try {
-           
+
             $data = $req->validate([
                 'service_rate' => 'required',
                 'service_rate_type' => 'required',
                 'service_type_id' => 'required',
                 'service_status' => 'required',
-                'service_desc'=> ''
+                'service_desc' => ''
 
             ], [], [
                 'service_rate' => 'Service Rate',
                 'service_rate_type' => 'Service Rate Type',
                 'service_type_id' => 'Service Type',
                 'service_status' => 'Status',
-                'service_desc'=> 'Description'
+                'service_desc' => 'Description'
 
             ]);
             $oridata = Service::whereId($id)->first();
             $message = null;
-            if( $oridata->service_rate != $data['service_rate'] || $oridata->service_rate_type != $data['service_rate_type'] )
-            {
+            if ($oridata->service_rate != $data['service_rate'] || $oridata->service_rate_type != $data['service_rate_type']) {
                 $data['service_status'] = 0;
                 $message = 'Your service has been successfully submitted! Please allow up to 3 business days for our administrators to review your updated application. We’ll notify you once it’s been processed.';
-            }
-            else
-            {
+            } else {
                 $message = 'Service details has been successfully updated !';
             }
             Service::whereId($id)->update($data);
@@ -285,7 +283,6 @@ class TaskerAPIController extends Controller
             return response([
                 'message' => $message
             ], 201);
-
         } catch (Exception $e) {
             return response([
                 'message' => 'Error : ' . $e->getMessage()
@@ -308,6 +305,148 @@ class TaskerAPIController extends Controller
         }
     }
 
+    // Task Preferences > Visibility & Location - Visibility Change 
+    public function taskerVisibleToggleAPI()
+    {
+        try {
+            if (Auth::user()->tasker_working_status == 0) {
+                Tasker::whereId(Auth::user()->id)->update(['tasker_working_status' => 1]);
+                $message = 'You are now visible to clients !';
+            } else if (Auth::user()->tasker_working_status == 1) {
+                Tasker::whereId(Auth::user()->id)->update(['tasker_working_status' => 0]);
+                $message = 'You are now invisible to clients !';
+            }
+            return response([
+                'message' => $message
+            ], 200);
+        } catch (Exception $e) {
+            return response([
+                'message' => 'Error : ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Task Preferences > Visibility & Location - Update Location API
+    public function taskerUpdateLocationAPI(Request $req)
+    {
+        $id = Auth::user()->id;
+        try {
+            $taskers = $req->validate(
+                [
+                    'tasker_workingloc_state' => 'required',
+                    'tasker_workingloc_area' => 'required',
+                ],
+                [],
+                [
+                    'tasker_workingloc_state' => 'Working State',
+                    'tasker_workingloc_area' => 'Working Area',
+                ]
+            );
+
+
+            Tasker::where('id', $id)->update($taskers);
+            return response([
+                'message' => 'Tasker working location have been saved !',
+            ], 201);
+        } catch (Exception $e) {
+            return response([
+                'message' => 'Error : ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Task Preferences > Time Slot - Update Type API
+    public function taskerTypeToggleAPI(Request $req)
+    {
+        try {
+            Tasker::whereId(Auth::user()->id)->update(['tasker_worktype' => $req->tasker_worktype]);
+
+            return response()->json([
+                'message' => 'Your working type has been successfully updated!'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update your working type. Please try again.'
+            ], 500);
+        }
+    }
+
+    // Task Preferences > Time Slot - Time Slot API
+    public function taskerCreateTimeSlotAPI($date)
+    {
+        $isFull = Tasker::where('tasker_status', 2)->where('tasker_worktype', 1)->where('id', Auth::user()->id)->exists();
+        if ($isFull) // Full-Time
+        {
+            $timeslotsFt = TimeSlot::where('slot_category', 1)->get();
+
+            foreach ($timeslotsFt as $ft) {
+                $check = TaskerTimeSlot::where('slot_id', $ft->id)->where('tasker_id', Auth::user()->id)->where('slot_date', $date)->exists();
+                if (!$check) {
+                    $data = new TaskerTimeSlot();
+                    $data->slot_id = $ft->id;
+                    $data->tasker_id = Auth::user()->id;
+                    $data->slot_date = $date;
+                    $data->slot_status = 1;
+                    $data->save();
+                } else {
+                    $datePrompt = Carbon::createFromFormat('Y-m-d', $date);
+                    $formattedDate = $datePrompt->format('l, d F Y');
+                    return response()->json([
+                        'error' => 'All slots for ' . Carbon::createFromFormat('Y-m-d', $date)->format('l, d F Y') . ' has been generated. No need to generate again.',
+                    ], 400);
+                }
+            }
+        } else // Part-Time
+        {
+            $timeslotsPt = TimeSlot::where('slot_category', 2)->get();
+
+            foreach ($timeslotsPt as $pt) {
+                $check = TaskerTimeSlot::where('slot_id', $pt->id)->where('tasker_id', Auth::user()->id)->where('slot_date', $date)->exists();
+                if (!$check) {
+                    $data = new TaskerTimeSlot();
+                    $data->slot_id = $pt->id;
+                    $data->tasker_id = Auth::user()->id;
+                    $data->slot_date = $date;
+                    $data->slot_status = 1;
+                    $data->save();
+                } else {
+                    $datePrompt = Carbon::createFromFormat('Y-m-d', $date);
+                    $formattedDate = $datePrompt->format('l, d F Y');
+                    return response()->json([
+                        'error' => 'All slots for ' . Carbon::createFromFormat('Y-m-d', $date)->format('l, d F Y') . ' has been generated. No need to generate again.',
+                    ], 400);
+                }
+            }
+        }
+
+        $datePrompt = Carbon::createFromFormat('Y-m-d', $date);
+        $formattedDate = $datePrompt->format('l, d F Y');
+        return response()->json([
+            'success' => 'Slot for ' . Carbon::createFromFormat('Y-m-d', $date)->format('l, d F Y') . ' has been generated successfully!',
+        ], 201);
+    }
+
+    // Task Preferences > Time Slot - Get Time Slot API
+    public function getTaskerTimeSlotAPI($date)
+    {
+        try {
+            $data = TaskerTimeSlot::where('tasker_id', Auth::user()->id)->where('slot_date', $date)->get();
+            $data = DB::table('tasker_time_slots as a')
+                ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                ->where('a.tasker_id', Auth::user()->id)
+                ->where('a.slot_date', '=', $date)
+                ->select('a.id as taskerTimeSlotID', 'a.slot_status', 'a.slot_date', 'b.id as timeSlotID', 'b.time', 'b.slot_category')
+                ->get();
+
+            return response()->json([
+                'data' => $data
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch your time. Please try again.'
+            ], 500); 
+        }
+    }
 
     // Get State API
     public function getStateAPI()
@@ -323,7 +462,7 @@ class TaskerAPIController extends Controller
             ], 301);
         }
     }
-    
+
     // Get Area API
     public function getAreasAPI($state)
     {
@@ -339,6 +478,4 @@ class TaskerAPIController extends Controller
 
         return response()->json($areas);
     }
-
-
 }
