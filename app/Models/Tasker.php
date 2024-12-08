@@ -38,5 +38,8 @@ class Tasker extends Authenticatable
         'tasker_worktype',
         'tasker_rank',
         'tasker_rating',
+        'latitude',
+        'longitude',
+        'working_radius',
     ];
 }

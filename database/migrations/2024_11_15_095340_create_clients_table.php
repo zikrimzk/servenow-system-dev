@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('client_area')->nullable();
             $table->integer('client_status')->default(0);
             $table->string('client_photo')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->string('password');
             $table->timestamps();
         });

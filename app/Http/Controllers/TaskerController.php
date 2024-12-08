@@ -8,9 +8,19 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Geocoder\Geocoder;
 
 class TaskerController extends Controller
 {
+
+    protected $geocoder;
+
+    public function __construct(Geocoder $geocoder)
+    {
+        $this->geocoder = $geocoder;
+    }
+
+
     public function createTasker(Request $req)
     {
         $taskers = $req->validate(
@@ -256,21 +266,28 @@ class TaskerController extends Controller
 
     public function taskerUpdateLocation(Request $req, $id)
     {
-
         $taskers = $req->validate(
             [
                 'tasker_workingloc_state' => 'required',
                 'tasker_workingloc_area' => 'required',
+
             ],
             [],
             [
                 'tasker_workingloc_state' => 'Working State',
                 'tasker_workingloc_area' => 'Working Area',
             ]
+
         );
 
 
+        $address=$taskers['tasker_workingloc_area'].','.$taskers['tasker_workingloc_state'];
+        $result = $this->geocoder->getCoordinatesForAddress($address);
+        $taskers['latitude'] = $result['lat'];
+        $taskers['longitude'] = $result['lng'];
+        // dd($result);
         Tasker::whereId($id)->update($taskers);
+        
 
         return back()->with('success', 'Tasker location have been saved !');
     }

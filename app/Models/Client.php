@@ -25,5 +25,7 @@ class Client extends Authenticatable
         'client_status',
         'client_photo',
         'password',
+        'latitude',
+        'longitude',
     ];
 }

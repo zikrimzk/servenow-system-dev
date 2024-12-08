@@ -1,3 +1,6 @@
+<?php
+use Illuminate\Support\Str;
+?>
 @extends('client.layouts.main')
 
 <style>
@@ -122,42 +125,31 @@
                                             <div class="row mt-4">
                                                 <div class="col-sm-12">
                                                     <div class="row">
-                                                        <!-- Default Address Checkbox -->
-                                                        <div class="col-sm-12">
-                                                            <div class="mb-3 mt-5">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                    id="defaultCheckbox" value="1"
-                                                                    onclick="toggleAddressFields()">
-                                                                <label class="form-check-label"
-                                                                    for="defaultCheckbox">Default Address</label>
-                                                            </div>
-                                                        </div>
                                                         <!-- Address Fields -->
                                                         <div class="col-sm-6 mb-3">
                                                             <label class="form-label">Address 1</label>
                                                             <input type="text" class="form-control" id="address1"
-                                                                placeholder="Enter Address" name="address1" />
+                                                                placeholder="Enter Address" name="address1"
+                                                                value="{{ Auth::user()->client_address_one }}"readonly />
                                                         </div>
 
                                                         <div class="col-sm-6 mb-3">
                                                             <label class="form-label">Address 2</label>
                                                             <input type="text" class="form-control" id="address2"
-                                                                placeholder="Enter Address" name="address2" />
+                                                                placeholder="Enter Address" name="address2"
+                                                                value="{{ Auth::user()->client_address_two }}" readonly />
                                                         </div>
                                                         <div class="col-sm-6 mb-3">
                                                             <label class="form-label">Postcode</label>
                                                             <input type="text" class="form-control" id="postcode"
-                                                                placeholder="Postcode" name="postcode" />
+                                                                placeholder="Postcode" name="postcode"
+                                                                value="{{ Auth::user()->client_postcode }}"readonly />
                                                         </div>
                                                         <div class="col-sm-6 mb-3">
                                                             <label class="form-label">State:</label>
-                                                            <select name="client_state" class="form-control"
-                                                                id="state">
-                                                                <option value="" selected>Select State</option>
-                                                                @foreach ($states['states'] as $state)
-                                                                    <option value="{{ strtolower($state['name']) }}">
-                                                                        {{ $state['name'] }}</option>
-                                                                @endforeach
+                                                            <select name="client_state" class="form-control" id="state">
+                                                                <option value="{{ Auth::user()->client_state }}" selected>
+                                                                    {{ Str::headline(Auth::user()->client_state) }}</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-sm-6 mb-3">
@@ -166,8 +158,8 @@
                                                             <select name="client_area"
                                                                 class="form-control @error('client_area') is-invalid @enderror"
                                                                 id="addCity">
-                                                                <option value="" selected>Select Area
-                                                                </option>
+                                                                <option value="{{ Auth::user()->client_area }}" selected>
+                                                                    {{ Str::headline(Auth::user()->client_area) }}</option>
                                                             </select>
                                                             @error('client_area')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -299,6 +291,8 @@
                                                                         <span class="fw-bold">★ 4.9</span> (394
                                                                         reviews)
                                                                     </p>
+                                                                    {{-- <p class="mb-1">
+                                                                        {{ $tk->road_distance }}km</p> --}}
                                                                     <p class="mb-1">N/A Cleaning tasks</p>
                                                                     <p class="mb-0 text-muted">N/A Cleaning tasks
                                                                         overall
@@ -378,9 +372,9 @@
                                                                         </div>
                                                                     </div>
                                                                     <div class="d-grid mt-4 mb-2 ">
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary ">Select
-                                                                            & Continue</button>
+                                                                        <button type="button" class="btn btn-primary"id="nextStepButton" onclick="navigateTabs('next')" data-bs-dismiss="modal">
+                                                                            Select &
+                                                                            Continue</button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -396,114 +390,171 @@
 
                                         <!-- START: Define your tab pans here -->
                                         <div class="tab-pane" id="educationDetail">
-                                            <form id="educationForm" method="post" action="#">
-
-
-                                                <div class="container mt-5">
-                                                    <h3 class="mb-4">Payment</h3>
+                                            <h2>Payment</h2>
+                                            <div class="container mt-4 pt-4">
+                                                <div class="row g-4">
                                                     <div class="row">
-                                                        <div class="col-md-4">
-                                                            <div class="list-group" id="payment-options">
-                                                                <button
-                                                                    class="list-group-item list-group-item-action active"
-                                                                    data-bs-toggle="tab" data-bs-target="#credit-card">
-                                                                    Credit Card
-                                                                </button>
-                                                                <button
-                                                                    class="list-group-item list-group-item-action"href="#"
-                                                                    data-bs-toggle="tab">
-                                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/PayPal_logo.svg/2560px-PayPal_logo.svg.png"
-                                                                        style="height: 20px;" id="paypal">
-                                                                </button>
+                                                        <!-- Credit Card Option -->
+                                                        <div class="col-xl-6 col-xxl-4">
+                                                            <div class="address-check border rounded">
+                                                                <div class="form-check">
+                                                                    <input type="radio" name="payoptradio1"
+                                                                        class="form-check-input input-primary"
+                                                                        id="payopn-check-1" checked />
+                                                                    <label class="form-check-label d-block"
+                                                                        for="payopn-check-1">
+                                                                        <span class="card-body p-3 d-block">
+                                                                            <span class="h5 mb-3 d-block">Credit
+                                                                                Card</span>
+                                                                            <span class="d-flex align-items-center">
+                                                                                <span class="f-12 badge bg-success me-3">5%
+                                                                                    OFF</span>
+                                                                                <img src="../assets/images/application/card.png"
+                                                                                    alt="img"
+                                                                                    class="img-fluid ms-1" />
+                                                                            </span>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-8">
-                                                            <div class="tab-content">
-                                                                <div class="tab-pane fade show active" id="credit-card">
-                                                                    <h5>Amount being paid now: <strong>RM50.00</strong></h5>
-                                                                    <form>
-                                                                        <div class="mb-3">
-                                                                            <label for="cardholder-name"
-                                                                                class="form-label">Cardholder's
-                                                                                Name</label>
-                                                                            <input type="text" class="form-control"
-                                                                                id="cardholder-name"
-                                                                                placeholder="Enter your name">
-                                                                        </div>
-                                                                        <div class="mb-3">
-                                                                            <label for="card-number"
-                                                                                class="form-label">Card Number</label>
-                                                                            <input type="text" class="form-control"
-                                                                                id="card-number"
-                                                                                placeholder="1234 5678 9012 3456">
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <div class="col-md-6">
-                                                                                <label for="expiration-date"
-                                                                                    class="form-label">Expiration
-                                                                                    Date</label>
-                                                                                <div class="d-flex">
-                                                                                    <select class="form-select me-2"
-                                                                                        id="expiration-month">
-                                                                                        <option>01</option>
-                                                                                        <option>02</option>
-                                                                                        <option>03</option>
-                                                                                    </select>
-                                                                                    <select class="form-select"
-                                                                                        id="expiration-year">
-                                                                                        <option>2023</option>
-                                                                                        <option>2024</option>
-                                                                                        <option>2025</option>
 
-                                                                                    </select>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="cvv"
-                                                                                    class="form-label">CVV Code</label>
-                                                                                <input type="text" class="form-control"
-                                                                                    id="cvv" placeholder="123">
-                                                                            </div>
-                                                                        </div>
-                                                                    </form>
-                                                                </div>
-                                                                <div class="tab-pane fade" id="paypal">
-                                                                    <h5>PayPal</h5>
-                                                                    <p>Redirecting you to PayPal...</p>
-                                                                </div>
-                                                                <div class="tab-pane fade" id="pay-later">
-                                                                    <h5>Pay Later</h5>
-                                                                    <p>Select this option to defer payment.</p>
+                                                        <div class="col-xl-6 col-xxl-4">
+                                                            <div class="address-check border rounded">
+                                                                <div class="form-check">
+                                                                    <input type="radio" name="payoptradio1"
+                                                                        class="form-check-input input-primary"
+                                                                        id="payopn-check-2" />
+                                                                    <label class="form-check-label d-block"
+                                                                        for="payopn-check-2">
+                                                                        <span class="card-body p-3 d-block">
+                                                                            <span class="h5 mb-3 d-block">Pay with
+                                                                                PayPal</span>
+                                                                            <span class="d-flex align-items-center">
+                                                                                <span class="f-12 badge bg-success me-3">5%
+                                                                                    OFF</span>
+                                                                                <img src="../assets/images/application/paypal.png"
+                                                                                    alt="img"
+                                                                                    class="img-fluid ms-1" />
+                                                                            </span>
+                                                                        </span>
+                                                                    </label>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <!-- end education detail tab pane -->
+                                                    <!-- Payment Section -->
+                                                    <div class="col-lg-8 col-md-12">
 
-                                        <!-- START: Define your tab pans here -->
-                                        <div class="tab-pane" id="finish">
-                                            <div class="row d-flex justify-content-center">
-                                                <div class="col-lg-6">
-                                                    <div class="text-center">
-                                                        <i class="ph-duotone ph-gift f-50 text-danger"></i>
-                                                        <h3 class="mt-4 mb-3">Thank you !</h3>
-                                                        <div class="mb-3">
-                                                            <div class="form-check d-inline-block">
-                                                                <input type="checkbox" class="form-check-input"
-                                                                    id="customCheck1" />
-                                                                <label class="form-check-label" for="customCheck1">I agree
-                                                                    with
-                                                                    the Terms and Conditions</label>
+                                                        <!-- Tambahkan semua elemen form pembayaran di sini -->
+                                                        <div class="card p-4">
+                                                            <div id="credit-card-form" class="mt-4">
+                                                                <h5>Credit Card Details</h5>
+                                                                <form>
+                                                                    <div class="mb-3">
+                                                                        <label for="cardholder-name"
+                                                                            class="form-label">Cardholder's Name</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="cardholder-name"
+                                                                            placeholder="Enter your name">
+                                                                    </div>
+                                                                    <div class="mb-3">
+                                                                        <label for="card-number" class="form-label">Card
+                                                                            Number</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="card-number"
+                                                                            placeholder="1234 5678 9012 3456">
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            <label for="expiration-date"
+                                                                                class="form-label">Expiration Date</label>
+                                                                            <div class="d-flex">
+                                                                                <select class="form-select me-2"
+                                                                                    id="expiration-month">
+                                                                                    <option>01</option>
+                                                                                    <option>02</option>
+                                                                                    <option>03</option>
+                                                                                </select>
+                                                                                <select class="form-select"
+                                                                                    id="expiration-year">
+                                                                                    <option>2023</option>
+                                                                                    <option>2024</option>
+                                                                                    <option>2025</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <label for="cvv" class="form-label">CVV
+                                                                                Code</label>
+                                                                            <input type="text" class="form-control"
+                                                                                id="cvv" placeholder="123">
+                                                                        </div>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                        <div id="paypal-message" class="mt-4" style="display: none;">
+                                                            <h5>Pay with PayPal</h5>
+                                                            <p>You will be redirected to PayPal to complete your payment.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Order Summary Section -->
+                                                    <div class="col-lg-4 col-md-12">
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <h5>Order Summary</h5>
+                                                            </div>
+                                                            <div class="card-body p-0">
+                                                                <ul class="list-group list-group-flush">
+                                                                    <li class="list-group-item">
+                                                                        <div class="d-flex align-items-start">
+                                                                            <img class="bg-light rounded img-fluid wid-60 flex-shrink-0"
+                                                                                src="../assets/images/application/img-prod-2.jpg"
+                                                                                alt="Product image" />
+                                                                            <div class="flex-grow-1 mx-2">
+                                                                                <h5 class="mb-1">Canon EOS 1500D 24.1
+                                                                                </h5>
+                                                                                <p class="text-muted text-sm mb-2">SLR
+                                                                                    Camera (Black) with EF</p>
+                                                                                <h5 class="mb-1">
+                                                                                    <b>$275</b><span
+                                                                                        class="mx-2 text-sm text-decoration-line-through text-muted f-w-400">$325</span>
+                                                                                </h5>
+                                                                            </div>
+                                                                            <a href="#"
+                                                                                class="avtar avtar-s btn-link-danger btn-pc-default flex-shrink-0">
+                                                                                <i class="ti ti-trash f-20"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li class="list-group-item">
+                                                                        <div class="float-end">
+                                                                            <h5 class="mb-0">$300.00</h5>
+                                                                        </div>
+                                                                        <span class="text-muted">Sub Total</span>
+                                                                    </li>
+                                                                    <li class="list-group-item">
+                                                                        <div class="float-end">
+                                                                            <h5 class="mb-0">-</h5>
+                                                                        </div>
+                                                                        <span class="text-muted">Estimated Delivery</span>
+                                                                    </li>
+                                                                    <li class="list-group-item">
+                                                                        <div class="float-end">
+                                                                            <h5 class="mb-0">-</h5>
+                                                                        </div>
+                                                                        <span class="text-muted">Voucher</span>
+                                                                    </li>
+                                                                </ul>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!-- end col -->
                                             </div>
-                                            <!-- end row -->
+
 
 
                                         </div>
@@ -531,6 +582,32 @@
 
 
     <script>
+
+       
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const creditCardForm = document.getElementById('credit-card-form');
+            const paypalMessage = document.getElementById('paypal-message');
+            const creditCardRadio = document.getElementById('payopn-check-1');
+            const paypalRadio = document.getElementById('payopn-check-2');
+
+            // Show/Hide forms based on selection
+            creditCardRadio.addEventListener('change', function() {
+                if (creditCardRadio.checked) {
+                    creditCardForm.style.display = 'block';
+                    paypalMessage.style.display = 'none';
+                }
+            });
+
+            paypalRadio.addEventListener('change', function() {
+                if (paypalRadio.checked) {
+                    creditCardForm.style.display = 'none';
+                    paypalMessage.style.display = 'block';
+                }
+            });
+        });
+
+
         function updateBookingAddress() {
             // Ambil nilai dari setiap medan
             const address1 = document.getElementById('address1').value.trim();
@@ -549,7 +626,7 @@
 
         // Tambahkan event listener pada medan alamat
         document.addEventListener('DOMContentLoaded', function() {
-            const addressFields = ['address1', 'address2', 'postcode', 'state', 'addCity'];
+            const addressFields = ['address1','address2','postcode','state','addCity'];
 
             addressFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
@@ -566,7 +643,11 @@
                 button.addEventListener('click', function() {
                     const taskerId = this.getAttribute('data-tasker-id');
                     if (taskerId) {
+                        const today = new Date();
+                        const formattedToday = today.toISOString().split('T')[
+                            0]; // Format as YYYY-MM-DD
                         localStorage.setItem('selectedTaskerId', taskerId);
+                        getTaskerTimeSlots(formattedToday);
                     }
                 });
             });
@@ -732,9 +813,9 @@
 
     <script>
         // DEFAULT ADDRESS
+
         function toggleAddressFields() {
             const checkbox = document.getElementById('defaultCheckbox');
-
             // Fields
             const address1 = document.getElementById('address1');
             const address2 = document.getElementById('address2');
@@ -863,6 +944,7 @@
             // Butang navigasi
             const prevButton = document.getElementById('prevButton');
             const nextButton = document.getElementById('nextButton');
+            const nextStepButton = document.getElementById('nextStepButton');
 
             // Aktifkan/Nonaktifkan butang "Prev"
             prevButton.disabled = currentIndex === 0;
@@ -883,8 +965,18 @@
                 nextButton.disabled = currentIndex === tabs.length - 1; // Normal behavior for other tabs
             }
 
+            // Sembunyikan butang "Next" jika berada di tab ketiga (indeks 2)
+            if (currentIndex === 2) {
+                nextButton.style.display = 'none';
+                nextStepButton.style.diplay=''; // Sembunyikan butang "Next"
+            } else {
+                nextButton.style.display = ''; 
+                nextStepButton.style.diplay='none'; // Tunjukkan semula butang "Next"
+            }
+
             updateProgressBar(currentIndex + 1, tabs.length);
         }
+
 
         // Pastikan fungsi ini dipanggil pada setiap perubahan input di medan borang alamat
         function attachAddressFieldListeners() {

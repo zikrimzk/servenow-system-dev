@@ -7,9 +7,20 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Geocoder\Geocoder;
 
 class ClientController extends Controller
 {
+
+    protected $geocoder;
+
+    public function __construct(Geocoder $geocoder)
+    {
+        $this->geocoder = $geocoder;
+    }
+
+
+
     public function adminCreateClient(Request $req)
     {
 
@@ -85,7 +96,7 @@ class ClientController extends Controller
     public function adminDeleteClient($id)
     {
         try {
-            Client::where('id', $id)->update(['client_status'=>4]);
+            Client::where('id', $id)->update(['client_status' => 4]);
             return back()->with('success', 'Client account has been deactivated !');
         } catch (Exception $e) {
             return back()->with('error', 'Error : ' . $e->getMessage());
@@ -236,6 +247,11 @@ class ClientController extends Controller
         );
 
         try {
+
+            $address = $validated['client_address_one'] . ',' . $validated['client_address_two'] . ',' . $validated['client_area'] . ',' . $validated['client_postcode'] . ',' . $validated['client_state'];
+            $result = $this->geocoder->getCoordinatesForAddress($address);
+            $validated['latitude'] = $result['lat'];
+            $validated['longitude'] = $result['lng'];
             //Address Update 
             Client::where('id', $id)->update([
                 'client_address_one' => $validated['client_address_one'],
@@ -243,6 +259,8 @@ class ClientController extends Controller
                 'client_postcode' => $validated['client_postcode'],
                 'client_state' => $validated['client_state'],
                 'client_area' => $validated['client_area'],
+                'latitude'=>$validated['latitude'],
+                'longitude'=>$validated['longitude']
             ]);
 
             // Suceess Update Address

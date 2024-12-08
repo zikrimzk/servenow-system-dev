@@ -31,6 +31,9 @@ return new class extends Migration
             $table->string('tasker_address_area')->nullable();
             $table->string('tasker_workingloc_state')->nullable();
             $table->string('tasker_workingloc_area')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->integer('working_radius')->nullable();
             $table->integer('tasker_working_status')->default(0);
             $table->integer('tasker_worktype')->nullable(); // part-time (1) OR full-time(2)
             $table->integer('tasker_rank')->nullable(); 

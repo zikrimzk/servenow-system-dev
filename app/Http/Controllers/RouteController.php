@@ -122,9 +122,14 @@ class RouteController extends Controller
     public function clientBooking($id)
     {
         try {
-            $tasker = Tasker::where('tasker_working_status', 1)->get();
             $client = Client::where('id', auth()->id())->first();
-            $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+            $clientLat = $client->latitude;
+            $clientLng = $client->longitude;
+
+            // API Key for Google Directions API
+            $apiKey = env('GOOGLE_MAPS_GEOCODING_API_KEY', '');
+
+            // Fetch taskers and calculate road distances
             $svtasker = DB::table('services as a')
                 ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
                 ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
@@ -142,9 +147,38 @@ class RouteController extends Controller
                     'b.servicetype_status',
                     'c.tasker_firstname',
                     'c.tasker_rating',
-                    'c.tasker_photo'
+                    'c.tasker_photo',
+                    'c.latitude as tasker_lat',
+                    'c.longitude as tasker_lng'
                 )
                 ->get();
+
+            // Filter taskers within a specified distance
+            // $svtasker = $svtasker->map(function ($tasker) use ($clientLat, $clientLng, $apiKey) {
+            //     $taskerLat = $tasker->tasker_lat;
+            //     $taskerLng = $tasker->tasker_lng;
+
+            //     // Call Google Directions API
+            //     $url = "https://maps.googleapis.com/maps/api/directions/json?origin=$clientLat,$clientLng&destination=$taskerLat,$taskerLng&key=$apiKey";
+            //     $response = file_get_contents($url);
+            //     $data = json_decode($response, true);
+
+            //     // Get road distance
+            //     if (!empty($data['routes']) && isset($data['routes'][0]['legs'][0]['distance']['value'])) {
+            //         $distanceInMeters = $data['routes'][0]['legs'][0]['distance']['value'];
+            //         $tasker->road_distance = $distanceInMeters / 1000; // Convert to kilometers
+            //     } else {
+            //         $tasker->road_distance = null; // If failed
+            //     }
+
+            //     return $tasker;
+            // })
+            //     ->filter(function ($tasker) {
+            //         // Filter only taskers within 40 km
+            //         return $tasker->road_distance !== null && $tasker->road_distance <= 40;
+            //     })
+            //     ->sortBy('road_distance'); // Optional: Sort by nearest distance
+
             $sv = ServiceType::whereId($id)->first();
 
             $timeSlot = DB::table('time_slots as a')
@@ -153,7 +187,7 @@ class RouteController extends Controller
                 ->select('b.slot_id', 'a.time', 'b.tasker_id')
                 ->get();
 
-
+            $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
 
             return view('client.booking.index', [
                 'title' => 'Describe your task',
@@ -164,7 +198,7 @@ class RouteController extends Controller
                 'time' => $timeSlot
             ]);
         } catch (Exception $e) {
-            return back();
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 

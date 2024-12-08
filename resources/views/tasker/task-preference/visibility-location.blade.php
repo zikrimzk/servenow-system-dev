@@ -13,7 +13,7 @@
                                 <li class="breadcrumb-item" aria-current="page">Visibility & Location</li>
                             </ul>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-12"> 
                             <div class="page-header-title">
                                 <h2 class="mb-4">Visibility & Location</h2>
                             </div>
