@@ -47,13 +47,23 @@ Route::middleware('auth:sanctum')->post('/update-profile-{id}', [TaskerAPIContro
 // Tasket - Service Type Fetch
 Route::middleware('auth:sanctum')->get('/get-service-type', [TaskerAPIController::class, 'getAllServiceType']);
 
-
 // Tasker - Service Management API
 Route::middleware('auth:sanctum')->post('/create-service', [TaskerAPIController::class, 'createServiceAPI']);
 Route::middleware('auth:sanctum')->get('/get-service-list', [TaskerAPIController::class, 'getAllServiceAPI']);
 Route::middleware('auth:sanctum')->get('/get-service-{id}', [TaskerAPIController::class, 'getSingleServiceAPI']);
 Route::middleware('auth:sanctum')->post('/update-service-{id}', [TaskerAPIController::class, 'updateServiceAPI']);
 Route::middleware('auth:sanctum')->get('/delete-service-{id}', [TaskerAPIController::class, 'deleteServiceAPI']);
+
+// Tasker - Visibility & Location API
+Route::middleware('auth:sanctum')->post('/update-tasker-location', [TaskerAPIController::class, 'taskerUpdateLocationAPI']);
+Route::middleware('auth:sanctum')->get('/change-tasker-visibility', [TaskerAPIController::class, 'taskerVisibleToggleAPI']);
+
+// Tasker - Time Slot Setting API
+Route::middleware('auth:sanctum')->post('/tasker-working-type-change', [TaskerAPIController::class, 'taskerTypeToggleAPI']);
+Route::middleware('auth:sanctum')->get('/create-time-slot-{date}', [TaskerAPIController::class, 'taskerCreateTimeSlotAPI'])->name('taskerTimeSlotCreateAPI');
+Route::middleware('auth:sanctum')->get('/get-tasker-time-slot-{date}', [TaskerAPIController::class, 'getTaskerTimeSlotAPI'])->name('getTaskerTimeSlot');
+
+
 
 
 
