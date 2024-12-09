@@ -23,11 +23,11 @@ class TaskerAPIController extends Controller
             $data = Tasker::where('id', Auth::user()->id)->get();
             return response([
                 'data' => $data
-            ], 201);
+            ], 200);
         } catch (Exception $e) {
             return response([
                 'message' => 'Error : ' . $e->getMessage()
-            ], 301);
+            ], 500);
         }
     }
     // Tasker Update Profile

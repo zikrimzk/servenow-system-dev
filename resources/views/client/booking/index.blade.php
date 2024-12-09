@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Support\Str;
+use App\Models\Tasker;
 ?>
 @extends('client.layouts.main')
 
@@ -330,7 +331,7 @@ use Illuminate\Support\Str;
                                                         </div>
                                                     </div>
                                                 </div>
-
+                                                <hr>
                                                 <form action="/TEST" method="POST">
                                                     <div id="selectdatetime-{{ $tk->taskerID }}" class="modal fade"
                                                         tabindex="-1" role="dialog"
@@ -372,7 +373,10 @@ use Illuminate\Support\Str;
                                                                         </div>
                                                                     </div>
                                                                     <div class="d-grid mt-4 mb-2 ">
-                                                                        <button type="button" class="btn btn-primary"id="nextStepButton" onclick="navigateTabs('next')" data-bs-dismiss="modal">
+                                                                        <button type="button"
+                                                                            class="btn btn-primary"id="nextStepButton"
+                                                                            onclick="navigateTabs('next')"
+                                                                            data-bs-dismiss="modal">
                                                                             Select &
                                                                             Continue</button>
                                                                     </div>
@@ -505,30 +509,12 @@ use Illuminate\Support\Str;
                                                     <div class="col-lg-4 col-md-12">
                                                         <div class="card">
                                                             <div class="card-header">
-                                                                <h5>Order Summary</h5>
+                                                                <h5>Booking Summary</h5>
                                                             </div>
                                                             <div class="card-body p-0">
                                                                 <ul class="list-group list-group-flush">
-                                                                    <li class="list-group-item">
-                                                                        <div class="d-flex align-items-start">
-                                                                            <img class="bg-light rounded img-fluid wid-60 flex-shrink-0"
-                                                                                src="../assets/images/application/img-prod-2.jpg"
-                                                                                alt="Product image" />
-                                                                            <div class="flex-grow-1 mx-2">
-                                                                                <h5 class="mb-1">Canon EOS 1500D 24.1
-                                                                                </h5>
-                                                                                <p class="text-muted text-sm mb-2">SLR
-                                                                                    Camera (Black) with EF</p>
-                                                                                <h5 class="mb-1">
-                                                                                    <b>$275</b><span
-                                                                                        class="mx-2 text-sm text-decoration-line-through text-muted f-w-400">$325</span>
-                                                                                </h5>
-                                                                            </div>
-                                                                            <a href="#"
-                                                                                class="avtar avtar-s btn-link-danger btn-pc-default flex-shrink-0">
-                                                                                <i class="ti ti-trash f-20"></i>
-                                                                            </a>
-                                                                        </div>
+                                                                    <li class="list-group-item" id="tasker-details">
+
                                                                     </li>
                                                                     <li class="list-group-item">
                                                                         <div class="float-end">
@@ -549,6 +535,7 @@ use Illuminate\Support\Str;
                                                                         <span class="text-muted">Voucher</span>
                                                                     </li>
                                                                 </ul>
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -582,9 +569,35 @@ use Illuminate\Support\Str;
 
 
     <script>
+ 
+    document.addEventListener('DOMContentLoaded', function () {
+    const tabs = document.querySelectorAll('.nav-pills .nav-link');
+    const reverseTabButton = document.querySelector('.ti-edit'); // Target the button by its class
 
-       
+    reverseTabButton.addEventListener('click', function () {
+        const activeTab = document.querySelector('.nav-pills .nav-link.active');
+        const currentIndex = Array.from(tabs).indexOf(activeTab);
 
+        // Check if there is a previous tab to navigate to
+        if (currentIndex > 0) {
+            // Deactivate the current tab
+            activeTab.classList.remove('active');
+            activeTab.setAttribute('aria-selected', 'false');
+
+            // Activate the previous tab
+            const previousTab = tabs[currentIndex - 1];
+            previousTab.classList.add('active');
+            previousTab.setAttribute('aria-selected', 'true');
+
+            // Activate the corresponding tab content
+            const tabContents = document.querySelectorAll('.tab-pane');
+            tabContents[currentIndex].classList.remove('active', 'show');
+            tabContents[currentIndex - 1].classList.add('active', 'show');
+        }
+
+        updateButtons(); // Update navigation buttons and progress bar
+    });
+});
         document.addEventListener('DOMContentLoaded', function() {
             const creditCardForm = document.getElementById('credit-card-form');
             const paypalMessage = document.getElementById('paypal-message');
@@ -626,7 +639,7 @@ use Illuminate\Support\Str;
 
         // Tambahkan event listener pada medan alamat
         document.addEventListener('DOMContentLoaded', function() {
-            const addressFields = ['address1','address2','postcode','state','addCity'];
+            const addressFields = ['address1', 'address2', 'postcode', 'state', 'addCity'];
 
             addressFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
@@ -648,6 +661,7 @@ use Illuminate\Support\Str;
                             0]; // Format as YYYY-MM-DD
                         localStorage.setItem('selectedTaskerId', taskerId);
                         getTaskerTimeSlots(formattedToday);
+                        checkoutTaskerDetails();
                     }
                 });
             });
@@ -809,6 +823,46 @@ use Illuminate\Support\Str;
 
             return validSlots;
         }
+
+
+        function checkoutTaskerDetails() {
+            const taskerId = localStorage.getItem('selectedTaskerId');
+
+            $.ajax({
+                url: '{{ route('getTaskerDetail') }}',
+                type: 'GET',
+                data: {
+                    id: taskerId
+                },
+                success: function(result) {
+                    var data = result.data[0];
+                    console.log(data);
+                    const taskerDetailsHTML = `
+                        <div class="d-flex align-items-start">
+                            <img class="bg-light rounded user-avtar rounded-circle flex-shrink-0"
+                                src="{{ asset('storage') }}/${data.tasker_photo}" 
+                                alt="Tasker photo" width="60" height="60" />
+                            <div class="flex-grow-1 mx-2">
+                                <h5 class="mb-1">${data.tasker_firstname}</h5>
+                                <p class="text-muted text-sm mb-2">hghghg</p>
+                                <h5 class="mb-1">
+                                    <b>66565</b>
+                                    <span class="mx-2 text-sm text-decoration-line-through text-muted f-w-400"></span>
+                                </h5>
+                            </div>
+                            <a href="#" class="avtar avtar-s btn-link-primary btn-pc-default flex-shrink-0" id="prevButton" onclick="navigateTabs('prev')">
+                                <i class="ti ti-edit f-20"></i>
+                            </a>
+                            
+                        </div>
+                    `;
+                    $('#tasker-details').html(taskerDetailsHTML);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching tasker data:', error);
+                }
+            });
+        }
     </script>
 
     <script>
@@ -968,10 +1022,10 @@ use Illuminate\Support\Str;
             // Sembunyikan butang "Next" jika berada di tab ketiga (indeks 2)
             if (currentIndex === 2) {
                 nextButton.style.display = 'none';
-                nextStepButton.style.diplay=''; // Sembunyikan butang "Next"
+                nextStepButton.style.diplay = ''; // Sembunyikan butang "Next"
             } else {
-                nextButton.style.display = ''; 
-                nextStepButton.style.diplay='none'; // Tunjukkan semula butang "Next"
+                nextButton.style.display = '';
+                nextStepButton.style.diplay = 'none'; // Tunjukkan semula butang "Next"
             }
 
             updateProgressBar(currentIndex + 1, tabs.length);
