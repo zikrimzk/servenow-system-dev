@@ -27457,8 +27457,8 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 .address-check {
   overflow: visible;
   position: relative;
-  width: calc(100% - 20px);
-  margin: 10px;
+  width: calc(100% - 30px);
+  /* margin: 10px; */
 }
 .address-check .address-details {
   -webkit-line-clamp: 2;

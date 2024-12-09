@@ -193,6 +193,8 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     // Client - Booking
     Route::get('/tasker-get-time/{date}/{taskerid}', [BookingController::class, 'getBookingTime'])->name('client-tasker-get-time');
     Route::get('/get-tasker-details', [BookingController::class, 'getTaskerDetail'])->name('getTaskerDetail');
+    Route::post('/client-book-service', [BookingController::class, 'clientBookFunction'])->name('clientBookService');
+
 
 });
 

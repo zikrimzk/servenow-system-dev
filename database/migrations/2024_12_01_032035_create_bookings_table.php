@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->date('booking_date');
             $table->text('booking_address');
-            $table->time('booking_time_start');
-            $table->time('booking_time_end');
-            $table->integer('booking_status');
-            $table->text('booking_note');
+            $table->time('booking_time_start')->nullable();
+            $table->time('booking_time_end')->nullable();
+            $table->integer('booking_status')->default(1);
+            $table->text('booking_note')->nullable();
+            $table->decimal('booking_rate', 8, 2); 
             $table->foreignId('client_id')->references('id')->on('clients');
             $table->foreignId('service_id')->references('id')->on('services');
             $table->timestamps();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\Tasker;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -34,16 +35,46 @@ class BookingController extends Controller
             $checkout= DB::table('taskers as a')
             ->join('services as b','a.id','=','b.tasker_id')
             ->join('service_types as c','b.service_type_id','=','c.id')
-            ->where('b.id','=', $request->id)
+            ->where('a.id','=', $request->id)
+            ->where('b.id','=', $request->svid)
             ->get();
+
             return response([
-                'data' => $checkout
-                
+                'taskerservice' => $checkout,
             ], 200);
         } catch (Exception $e) {
             return response([
                 'message' => 'Error : ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function clientBookFunction(Request $request)
+    {
+        try {
+            $booking = $request->validate([
+                'booking_date' => 'required',
+                'booking_address' => 'required',
+                'booking_time_start' => 'required',
+                'booking_time_end' => 'required',
+                'booking_note' => '',
+                'booking_rate' => 'required',
+                'service_id' => 'required',
+            ],[],[
+                'booking_date' => 'Booking Date',
+                'booking_address' => 'Booking Address',
+                'booking_time_start' => 'Start Booking Time',
+                'booking_time_end' => 'End Booking Time',
+                'booking_note' => 'Booking Note',
+                'booking_rate' => 'Booking Rate',
+                'service_id' => 'Service',
+            ]);
+            $booking['client_id'] = Auth::user()->id;
+            Booking::create($booking);
+
+            return back()->with('success', 'Successfully Booked');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
     }
 }

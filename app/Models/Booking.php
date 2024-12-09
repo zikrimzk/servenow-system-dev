@@ -16,6 +16,7 @@ class Booking extends Model
         'booking_time_end',
         'booking_status',
         'booking_note',
+        'booking_rate',
         'client_id',
         'service_id',
 
