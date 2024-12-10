@@ -70,6 +70,23 @@ class BookingController extends Controller
                 'service_id' => 'Service',
             ]);
             $booking['client_id'] = Auth::user()->id;
+            $new_end_time = date('H:i:s', strtotime('-1 hour', strtotime($booking['booking_time_end'])));
+
+            $tasker_id= $request->tasker_id;
+            $slot = DB::table('tasker_time_slots as a')
+            ->join('time_slots as b','a.slot_id','=','b.id')
+            ->where('a.tasker_id','=', $tasker_id)
+            ->where('a.slot_date','=',$booking['booking_date'])
+            ->whereBetween('b.time', [$booking['booking_time_start'], $new_end_time])
+            ->where('a.slot_status','=',1)
+            ->select('a.id as tasker_time_id','b.id as time_id','a.slot_date','a.slot_status','a.slot_id','b.time','b.slot_category')
+            ->get();
+
+            foreach ($slot as $s) {
+                DB::table('tasker_time_slots')
+                    ->where('id', '=', $s->tasker_time_id)
+                    ->update(['slot_status' => 2]);
+            }
             Booking::create($booking);
 
             return back()->with('success', 'Successfully Booked');

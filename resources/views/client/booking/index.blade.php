@@ -613,6 +613,8 @@ use App\Models\Tasker;
                                                                     class="bookingRate">
                                                                 <input type="text" name="service_id"
                                                                     class="serviceID">
+                                                                <input type="text" name="tasker_id"
+                                                                    class="taskerID">
                                                             </div>
                                                             <div class="d-grid mt-4 mb-4">
                                                                 <button type="submit" class="btn btn-primary">Proceed to
@@ -771,6 +773,7 @@ use App\Models\Tasker;
             const prevButton = document.getElementById('prevButton');
             const nextButton = document.getElementById('nextButton');
             const nextStepButton = document.getElementById('nextStepButton');
+            const taskoption = document.getElementById('task-option');
 
             // Enable/Disable "Previous" button
             prevButton.disabled = currentIndex === 0;
@@ -792,6 +795,11 @@ use App\Models\Tasker;
             }
 
             // Adjust "Next" and "Next Step" button visibility for Tasker Selection
+            if(currentIndex === 1)
+            {
+                nextButton.disabled = true;
+
+            }
             if (currentIndex === 2) {
                 nextButton.style.display = 'none'; // Hide "Next"
                 nextStepButton.style.display = ''; // Show "Next Step"
@@ -914,7 +922,6 @@ use App\Models\Tasker;
 
         function updateHours() {
             const option = document.getElementById('task-option').value;
-
             const radios = [{
                     id: 'hour1',
                     range: ['s']
@@ -948,6 +955,7 @@ use App\Models\Tasker;
                 } else {
                     el.disabled = true;
                     el.checked = false;
+                    nextButton.disabled = true;
                 }
             });
         }
@@ -955,6 +963,10 @@ use App\Models\Tasker;
         function saveToLocalStorage(event) {
             const selectedValue = event.target.value;
             localStorage.setItem('selectedHour', selectedValue);
+            const nextbutton = document.getElementById('nextButton');
+            nextButton.disabled = false;
+
+
         }
 
         document.querySelectorAll('input[name="hour"]').forEach(radio => {
@@ -1159,6 +1171,7 @@ use App\Models\Tasker;
                     $('.inputTimeEnd').val(convertTo24HourFormat(endTimeFormatted));
                     $('.bookingRate').val(totalprice)
                     $('.serviceID').val(svId);
+                    $('.taskerID').val(taskerId);
                     $('.address-details').html($('.booking_address').val());
                     //INITIALIZE IN INPUT FORM END
 

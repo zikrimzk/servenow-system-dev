@@ -234,7 +234,7 @@
                 </form>
             @endforeach
             <!-- Modal Time Slot Update End  Here -->
-            
+
         </div>
     </div>
     <!-- [ Main Content ] end -->
@@ -299,9 +299,12 @@
                         html += `
                     <div class="card p-4 border border-1 mt-3">
                         <div class="card-body">
-                            ${item.slot_status == 1 
+                            ${
+                                item.slot_status == 1 
                                 ? '<span class="badge text-bg-success">Available</span>'
-                                : '<span class="badge text-bg-danger">Unavailable</span>'
+                                : item.slot_status == 2
+                                    ? '<span class="badge text-bg-warning">Booked</span>'
+                                    : '<span class="badge text-bg-danger">Unavailable</span>'
                             }
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -327,6 +330,14 @@
             });
         }
 
+        function formatDateLocal(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+
         const populateWeekTabs = () => {
             const today = new Date(); // Current date
             const listGroup = document.getElementById('list-tab');
@@ -335,19 +346,21 @@
             // Clear existing content
             listGroup.innerHTML = '';
             tabContent.innerHTML = '';
-
+            today.setHours(0, 0, 0, 0);
             // Generate tabs for the next 7 days starting from today
             for (let i = 0; i < 7; i++) {
-                const date = new Date(today);
-                date.setDate(today.getDate() + i); // Increment date
-                const formattedDate = date.toISOString().split('T')[0]; // Format as yyyy-mm-dd
+                const date = new Date(today); // Salin tarikh semasa
+                date.setDate(today.getDate() + i); // Tambah hari
+               
+                const formattedDate = formatDateLocal(date); // Format yyyy-mm-dd
                 const listDate = date.toLocaleDateString('en-GB', {
-                    day: 'numeric', // day without leading zero
-                    month: 'long', // full month name
-                    year: 'numeric' // 4-digit year
+                    day: 'numeric', // Hari tanpa sifar di depan
+                    month: 'long', // Nama penuh bulan
+                    year: 'numeric' // Tahun 4 digit
                 });
+        
 
-                // Create the tab
+                // Buat tab
                 const tabId = `list-${i + 1}`;
                 const tab = document.createElement('a');
                 tab.className = 'list-group-item list-group-item-action';
@@ -362,7 +375,7 @@
                             <span>${date.toLocaleDateString('en-GB', { weekday: 'long' })}</span>
                         </div>
                         <div class="col-sm-12">
-                           <span class="fw-semibold">${listDate}</span>
+                        <span class="fw-semibold">${listDate}</span>
                         </div>
                     </div>
                     `;
