@@ -603,17 +603,17 @@ use App\Models\Tasker;
                                                                 </div>
                                                             </div>
                                                             <div class="checkout-details">
-                                                                <input type="text" name="booking_address"
+                                                                <input type="hidden" name="booking_address"
                                                                     class="booking_address">
-                                                                <input type="text" name="booking_time_start"
+                                                                <input type="hidden" name="booking_time_start"
                                                                     class="inputTimeStart">
-                                                                <input type="text" name="booking_time_end"
+                                                                <input type="hidden" name="booking_time_end"
                                                                     class="inputTimeEnd">
-                                                                <input type="text" name="booking_rate"
+                                                                <input type="hidden" name="booking_rate"
                                                                     class="bookingRate">
-                                                                <input type="text" name="service_id"
+                                                                <input type="hidden" name="service_id"
                                                                     class="serviceID">
-                                                                <input type="text" name="tasker_id"
+                                                                <input type="hidden" name="tasker_id"
                                                                     class="taskerID">
                                                             </div>
                                                             <div class="d-grid mt-4 mb-4">
