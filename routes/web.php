@@ -145,7 +145,7 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
 
     //Tasker - Service Management
-    Route::get('/service-management', [RouteController::class, 'taskerServiceManagementNav'])->name('tasker-service-management');
+    Route::get('/service-approval', [RouteController::class, 'taskerServiceManagementNav'])->name('tasker-service-management');
     Route::post('/create-service', [ServiceController::class, 'createService'])->name('tasker-service-create');
     Route::post('/update-service-{id}', [ServiceController::class, 'updateService'])->name('tasker-service-update');
     Route::get('/delete-service-{id}', [ServiceController::class, 'deleteService'])->name('tasker-service-delete');
@@ -161,6 +161,15 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::get('/create-time-slot-{date}', [SettingController::class, 'taskerCreateTimeSlot'])->name('tasker-timeslot-create');
     Route::get('/get-time-slot-{date}', [SettingController::class, 'getTaskerTimeSlot'])->name('get-tasker-timeslot');
     Route::post('/update-time-slot-{id}', [SettingController::class, 'taskerUpdateTimeSlot'])->name('tasker-timeslot-update');
+
+    // Tasker - Booking Management
+    Route::get('/my-booking', [RouteController::class, 'taskerBookingManagementNav'])->name('tasker-booking-management');
+    Route::get('/get-bookings', [BookingController::class, 'getBookingsDetails'])->name('get-tasker-bookings');
+    Route::get('/tasker-timeslots-calender', [BookingController::class, 'getRangeTimeSlotsForTaskerCalander'])->name('get-calander-range-tasker');
+    Route::post('/rescehedule-booking', [BookingController::class, 'rescheduleBookingTimeFunction'])->name('reschedule-booking-tasker');
+
+    
+
 });
 
 /* Tasker Route End */

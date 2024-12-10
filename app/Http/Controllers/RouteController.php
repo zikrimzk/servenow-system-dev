@@ -418,6 +418,12 @@ class RouteController extends Controller
         ]);
     }
 
+    public function taskerBookingManagementNav(Request $request) 
+    {
+        return view('tasker.booking.index', [
+            'title'=> 'My Booking',
+        ]);
+    }
 
     /**** Tasker Route Function - End ****/
 

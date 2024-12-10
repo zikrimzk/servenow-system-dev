@@ -422,9 +422,8 @@ use App\Models\Tasker;
                                                                             <div class="col-sm-12 mb-3">
                                                                                 <label for="task-date"
                                                                                     class="mb-2">Availability</label>
-                                                                                <input type="text" id="task-date"
-                                                                                    class="form-control"
-                                                                                    name="booking_date"
+                                                                                <input type="text" id=""
+                                                                                    class="form-control task-date"
                                                                                     placeholder="Choose Date">
                                                                             </div>
                                                                             <div class="col-sm-12 mb-3">
@@ -603,6 +602,8 @@ use App\Models\Tasker;
                                                                 </div>
                                                             </div>
                                                             <div class="checkout-details">
+                                                                <input type="hidden" name="booking_date"
+                                                                class="bookingDate">
                                                                 <input type="hidden" name="booking_address"
                                                                     class="booking_address">
                                                                 <input type="hidden" name="booking_time_start"
@@ -900,7 +901,8 @@ use App\Models\Tasker;
             const today = new Date();
             const formattedToday = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
             // Initialize Flatpickr
-            flatpickr("#task-date", {
+            $('.bookingDate').val(formattedToday);
+            flatpickr(".task-date", {
                 enableTime: false,
                 minDate: "today",
                 maxDate: new Date(new Date().setDate(today.getDate() + 7)),
@@ -908,6 +910,7 @@ use App\Models\Tasker;
                 onChange: function(selectedDates, dateStr, instance) {
                     // Pass the selected date to the AJAX function
                     getTaskerTimeSlots(dateStr);
+                    $('.bookingDate').val(dateStr);
                 }
             });
 

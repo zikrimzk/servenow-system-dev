@@ -48,9 +48,7 @@
                 <li class="pc-item">
                     <a href="{{ route('tasker-home') }}" class="pc-link">
                         <span class="pc-micon">
-                            <svg class="pc-icon">
-                                <use xlink:href="#custom-story"></use>
-                            </svg>
+                            <i class="fas fa-home pc-icon "></i> 
                         </span>
                         <span class="pc-mtext">Dashboard</span>
                     </a>
@@ -62,15 +60,14 @@
                 <li class="pc-item pc-hasmenu">
                     <a href="#!" class="pc-link">
                         <span class="pc-micon">
-                            <svg class="pc-icon">
-                                <use xlink:href="#custom-status-up"></use>
-                            </svg>
+                            <i class="fas fa-cogs pc-icon "></i> 
                         </span>
                         <span class="pc-mtext">Task Preferences</span>
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-visibleloc-setting') }}">Visibility & Location</a></li>
+                        <li class="pc-item"><a class="pc-link"
+                                href="{{ route('tasker-visibleloc-setting') }}">Visibility & Location</a></li>
                         <li class="pc-item"><a class="pc-link" href="{{ route('tasker-timeslot-setting') }}">Time
                                 Slot</a></li>
                     </ul>
@@ -79,9 +76,7 @@
                 <li class="pc-item pc-hasmenu">
                     <a href="#!" class="pc-link">
                         <span class="pc-micon">
-                            <svg class="pc-icon">
-                                <use xlink:href="#custom-status-up"></use>
-                            </svg>
+                            <i class="fas fa-hammer pc-icon "></i> 
                         </span>
                         <span class="pc-mtext">Services</span>
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
@@ -89,6 +84,20 @@
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="{{ route('tasker-service-management') }}">Services
                                 Management</a></li>
+                    </ul>
+                </li>
+
+
+                <li class="pc-item pc-hasmenu">
+                    <a href="#!" class="pc-link">
+                        <span class="pc-micon">
+                            <i class="fas fa-calendar-check pc-icon "></i> 
+                        </span>
+                        <span class="pc-mtext">Bookings</span>
+                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                    </a>
+                    <ul class="pc-submenu">
+                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-booking-management') }}">My Booking</a></li>
                     </ul>
                 </li>
             </ul>

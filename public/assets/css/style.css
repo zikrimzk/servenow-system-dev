@@ -27112,6 +27112,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 .fc-event.event-success.fc-h-event .fc-event-main {
   color: #2ca87f;
 }
+
 .fc-event.event-success.fc-h-event:focus, .fc-event.event-success.fc-h-event:hover {
   background: #2ca87f;
   color: #fff;
@@ -27136,6 +27137,17 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 }
 .fc-event.event-warning.fc-h-event:focus, .fc-event.event-warning.fc-h-event:hover {
   background: #e58a00;
+  color: #fff;
+}
+.fc-event.event-unavailable {
+  background: #6c131b !important;
+  color: #fff !important;
+}
+.fc-event.event-unavailable.fc-h-event .fc-event-main {
+  color: #6c131b;
+}
+.fc-event.event-unavailable.fc-h-event:focus, .fc-event.event-unavailable.fc-h-event:hover {
+  background: #6c131b;
   color: #fff;
 }
 .fc-event.event-danger {
