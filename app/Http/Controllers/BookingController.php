@@ -131,7 +131,7 @@ class BookingController extends Controller
                     'end' => $booking->booking_date . 'T' . $booking->booking_time_end,
                     'id' => $booking->bookingID,
                     'status' => $booking->booking_status,
-                    'className' => 'event-success'
+                    // 'className' => 'event-success'
                 ];
             });
 

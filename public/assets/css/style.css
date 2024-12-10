@@ -26976,7 +26976,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 }
 
 .fc-event-time {
-  display: none;
+  display: block;
 }
 
 .fc-event .fc-content {
