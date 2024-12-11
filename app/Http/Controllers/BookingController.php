@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Tasker;
 use App\Models\Booking;
 use App\Models\TimeSlot;
@@ -126,7 +127,7 @@ class BookingController extends Controller
             // dd($bookings);
             $events = $bookings->map(function ($booking) {
                 return [
-                    'title' => $booking->client_firstname,
+                    'title' => $booking->client_firstname . ' (' . $booking->servicetype_name . ')',
                     'start' => $booking->booking_date . 'T' . $booking->booking_time_start,
                     'end' => $booking->booking_date . 'T' . $booking->booking_time_end,
                     'id' => $booking->bookingID,
@@ -166,7 +167,7 @@ class BookingController extends Controller
             $endTime = $availability->isNotEmpty() ? $availability->max('slot_time') : '07:30:00';
             $new_end_time = date('H:i:s', strtotime('+1 hour', strtotime($endTime)));
             // dd($endTime,$new_end_time);
- 
+
             return response()->json([
                 'start_time' => $startTime,
                 'end_time' =>  $new_end_time,
@@ -184,11 +185,31 @@ class BookingController extends Controller
         $booking = Booking::find($request->id);
 
         // Update the start and end times
-        $booking->booking_time_start = \Carbon\Carbon::parse($request->start)->format('H:i:s');
-        $booking->booking_time_end = \Carbon\Carbon::parse($request->end)->format('H:i:s');
+        $booking->booking_time_start = Carbon::parse($request->start)->format('H:i:s');
+        $booking->booking_time_end = Carbon::parse($request->end)->format('H:i:s');
+
 
         // Save the updated booking
         $booking->save();
+        $new_end_time = date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($request->end)->format('H:i:s'))));
+
+
+        // $slot = DB::table('tasker_time_slots as a')
+        //     ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+        //     ->where('a.tasker_id', '=', Auth::user()->id)
+        //     ->where('a.slot_date', '=', $booking['booking_date'])
+        //     ->whereBetween('b.time', [Carbon::parse($request->start)->format('H:i:s'), $new_end_time ])
+        //     ->where('a.slot_status', '=', 1)
+        //     ->select('a.id as tasker_time_id', 'b.id as time_id', 'a.slot_date', 'a.slot_status', 'a.slot_id', 'b.time', 'b.slot_category')
+        //     ->get();
+
+        // foreach ($slot as $s) {
+        //     DB::table('tasker_time_slots')
+        //         ->where('id', '=', $s->tasker_time_id)
+        //         ->update(['slot_status' => 2]);
+        // }
+
+
 
         // Return a response confirming the update
         return response()->json([

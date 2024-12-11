@@ -715,11 +715,11 @@
                     },
                     eventClick: function(info) {
                         const details = `
-                        Booking Details:
-                        - Title: ${info.event.title}
-                        - Start: ${info.event.start.toLocaleString()}
-                        - End: ${info.event.end.toLocaleString()}
-                    `;
+                    Booking Details:
+                    - Title: ${info.event.title}
+                    - Start: ${info.event.start.toLocaleString()}
+                    - End: ${info.event.end.toLocaleString()}
+                `;
                         alert(details); // Show alert when an event is clicked
                     },
                     eventDrop: function(info) {
@@ -815,6 +815,10 @@
                 initializeCalendar(data);
             });
         });
+
+       
+
+       
     </script>
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
