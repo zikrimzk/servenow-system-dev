@@ -19,6 +19,7 @@ use Yajra\DataTables\Facades\DataTables;
 class RouteController extends Controller
 {
 
+
     /**** General Route Function - Start ****/
 
     // Get Area API
@@ -58,6 +59,7 @@ class RouteController extends Controller
             return redirect(route('client-home'));
         }
     }
+    
     //Client -LoginOrSignUp Option
     public function loginOptionNav()
     {
@@ -200,6 +202,14 @@ class RouteController extends Controller
         } catch (Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
         }
+    }
+
+    public function clientUpcoming()
+    {
+        return view('client.booking.taskremain', [
+            'title' => 'My UpcomingTask',
+            
+        ]);
     }
 
 
