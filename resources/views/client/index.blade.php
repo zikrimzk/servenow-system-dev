@@ -94,7 +94,7 @@
     <!-- [ Pre-loader ] End -->
 
     <!-- [ Header ] start -->
-    <header id="home" style="background-image: url(../assets/images/landing/img-headerbg.jpg)">
+    <header id="home" style="background-image: url(../assets/images/servenowBg1.png)">
 
         <!-- [ Nav ] start -->
         <nav class="navbar navbar-expand-md navbar-light default">
@@ -128,7 +128,6 @@
         <!-- [ Nav ] start -->
 
         <div class="container mt-5">
-            {{-- <img class="img-fluid" src="../assets/images/servenowLogoIsk1.png" alt="wr3r23"> --}}
             <div class="row justify-content-center">
                 <div class="col-md-10 text-center">
                     <h1 class="wow fadeInUp" data-wow-delay="0.2s">
@@ -150,17 +149,8 @@
                     <!-- [ Text] end -->
                     <!-- [ Search-Text] Start -->
                     <div class="my-4 my-sm-5 wow fadeInUp" data-wow-delay="0.4s">
-                        <div class="container">
-                            <div class="row justify-content-center">
-                                <div
-                                    class="search-bar d-flex align-items-center col-12 col-sm-8 col-md-6 col-lg-3 border border-1 border-dark">
-                                    <i class="fa-solid fa-magnifying-glass me-2"></i>
-                                    <input type="text"
-                                        class="form-control bg-transparent text-grey w-100 shadow-none"
-                                        placeholder="What do you need help with?">
-                                </div>
-                            </div>
-                        </div>
+                        <img src="../assets/images/servenowLogoIsk3.png" alt="img" class="img-fluid"
+                            style="max-width: 75px;" />
                     </div>
 
 
@@ -185,7 +175,6 @@
                 </div>
                 <!-- [ Highlight Option] End -->
             </div>
-            {{-- <img class="img-fluid" src="../assets/images/servenowLogoIsk2.png" alt="wr3r23"> --}}
         </div>
 
 
