@@ -232,7 +232,12 @@
                         center: 'title',
                         right: 'timeGridDay,dayGridMonth,listWeek',
                     },
+                    // plugins: [FullCalendar.Interaction],
                     themeSystem: 'bootstrap',
+                    dragScroll: true, // Enables scrolling during drag
+                    longPressDelay: 300, // Time delay before drag starts on touch devices
+                    eventStartEditable: true, // Allow dragging
+                    eventDurationEditable: true, // Allow resizing
                     height: 'auto',
                     validRange: validRange,
                     slotMinTime: '07:00:00',
