@@ -205,6 +205,7 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     Route::get('/get-tasker-details', [BookingController::class, 'getTaskerDetail'])->name('getTaskerDetail');
     Route::post('/client-book-service', [BookingController::class, 'clientBookFunction'])->name('clientBookService');
 
+    Route::get('/UpcomingTask', [RouteController::class, 'clientUpcoming'])->name('Upcoming');
 
 });
 
