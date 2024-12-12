@@ -165,8 +165,9 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     // Tasker - Booking Management
     Route::get('/my-booking', [RouteController::class, 'taskerBookingManagementNav'])->name('tasker-booking-management');
     Route::get('/get-bookings', [BookingController::class, 'getBookingsDetails'])->name('get-tasker-bookings');
+    Route::get('/get-unavailable-slot', [BookingController::class, 'getTaskerUnavailableSlot'])->name('get-unavailable-slot');
     Route::get('/tasker-timeslots-calender', [BookingController::class, 'getRangeTimeSlotsForTaskerCalander'])->name('get-calander-range-tasker');
-    Route::post('/rescehedule-booking', [BookingController::class, 'rescheduleBookingTimeFunction'])->name('reschedule-booking-tasker');
+    Route::post('/reschedule-booking', [BookingController::class, 'rescheduleBookingTimeFunction'])->name('reschedule-booking-tasker');
 
     
 

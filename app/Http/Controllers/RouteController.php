@@ -749,6 +749,8 @@ class RouteController extends Controller
 
             $data = DB::table('time_slots')
                 ->select('id', 'time', 'slot_category')
+                ->orderBy('time', 'asc')
+                ->orderBy('slot_category','asc')
                 ->get();
 
             $table = DataTables::of($data)->addIndexColumn();

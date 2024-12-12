@@ -182,6 +182,7 @@ class SettingController extends Controller
                 ->where('a.tasker_id', Auth::user()->id)
                 ->where('a.slot_date', '=', $date)
                 ->select('a.id as taskerTimeSlotID', 'a.slot_status', 'a.slot_date', 'b.id as timeSlotID', 'b.time', 'b.slot_category')
+                ->orderBy('b.time', 'asc')
                 ->get();
 
             return response()->json(['data' => $data], 200);
