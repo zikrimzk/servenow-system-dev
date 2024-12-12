@@ -128,6 +128,7 @@
         <!-- [ Nav ] start -->
 
         <div class="container mt-5">
+            {{-- <img class="img-fluid" src="../assets/images/servenowLogoIsk1.png" alt="wr3r23"> --}}
             <div class="row justify-content-center">
                 <div class="col-md-10 text-center">
                     <h1 class="wow fadeInUp" data-wow-delay="0.2s">
@@ -149,12 +150,13 @@
                     <!-- [ Text] end -->
                     <!-- [ Search-Text] Start -->
                     <div class="my-4 my-sm-5 wow fadeInUp" data-wow-delay="0.4s">
-                        <div class="container ">
+                        <div class="container">
                             <div class="row justify-content-center">
                                 <div
                                     class="search-bar d-flex align-items-center col-12 col-sm-8 col-md-6 col-lg-3 border border-1 border-dark">
                                     <i class="fa-solid fa-magnifying-glass me-2"></i>
-                                    <input type="text" class="form-control bg-transparent text-grey w-100"
+                                    <input type="text"
+                                        class="form-control bg-transparent text-grey w-100 shadow-none"
                                         placeholder="What do you need help with?">
                                 </div>
                             </div>
@@ -183,11 +185,138 @@
                 </div>
                 <!-- [ Highlight Option] End -->
             </div>
+            {{-- <img class="img-fluid" src="../assets/images/servenowLogoIsk2.png" alt="wr3r23"> --}}
         </div>
+
+
 
     </header>
 
     <!-- [ Header ] End -->
+
+    <body>
+        <div class="container title my-5">
+            <h2 class="mb-3">Recommended Tasker</h2>
+            <div class="container">
+                <div class="row">
+                    <!-- Card 1 -->
+                    <div class="col-12 col-sm-6 col-md-4 mb-4">
+                        <div class="card"
+                            style="width: 100%; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <img class="rounded-circle"
+                                        style="width: 120px; border: 3px solid #ddd; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);"
+                                        src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" alt="Avatar" />
+                                </div>
+
+                                <h5 class="card-title"
+                                    style="font-family: 'Arial', sans-serif; font-weight: 600; color: #333;">Card Title
+                                </h5>
+                                <p class="card-text" style="font-size: 14px; color: #555;">Some quick example text to
+                                    build on the card title and make up the bulk of the card's content.</p>
+
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="my-2">
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-muted"></i>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa fa-map-marker-alt text-danger me-2"></i>
+                                        <p class="card-text fs-6 text-muted mb-0">5.4 Km</p>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-center mt-3">
+                                    <a href="#" class="btn btn-primary w-100">Go somewhere</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="col-12 col-sm-6 col-md-4 mb-4">
+                        <div class="card"
+                            style="width: 100%; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <img class="rounded-circle"
+                                        style="width: 120px; border: 3px solid #ddd; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);"
+                                        src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" alt="Avatar" />
+                                </div>
+
+                                <h5 class="card-title"
+                                    style="font-family: 'Arial', sans-serif; font-weight: 600; color: #333;">Card Title
+                                </h5>
+                                <p class="card-text" style="font-size: 14px; color: #555;">Some quick example text to
+                                    build on the card title and make up the bulk of the card's content.</p>
+
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="my-2">
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-muted"></i>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa fa-map-marker-alt text-danger me-2"></i>
+                                        <p class="card-text fs-6 text-muted mb-0">5.4 Km</p>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-center mt-3">
+                                    <a href="#" class="btn btn-primary w-100">Go somewhere</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="col-12 col-sm-6 col-md-4 mb-4">
+                        <div class="card"
+                            style="width: 100%; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <img class="rounded-circle"
+                                        style="width: 120px; border: 3px solid #ddd; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);"
+                                        src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" alt="Avatar" />
+                                </div>
+
+                                <h5 class="card-title"
+                                    style="font-family: 'Arial', sans-serif; font-weight: 600; color: #333;">Card Title
+                                </h5>
+                                <p class="card-text" style="font-size: 14px; color: #555;">Some quick example text to
+                                    build on the card title and make up the bulk of the card's content.</p>
+
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="my-2">
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-muted"></i>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa fa-map-marker-alt text-danger me-2"></i>
+                                        <p class="card-text fs-6 text-muted mb-0">5.4 Km</p>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-center mt-3">
+                                    <a href="#" class="btn btn-primary w-100">Go somewhere</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </body>
 
 
     <!-- [ footer apps ] start -->
@@ -216,7 +345,7 @@
         <div class="border-top border-bottom footer-center">
             <div class="container">
                 <div class="row">
-                    <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="col-md-6 wow fadeInUp" data-wow-delay="0.2s">
                         <img src="../assets/images/logo-test.png" alt="img" class="img-fluid"
                             style="max-width: 110px;" />
                         <p class="mb-4">
@@ -225,73 +354,68 @@
                             products. Our experienced team players are responsible for managing ServeNow.
                         </p>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-6">
                         <div class="row">
-                            <div class="col-sm-4 wow fadeInUp" data-wow-delay="0.6s">
-                                <h5 class="mb-4">Company</h5>
-                                <ul class="list-unstyled footer-link">
-                                    <li>
-                                        <a href="https://1.envato.market/xk3bQd" target="_blank">Profile</a>
-                                    </li>
-                                    <li>
-                                        <a href="https://1.envato.market/Qyre4x" target="_blank">Portfolio</a>
-                                    </li>
-                                    <li>
-                                        <a href="https://1.envato.market/Py9k4X" target="_blank">Follow Us</a>
-                                    </li>
-                                    <li>
-                                        <a href="https://phoenixcoded.net" target="_blank">Website</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="col-sm-4 wow fadeInUp" data-wow-delay="0.8s">
-                                <h5 class="mb-4">Help & Support</h5>
+                            <div class="col-sm-6 wow fadeInUp" data-wow-delay="0.8s">
+                                <h5 class="mb-4">Contact Us</h5>
                                 <ul class="list-unstyled footer-link">
                                     <li>
                                         <a href="https://phoenixcoded.gitbook.io/able-pro/"
-                                            target="_blank">Documentation</a>
+                                            target="_blank">servenow@gmail.com</a>
                                     </li>
                                     <li>
                                         <a href="https://phoenixcoded.gitbook.io/able-pro/roadmap/"
-                                            target="_blank">Feature Request</a>
+                                            target="_blank">6026429534</a>
                                     </li>
-                                    <li>
-                                        <a href="https://phoenixcoded.gitbook.io/able-pro/roadmap/"
-                                            target="_blank">RoadMap</a>
-                                    </li>
-                                    <li>
-                                        <a href="https://phoenixcoded.authordesk.app/" target="_blank">Support</a>
-                                    </li>
-                                    <li>
-                                        <a href="https://themeforest.net/user/phoenixcoded#contact"
-                                            target="_blank">Email Us</a>
-                                    </li>
+
                                 </ul>
                             </div>
-                            <div class="col-sm-4 wow fadeInUp" data-wow-delay="1s">
-                                <h5 class="mb-4">Useful Resources</h5>
+                            <div class="col-sm-6 wow fadeInUp" data-wow-delay="0.6s">
+                                <h5 class="mb-4">Social Media</h5>
                                 <ul class="list-unstyled footer-link">
                                     <li>
-                                        <a href="https://themeforest.net/page/item_support_policy"
-                                            target="_blank">Support Policy</a>
+                                        <a href="https://www.instagram.com" target="_blank">
+                                            <i class="fab fa-instagram"
+                                                style="color: #E4405F; font-size: 20px; width: 15px"></i>
+                                            <span style="margin-left: 8px;">serve_now</span>
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://themeforest.net/licenses/standard" target="_blank">Licenses
-                                            Term</a>
+                                        <a href="https://x.com" target="_blank">
+                                            <i class="fab fa-x"
+                                                style="color: #1DA1F2; font-size: 20px; width: 15px"></i>
+                                            <span style="margin-left: 8px;">serve_now</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://www.tiktok.com" target="_blank">
+                                            <i class="fab fa-tiktok"
+                                                style="color: #010101; font-size: 20px; width: 15px"></i>
+                                            <span style="margin-left: 8px;">serve_now</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://www.pinterest.com" target="_blank">
+                                            <i class="fab fa-pinterest"
+                                                style="color: #E60023; font-size: 20px; width: 15px"></i>
+                                            <span style="margin-left: 8px;">Serve Now</span>
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
+
+
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="container">
+        {{-- <div class="container">
             <div class="row align-items-center">
                 <div class="col my-1 wow fadeInUp" data-wow-delay="0.4s">
                     <p class="mb-0">
                         ServeNow Copyright © 2024 All rights reserved
-
                     </p>
                 </div>
                 <div class="col-auto my-1">
@@ -306,7 +430,17 @@
                     </ul>
                 </div>
             </div>
+        </div> --}}
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-auto my-1 wow fadeInUp" data-wow-delay="0.4s">
+                    <p class="mb-0 text-center">
+                        ServeNow Copyright © 2024 All rights reserved
+                    </p>
+                </div>
+            </div>
         </div>
+
     </footer>
 
     <!-- [ footer apps ] End -->
