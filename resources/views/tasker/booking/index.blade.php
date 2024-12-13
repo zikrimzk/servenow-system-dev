@@ -232,7 +232,6 @@
                         center: 'title',
                         right: 'timeGridDay,dayGridMonth,listWeek',
                     },
-                    // plugins: [FullCalendar.Interaction],
                     themeSystem: 'bootstrap',
                     dragScroll: true, // Enables scrolling during drag
                     longPressDelay: 300, // Time delay before drag starts on touch devices
@@ -472,6 +471,8 @@
                     hour12: false
                 }) : null;
 
+                const date = formatDateLocal(info.event.start)
+
                 if (!start || !end) {
                     console.error('Event start or end time is missing.');
                     return; // Exit early if start or end time is missing
@@ -491,6 +492,7 @@
                             id: eventId,
                             start,
                             end,
+                            date,
                         }),
                     })
                     .then(response => response.json())

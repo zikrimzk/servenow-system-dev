@@ -240,10 +240,12 @@ class BookingController extends Controller
         
 
         // Get the old time range
+        $oldDate = $booking->booking_date;
         $oldStartTime = $booking->booking_time_start;
         $oldEndTime = $booking->booking_time_end;
 
         // Update the booking start and end times
+        $booking->booking_date = $request->date;
         $booking->booking_time_start = Carbon::parse($request->start)->format('H:i:s');
         $booking->booking_time_end = Carbon::parse($request->end)->format('H:i:s');
         $booking->save();
@@ -255,7 +257,7 @@ class BookingController extends Controller
         DB::table('tasker_time_slots as a')
             ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
             ->where('a.tasker_id', '=', Auth::user()->id)
-            ->where('a.slot_date', '=', $booking['booking_date'])
+            ->where('a.slot_date', '=', $oldDate)
             ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
             ->update(['a.slot_status' => 1]);
 
@@ -263,7 +265,7 @@ class BookingController extends Controller
         $newSlots = DB::table('tasker_time_slots as a')
             ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
             ->where('a.tasker_id', '=', Auth::user()->id)
-            ->where('a.slot_date', '=', $booking['booking_date'])
+            ->where('a.slot_date', '=', $request->date)
             ->whereBetween('b.time', [Carbon::parse($request->start)->format('H:i:s'), $newEndTime])
             ->where('a.slot_status', '=', 1) 
             ->select('a.id as tasker_time_id', 'b.time')
