@@ -4,16 +4,134 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Carbon\Carbon;
+use App\Models\Client;
 use App\Models\Tasker;
 use App\Models\Booking;
 use App\Models\TimeSlot;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Spatie\Geocoder\Geocoder;
 use App\Models\TaskerTimeSlot;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
+
+    protected $geocoder;
+
+    public function __construct(Geocoder $geocoder)
+    {
+        $this->geocoder = $geocoder;
+    }
+
+    public function getCoordinates(Request $request)
+    {
+        try {
+            if ($request->useProfileAddress == 'true') {
+                $client = Client::where('id', auth()->id())->first();
+                $address = $client->client_address_one . ', '
+                    . $client->client_address_two . ', '
+                    . $client->client_area  . ', '
+                    . $client->client_postcode . ' '
+                    . $client->client_state;
+                $address = Str::headline($address);
+                return response()->json([
+                    'status' => 'success',
+                    'latitude' => $client->latitude,
+                    'longitude' => $client->longitude,
+                    'address' => $address,
+                ]);
+            } else {
+                $address = $request->address;
+                $address = Str::headline($address);
+                $result = $this->geocoder->getCoordinatesForAddress($address);
+                return response()->json([
+                    'status' => 'success',
+                    'latitude' => $result['lat'],
+                    'longitude' => $result['lng'],
+                    'address' => $address,
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function fetchTaskers(Request $request, $id)
+    {
+        try {
+            // Retrieve latitude and longitude
+            $clientLat = $request->latitude;
+            $clientLng = $request->longitude;
+
+            // API Key for Google Directions API
+            $apiKey = env('GOOGLE_MAPS_GEOCODING_API_KEY', '');
+
+            // Fetch taskers within a 30 km radius
+            $svtasker = DB::table('services as a')
+                ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
+                ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
+                ->where('b.id', '=', $id)
+                ->where('a.service_status', '=', 1)
+                ->select(
+                    'a.id as svID',
+                    'b.id as typeID',
+                    'c.id as taskerID',
+                    'a.service_rate_type',
+                    'a.service_rate',
+                    'a.service_status',
+                    'a.service_desc',
+                    'b.servicetype_name',
+                    'b.servicetype_status',
+                    'c.tasker_firstname',
+                    'c.tasker_rating',
+                    'c.tasker_photo',
+                    'c.latitude as tasker_lat',
+                    'c.longitude as tasker_lng'
+                )
+                ->get();
+            // Filter taskers within a specified distance
+            $svtasker = $svtasker->map(function ($tasker) use ($clientLat, $clientLng, $apiKey) {
+                $taskerLat = $tasker->tasker_lat;
+                $taskerLng = $tasker->tasker_lng;
+
+                //Call Google Directions API
+                // $url = "https://maps.googleapis.com/maps/api/directions/json?origin=$clientLat,$clientLng&destination=$taskerLat,$taskerLng&key=$apiKey";
+                // $response = file_get_contents($url);
+                // $data = json_decode($response, true);
+
+                // Get road distance
+                if (!empty($data['routes']) && isset($data['routes'][0]['legs'][0]['distance']['value'])) {
+                    $distanceInMeters = $data['routes'][0]['legs'][0]['distance']['value'];
+                    $tasker->road_distance = $distanceInMeters / 1000; // Convert to kilometers
+                } else {
+                    $tasker->road_distance = null; // If failed
+                }
+
+                return $tasker;
+            });
+            // ->filter(function ($tasker) {
+            //     // Filter only taskers within 40 km
+            //     return $tasker->road_distance !== null && $tasker->road_distance <= 4000;
+            // })
+            // ->sortBy('road_distance'); // Optional: Sort by nearest distance
+
+            return response()->json([
+                'status' => 'success',
+                'taskers' => $svtasker,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
     public function getBookingTime($date, $taskerid)
     {
         try {
@@ -60,6 +178,8 @@ class BookingController extends Controller
                 'booking_address' => 'required',
                 'booking_time_start' => 'required',
                 'booking_time_end' => 'required',
+                'booking_latitude' => 'required',
+                'booking_longitude' => 'required',
                 'booking_note' => '',
                 'booking_rate' => 'required',
                 'service_id' => 'required',
@@ -68,6 +188,8 @@ class BookingController extends Controller
                 'booking_address' => 'Booking Address',
                 'booking_time_start' => 'Start Booking Time',
                 'booking_time_end' => 'End Booking Time',
+                'booking_latitude' => 'Coordinate [Latitude]',
+                'booking_longitude' => 'Coordinate [Longitude]',
                 'booking_note' => 'Booking Note',
                 'booking_rate' => 'Booking Rate',
                 'service_id' => 'Service',
@@ -113,6 +235,8 @@ class BookingController extends Controller
                     'a.id as bookingID',
                     'a.booking_date',
                     'a.booking_address',
+                    'a.booking_latitude',
+                    'a.booking_longitude',
                     'a.booking_time_start',
                     'a.booking_time_end',
                     'a.booking_note',
@@ -137,10 +261,12 @@ class BookingController extends Controller
                     'id' => $booking->bookingID,
                     'status' => $booking->booking_status,
                     'task' => $booking->servicetype_name,
-                    'name' => $booking->client_firstname . ' '. $booking->client_lastname,
+                    'name' => $booking->client_firstname . ' ' . $booking->client_lastname,
                     'phoneno' => $booking->client_phoneno,
-                    'lat' => $booking->latitude,
-                    'long' => $booking->longitude,
+                    'lat' => $booking->booking_latitude,
+                    'long' => $booking->booking_longitude,
+                    'note' => $booking->booking_note,
+
                 ];
             });
 
@@ -237,7 +363,7 @@ class BookingController extends Controller
     {
         // Find the booking by ID
         $booking = Booking::find($request->id);
-        
+
 
         // Get the old time range
         $oldDate = $booking->booking_date;
@@ -267,7 +393,7 @@ class BookingController extends Controller
             ->where('a.tasker_id', '=', Auth::user()->id)
             ->where('a.slot_date', '=', $request->date)
             ->whereBetween('b.time', [Carbon::parse($request->start)->format('H:i:s'), $newEndTime])
-            ->where('a.slot_status', '=', 1) 
+            ->where('a.slot_status', '=', 1)
             ->select('a.id as tasker_time_id', 'b.time')
             ->get();
 

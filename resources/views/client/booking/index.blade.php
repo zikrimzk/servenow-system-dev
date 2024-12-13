@@ -95,17 +95,7 @@ use App\Models\Tasker;
                                 @endif
                             </div>
                             <!-- End Alert -->
-                            <h1 class="my-3 my-md-0">{{ $sv->servicetype_name }}</h1>
-                            <div class="alert alert-primary mt-3 mb-4">
-                                <div class="d-flex">
-                                    <i class="ti ti-edit h2 f-w-400 mb-0 text-primary"></i>
-                                    <div class="flex-grow-1 ms-3">
-                                        Describe your task in detail to help us match you with the best service providers in
-                                        your area. Be as specific as possible about what you need, including any special
-                                        requirements or preferences.
-                                    </div>
-                                </div>
-                            </div>
+                            <h1 class="my-4">{{ $sv->servicetype_name }}</h1>
                         </div>
                         <div class="col-sm-8 col-md-12">
                             <div class="card">
@@ -165,51 +155,84 @@ use App\Models\Tasker;
                                                     <h2 class="mb-1">Your Location</h2>
                                                 </div>
                                                 <div class="row mt-4">
-                                                    <div class="col-sm-12">
-                                                        <div class="row">
-                                                            <!-- Address Fields -->
-                                                            <div class="col-sm-6 mb-3">
-                                                                <label class="form-label">Address 1</label>
-                                                                <input type="text" class="form-control" id="address1"
-                                                                    placeholder="Enter Address"
-                                                                    value="{{ Auth::user()->client_address_one }}"readonly />
+                                                    <p class="text-muted fst-italic mb-3">Choose your options</p>
+                                                    <div class="col-xl-12">
+                                                        <div class="address-check border card rounded p-3">
+                                                            <div class="form-check">
+                                                                <input type="radio" class="form-check-input input-primary"
+                                                                    id="useProfileAddress" name="addressOption"
+                                                                    checked="" />
+                                                                <label class="form-check-label d-block"
+                                                                    for="useProfileAddress">
+                                                                    <span class="h6 mb-3 d-block">
+                                                                        {{ Auth::user()->client_firstname . ' ' . Auth::user()->client_lastname }}
+                                                                        <small class="text-muted">(Default)</small>
+                                                                    </span>
+                                                                    <p class="mb-0">
+                                                                        {{ Str::headline(Auth::user()->client_address_one . ', ' . Auth::user()->client_address_two . ', ' . Auth::user()->client_area . ', ' . Auth::user()->client_postcode . ' ' . Auth::user()->client_state) }}
+                                                                    </p>
+                                                                </label>
                                                             </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-12">
+                                                        <div class="address-check border card rounded p-3">
+                                                            <div class="form-check">
+                                                                <input type="radio" class="form-check-input input-primary"
+                                                                    id="useDifferentAddress" name="addressOption" />
+                                                                <label class="form-check-label d-block"
+                                                                    for="useDifferentAddress">
+                                                                    <span class="h6 mb-3 d-block">
+                                                                        Different Address
+                                                                        <small class="text-muted">(Optional)</small>
+                                                                    </span>
+                                                                    <p class="mb-0 text-muted">
+                                                                        You have to enter your address
+                                                                    </p>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="differentAddressContent" style="display: none;">
+                                                    <p>Please enter your new address below:</p>
+                                                    <div class="row mt-4">
+                                                        <div class="col-sm-12">
+                                                            <div class="row">
+                                                                <!-- Address Fields -->
+                                                                <div class="col-sm-12 mb-3">
+                                                                    <label class="form-label">Address</label>
+                                                                    <input type="text" class="form-control"
+                                                                        id="address" placeholder="Enter Address">
+                                                                </div>
+                                                                <!-- State Field -->
+                                                                <div class="col-sm-6">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">State</label>
+                                                                        <select name="client_state" class="form-control"
+                                                                            id="addState">
+                                                                            <option value="" selected>Select State
+                                                                            </option>
+                                                                            @foreach ($states['states'] as $state)
+                                                                                <option
+                                                                                    value="{{ strtolower($state['name']) }}">
+                                                                                    {{ $state['name'] }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
 
-                                                            <div class="col-sm-6 mb-3">
-                                                                <label class="form-label">Address 2</label>
-                                                                <input type="text" class="form-control" id="address2"
-                                                                    placeholder="Enter Address"
-                                                                    value="{{ Auth::user()->client_address_two }}"
-                                                                    readonly />
-                                                            </div>
-                                                            <div class="col-sm-6 mb-3">
-                                                                <label class="form-label">Postcode</label>
-                                                                <input type="text" class="form-control" id="postcode"
-                                                                    placeholder="Postcode"
-                                                                    value="{{ Auth::user()->client_postcode }}"readonly />
-                                                            </div>
-                                                            <div class="col-sm-6 mb-3">
-                                                                <label class="form-label">State</label>
-                                                                <select class="form-control" id="state">
-                                                                    <option value="{{ Auth::user()->client_state }}"
-                                                                        selected>
-                                                                        {{ Str::headline(Auth::user()->client_state) }}
-                                                                    </option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="col-sm-6 mb-3">
-                                                                <label class="form-label">Area</label>
-                                                                <select
-                                                                    class="form-control @error('client_area') is-invalid @enderror"
-                                                                    id="addCity">
-                                                                    <option value="{{ Auth::user()->client_area }}"
-                                                                        selected>
-                                                                        {{ Str::headline(Auth::user()->client_area) }}
-                                                                    </option>
-                                                                </select>
-                                                                @error('client_area')
-                                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
+                                                                <!-- Area Field -->
+                                                                <div class="col-sm-6">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Area</label>
+                                                                        <select name="client_area" class="form-control"
+                                                                            id="addCity">
+                                                                            <option value="" selected>Select Area
+                                                                            </option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -224,6 +247,20 @@ use App\Models\Tasker;
                                                     <h2 class="mb-1">Service Options</h2>
                                                 </div>
                                                 <div class="row mt-4">
+                                                    <div class="col-sm-12">
+                                                        <div class="alert alert-primary mt-3 mb-4">
+                                                            <div class="d-flex">
+                                                                <i class="ti ti-edit h2 f-w-400 mb-0 text-primary"></i>
+                                                                <div class="flex-grow-1 ms-3">
+                                                                    Describe your task in detail to help us match you with
+                                                                    the best service providers in
+                                                                    your area. Be as specific as possible about what you
+                                                                    need, including any special
+                                                                    requirements or preferences.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div class="col-sm-12 ">
                                                         <div class="row">
                                                             <div class="col-sm-12 mb-3">
@@ -303,151 +340,58 @@ use App\Models\Tasker;
 
                                             <!-- TASKER SELECTION TAB [START] -->
                                             <div class="tab-pane" id="jobDetail">
-
-                                                <div class="text-center m-5 p-5" id="loadingSpinner">
-                                                    <div class="spinner-border spinner-border-lg text-primary"
-                                                        role="status">
-                                                        <span class="sr-only">Loading...</span>
-                                                    </div>
-                                                    <div class="link-primary mt-3" role="status">
-                                                        <h4 id="loadingText"></h4>
-                                                        {{-- <h4>Searching for the perfect tasker to meet your needs...</h4> --}}
-                                                    </div>
+                                                <div class="text-center mb-4 mt-4">
+                                                    <h2 class="mb-1">Select Your Tasker</h2>
                                                 </div>
-
                                                 <!--Tasker Selection [Start]-->
-                                                <div id="taskerList" style="display:none;">
-                                                    <div class="text-center mb-4 mt-4">
-                                                        <h2 class="mb-1">Select Your Tasker</h2>
-                                                    </div>
-                                                    @foreach ($tasker as $tk)
-                                                        <div class="card m-2 border border-0 mb-5">
-                                                            <!--Image Tasker Section [Start]-->
-                                                            <div class="row mt-4">
-
-                                                                <div class="col-sm-3 col-md-3 col-lg-3">
-                                                                    <div
-                                                                        class="d-flex justify-content-center align-items-center">
-                                                                        <img src="{{ asset('storage/' . $tk->tasker_photo) }}"
-                                                                            alt="Profile Photo" width="150"
-                                                                            height="150"
-                                                                            class="user-avtar rounded-circle">
-
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="col-sm-9 col-md-9 col-lg-9">
-                                                                    <div class="p-3">
-                                                                        <div
-                                                                            class="d-flex justify-content-between align-items-center mb-2">
-                                                                            <h5 class="mb-2 f-24">
-                                                                                {{ explode(' ', $tk->tasker_firstname)[0] }}.
-                                                                            </h5>
-                                                                            <h5 class="mb-2">RM
-                                                                                {{ $tk->service_rate }}/{{ $tk->service_rate_type }}
-                                                                            </h5>
-                                                                        </div>
-                                                                        <div class="d-flex align-items-center mb-2">
-                                                                            <span
-                                                                                class="badge bg-success text-white me-2">GREAT
-                                                                                VALUE</span>
-                                                                            <span class="badge text-bg-primary text-dark">2
-                                                                                HOUR
-                                                                                MINIMUM</span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <p class="mb-1">
-                                                                                <span class="fw-bold">★ 4.9</span> (394
-                                                                                reviews)
-                                                                            </p>
-                                                                            {{-- <p class="mb-1">
-                                                                            {{ $tk->road_distance }}km</p> --}}
-                                                                            <p class="mb-1">N/A Cleaning tasks</p>
-                                                                            <p class="mb-0 text-muted">N/A Cleaning tasks
-                                                                                overall
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row flex-sm-row  flex-column-reverse">
-                                                                <div class="col-sm-12 col-md-3 col-lg-3">
-                                                                    <div class="d-none d-md-block text-center mt-2 mb-2">
-                                                                        <a href="" class=" mb-2  primary p-1">View
-                                                                            Profile & Review
-                                                                        </a>
-                                                                    </div>
-                                                                    <div
-                                                                        class="d-grid d-md-flex justify-content-md-center align-items-md-center ">
-                                                                        <button type="button"
-                                                                            class="btn btn-primary select-continue-btn"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#selectdatetime-{{ $tk->taskerID }}"
-                                                                            data-tasker-id="{{ $tk->taskerID }}"
-                                                                            data-service-id="{{ $tk->svID }}">
-                                                                            Select & Continue
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="col-sm-12 col-md-9 col-lg-9">
-                                                                    <div class=" bg-light p-3">
-                                                                        <h4> How I can help:</h4>
-                                                                        <p class="text-muted fw-normal f-16">
-                                                                            {{ $tk->service_desc }}
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <hr>
-                                                        <div id="selectdatetime-{{ $tk->taskerID }}" class="modal fade"
-                                                            tabindex="-1" role="dialog"
-                                                            aria-labelledby="exampleModalLiveLabel" aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered"
-                                                                role="document">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title"
-                                                                            id="exampleModalLiveLabel">
-                                                                            Plan Your Task with
-                                                                            {{ explode(' ', $tk->tasker_firstname)[0] }}
-                                                                        </h5>
-                                                                        <button type="button" class="btn-close"
-                                                                            data-bs-dismiss="modal"
-                                                                            aria-label="Close"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <div class="row">
-                                                                            <div class="col-sm-12 mb-3">
-                                                                                <label for="task-date"
-                                                                                    class="mb-2">Availability</label>
-                                                                                <input type="text" id=""
-                                                                                    class="form-control task-date"
-                                                                                    placeholder="Choose Date">
-                                                                            </div>
-                                                                            <div class="col-sm-12 mb-3">
-                                                                                <label for="task-time"
-                                                                                    class="mb-2">Time</label>
-                                                                                <select class="form-control task-time">
-                                                                                    <!-- Options akan diisi melalui AJAX -->
-                                                                                </select>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="d-grid mt-4 mb-2 ">
-                                                                            <button type="button"
-                                                                                class="btn btn-primary select-tasker disabled"id="nextStepButton"
-                                                                                onclick="navigateTabs('next')"
-                                                                                data-bs-dismiss="modal">
-                                                                                Select &
-                                                                                Continue</button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
+                                                <div id="taskerList">
+                                                    <!--Tasker List Ajax Generated -->
                                                 </div>
+                                                @foreach ($tasker as $tk)
+                                                    <div id="selectdatetime-{{ $tk->taskerID }}" class="modal fade"
+                                                        tabindex="-1" role="dialog"
+                                                        aria-labelledby="exampleModalLiveLabel" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="exampleModalLiveLabel">
+                                                                        Plan Your Task with
+                                                                        {{ explode(' ', $tk->tasker_firstname)[0] }}
+                                                                    </h5>
+                                                                    <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal"
+                                                                        aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="row">
+                                                                        <div class="col-sm-12 mb-3">
+                                                                            <label for="task-date"
+                                                                                class="mb-2">Availability</label>
+                                                                            <input type="text" id=""
+                                                                                class="form-control task-date"
+                                                                                placeholder="Choose Date">
+                                                                        </div>
+                                                                        <div class="col-sm-12 mb-3">
+                                                                            <label for="task-time"
+                                                                                class="mb-2">Time</label>
+                                                                            <select class="form-control task-time">
+                                                                                <!-- Options akan diisi melalui AJAX -->
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="d-grid mt-4 mb-2 ">
+                                                                        <button type="button"
+                                                                            class="btn btn-primary select-tasker disabled"id="nextStepButton"
+                                                                            onclick="navigateTabs('next')"
+                                                                            data-bs-dismiss="modal">
+                                                                            Select &
+                                                                            Continue</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
                                                 <!-- Tasker Selection [End] -->
                                             </div>
                                             <!-- TASKER SELECTION TAB [END] -->
@@ -603,9 +547,13 @@ use App\Models\Tasker;
                                                             </div>
                                                             <div class="checkout-details">
                                                                 <input type="hidden" name="booking_date"
-                                                                class="bookingDate">
+                                                                    class="bookingDate">
                                                                 <input type="hidden" name="booking_address"
                                                                     class="booking_address">
+                                                                <input type="hidden" name="booking_latitude"
+                                                                    class="booking_latitude">
+                                                                <input type="hidden" name="booking_longitude"
+                                                                    class="booking_longitude">
                                                                 <input type="hidden" name="booking_time_start"
                                                                     class="inputTimeStart">
                                                                 <input type="hidden" name="booking_time_end"
@@ -614,8 +562,7 @@ use App\Models\Tasker;
                                                                     class="bookingRate">
                                                                 <input type="hidden" name="service_id"
                                                                     class="serviceID">
-                                                                <input type="hidden" name="tasker_id"
-                                                                    class="taskerID">
+                                                                <input type="hidden" name="tasker_id" class="taskerID">
                                                             </div>
                                                             <div class="d-grid mt-4 mb-4">
                                                                 <button type="submit" class="btn btn-primary">Proceed to
@@ -729,34 +676,11 @@ use App\Models\Tasker;
                 tabs[newIndex].classList.remove('disabled');
                 tabs[newIndex].setAttribute('data-bs-toggle', 'tab'); // Allow tab switching
 
-                // Handle Tasker Selection loading
-                if (newIndex === 2) { // Tasker Selection index
-                    const text = "Finding...";
-                    const speed = 200; // Typing speed in milliseconds
-                    let i = 0;
-
-                    function typeEffect() {
-                        if (i < text.length) {
-                            document.getElementById("loadingText").innerHTML += text.charAt(i);
-                            i++;
-                            setTimeout(typeEffect, speed);
-                        }
-                    }
-
-                    typeEffect();
-
-
-                    document.getElementById('loadingSpinner').style.display = 'block'; // Show spinner
-                    document.getElementById('taskerList').style.display = 'none'; // Hide tasker list initially
-
-                    // Simulate loading and show the tasker list after 2.5 seconds
-                    setTimeout(function() {
-                        document.getElementById('loadingSpinner').style.display = 'none'; // Hide spinner
-                        document.getElementById('taskerList').style.display = 'block'; // Show tasker list
-                    }, 3000); // Adjust delay as needed
+                if (newIndex === 1) {
+                    findNearbyTaskers();
                 }
 
-                updateBookingAddress();
+                // updateBookingAddress();
             }
 
             // Navigate to new tab
@@ -779,28 +703,6 @@ use App\Models\Tasker;
             // Enable/Disable "Previous" button
             prevButton.disabled = currentIndex === 0;
 
-            if (currentIndex === 1) {
-                // Validate address fields
-                const address1 = document.getElementById('address1').value.trim();
-                const address2 = document.getElementById('address2').value.trim();
-                const postcode = document.getElementById('postcode').value.trim();
-                const state = document.getElementById('state').value.trim();
-                const area = document.getElementById('addCity').value.trim();
-
-                const isAddressValid = address1 !== "" && postcode !== "" && state !== "" && area !== "";
-
-                // Enable "Next" button only if address is valid
-                nextButton.disabled = !isAddressValid;
-            } else {
-                nextButton.disabled = currentIndex === tabs.length - 1;
-            }
-
-            // Adjust "Next" and "Next Step" button visibility for Tasker Selection
-            if(currentIndex === 1)
-            {
-                nextButton.disabled = true;
-
-            }
             if (currentIndex === 2) {
                 nextButton.style.display = 'none'; // Hide "Next"
                 nextStepButton.style.display = ''; // Show "Next Step"
@@ -842,21 +744,213 @@ use App\Models\Tasker;
             });
         });
 
+
+        /******************** *************************** ***********/
+        /******************** AJAX: FETCH TASKER ********************/
+        /******************** *************************** ***********/
+
+        let useProfileAddress = true;
+        const differentContent = document.getElementById('differentAddressContent');
+        $('#useProfileAddress').on('change', function() {
+            if (this.checked) {
+                useProfileAddress = true;
+                differentContent.style.display = 'none';
+            } else {
+                useProfileAddress = false;
+                differentContent.style.display = 'none';
+            }
+        });
+
+        $('#useDifferentAddress').on('change', function() {
+            if (this.checked) {
+                useProfileAddress = false;
+                differentContent.style.display = 'block';
+            } else {
+                useProfileAddress = false;
+                differentContent.style.display = 'none';
+            }
+        });
+
+        $('#addState').on('change', function() {
+            var state = $(this).val();
+            if (state) {
+                $.ajax({
+                    url: '/get-areas/' + state, // Ensure this matches the route
+                    type: 'GET',
+                    success: function(data) {
+                        $('#addCity').empty().append(
+                            '<option value="">Select Area</option>');
+                        $.each(data, function(index, area) {
+                            $('#addCity').append('<option value="' + area + '">' +
+                                area + '</option>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching areas: " +
+                            error); // For debugging if request fails
+                    }
+                });
+            } else {
+                $('#addCity').empty().append('<option value="">Select Area</option>');
+            }
+        });
+
+        function findNearbyTaskers() {
+            var area = document.getElementById('addCity').value;
+            var state = document.getElementById('addState').value;
+            var address = document.getElementById('address').value;
+            var fullAddress = `${address}, ${area}, ${state}`.replace(/(, )+/g, ', ').replace(/, $/, '');
+            $.ajax({
+                url: '{{ route('booking-generate-coordinates') }}',
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                data: {
+                    address: fullAddress,
+                    useProfileAddress: useProfileAddress,
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        let {
+                            latitude,
+                            longitude,
+                            address
+                        } = response;
+                        console.log(latitude, longitude);
+                        fetchTaskers(latitude, longitude);
+                        $('.booking_latitude').val(latitude);
+                        $('.booking_longitude').val(longitude);
+                        $('.booking_address').val(address.replace(/(, )+/g, ', ').replace(/, $/, ''));
+
+                    } else {
+                        alert(response.status);
+                    }
+                },
+                error: function(err) {
+                    console.error(err);
+                },
+            });
+        }
+
+        function fetchTaskers(latitude, longitude) {
+            $.ajax({
+                url: '{{ route('booking-fetch-tasker', $sv->id) }}',
+                method: 'GET',
+                data: {
+                    latitude: latitude,
+                    longitude: longitude,
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Display tasker list
+                        displayTaskers(response.taskers);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(err) {
+                    console.error(err);
+                },
+            });
+        }
+
+        function displayTaskers(taskers) {
+            let taskerContainer = document.getElementById('taskerList'); // Assume this container exists
+            taskerContainer.innerHTML = '';
+            let taskerArray = Object.values(taskers);
+
+            taskerArray.forEach(tasker => {
+                taskerContainer.innerHTML += `
+                    <div class="card m-2 border border-0 mb-5">
+                        <!--Image Tasker Section [Start]-->
+                        <div class="row mt-4">
+                            <div class="col-sm-3 col-md-3 col-lg-3">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <img src="{{ asset('storage') }}/${tasker.tasker_photo}"
+                                        alt="Profile Photo" width="150"
+                                        height="150"
+                                        class="user-avtar rounded-circle">
+                                </div>
+                            </div>
+
+                            <div class="col-sm-9 col-md-9 col-lg-9">
+                                <div class="p-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="mb-2 f-24">
+                                            ${tasker.tasker_firstname.split(' ')[0]}.
+                                        </h5>
+                                        <h5 class="mb-2">
+                                            RM ${tasker.service_rate}/${tasker.service_rate_type}
+                                        </h5>
+                                    </div>
+
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="badge bg-success text-white me-2">GREAT VALUE</span>
+                                    </div>
+
+                                    <div>
+                                        <p class="mb-1">
+                                            <span class="fw-bold">★ 4.9</span> (394 reviews)
+                                        </p>                                       
+                                        <p class="mb-1">N/A ${tasker.servicetype_name} tasks</p>
+                                        <p class="mb-1"> 
+                                            <i class="fa fa-map-marker-alt text-danger me-2"></i>
+                                            ${tasker.road_distance} KM away
+                                        </p>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row flex-sm-row  flex-column-reverse">
+                            <div class="col-sm-12 col-md-3 col-lg-3">
+                                <div class="d-none d-md-block text-center mt-2 mb-2">
+                                    <a href="#" class=" mb-2  primary p-1">View Profile & Review </a>
+                                </div>
+                                <div class="d-grid d-md-flex justify-content-md-center align-items-md-center ">
+                                    <button type="button"
+                                        class="btn btn-primary select-continue-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#selectdatetime-${tasker.taskerID}"
+                                        data-tasker-id="${tasker.taskerID}"
+                                        data-service-id="${tasker.svID}">
+                                        Select & Continue
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12 col-md-9 col-lg-9">
+                                <div class=" bg-light p-3">
+                                    <h4> How I can help:</h4>
+                                        <p class="text-muted fw-normal f-16">
+                                            ${tasker.service_desc}
+                                        </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
         /******************** *************************** ***********************/
         /******************** MODAL: ASSIGN TASKER DYNAMICLY ********************/
         /******************** *************************** ***********************/
 
         document.addEventListener('DOMContentLoaded', function() {
-            const buttons = document.querySelectorAll('.select-continue-btn');
-            buttons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    const taskerId = this.getAttribute('data-tasker-id');
-                    const svId = this.getAttribute('data-service-id');
+            // Use event delegation on the tasker container
+            const taskerContainer = document.getElementById('taskerList');
+            taskerContainer.addEventListener('click', function(event) {
+                // Check if the clicked element has the 'select-continue-btn' class
+                if (event.target.classList.contains('select-continue-btn')) {
+                    const taskerId = event.target.getAttribute('data-tasker-id');
+                    const svId = event.target.getAttribute('data-service-id');
                     $('.task-time').val('');
                     if (taskerId) {
                         const today = new Date();
-                        const formattedToday = today.toISOString().split('T')[
-                            0]; // Format as YYYY-MM-DD
+                        const formattedToday = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
                         localStorage.setItem('selectedTaskerId', taskerId);
                         localStorage.setItem('selectedServiceId', svId);
                         getTaskerTimeSlots(formattedToday);
@@ -864,37 +958,37 @@ use App\Models\Tasker;
                         if ($('.task-time').val() == '') {
                             $('.select-tasker').addClass('disabled');
                         }
-
                     }
-                });
-            });
-        });
-
-        function updateBookingAddress() {
-            // Ambil nilai dari setiap medan
-            const address1 = document.getElementById('address1').value.trim();
-            const address2 = document.getElementById('address2').value.trim();
-            const postcode = document.getElementById('postcode').value.trim();
-            const state = document.getElementById('state').value.trim();
-            const area = document.getElementById('addCity').value.trim();
-
-            // Gabungkan nilai-nilai tersebut
-            const fullAddress = `${address1}, ${address2}, ${postcode}, ${area}, ${state}`.replace(/(, )+/g, ', ').replace(
-                /, $/, '');
-
-            $('.booking_address').val(fullAddress.toUpperCase());
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const addressFields = ['address1', 'address2', 'postcode', 'state', 'addCity'];
-
-            addressFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    field.addEventListener('input', updateBookingAddress); // Update address on input change
                 }
             });
         });
+
+
+        // function updateBookingAddress() {
+        //     // Ambil nilai dari setiap medan
+        //     const address1 = document.getElementById('address1').value.trim();
+        //     const address2 = document.getElementById('address2').value.trim();
+        //     const postcode = document.getElementById('postcode').value.trim();
+        //     const state = document.getElementById('state').value.trim();
+        //     const area = document.getElementById('addCity').value.trim();
+
+        //     // Gabungkan nilai-nilai tersebut
+        //     const fullAddress = `${address1}, ${address2}, ${postcode}, ${area}, ${state}`.replace(/(, )+/g, ', ').replace(
+        //         /, $/, '');
+
+        //     $('.booking_address').val(fullAddress.toUpperCase());
+        // }
+
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     const addressFields = ['address1', 'address2', 'postcode', 'state', 'addCity'];
+
+        //     addressFields.forEach(fieldId => {
+        //         const field = document.getElementById(fieldId);
+        //         if (field) {
+        //             field.addEventListener('input', updateBookingAddress); // Update address on input change
+        //         }
+        //     });
+        // });
 
         // FLATPICKER : CALANDER
         document.addEventListener('DOMContentLoaded', function() {

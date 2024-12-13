@@ -193,7 +193,6 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     Route::post('/update-profile-client-{id}', [ClientController::class, 'clientUpdateProfile'])->name('client-update-profile');
     Route::post('/client-update-password-{id}', [ClientController::class, 'clientUpdatePassword'])->name('client-update-password');
     Route::post('/client-update-address-{id}', [ClientController::class, 'clientUpdateAddress'])->name('client-update-address');
-    Route::get('/booking-{id}', [RouteController::class, 'clientBooking'])->name('client-booking');
 
 
     // Client - Logout
@@ -201,11 +200,15 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
 
 
     // Client - Booking
+    Route::get('/booking-{id}', [RouteController::class, 'clientBooking'])->name('client-booking');
+    Route::get('/fetch-tasker/{taskid}', [BookingController::class, 'fetchTaskers'])->name('booking-fetch-tasker');
+    Route::post('/generate-coordinates-booking', [BookingController::class, 'getCoordinates'])->name('booking-generate-coordinates');
+
+    
     Route::get('/tasker-get-time/{date}/{taskerid}', [BookingController::class, 'getBookingTime'])->name('client-tasker-get-time');
     Route::get('/get-tasker-details', [BookingController::class, 'getTaskerDetail'])->name('getTaskerDetail');
     Route::post('/client-book-service', [BookingController::class, 'clientBookFunction'])->name('clientBookService');
-
-    Route::get('/UpcomingTask', [RouteController::class, 'clientUpcoming'])->name('Upcoming');
+    Route::get('/upcomingTask', [RouteController::class, 'clientUpcoming'])->name('Upcoming');
 
 });
 

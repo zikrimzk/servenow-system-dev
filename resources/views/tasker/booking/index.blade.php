@@ -97,38 +97,44 @@
                                 <div class="col-sm-12">
                                     <div class="mb-3">
                                         <label for="modalEventTask" class="form-label">Task</label>
-                                        <input type="text" class="form-control" id="modalEventTask">
+                                        <input type="text" class="form-control" id="modalEventTask" readonly/>
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="mb-3">
                                         <label for="modalEventTitle" class="form-label">Client Name</label>
-                                        <input type="text" class="form-control" id="modalEventTitle">
+                                        <input type="text" class="form-control" id="modalEventTitle" readonly/>
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="mb-3">
                                         <label for="modalEventPhoneNo" class="form-label">Phone No</label>
-                                        <input type="text" class="form-control" id="modalEventPhoneNo">
+                                        <input type="text" class="form-control" id="modalEventPhoneNo" readonly/>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="mb-3">
-                                        <label for="modalEventTitle" class="form-label">Start Time</label>
-                                        <input type="text" class="form-control" id="modalEventStart">
+                                        <label for="modalEventStart" class="form-label">Start Time</label>
+                                        <input type="text" class="form-control" id="modalEventStart" readonly/>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <div class="mb-3">
-                                        <label for="modalEventTitle" class="form-label">End Time</label>
-                                        <input type="text" class="form-control" id="modalEventEnd">
+                                        <label for="modalEventEnd" class="form-label">End Time</label>
+                                        <input type="text" class="form-control" id="modalEventEnd" readonly/>
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="mb-3">
-                                        <label for="modalEventTitle" class="form-label">Address</label>
-                                        <textarea id="modalEventDescription" class="form-control" cols="20" rows="5"></textarea>
+                                        <label for="modalEventDescription" class="form-label">Address</label>
+                                        <textarea id="modalEventDescription" class="form-control" cols="20" rows="5" readonly></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label for="modalEventNote" class="form-label">Task Note</label>
+                                        <textarea id="modalEventNote" class="form-control" cols="30" rows="5" readonly></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -157,9 +163,24 @@
     <script>
         function formatDateLocal(date) {
             const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+            const month = String(date.getMonth() + 1).padStart(2, '0'); 
             const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
+        }
+
+        function formatDateTime(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+
+            let hours = date.getHours();
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+
+            hours = hours % 12; 
+            hours = hours ? hours : 12; 
+
+            return `${day}-${month}-${year}, ${hours}:${minutes} ${ampm}`;
         }
 
         function getValidRange() {
@@ -168,8 +189,8 @@
             sevenDaysFromToday.setDate(today.getDate() + 7);
 
             return {
-                start: formatDateLocal(today), // Use the custom formatting function
-                end: formatDateLocal(sevenDaysFromToday) // Use the custom formatting function
+                start: formatDateLocal(today), 
+                end: formatDateLocal(sevenDaysFromToday)
             };
         }
 
@@ -177,13 +198,12 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
-            const taskerId = '{{ Auth::user()->id }}'; // Replace with dynamic tasker ID
+            const taskerId = '{{ Auth::user()->id }}'; 
 
-            let currentLoadedDate = null; // Tracks the last fetched date to prevent repeated requests
-            let allowedStartTimes = []; // Stores valid drop times dynamically
+            let currentLoadedDate = null; 
+            let allowedStartTimes = []; 
 
             function fetchAvailability(date) {
-                console.log('Fetching availability for:', date); // Debug log
                 return fetch(`{{ route('get-calander-range-tasker') }}?taskerid=${taskerId}&date=${date}`)
                     .then(response => response.json())
                     .then(data => {
@@ -197,7 +217,7 @@
                             };
                         }
 
-                        allowedStartTimes = data.allowed_times || []; // Set allowed times dynamically
+                        allowedStartTimes = data.allowed_times || []; 
                         return {
                             startTime: data.start_time,
                             endTime: data.end_time,
@@ -233,15 +253,15 @@
                         right: 'timeGridDay,dayGridMonth,listWeek',
                     },
                     themeSystem: 'bootstrap',
-                    dragScroll: true, // Enables scrolling during drag
-                    longPressDelay: 300, // Time delay before drag starts on touch devices
-                    eventStartEditable: true, // Allow dragging
-                    eventDurationEditable: true, // Allow resizing
+                    dragScroll: true, 
+                    longPressDelay: 300, 
+                    eventStartEditable: true, 
+                    eventDurationEditable: true,
                     height: 'auto',
                     validRange: validRange,
                     slotMinTime: '07:00:00',
                     slotMaxTime: '20:00:00',
-                    editable: true, // Allow dragging and resizing events
+                    editable: true,
                     selectable: true,
                     businessHours: [{
                         daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
@@ -249,7 +269,6 @@
                         endTime: endTime || '20:00:00',
                     }],
                     eventConstraint: 'businessHours',
-                    // events: '{{ route('get-tasker-bookings') }}', // Fetch bookings dynamically
                     eventSources: [{
                             events: function(fetchInfo, successCallback, failureCallback) {
                                 // Fetch events dynamically for tasker bookings
@@ -269,13 +288,10 @@
                                             phoneno: event.phoneno,
                                             lat: event.lat,
                                             long: event.long,
+                                            note: event.note,
+
                                             clickable: true
-
-
-                                            // You can add any other fields that FullCalendar needs, such as description, id, etc.
                                         }));
-
-                                        // Pass the events to FullCalendar
                                         successCallback(events);
                                     })
                                     .catch(error => {
@@ -286,7 +302,6 @@
                         },
                         {
                             events: function(fetchInfo, successCallback, failureCallback) {
-                                // Fetch events dynamically for tasker bookings
                                 fetch('{{ route('get-unavailable-slot') }}')
                                     .then(response => response.json())
                                     .then(data => {
@@ -312,15 +327,16 @@
                     ],
 
                     eventDidMount: function(info) {
-                        info.el.style.borderRadius = '8px'; // Rounded corners
-                        info.el.style.backgroundColor = '#007bff'; // Light primary blue
-                        info.el.style.color = '#fff'; // Text color white
+                        info.el.style.borderRadius = '8px'; 
+                        info.el.style.backgroundColor = '#007bff'; 
+                        info.el.style.color = '#fff';
                     },
                     eventClick: function(info) {
                         if (info.event.extendedProps.clickable === false) {
                             info.jsEvent.preventDefault();
                         } else {
                             const eventDescription = info.event.extendedProps.description || '';
+                            const eventNote = info.event.extendedProps.note || 'No Task Note';
                             const callButton = document.getElementById('callButton');
                             const getdirection = document.getElementById('getDirection');
                             document.getElementById('modalEventTitle').value = info.event.extendedProps
@@ -330,17 +346,19 @@
                             document.getElementById('modalEventPhoneNo').value = info.event
                                 .extendedProps
                                 .phoneno;
-                            document.getElementById('modalEventStart').value = info.event.start
+                            document.getElementById('modalEventStart').value = formatDateTime(info.event
+                                    .start)
                                 .toLocaleString();
-                            document.getElementById('modalEventEnd').value = info.event.end
+                            document.getElementById('modalEventEnd').value = formatDateTime(info.event
+                                    .end)
                                 .toLocaleString();
                             document.getElementById('modalEventDescription').value = eventDescription;
+                            document.getElementById('modalEventNote').value = eventNote;
 
                             callButton.href = `tel:${info.event.extendedProps.phoneno}`
                             getdirection.href =
                                 `https://www.waze.com/live-map/directions?z=10&to=ll.${info.event.extendedProps.lat}%2C${info.event.extendedProps.long}`
 
-                            // Show the modal
                             const modalElement = document.getElementById('eventDetailsModal');
                             const modal = new bootstrap.Modal(modalElement);
                             modal.show();
@@ -393,8 +411,8 @@
                     // Store the event and show the confirmation modal
                     eventToUpdate = info; // Ensure this line runs correctly
                     console.log('Event to update (drop):', eventToUpdate); // Debugging
-                    document.getElementById('newStartTime').textContent = info.event.start.toLocaleString();
-                    document.getElementById('newEndTime').textContent = info.event.end.toLocaleString();
+                    document.getElementById('newStartTime').textContent = formatDateTime(info.event.start);
+                    document.getElementById('newEndTime').textContent = formatDateTime(info.event.end);
                     new bootstrap.Modal(document.getElementById('confirmModal')).show();
                 }
             }

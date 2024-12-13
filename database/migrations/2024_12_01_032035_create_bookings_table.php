@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->date('booking_date');
             $table->text('booking_address');
+            $table->decimal('booking_latitude', 10, 8)->nullable();
+            $table->decimal('booking_longitude', 11, 8)->nullable();
             $table->time('booking_time_start')->nullable();
             $table->time('booking_time_end')->nullable();
             $table->integer('booking_status')->default(1);

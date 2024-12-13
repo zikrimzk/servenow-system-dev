@@ -12,6 +12,8 @@ class Booking extends Model
     protected $fillable = [
         'booking_date',
         'booking_address',
+        'booking_latitude',
+        'booking_longitude',
         'booking_time_start',
         'booking_time_end',
         'booking_status',

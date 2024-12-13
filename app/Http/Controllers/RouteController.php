@@ -124,12 +124,6 @@ class RouteController extends Controller
     public function clientBooking($id)
     {
         try {
-            $client = Client::where('id', auth()->id())->first();
-            $clientLat = $client->latitude;
-            $clientLng = $client->longitude;
-
-            // API Key for Google Directions API
-            $apiKey = env('GOOGLE_MAPS_GEOCODING_API_KEY', '');
 
             // Fetch taskers and calculate road distances
             $svtasker = DB::table('services as a')
@@ -155,32 +149,6 @@ class RouteController extends Controller
                 )
                 ->get();
 
-            // Filter taskers within a specified distance
-            // $svtasker = $svtasker->map(function ($tasker) use ($clientLat, $clientLng, $apiKey) {
-            //     $taskerLat = $tasker->tasker_lat;
-            //     $taskerLng = $tasker->tasker_lng;
-
-            //     // Call Google Directions API
-            //     $url = "https://maps.googleapis.com/maps/api/directions/json?origin=$clientLat,$clientLng&destination=$taskerLat,$taskerLng&key=$apiKey";
-            //     $response = file_get_contents($url);
-            //     $data = json_decode($response, true);
-
-            //     // Get road distance
-            //     if (!empty($data['routes']) && isset($data['routes'][0]['legs'][0]['distance']['value'])) {
-            //         $distanceInMeters = $data['routes'][0]['legs'][0]['distance']['value'];
-            //         $tasker->road_distance = $distanceInMeters / 1000; // Convert to kilometers
-            //     } else {
-            //         $tasker->road_distance = null; // If failed
-            //     }
-
-            //     return $tasker;
-            // })
-            //     ->filter(function ($tasker) {
-            //         // Filter only taskers within 40 km
-            //         return $tasker->road_distance !== null && $tasker->road_distance <= 40;
-            //     })
-            //     ->sortBy('road_distance'); // Optional: Sort by nearest distance
-
             $sv = ServiceType::whereId($id)->first();
 
             $timeSlot = DB::table('time_slots as a')
@@ -195,7 +163,6 @@ class RouteController extends Controller
                 'title' => 'Describe your task',
                 'tasker' => $svtasker,
                 'sv' => $sv,
-                'client' => $client,
                 'states' => $states,
                 'time' => $timeSlot
             ]);
