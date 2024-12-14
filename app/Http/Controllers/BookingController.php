@@ -230,7 +230,7 @@ class BookingController extends Controller
                 ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
                 ->join('taskers as e', 'c.tasker_id', '=', 'e.id')
                 ->where('e.id', '=', Auth::user()->id)
-                ->where('a.booking_status', '=', 1)
+                ->whereIn('a.booking_status', [1, 2, 3, 4, 6])
                 ->select(
                     'a.id as bookingID',
                     'a.booking_date',
@@ -252,7 +252,14 @@ class BookingController extends Controller
                 )
                 ->get();
             // dd($bookings);
+
             $events = $bookings->map(function ($booking) {
+                $className = '';
+                if ($booking->booking_status == 3) {
+                    $className = 'event-success';
+                } elseif ($booking->booking_status == 6) {
+                    $className = 'event-unavailable';
+                }
                 return [
                     'title' => $booking->client_firstname . ' (' . $booking->servicetype_name . ')',
                     'start' => $booking->booking_date . 'T' . $booking->booking_time_start,
@@ -266,7 +273,7 @@ class BookingController extends Controller
                     'lat' => $booking->booking_latitude,
                     'long' => $booking->booking_longitude,
                     'note' => $booking->booking_note,
-
+                    'className' => $className
                 ];
             });
 
@@ -364,7 +371,6 @@ class BookingController extends Controller
         // Find the booking by ID
         $booking = Booking::find($request->id);
 
-
         // Get the old time range
         $oldDate = $booking->booking_date;
         $oldStartTime = $booking->booking_time_start;
@@ -409,5 +415,48 @@ class BookingController extends Controller
             'message' => 'Event rescheduled successfully',
             'updated_booking' => $booking
         ]);
+    }
+
+    public function changeBookingStatus(Request $request)
+    {
+        try {
+            $booking = Booking::findOrFail($request->id);
+            if ($request->option == 1) {
+                $booking->booking_status = 3;
+                $booking->save();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Booking Confirmed!',
+                    'updated_booking' => $booking,
+                ]);
+            } else if ($request->option == 2) {
+                $booking->booking_status = 5;
+                $booking->save();
+
+                $oldDate = $booking->booking_date;
+                $oldStartTime = $booking->booking_time_start;
+                $oldEndTime = $booking->booking_time_end;
+
+                DB::table('tasker_time_slots as a')
+                    ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                    ->where('a.tasker_id', '=', Auth::user()->id)
+                    ->where('a.slot_date', '=', $oldDate)
+                    ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
+                    ->update(['a.slot_status' => 1]);
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Booking Cancelled!',
+                    'updated_booking' => $booking,
+                ]);
+            }
+        } catch (Exception $e) {
+            // Catch errors and return a JSON response with a proper error message.
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500); // HTTP status code 500 for server errors.
+        }
     }
 }

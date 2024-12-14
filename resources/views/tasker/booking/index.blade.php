@@ -97,32 +97,32 @@
                                 <div class="col-sm-12">
                                     <div class="mb-3">
                                         <label for="modalEventTask" class="form-label">Task</label>
-                                        <input type="text" class="form-control" id="modalEventTask" readonly/>
+                                        <input type="text" class="form-control" id="modalEventTask" readonly />
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="mb-3">
                                         <label for="modalEventTitle" class="form-label">Client Name</label>
-                                        <input type="text" class="form-control" id="modalEventTitle" readonly/>
+                                        <input type="text" class="form-control" id="modalEventTitle" readonly />
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="mb-3">
                                         <label for="modalEventPhoneNo" class="form-label">Phone No</label>
-                                        <input type="text" class="form-control" id="modalEventPhoneNo" readonly/>
+                                        <input type="text" class="form-control" id="modalEventPhoneNo" readonly />
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="mb-3">
                                         <label for="modalEventStart" class="form-label">Start Time</label>
-                                        <input type="text" class="form-control" id="modalEventStart" readonly/>
+                                        <input type="text" class="form-control" id="modalEventStart" readonly />
                                     </div>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <div class="mb-3">
                                         <label for="modalEventEnd" class="form-label">End Time</label>
-                                        <input type="text" class="form-control" id="modalEventEnd" readonly/>
+                                        <input type="text" class="form-control" id="modalEventEnd" readonly />
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
@@ -137,15 +137,33 @@
                                         <textarea id="modalEventNote" class="form-control" cols="30" rows="5" readonly></textarea>
                                     </div>
                                 </div>
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label for="modalEventStatus" class="form-label">Status</label>
+                                        <input type="text" class="form-control" id="modalEventStatus" readonly />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <div class="d-grid">
+                                        <button type="button" class="btn btn-danger" id="rejectBookingChange"
+                                            data-booking-id="#" data-option="2">Unable to Serve</button>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <div class="d-grid">
+                                        <button type="button" class="btn btn-success" id="confirmBookingChange"
+                                            data-booking-id="#" data-option="1">Confirm
+                                            Booking</button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
-                        <div class="modal-footer justify-content-end align-items-center gap-3">
-                            <div>
-                                <a href="#" class="btn btn-success" id="callButton">Contact
-                                    Client</a>
-                                <a href="#" class="btn btn-primary" id="getDirection" target="_blank">Get
-                                    Direction</a>
-                            </div>
+                        <div class="modal-footer justify-content-start align-items-center gap-1">
+                            <a href="#" class="btn btn-outline-secondary" id="callButton">Contact
+                                Client</a>
+                            <a href="#" class="btn btn-outline-secondary" id="getDirection" target="_blank">Get
+                                Direction</a>
                         </div>
                     </div>
                 </div>
@@ -163,7 +181,7 @@
     <script>
         function formatDateLocal(date) {
             const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0'); 
+            const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         }
@@ -177,8 +195,8 @@
             const minutes = String(date.getMinutes()).padStart(2, '0');
             const ampm = hours >= 12 ? 'PM' : 'AM';
 
-            hours = hours % 12; 
-            hours = hours ? hours : 12; 
+            hours = hours % 12;
+            hours = hours ? hours : 12;
 
             return `${day}-${month}-${year}, ${hours}:${minutes} ${ampm}`;
         }
@@ -189,19 +207,20 @@
             sevenDaysFromToday.setDate(today.getDate() + 7);
 
             return {
-                start: formatDateLocal(today), 
+                start: formatDateLocal(today),
                 end: formatDateLocal(sevenDaysFromToday)
             };
         }
 
         let validRange = getValidRange();
+        let calendarInstance = null;
 
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
-            const taskerId = '{{ Auth::user()->id }}'; 
+            const taskerId = '{{ Auth::user()->id }}';
 
-            let currentLoadedDate = null; 
-            let allowedStartTimes = []; 
+            let currentLoadedDate = null;
+            let allowedStartTimes = [];
 
             function fetchAvailability(date) {
                 return fetch(`{{ route('get-calander-range-tasker') }}?taskerid=${taskerId}&date=${date}`)
@@ -217,7 +236,7 @@
                             };
                         }
 
-                        allowedStartTimes = data.allowed_times || []; 
+                        allowedStartTimes = data.allowed_times || [];
                         return {
                             startTime: data.start_time,
                             endTime: data.end_time,
@@ -253,9 +272,9 @@
                         right: 'timeGridDay,dayGridMonth,listWeek',
                     },
                     themeSystem: 'bootstrap',
-                    dragScroll: true, 
-                    longPressDelay: 300, 
-                    eventStartEditable: true, 
+                    dragScroll: true,
+                    longPressDelay: 300,
+                    eventStartEditable: true,
                     eventDurationEditable: true,
                     height: 'auto',
                     validRange: validRange,
@@ -289,6 +308,7 @@
                                             lat: event.lat,
                                             long: event.long,
                                             note: event.note,
+                                            className: event.className,
 
                                             clickable: true
                                         }));
@@ -327,8 +347,8 @@
                     ],
 
                     eventDidMount: function(info) {
-                        info.el.style.borderRadius = '8px'; 
-                        info.el.style.backgroundColor = '#007bff'; 
+                        info.el.style.borderRadius = '8px';
+                        info.el.style.backgroundColor = '#007bff';
                         info.el.style.color = '#fff';
                     },
                     eventClick: function(info) {
@@ -337,8 +357,33 @@
                         } else {
                             const eventDescription = info.event.extendedProps.description || '';
                             const eventNote = info.event.extendedProps.note || 'No Task Note';
+                            const eventStatus = info.event.extendedProps.status;
                             const callButton = document.getElementById('callButton');
                             const getdirection = document.getElementById('getDirection');
+                            const confirmBookingChange = document.getElementById(
+                                'confirmBookingChange');
+                            const rejectBookingChange = document.getElementById(
+                                'rejectBookingChange');
+                            confirmBookingChange.style.display = 'none';
+                            rejectBookingChange.style.display = 'none';
+
+
+                            var newStatus = null;
+                            if (eventStatus == 1) {
+                                newStatus = 'To Pay';
+                            } else if (eventStatus == 2) {
+                                newStatus = 'Paid';
+                                confirmBookingChange.style.display = 'block';
+                                rejectBookingChange.style.display = 'block';
+                            } else if (eventStatus == 3) {
+                                newStatus = 'Confirmed';
+                            } else if (eventStatus == 4) {
+                                newStatus = 'Rescheduled';
+                            } else if (eventStatus == 5) {
+                                newStatus = 'Cancelled';
+                            } else if (eventStatus == 6) {
+                                newStatus = 'Completed';
+                            }
                             document.getElementById('modalEventTitle').value = info.event.extendedProps
                                 .name;
                             document.getElementById('modalEventTask').value = info.event.extendedProps
@@ -354,6 +399,11 @@
                                 .toLocaleString();
                             document.getElementById('modalEventDescription').value = eventDescription;
                             document.getElementById('modalEventNote').value = eventNote;
+                            document.getElementById('modalEventStatus').value = newStatus;
+
+                            confirmBookingChange.setAttribute('data-booking-id', info.event.id);
+                            rejectBookingChange.setAttribute('data-booking-id', info.event.id);
+
 
                             callButton.href = `tel:${info.event.extendedProps.phoneno}`
                             getdirection.href =
@@ -374,6 +424,7 @@
                 });
 
                 calendar.render();
+                calendarInstance = calendar;
 
             }
 
@@ -533,6 +584,86 @@
             fetchAvailability(initialDate).then(data => {
                 initializeCalendar(data);
             });
+        });
+
+        $('#confirmBookingChange').on('click', function() {
+
+            const bookingID = event.target.getAttribute('data-booking-id');
+            const option = event.target.getAttribute('data-option');
+
+            console.log('Booking ID:', bookingID);
+
+            fetch(`{{ route('confirmation-booking-tasker') }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify({
+                        id: bookingID,
+                        option: option
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        console.log('Event updated successfully in the database:', data.updated_booking);
+                        if (calendarInstance) {
+                            calendarInstance.refetchEvents();
+                            $('#eventDetailsModal').modal('hide');
+                        }
+                    } else {
+                        console.error('Failed to update event:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating event:', error);
+                });
+        });
+
+        $('#rejectBookingChange').on('click', function() {
+
+            const bookingID = event.target.getAttribute('data-booking-id');
+            const option = event.target.getAttribute('data-option');
+
+            console.log('Booking ID:', bookingID);
+
+            fetch(`{{ route('confirmation-booking-tasker') }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify({
+                        id: bookingID,
+                        option: option
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        console.log('Event updated successfully in the database:', data.updated_booking);
+                        if (calendarInstance) {
+                            calendarInstance.refetchEvents();
+                            $('#eventDetailsModal').modal('hide');
+                        }
+                    } else {
+                        console.error('Failed to update event:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating event:', error);
+                });
         });
     </script>
 @endsection
