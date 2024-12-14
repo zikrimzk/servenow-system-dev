@@ -1,91 +1,127 @@
-<?php
-use Illuminate\Support\Str;
-use App\Models\Tasker;
-?>
+
 @extends('client.layouts.main')
 
 @section('content')
     <!-- [ Main Content ] start -->
 
-    <style>
-        .table-primary {
-            background-color: #e3f2fd !important;
-        }
+    
+    <!-- [ Pre-loader ] start -->
+    <div class="page-loader">
+        <div class="bar"></div>
+    </div>
 
-        .table-hover tbody tr:hover {
-            background-color: #f1f8ff;
-        }
-
-        .badge-primary {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-        }
-
-        .table-responsive {
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #e9ecef;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .nav-tabs .nav-link {
-            color: #6c757d;
-            /* Default text color (Bootstrap secondary) */
-            border-color: transparent;
-            /* Default border color */
-            transition: color 0.3s, background-color 0.3s;
-        }
-
-        /* Hover effect */
-        .nav-tabs .nav-link:hover {
-            color: #0d6efd;
-            /* Primary color on hover */
-            background-color: #f8f9fa;
-            /* Light background on hover */
-        }
-
-        /* Active tab styles */
-        .nav-tabs .nav-link.active {
-            color: #fff;
-            /* White text */
-            background-color: #0d6efd;
-            /* Primary background color */
-            border-color: #0d6efd;
-            /* Primary border color */
-        }
-
-        .table-primary:hover {
-            background-color: #dbe9ff;
-            /* Light blue background on hover */
-        }
-
-        /* Focus effect when clicked */
-        .table-primary:focus-within {
-            background-color: #a6c8ff;
-            /* Slightly darker blue when focused */
-            box-shadow: 0 0 10px rgba(66, 133, 244, 0.5);
-            /* Add a glow effect to indicate focus */
-        }
-    </style>
-
-    <div class="container p-5">
-
-
-        <!-- [ Pre-loader ] start -->
-        <div class="page-loader">
-            <div class="bar"></div>
+    <div class="container mt-5 pt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 pt-3">
+            <h2 class="fw-bold">My Task</h2>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <ul class="nav nav-tabs mb-3 fw-bold border-bottom border-3 light-primary" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active text-uppercase" id="home-tab" data-bs-toggle="tab" href="#home"
+                        role="tab" aria-controls="home" aria-selected="true">ALL</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab"
+                        aria-controls="profile" aria-selected="false">On Book</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab"
+                        aria-controls="contact" aria-selected="false">Completed</a>
+                </li>
+            </ul>
         </div>
 
-        <div class="container mt-5">
-            <!-- Header -->
-            <div class="md-12 sm-12">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold">My Task</h2>
-                    <div>
-                        <button class="btn btn-primary">+ New Task</button>
+        <div class="card">
+            <div class="card-body">
+                <div class="card p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Cleaning</h6>
+        
+                            <span>In Progress</span>
+   
+                    </div>
+                    <hr>
+                    <div class="d-flex">
+                        <img src="path-to-product-image.jpg" alt="Product Image" class="img-thumbnail"
+                            style="width: 100px; height: auto;">
+                        <div class="ms-3">
+                            <p class="mb-1 fw-bold">ISKANDAR ZULKANAIN BIN ROSMI</p>
+                            <p class="mb-1">x1</p>
+                            <p class="mb-0">RM60 / per job</p>
+                            <p class="mb-0">8.00 A.M - 10.00 A.M</p>
+
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        
+                        <span class="text-muted">Jalan Kemboja 4cTaman Kemboja, 48300 Rawang, Selangor</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">Order Total: <span class="text-danger">RM66.88</span></span>
+                        <div>
+                            <button class="btn btn-danger btn-sm">Cancel Booking</button>
+
+                            <button class="btn btn-outline-secondary btn-sm">Contact Seller</button>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    {{-- <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="card p-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Baseus Official Store</h6>
+                            <div>
+                                <button class="btn btn-outline-primary btn-sm">Chat</button>
+                                <button class="btn btn-outline-secondary btn-sm">View Shop</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="d-flex">
+                            <img src="path-to-product-image.jpg" alt="Product Image" class="img-thumbnail"
+                                style="width: 100px; height: auto;">
+                            <div class="ms-3">
+                                <p class="mb-1 fw-bold">Baseus AT Car Vacuum Cleaner 45W 5000Pa Sweep Dust</p>
+                                <p class="mb-1">Variation: Black</p>
+                                <p class="mb-0">x1</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Confirm receipt after you've checked the received items</span>
+                            <div>
+                                <span class="text-decoration-line-through text-muted me-2">RM239.00</span>
+                                <span class="fw-bold text-danger">RM92.44</span>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Order Total: <span class="text-danger">RM66.88</span></span>
+                            <div>
+                                <button class="btn btn-warning btn-sm">Order Received</button>
+                                <button class="btn btn-outline-secondary btn-sm">Request For Return/Refund</button>
+                                <button class="btn btn-outline-secondary btn-sm">Contact Seller</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+            </div> --}}
+    {{-- <!-- Header -->
+            <div class="md-12 sm-12">
+                
             </div>
 
             <!-- Tabs -->
@@ -228,29 +264,19 @@ use App\Models\Tasker;
                         </table>
                     </div>
                 </div>
-            </div>
-
-        </div>
+            </div> --}}
 
 
 
 
-        <!-- [ Form Register ] end -->
-        <!-- Required Js -->
-        <script>
-            document.querySelectorAll('[data-bs-toggle="collapse"]').forEach((row) => {
-                row.addEventListener('click', () => {
-                    const target = document.querySelector(row.getAttribute('data-bs-target'));
-                    const isExpanded = row.getAttribute('aria-expanded') === 'true';
-                    row.setAttribute('aria-expanded', !isExpanded);
-                });
-            });
-        </script>
+    <!-- [ Form Register ] end -->
+    <!-- Required Js -->
+   
 
-     
 
-    
-    </div>
+
+
+
 
     <!-- [ footer apps ] start -->
 @section('footer')

@@ -32,6 +32,7 @@
     <!-- [Template CSS Files] -->
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
     <link rel="stylesheet" href="../assets/css/style-preset.css" />
+    <link rel="stylesheet" href="../assets/css/plugins/star-rating.min.css" />
     <link rel="stylesheet" href="../assets/css/landing.css" />
 
     <script src="../assets/js/tech-stack.js"></script>

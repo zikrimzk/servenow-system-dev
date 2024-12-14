@@ -171,10 +171,19 @@ class RouteController extends Controller
         }
     }
 
-    public function clientUpcoming()
+    public function clientBookingHistoryNav()
     {
-        return view('client.booking.taskremain', [
-            'title' => 'My UpcomingTask',
+        $booking=DB::table('bookings as a')
+        ->join('services as c','a.service_id','=','c.id')
+        ->join('service_types as d','c.service_type_id','=','d.id')
+        ->join('taskers as e','c.tasker_id','=','e.id')
+        ->where('a.client_id',Auth::user()->id)
+        ->orderby('booking_status','asc')
+        ->get();
+        // dd($booking);
+        return view('client.booking.booking-history', [
+            'title' => 'My Booking History',
+            'book'=> $booking
             
         ]);
     }

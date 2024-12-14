@@ -1,5 +1,5 @@
 <!-- [ Nav ] start -->
-<nav class="navbar navbar-expand-md navbar-light default">
+<nav class="navbar navbar-expand-md navbar-light default"style="z-index: 1000;">
     <div class="container">
         <a class="navbar-brand" href="../index.html">
             <img src="../assets/images/logo-test.png" alt="img" class="img-fluid" style="max-width: 110px;" />
@@ -19,7 +19,7 @@
                         Task</a>
                 </li>
                 <li class="nav-item px-1">
-                    <a class="nav-link" href="../dashboard/index.html">My Task</a>
+                    <a class="nav-link" href="{{ route('clientBookHistory') }}">My Task</a>
                 </li>
                 <li class="nav-item px-1 me-2 mb-2 mb-md-0">
                 </li>
