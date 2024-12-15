@@ -106,6 +106,10 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/reject-service-{id}', [ServiceController::class, 'adminRejectService'])->name('admin-reject-service');
     Route::get('/terminate-service-{id}', [ServiceController::class, 'adminTerminateService'])->name('admin-terminate-service');
 
+    // Admin - System Setting
+    Route::get('/system-setting', [RouteController::class, 'adminSystemSettingNav'])->name('admin-system-setting');
+    
+
     // Admin - Time Slot Setting
     Route::get('/time-slot-setting', [RouteController::class, 'adminTimeSlotNav'])->name('admin-timeslot-setting');
     Route::post('/create-time-slot', [SettingController::class, 'adminCreateTimeSlot'])->name('admin-timeslot-create');

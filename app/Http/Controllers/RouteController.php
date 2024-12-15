@@ -728,6 +728,16 @@ class RouteController extends Controller
     }
 
     // Admin - Time Slot Setting
+
+    public function adminSystemSettingNav()
+    {
+        return view('administrator.setting.system-index', [  
+            'title'=> 'System Settings',
+
+        ]);
+    }
+
+    // Admin - Time Slot Setting
     //Updated by: Zikri (5/12/2024)
     public function adminTimeSlotNav(Request $request)
     {
