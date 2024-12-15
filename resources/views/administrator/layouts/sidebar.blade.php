@@ -99,6 +99,7 @@
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-system-setting') }}">System</a></li>
                         <li class="pc-item"><a class="pc-link" href="{{ route('admin-timeslot-setting') }}">Time Slot</a></li>
                     </ul>
                 </li>
