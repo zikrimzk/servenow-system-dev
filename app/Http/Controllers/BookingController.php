@@ -459,4 +459,36 @@ class BookingController extends Controller
             ], 500); // HTTP status code 500 for server errors.
         }
     }
+    public function clientCancelBooking($id,$taskerid, $option)
+    {
+        try {
+
+            $booking = Booking::findOrFail($id);
+
+            if ($option == 1) {
+                $booking->booking_status = 5;
+                $booking->save();
+                $oldDate = $booking->booking_date;
+                $oldStartTime = $booking->booking_time_start;
+                $oldEndTime = $booking->booking_time_end;
+
+                DB::table('tasker_time_slots as a')
+                    ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                    ->where('a.tasker_id', '=', $taskerid)
+                    ->where('a.slot_date', '=', $oldDate)
+                    ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
+                    ->update(['a.slot_status' => 1]);
+                $message = 'Your booking cancellation request has been processed successfully !';
+            } else if ($option == 2) {
+                // refund process here
+                $booking->booking_status = 7;
+                $booking->save();
+                $message = 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account.';
+            }
+            return back()->with('success', $message);
+        } catch (Exception $e) {
+            // Catch errors and return a JSON response with a proper error message.
+            return back()->with('error', 'Opps , there was an unexpected error to execute the operation. Please try again.');
+        }
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Geocoder\Geocoder;
 use GuzzleHttp\Client;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,5 +27,7 @@ class AppServiceProvider extends ServiceProvider
 
         $geocoder->setApiKey(env('GOOGLE_MAPS_GEOCODING_API_KEY', '')); // Set your Google Maps API key
         app()->instance(Geocoder::class, $geocoder);
+
+        Paginator::useBootstrap();
     }
 }

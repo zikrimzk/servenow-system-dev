@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 
 class RouteController extends Controller
 {
@@ -59,7 +61,7 @@ class RouteController extends Controller
             return redirect(route('client-home'));
         }
     }
-    
+
     //Client -LoginOrSignUp Option
     public function loginOptionNav()
     {
@@ -173,18 +175,75 @@ class RouteController extends Controller
 
     public function clientBookingHistoryNav()
     {
-        $booking=DB::table('bookings as a')
-        ->join('services as c','a.service_id','=','c.id')
-        ->join('service_types as d','c.service_type_id','=','d.id')
-        ->join('taskers as e','c.tasker_id','=','e.id')
-        ->where('a.client_id',Auth::user()->id)
-        ->orderby('booking_status','asc')
-        ->get();
-        // dd($booking);
+        $booking = DB::table('bookings as a')
+            ->join('services as c', 'a.service_id', '=', 'c.id')
+            ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
+            ->join('taskers as e', 'c.tasker_id', '=', 'e.id')
+            ->select(
+                'a.id as bookingID',
+                'a.booking_date',
+                'a.booking_address',
+                'a.booking_latitude',
+                'a.booking_longitude',
+                'a.booking_time_start',
+                'a.booking_time_end',
+                'a.booking_status',
+                'a.booking_note',
+                'a.booking_rate',
+                'a.client_id',
+                'a.service_id',
+                'a.created_at',
+                'a.updated_at',
+                'c.service_rate',
+                'c.service_rate_type',
+                'c.service_desc',
+                'c.service_status',
+                'c.service_type_id',
+                'd.servicetype_name',
+                'd.servicetype_desc',
+                'd.servicetype_status',
+                'e.id as taskerID',
+                'e.tasker_code',
+                'e.tasker_photo',
+                'e.tasker_firstname',
+                'e.tasker_lastname',
+                'e.tasker_phoneno',
+                'e.email'
+            )
+            ->where('a.client_id', Auth::user()->id)
+            ->orderBy('booking_date', 'desc')
+            ->orderBy('booking_status', 'asc')
+            ->get();
+
+        // Grouping berdasarkan booking_date
+        $groupedBookings = $booking->groupBy('booking_date');
+        $toServeBookings = collect($booking)
+            ->whereIn('booking_status', [2, 3, 4])
+            ->groupBy('booking_date');
+
+        $groupedBookings = $booking->groupBy('booking_date');
+        $completed = collect($booking)
+            ->whereIn('booking_status', [6])
+            ->groupBy('booking_date');
+
+        $groupedBookings = $booking->groupBy('booking_date');
+        $cancelled = collect($booking)
+            ->whereIn('booking_status', [5])
+            ->groupBy('booking_date');
+
+        $groupedBookings = $booking->groupBy('booking_date');
+        $refund = collect($booking)
+            ->whereIn('booking_status', [7,8])
+            ->groupBy('booking_date');
+
         return view('client.booking.booking-history', [
             'title' => 'My Booking History',
-            'book'=> $booking
-            
+            'book' => $groupedBookings,
+            'toServeBooking' => $toServeBookings,
+            'completed' => $completed,
+            'cancelled' => $cancelled,
+            'refund'=>$refund
+
         ]);
     }
 
@@ -404,10 +463,10 @@ class RouteController extends Controller
         ]);
     }
 
-    public function taskerBookingManagementNav(Request $request) 
+    public function taskerBookingManagementNav(Request $request)
     {
         return view('tasker.booking.index', [
-            'title'=> 'My Booking',
+            'title' => 'My Booking',
         ]);
     }
 
@@ -731,8 +790,8 @@ class RouteController extends Controller
 
     public function adminSystemSettingNav()
     {
-        return view('administrator.setting.system-index', [  
-            'title'=> 'System Settings',
+        return view('administrator.setting.system-index', [
+            'title' => 'System Settings',
 
         ]);
     }
@@ -746,7 +805,7 @@ class RouteController extends Controller
             $data = DB::table('time_slots')
                 ->select('id', 'time', 'slot_category')
                 ->orderBy('time', 'asc')
-                ->orderBy('slot_category','asc')
+                ->orderBy('slot_category', 'asc')
                 ->get();
 
             $table = DataTables::of($data)->addIndexColumn();

@@ -54,221 +54,386 @@
                     <a class="nav-link text-uppercase" id="contact-tab" data-bs-toggle="tab" href="#cancelled"
                         role="tab" aria-controls="contact" aria-selected="false">Cancelled</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="contact-tab" data-bs-toggle="tab" href="#refund" role="tab"
+                        aria-controls="contact" aria-selected="false">Refund</a>
+                </li>
             </ul>
         </div>
     </div>
     <div class="container">
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="allbooking" role="tabpanel" aria-labelledby="allbooking-tab">
-                @foreach ($book as $b)
+                @foreach ($book as $date => $book)
                     <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
-                            @if ($b->booking_status == 1)
-                                <span class="badge bg-warning">To Pay</span>
-                            @elseif($b->booking_status == 2)
-                                <span class="badge bg-light-success">Paid</span>
-                            @elseif($b->booking_status == 3)
-                                <span class="badge bg-success">Confirmed</span>
-                            @elseif($b->booking_status == 4)
-                                <span class="badge bg-warning">Rescheduled</span>
-                            @elseif($b->booking_status == 5)
-                                <span class="badge bg-danger">Cancelled</span>
-                            @elseif($b->booking_status == 6)
-                                <span class="badge bg-success">Completed</span>
-                            @endif
-                        </div>
-                        <hr>
-                        <div class="d-flex">
-                            <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Product Image" width="100"
-                                height="100" class="">
-                            <div class="ms-3">
-                                <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
-                                <p class="mb-1">{{ $b->tasker_code }}</p>
-                                <p class="mb-0">{{ $b->service_rate }}/{{ $b->service_rate_type }}</p>
-                                <p class="mb-0">
-                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
-                                    -
-                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
-                                </p>
+                        <h3 class="mb-2 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}</h3>
+                        @foreach ($book as $b)
+                            <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
+                                    @if ($b->booking_status == 1)
+                                        <span class="badge bg-warning">To Pay</span>
+                                    @elseif($b->booking_status == 2)
+                                        <span class="badge bg-light-success">Paid</span>
+                                    @elseif($b->booking_status == 3)
+                                        <span class="badge bg-success">Confirmed</span>
+                                    @elseif($b->booking_status == 4)
+                                        <span class="badge bg-warning">Rescheduled</span>
+                                    @elseif($b->booking_status == 5)
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    @elseif($b->booking_status == 6)
+                                        <span class="badge bg-success">Completed</span>
+                                    @elseif($b->booking_status == 7)
+                                        <span class="badge bg-light-warning">Pending Refund</span>
+                                    @elseif($b->booking_status == 8)
+                                        <span class="badge bg-light-success">Refunded</span>
+                                    @endif
+                                </div>
+                                <hr>
+                                <div class="d-flex">
+                                    <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Product Image" width="100"
+                                        height="100" class="">
+                                    <div class="ms-3">
+                                        <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
+                                        <p class="mb-1">{{ $b->tasker_code }}</p>
+                                        <p class="mb-0">{{ $b->service_rate }}/{{ $b->service_rate_type }}</p>
+                                        <p class="mb-0">
+                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
+                                            -
+                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
+                                        </p>
 
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">{{ $b->booking_address }}</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Total: <span
+                                            class="text-danger">RM{{ $b->booking_rate }}</span></span>
+                                    @if ($b->booking_status == 1)
+                                        <div>
+                                            <button class="btn btn-danger"
+                                                data-bs-target="#cancelBookingModal-{{ $b->bookingID }}"
+                                                data-bs-toggle="modal">
+                                                Cancel Booking
+                                            </button>
+
+                                            <button class="btn btn-outline-secondary">Contact Seller</button>
+                                        </div>
+                                    @elseif($b->booking_status == 2)
+                                        <div>
+                                            <button class="btn btn-danger"
+                                                data-bs-target="#refundBookingModal-{{ $b->bookingID }}"
+                                                data-bs-toggle="modal">Request Refund</button>
+
+                                            <button class="btn btn-outline-secondary">Contact Seller</button>
+                                        </div>
+                                    @elseif($b->booking_status == 3 || $b->booking_status == 4)
+                                        <div>
+                                            <button class="btn btn-primary">Service Completed</button>
+                                            <button class="btn btn-outline-secondary">Contact Seller</button>
+                                        </div>
+                                    @elseif($b->booking_status == 6)
+                                        <div>
+                                            <button class="btn btn-primary"data-bs-toggle="modal"
+                                                data-bs-target="#reviewModal">Submit your review</button>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">{{ $b->booking_address }}</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold">Total: <span class="text-danger">RM{{ $b->booking_rate }}</span></span>
-                            @if ($b->booking_status == 1)
-                                <div>
-                                    <button class="btn btn-danger">Cancel Booking</button>
 
-                                    <button class="btn btn-outline-secondary">Contact Seller</button>
-                                </div>
-                            @elseif($b->booking_status == 2)
-                                <div>
-                                    <button class="btn btn-danger">Request Refund</button>
+                            <div class="modal fade" id="cancelBookingModal-{{ $b->bookingID }}" data-bs-keyboard="false"
+                                tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-sm-12 mb-4">
+                                                    <div class="d-flex justify-content-center align-items-center mb-3">
+                                                        <i class="ti ti-info-circle text-warning"
+                                                            style="font-size: 100px"></i>
+                                                    </div>
 
-                                    <button class="btn btn-outline-secondary">Contact Seller</button>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <div class="d-flex justify-content-center align-items-center">
+                                                        <h2>Cancel Booking Request</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 mb-3">
+                                                    <div class="d-flex justify-content-center align-items-center">
+                                                        <p class="fw-normal f-18 text-center">Are you sure you want to
+                                                            cancel this
+                                                            booking? </p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <div class="d-flex justify-content-between gap-3 align-items-center">
+                                                        <button type="reset" class="btn btn-light btn-pc-default"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <div>
+                                                            <a href="{{ route('client-cancel-booking', [$b->bookingID, $b->taskerID, 1]) }}"
+                                                                class="btn btn-light-danger">Cancel Booking</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            @elseif($b->booking_status == 3 || $b->booking_status == 4)
-                                <div>
-                                    <button class="btn btn-primary">Service Completed</button>
-                                    <button class="btn btn-outline-secondary">Contact Seller</button>
+                            </div>
+                            <div class="modal fade" id="refundBookingModal-{{ $b->bookingID }}" data-bs-keyboard="false"
+                                tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-sm-12 mb-4">
+                                                    <div class="d-flex justify-content-center align-items-center mb-3">
+                                                        <i class="ti ti-info-circle text-warning"
+                                                            style="font-size: 100px"></i>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <div class="d-flex justify-content-center align-items-center">
+                                                        <h2>Refund Booking Request</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 mb-3">
+                                                    <div class="d-flex justify-content-center align-items-center">
+                                                        <p class="fw-normal f-18 text-center">Are you sure you want to
+                                                            request a
+                                                            refund? This action will cancel your booking, and it may take up
+                                                            to 5
+                                                            working days to process your refund. </p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <div class="d-flex justify-content-between gap-3 align-items-center">
+                                                        <button type="reset" class="btn btn-light btn-pc-default"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <div>
+                                                            <a href="{{ route('client-cancel-booking', [$b->bookingID, $b->taskerID, 2]) }}"
+                                                                class="btn btn-light-danger">Refund</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            @elseif($b->booking_status == 6)
-                                <div>
-                                    <button class="btn btn-primary"data-bs-toggle="modal"
-                                        data-bs-target="#reviewModal">Submit your review</button>
-                                </div>
-                            @endif
-                        </div>
+                            </div>
+                        @endforeach
                     </div>
                 @endforeach
-
             </div>
 
-            <div class="tab-pane fade" id="toserve" role="tabpanel" aria-labelledby="allbooking-tab">
-                @foreach ($book->whereIn('booking_status', [2, 3, 4]) as $b)
-                    <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
-                            @if ($b->booking_status == 2)
-                                <span class="badge bg-light-success">Paid</span>
-                            @elseif($b->booking_status == 3)
-                                <span class="badge bg-success">Confirmed</span>
-                            @elseif($b->booking_status == 4)
-                                <span class="badge bg-warning">Rescheduled</span>
-                            @endif
-                        </div>
-                        <hr>
-                        <div class="d-flex">
-                            <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Product Image" width="100"
-                                height="100" class="">
-                            <div class="ms-3">
-                                <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
-                                <p class="mb-1">{{ $b->tasker_code }}</p>
-                                <p class="mb-0">{{ $b->service_rate }}/{{ $b->service_rate_type }}</p>
-                                <p class="mb-0">
-                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
-                                    -
-                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
-                                </p>
 
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center">
+            <div class="tab-pane fade" id="toserve" role="tabpanel" aria-labelledby="toserve-tab">
+                @foreach ($toServeBooking as $date => $bookings)
+                    <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                        <h3 class="mb-2 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}</h3>
+                        @foreach ($bookings as $b)
+                            <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
+                                    @if ($b->booking_status == 2)
+                                        <span class="badge bg-light-success">Paid</span>
+                                    @elseif($b->booking_status == 3)
+                                        <span class="badge bg-success">Confirmed</span>
+                                    @elseif($b->booking_status == 4)
+                                        <span class="badge bg-warning">Rescheduled</span>
+                                    @endif
+                                </div>
+                                <hr>
+                                <div class="d-flex">
+                                    <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Tasker Photo"
+                                        width="100" height="100">
+                                    <div class="ms-3">
+                                        <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
+                                        <p class="mb-1">{{ $b->tasker_code }}</p>
+                                        <p class="mb-0">
+                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
+                                            -
+                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">{{ $b->booking_address }}</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Total: <span
+                                            class="text-danger">RM{{ $b->booking_rate }}</span></span>
+                                    @if ($b->booking_status == 2)
+                                        <div>
+                                            <button class="btn btn-danger"
+                                                data-bs-target="#refundBookingModal-{{ $b->bookingID }}"
+                                                data-bs-toggle="modal">Request Refund</button>
 
-                            <span class="text-muted">{{ $b->booking_address }}</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold">Total: <span class="text-danger">RM{{ $b->booking_rate }}</span></span>
-                            <div>
-                                @if ($b->booking_status == 2)
-                                    <button class="btn btn-danger">Request Refund</button>
-                                    <button class="btn btn-outline-secondary">Contact Seller</button>
-                                @elseif($b->booking_status == 3)
-                                    <button class="btn btn-primary"data-bs-toggle="modal"
-                                        data-bs-target="#reviewModal">Submit your review</button>
-                                @elseif($b->booking_status == 4)
-                                    <button class="btn btn-danger">Request Refund</button>
-                                    <button class="btn btn-outline-secondary">Contact Seller</button>
-                                @endif
+                                            <button class="btn btn-outline-secondary">Contact Seller</button>
+                                        </div>
+                                    @elseif($b->booking_status == 3 || $b->booking_status == 4)
+                                        <div>
+                                            <button class="btn btn-primary">Service Completed</button>
+                                            <button class="btn btn-outline-secondary">Contact Seller</button>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
+                        @endforeach
                     </div>
                 @endforeach
-
             </div>
 
             <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="allbooking-tab">
-                @foreach ($book->whereIn('booking_status', [6]) as $b)
-                    <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
-                            <span class="badge bg-success">Completed</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex">
-                            <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Product Image" width="100"
-                                height="100" class="">
-                            <div class="ms-3">
-                                <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
-                                <p class="mb-1">{{ $b->tasker_code }}</p>
-                                <p class="mb-0">{{ $b->service_rate }}/{{ $b->service_rate_type }}</p>
-                                <p class="mb-0">
-                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
-                                    -
-                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
-                                </p>
+                @foreach ($completed as $date => $booking)
+                    <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                        <h3 class="mb-2 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}</h3>
+                        @foreach ($booking as $b)
+                            <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
+                                    <span class="badge bg-success">Completed</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex">
+                                    <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Product Image"
+                                        width="100" height="100" class="">
+                                    <div class="ms-3">
+                                        <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
+                                        <p class="mb-1">{{ $b->tasker_code }}</p>
+                                        <p class="mb-0">{{ $b->service_rate }}/{{ $b->service_rate_type }}</p>
+                                        <p class="mb-0">
+                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
+                                            -
+                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
+                                        </p>
 
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">{{ $b->booking_address }}</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Total: <span
+                                            class="text-danger">RM{{ $b->booking_rate }}</span></span>
+                                    @if ($b->booking_status == 6)
+                                        <div>
+                                            <button class="btn btn-primary"data-bs-toggle="modal"
+                                                data-bs-target="#reviewModal">Submit your review</button>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center">
-
-                            <span class="text-muted">{{ $b->booking_address }}</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold">Total: <span class="text-danger">RM{{ $b->booking_rate }}</span></span>
-                            <div>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
-                                    Open Review Modal
-                                </button>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 @endforeach
-
             </div>
 
             <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="allbooking-tab">
-                @foreach ($book->whereIn('booking_status', [5]) as $b)
-                    <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
-                            <span class="badge bg-danger">Cancelled</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex">
-                            <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Product Image" width="100"
-                                height="100" class="">
-                            <div class="ms-3">
-                                <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
-                                <p class="mb-1">{{ $b->tasker_code }}</p>
-                                <p class="mb-0">{{ $b->service_rate }}/{{ $b->service_rate_type }}</p>
-                                <p class="mb-0">
-                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
-                                    -
-                                    {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
-                                </p>
+                @foreach ($cancelled as $date => $booking)
+                    <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                        <h3 class="mb-2 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}</h3>
+                        @foreach ($booking as $b)
+                            <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
+                                    <span class="badge bg-danger">Cancelled</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex">
+                                    <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Product Image"
+                                        width="100" height="100" class="">
+                                    <div class="ms-3">
+                                        <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
+                                        <p class="mb-1">{{ $b->tasker_code }}</p>
+                                        <p class="mb-0">{{ $b->service_rate }}/{{ $b->service_rate_type }}</p>
+                                        <p class="mb-0">
+                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
+                                            -
+                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
+                                        </p>
 
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+
+                                    <span class="text-muted">{{ $b->booking_address }}</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Total: <span
+                                            class="text-danger">RM{{ $b->booking_rate }}</span></span>
+
+                                </div>
                             </div>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center">
-
-                            <span class="text-muted">{{ $b->booking_address }}</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold">Total: <span class="text-danger">RM{{ $b->booking_rate }}</span></span>
-
-                        </div>
+                        @endforeach
                     </div>
                 @endforeach
+            </div>
+            <div class="tab-pane fade" id="refund" role="tabpanel" aria-labelledby="allbooking-tab">
+                @foreach ($refund as $date => $booking)
+                    <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                        <h3 class="mb-2 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}</h3>
+                        @foreach ($booking as $b)
+                            <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
+                                    @if($b->booking_status == 7)
+                                        <span class="badge bg-light-warning">Pending Refund</span>
+                                    @elseif($b->booking_status == 8)
+                                        <span class="badge bg-light-success">Refunded</span>
+                                    @endif
+                                </div>
+                                <hr>
+                                <div class="d-flex">
+                                    <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Product Image"
+                                        width="100" height="100" class="">
+                                    <div class="ms-3">
+                                        <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
+                                        <p class="mb-1">{{ $b->tasker_code }}</p>
+                                        <p class="mb-0">{{ $b->service_rate }}/{{ $b->service_rate_type }}</p>
+                                        <p class="mb-0">
+                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
+                                            -
+                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
+                                        </p>
 
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+
+                                    <span class="text-muted">{{ $b->booking_address }}</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Total: <span
+                                            class="text-danger">RM{{ $b->booking_rate }}</span></span>
+
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
+    </div>
+    </div>
 
-    <div id="reviewModal" class="modal fade" tabindex="-1" role="dialog"
-        aria-labelledby="exampleModalLiveLabel" aria-hidden="true">
+    <div id="reviewModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLiveLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -374,4 +539,3 @@
     @include('client.layouts.footer')
 @endsection
 @endsection
-
