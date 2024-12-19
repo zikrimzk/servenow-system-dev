@@ -507,22 +507,20 @@ class BookingController extends Controller
     public function clientReviewBooking(Request $request)
     {
         try {
-            if ($request->review_type === "on") {
-                $request->merge(['review_type' => "2"]);
-            } else {
-                $request->merge(['review_type' => "1"]);
-            }
+           
             $validated = $request->validate([
                 'review_rating' => 'required|integer|min:1|max:5',
-                'review_description' => 'required|string|max:1000',
+                'review_description' => 'max:1000',
                 'photos' => 'nullable|array|max:4',
                 'photos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
-                'review_type' => 'nullable|string',
+                'review_type' => 'nullable',
                 'booking_id' => 'required|integer|exists:bookings,id',
             ]);
-            // dd($validated);
-
-
+            if ($request->review_type == "on") {
+                $validated['review_type'] = 2;
+            } else {
+                $validated['review_type'] = 1;
+            }
 
             $imagePaths = [null, null, null, null];
 
@@ -542,11 +540,10 @@ class BookingController extends Controller
                 'review_imageTwo' => $imagePaths[1],
                 'review_imageThree' => $imagePaths[2],
                 'review_imageFour' => $imagePaths[3],
-                'review_type' => $validated['review_type'] ?? '1',
+                'review_type' => $validated['review_type'],
                 'review_date_time' => now(),
                 'booking_id' => $validated['booking_id']
             ]);
-
             return back()->with('success', 'Review submitted successfully!');
         } catch (Exception $e) {
 

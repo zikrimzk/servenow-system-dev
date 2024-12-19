@@ -93,7 +93,7 @@
                             </div>
                             <div class="form-floating mb-3">
                                 <input type="tel" class="form-control @error('client_phoneno') is-invalid @enderror"
-                                    id="ClientPhoneNo" placeholder="Phone Number" name="client_phoneno" maxlength="13"
+                                    id="ClientPhoneNo" placeholder="Phone Number" name="client_phoneno" maxlength="15"
                                     required />
                                 <label for="ClientPhoneNo">Phone Number</label>
                                 @error('client_phoneno')

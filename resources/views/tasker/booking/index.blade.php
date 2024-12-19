@@ -380,6 +380,8 @@
                                 newStatus = 'Confirmed';
                             } else if (eventStatus == 4) {
                                 newStatus = 'Rescheduled';
+                                confirmBookingChange.style.display = 'block';
+                                rejectBookingChange.style.display = 'block';
                             } else if (eventStatus == 5) {
                                 newStatus = 'Cancelled';
                             } else if (eventStatus == 6) {
