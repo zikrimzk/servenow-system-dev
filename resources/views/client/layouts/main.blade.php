@@ -35,6 +35,7 @@
     <link rel="stylesheet" href="../assets/css/plugins/star-rating.min.css" />
     <link rel="stylesheet" href="../assets/css/landing.css" />
 
+
     <script src="../assets/js/tech-stack.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

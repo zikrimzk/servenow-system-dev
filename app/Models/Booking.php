@@ -23,4 +23,5 @@ class Booking extends Model
         'service_id',
 
     ];
+    
 }

@@ -29,6 +29,50 @@
             fill: var(--bs-danger);
             stroke: var(--bs-danger);
         }
+
+        .photo-slot {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .photo-preview {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-preview button {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: white;
+            border: none;
+            color: red;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+        }
     </style>
     <div class="container mt-5 pt-5">
         <div class="d-flex justify-content-between align-items-center mb-4 pt-3">
@@ -227,6 +271,101 @@
                                     </div>
                                 </div>
                             </div>
+                            <form method="POST" action="{{ route('client-submit-review') }}"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div id="reviewModal" class="modal fade" tabindex="-1" role="dialog"
+                                    aria-labelledby="exampleModalLiveLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                                        role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLiveLabel">Review & Rate</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div>
+                                                    <input type="" value="{{ $b->bookingID }}"name="booking_id">
+                                                </div>
+                                                <h6 class="mb-3">
+                                                    {{ $b->tasker_firstname . ' ' . $b->tasker_lastname }}
+                                                </h6>
+                                                <p class="text-muted small mb-4"> {{ $b->tasker_code }}</p>
+                                                <div class="mb-3">
+                                                    <label for="glsr-ltr" class="form-label"><strong>Work
+                                                            Quality</strong></label>
+                                                    <select id="glsr-ltr" class="star-rating-old" name="review_rating">
+                                                        <option value="">Select a rating</option>
+                                                        <option value="5">Fantastic</option>
+                                                        <option value="4">Great</option>
+                                                        <option value="3">Good</option>
+                                                        <option value="2">Poor</option>
+                                                        <option value="1">Terrible</option>
+                                                    </select>
+                                                </div>
+
+
+                                                <div class="mb-3">
+                                                    <label for="qualityInput"
+                                                        class="form-label"><strong>Review</strong></label>
+                                                    <textarea class="form-control" id="qualityInput" rows="8" cols="5"
+                                                        placeholder="Share your thoughts on the services to help other buyers." name="review_description"></textarea>
+                                                </div>
+
+                                                <div class="d-flex gap-2 justify-content-start mb-2">
+                                                    <div class="photo-slot text-center" id="addPhotoButton">
+                                                        <label
+                                                            style="cursor: pointer; display: block; width: 100%; height: 100%;">
+                                                            <input type="file" id="photoInput" accept="image/*"
+                                                                multiple style="display: none;" name="photos[]">
+                                                            <img src="image.png" alt="Add Picture"
+                                                                style="width: 50px; height: 50px; opacity: 0.6;">
+                                                        </label>
+                                                    </div>
+
+                                                </div>
+                                                <div id="photoPreviewContainer" class="mt-2 d-flex gap-2">
+                            
+                                                </div>
+                                                <p id="photoCounter" style="font-size: 14px;">0/4</p>
+                                                <p id="errorMessage" style="color: red; display: none;">You can only
+                                                    upload up
+                                                    to 4 photos!</p>
+
+                                                <div id="photoPreviewContainer" class="mt-2">
+                                                    <img id="photoPreview" style="max-width: 200px; display: none;"
+                                                        alt="Photo Preview">
+                                                </div>
+
+                                                <small class="text-muted">Add 50 characters with 1 photo and 1 video to
+                                                    earn
+                                                </small>
+
+
+                                            </div>
+                                            <div class="modal-footer justify-content-between align-items-center">
+                                               
+                                                <div class="center-form-check mb-3 mt-3">
+                                                    <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input" id="anonymousCheck" name="review_type" value="2">
+                                                        <label class="form-check-label small" for="anonymousCheck">
+                                                            Leave your review anonymously
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                              
+                                                <div>
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-danger">Submit</button>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         @endforeach
                     </div>
                 @endforeach
@@ -389,7 +528,7 @@
                             <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
-                                    @if($b->booking_status == 7)
+                                    @if ($b->booking_status == 7)
                                         <span class="badge bg-light-warning">Pending Refund</span>
                                     @elseif($b->booking_status == 8)
                                         <span class="badge bg-light-success">Refunded</span>
@@ -432,73 +571,85 @@
     </div>
     </div>
 
-    <div id="reviewModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLiveLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLiveLabel">Review & Rate</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <h6 class="mb-3">
-                        KHAIRUL ADZHAR BIN NORAIDI
-                    </h6>
-                    <p class="text-muted small mb-4"> SSTS_152</p>
-                    <div class="mb-3">
-                        <label for="glsr-ltr" class="form-label"><strong>Work Quality</strong></label>
-                        <select id="glsr-ltr" class="star-rating-old">
-                            <option value="">Select a rating</option>
-                            <option value="5">Fantastic</option>
-                            <option value="4">Great</option>
-                            <option value="3">Good</option>
-                            <option value="2">Poor</option>
-                            <option value="1">Terrible</option>
-                        </select>
-                    </div>
 
-
-                    <div class="mb-3">
-                        <label for="qualityInput" class="form-label"><strong>Review</strong></label>
-                        <textarea class="form-control" id="qualityInput" rows="8" cols="5"
-                            placeholder="Share your thoughts on the services to help other buyers."></textarea>
-                    </div>
-
-                    <div class="d-flex gap-2 justify-content-start mb-2">
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-camera"></i> Add Photo
-                        </button>
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-camera-video"></i> Add Video
-                        </button>
-                    </div>
-
-                    <small class="text-muted">Add 50 characters with 1 photo and 1 video to earn </small>
-
-
-                </div>
-                <div class="modal-footer justify-content-between align-items-center">
-                    <!-- Checkbox for Anonymous Review -->
-                    <div class="center-form-check mb-3 mt-3">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="anonymousCheck">
-                            <label class="form-check-label small" for="anonymousCheck">
-                                Leave your review anonymously
-                            </label>
-                        </div>
-                    </div>
-                    <!-- Submit and Cancel Buttons -->
-                    <div>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger">Submit</button>
-
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
     <script src="../assets/js/plugins/star-rating.min.js"></script>
+    <script>
+        let uploadedPhotos = []; 
+        const maxPhotos = 4;
+
+        const photoInput = document.getElementById('photoInput');
+        const errorMessage = document.getElementById('errorMessage');
+        const photoCounter = document.getElementById('photoCounter');
+        const photoPreviewContainer = document.getElementById('photoPreviewContainer');
+
+        photoInput.addEventListener('change', function(event) {
+            const files = Array.from(event.target.files);
+
+            
+            if (uploadedPhotos.length + files.length > maxPhotos) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            errorMessage.style.display = 'none';
+
+           
+            files.forEach(file => {
+                if (uploadedPhotos.length < maxPhotos) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                       
+                        const div = document.createElement('div');
+                        div.classList.add('photo-preview');
+
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+
+                        
+                        const btnRemove = document.createElement('button');
+                        btnRemove.innerHTML = 'x';
+                        btnRemove.addEventListener('click', () => {
+                            photoPreviewContainer.removeChild(div);
+                            uploadedPhotos = uploadedPhotos.filter(f => f !== file);
+                            updateInputFiles();
+                            updateCounter();
+                        });
+
+                        div.appendChild(img);
+                        div.appendChild(btnRemove);
+                        photoPreviewContainer.appendChild(div);
+
+                        uploadedPhotos.push(file);
+                        updateInputFiles(); 
+                        updateCounter();
+                    };
+
+                    reader.readAsDataURL(file);
+                }
+            });
+
+           
+            event.target.value = '';
+        });
+
+        function updateInputFiles() {
+            const dataTransfer = new DataTransfer();
+
+            
+            uploadedPhotos.forEach(file => {
+                dataTransfer.items.add(file);
+            });
+
+           
+            photoInput.files = dataTransfer.files;
+        }
+
+        function updateCounter() {
+            photoCounter.innerText = `${uploadedPhotos.length}/${maxPhotos}`;
+        }
+    </script>
     <script>
         var destroyed = false;
         var starratingPrebuilt = new StarRating('.star-rating-prebuilt', {

@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Tasker;
 use App\Models\Booking;
+use App\Models\Review;
 use App\Models\TimeSlot;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ use Spatie\Geocoder\Geocoder;
 use App\Models\TaskerTimeSlot;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -452,14 +454,13 @@ class BookingController extends Controller
                 ]);
             }
         } catch (Exception $e) {
-            // Catch errors and return a JSON response with a proper error message.
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 500); // HTTP status code 500 for server errors.
+            ], 500);
         }
     }
-    public function clientCancelBooking($id,$taskerid, $option)
+    public function clientCancelBooking($id, $taskerid, $option)
     {
         try {
 
@@ -491,4 +492,66 @@ class BookingController extends Controller
             return back()->with('error', 'Opps , there was an unexpected error to execute the operation. Please try again.');
         }
     }
+
+    public function clientReviewBooking(Request $request)
+    {
+        try {
+            if ($request->review_type === "on") {
+                $request->merge(['review_type' => "2"]);
+            } else {
+                $request->merge(['review_type' => "1"]);
+            }            
+            $validated = $request->validate([
+                'review_rating' => 'required|integer|min:1|max:5',
+                'review_description' => 'required|string|max:1000',
+                'photos' => 'nullable|array|max:4', 
+                'photos.*' => 'image|mimes:jpeg,png,jpg|max:2048', 
+                'review_type' => 'nullable|string', 
+                'booking_id' => 'required|integer|exists:bookings,id', 
+            ]);
+            dd($validated);
+           
+
+           
+            $imagePaths = [null, null, null, null];
+    
+            if ($request->hasFile('photos')) {
+                foreach ($request->file('photos') as $index => $photo) {
+                    if ($index < 4) { 
+                        $imagePaths[$index] = $photo->store('uploads/review_images', 'public'); 
+                    }
+                }
+            }
+            $imagePaths = array_pad($imagePaths, 4, null);
+       
+            $review = Review::create([
+                'review_rating' => $validated['review_rating'],
+                'review_description' => $validated['review_description'],
+                'review_imageOne' => $imagePaths[0],
+                'review_imageTwo' => $imagePaths[1],
+                'review_imageThree' => $imagePaths[2],
+                'review_imageFour' => $imagePaths[3],
+                'review_type' => $validated['review_type'] ?? '1',
+                'review_date_time' => now(),
+                'booking_id' => $validated['booking_id']
+            ]);
+           
+            return response()->json(['success' => 'Review submitted successfully!', 'review' => $review], 200);
+    
+        } catch (\Illuminate\Validation\ValidationException $e) {
+           
+            return response()->json(['error' => $e->errors()], 422);
+        } catch (\Exception $e) {
+           
+            Log::error('Unexpected error:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+           
+            return response()->json(['error' => 'An unexpected error occurred. Please try again.'], 500);
+        }
+    }
+    
+
 }

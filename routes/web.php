@@ -215,6 +215,10 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     // Client - Booking History
     Route::get('/my-booking-history', [RouteController::class, 'clientBookingHistoryNav'])->name('clientBookHistory');
     Route::get('/cancel-booking-process/{id}/{taskerid}/{option}', [BookingController::class, 'clientCancelBooking'])->name('client-cancel-booking');
+    Route::post('/submit-review', [BookingController::class, 'clientReviewBooking'])->name('client-submit-review');
+
+
+
 
 
 });
