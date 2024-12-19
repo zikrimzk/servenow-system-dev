@@ -309,7 +309,8 @@
                                             long: event.long,
                                             note: event.note,
                                             className: event.className,
-
+                                            editable: event.editable,
+                                            overlap: event.overlap,
                                             clickable: true
                                         }));
                                         successCallback(events);

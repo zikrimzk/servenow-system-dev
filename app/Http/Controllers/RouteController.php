@@ -11,6 +11,7 @@ use App\Models\ServiceType;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
+use App\Models\Review;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -235,6 +236,8 @@ class RouteController extends Controller
         $refund = collect($booking)
             ->whereIn('booking_status', [7,8])
             ->groupBy('booking_date');
+        
+        $review = Review::all();
 
         return view('client.booking.booking-history', [
             'title' => 'My Booking History',
@@ -242,7 +245,8 @@ class RouteController extends Controller
             'toServeBooking' => $toServeBookings,
             'completed' => $completed,
             'cancelled' => $cancelled,
-            'refund'=>$refund
+            'refund'=>$refund,
+            'review'=>$review
 
         ]);
     }

@@ -109,11 +109,7 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
-                        <li class="nav-item px-1">
-                            <a class="nav-link" href="https://phoenixcoded.gitbook.io/able-pro/"
-                                target="_blank">Service</a>
-                        </li>
-                        <li class="nav-item px-1">
+                        <li class="nav-item px-2">
                             <a class="nav-link" href="{{ route('servenow-login-option') }}">Sign up / Log in</a>
                         </li>
                         <li class="nav-item">

@@ -254,13 +254,16 @@ class BookingController extends Controller
                 )
                 ->get();
             // dd($bookings);
-
             $events = $bookings->map(function ($booking) {
                 $className = '';
+                $editable = true;
+
                 if ($booking->booking_status == 3) {
                     $className = 'event-success';
+                    $editable = false;
                 } elseif ($booking->booking_status == 6) {
                     $className = 'event-unavailable';
+                    $editable = false;
                 }
                 return [
                     'title' => $booking->client_firstname . ' (' . $booking->servicetype_name . ')',
@@ -275,7 +278,9 @@ class BookingController extends Controller
                     'lat' => $booking->booking_latitude,
                     'long' => $booking->booking_longitude,
                     'note' => $booking->booking_note,
-                    'className' => $className
+                    'className' => $className,
+                    'overlap' => false,
+                    'editable' => $editable,
                 ];
             });
 
@@ -380,6 +385,7 @@ class BookingController extends Controller
 
         // Update the booking start and end times
         $booking->booking_date = $request->date;
+        $booking->booking_status = 4;
         $booking->booking_time_start = Carbon::parse($request->start)->format('H:i:s');
         $booking->booking_time_end = Carbon::parse($request->end)->format('H:i:s');
         $booking->save();
@@ -419,7 +425,7 @@ class BookingController extends Controller
         ]);
     }
 
-    public function changeBookingStatus(Request $request)
+    public function taskerChangeBookingStatus(Request $request)
     {
         try {
             $booking = Booking::findOrFail($request->id);
@@ -460,7 +466,7 @@ class BookingController extends Controller
             ], 500);
         }
     }
-    public function clientCancelBooking($id, $taskerid, $option)
+    public function clientChangeBookingStatus($id, $taskerid, $option)
     {
         try {
 
@@ -485,6 +491,11 @@ class BookingController extends Controller
                 $booking->booking_status = 7;
                 $booking->save();
                 $message = 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account.';
+            } else if ($option == 3) {
+                // refund process here
+                $booking->booking_status = 6;
+                $booking->save();
+                $message = 'You have confirmed that you have received the service. Please leave a review for the tasker.';
             }
             return back()->with('success', $message);
         } catch (Exception $e) {
@@ -500,30 +511,30 @@ class BookingController extends Controller
                 $request->merge(['review_type' => "2"]);
             } else {
                 $request->merge(['review_type' => "1"]);
-            }            
+            }
             $validated = $request->validate([
                 'review_rating' => 'required|integer|min:1|max:5',
                 'review_description' => 'required|string|max:1000',
-                'photos' => 'nullable|array|max:4', 
-                'photos.*' => 'image|mimes:jpeg,png,jpg|max:2048', 
-                'review_type' => 'nullable|string', 
-                'booking_id' => 'required|integer|exists:bookings,id', 
+                'photos' => 'nullable|array|max:4',
+                'photos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+                'review_type' => 'nullable|string',
+                'booking_id' => 'required|integer|exists:bookings,id',
             ]);
-            dd($validated);
-           
+            // dd($validated);
 
-           
+
+
             $imagePaths = [null, null, null, null];
-    
+
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $index => $photo) {
-                    if ($index < 4) { 
-                        $imagePaths[$index] = $photo->store('uploads/review_images', 'public'); 
+                    if ($index < 4) {
+                        $imagePaths[$index] = $photo->store('uploads/review_images', 'public');
                     }
                 }
             }
             $imagePaths = array_pad($imagePaths, 4, null);
-       
+
             $review = Review::create([
                 'review_rating' => $validated['review_rating'],
                 'review_description' => $validated['review_description'],
@@ -535,23 +546,17 @@ class BookingController extends Controller
                 'review_date_time' => now(),
                 'booking_id' => $validated['booking_id']
             ]);
-           
-            return response()->json(['success' => 'Review submitted successfully!', 'review' => $review], 200);
-    
-        } catch (\Illuminate\Validation\ValidationException $e) {
-           
-            return response()->json(['error' => $e->errors()], 422);
-        } catch (\Exception $e) {
-           
+
+            return back()->with('success', 'Review submitted successfully!');
+        } catch (Exception $e) {
+
             Log::error('Unexpected error:', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-           
-            return response()->json(['error' => 'An unexpected error occurred. Please try again.'], 500);
+
+            return back()->with('error', 'An unexpected error occurred. Please try again.');
         }
     }
-    
-
 }

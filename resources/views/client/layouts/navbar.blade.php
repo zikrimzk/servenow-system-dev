@@ -15,10 +15,6 @@
                     <a class="nav-link" href="{{ route('client-home') }}">Home</a>
                 </li>
                 <li class="nav-item px-1">
-                    <a class="nav-link" href="https://phoenixcoded.gitbook.io/able-pro/" target="_blank">Book a
-                        Task</a>
-                </li>
-                <li class="nav-item px-1">
                     <a class="nav-link" href="{{ route('clientBookHistory') }}">My Task</a>
                 </li>
                 <li class="nav-item px-1 me-2 mb-2 mb-md-0">
@@ -54,9 +50,7 @@
                 </li>
 
             </ul>
-            <ul class="list-unstyled">
-
-            </ul>
+           
         </div>
     </div>
 </nav>

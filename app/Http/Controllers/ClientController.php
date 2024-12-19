@@ -108,7 +108,7 @@ class ClientController extends Controller
             [
                 'client_firstname' => 'required|string',
                 'client_lastname' => 'required|string',
-                'client_phoneno' => 'required|string|min:10|max:11',
+                'client_phoneno' => 'required|string|min:10|max:15',
                 'email' => 'required|email|unique:clients',
                 'password' => 'required|same:cpassword|min:8',
                 'cpassword' => 'required|min:8',

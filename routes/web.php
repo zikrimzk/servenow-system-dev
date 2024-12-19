@@ -172,7 +172,7 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::get('/get-unavailable-slot', [BookingController::class, 'getTaskerUnavailableSlot'])->name('get-unavailable-slot');
     Route::get('/tasker-timeslots-calender', [BookingController::class, 'getRangeTimeSlotsForTaskerCalander'])->name('get-calander-range-tasker');
     Route::post('/reschedule-booking', [BookingController::class, 'rescheduleBookingTimeFunction'])->name('reschedule-booking-tasker');
-    Route::post('/confirm-reject-booking', [BookingController::class, 'changeBookingStatus'])->name('confirmation-booking-tasker');
+    Route::post('/change-booking-status-tasker', [BookingController::class, 'taskerChangeBookingStatus'])->name('confirmation-booking-tasker');
 
 });
 
@@ -214,7 +214,7 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
 
     // Client - Booking History
     Route::get('/my-booking-history', [RouteController::class, 'clientBookingHistoryNav'])->name('clientBookHistory');
-    Route::get('/cancel-booking-process/{id}/{taskerid}/{option}', [BookingController::class, 'clientCancelBooking'])->name('client-cancel-booking');
+    Route::get('/change-booking-process/{id}/{taskerid}/{option}', [BookingController::class, 'clientChangeBookingStatus'])->name('client-change-booking-status');
     Route::post('/submit-review', [BookingController::class, 'clientReviewBooking'])->name('client-submit-review');
 
 
