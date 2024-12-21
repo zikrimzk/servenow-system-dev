@@ -68,11 +68,11 @@ use Carbon\Carbon;
                                     <thead>
                                         <tr>
                                             <th scope="col">#</th>
-                                            <th scope="col">Tasker</th>
                                             <th scope="col">Client</th>
                                             <th scope="col">Booking Date</th>
                                             <th scope="col">Booking Time</th>
                                             <th scope="col">Booking Status</th>
+                                            <th scope="col">Amount (RM)</th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -147,6 +147,14 @@ use Carbon\Carbon;
                                     </div>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
+                                            <label class="form-label">Booking Amount (RM)</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ number_format($b->booking_rate, 2) }}"
+                                                disabled />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
                                             <label class="form-label d-block mb-2">Booking Status</label>
                                             @if ($b->booking_status == 1)
                                                 <span class="badge bg-warning">To Pay</span>
@@ -202,10 +210,6 @@ use Carbon\Carbon;
                             searchable: false
                         },
                         {
-                            data: 'tasker',
-                            name: 'tasker'
-                        },
-                        {
                             data: 'client',
                             name: 'client'
                         },
@@ -220,6 +224,10 @@ use Carbon\Carbon;
                         {
                             data: 'booking_status',
                             name: 'booking_status'
+                        },
+                        {
+                            data: 'booking_amount',
+                            name: 'booking_amount'
                         },
                         {
                             data: 'action',

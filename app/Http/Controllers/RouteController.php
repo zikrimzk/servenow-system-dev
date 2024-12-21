@@ -506,11 +506,6 @@ class RouteController extends Controller
                 'a.booking_note',
                 'a.booking_rate',
                 'c.servicetype_name',
-                'd.tasker_firstname',
-                'd.tasker_lastname',
-                'd.tasker_phoneno',
-                'd.email as tasker_email',
-                'd.tasker_code',
                 'e.client_firstname',
                 'e.client_lastname',
                 'e.client_phoneno',
@@ -518,17 +513,13 @@ class RouteController extends Controller
 
             )
             ->whereNotIn('a.booking_status', [7,8])
+            ->where('b.tasker_id', Auth::user()->id)
             ->orderbyDesc('a.booking_date')
             ->get();
 
         if ($request->ajax()) {
 
             $table = DataTables::of($data)->addIndexColumn();
-
-            $table->addColumn('tasker', function ($row) {
-                $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
-                return $tasker;
-            });
 
             $table->addColumn('client', function ($row) {
                 $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
@@ -567,6 +558,18 @@ class RouteController extends Controller
                 return $status;
             });
 
+            $table->addColumn('booking_amount', function ($row) {
+
+                if ($row->booking_status == 1) {
+                    $amount = '<span class="text-warning"> ' . $row->booking_rate . '</span>';
+                } else if ($row->booking_status == 2 || $row->booking_status == 3 || $row->booking_status == 4 || $row->booking_status == 6) {
+                    $amount = '<span class="text-success"> ' . $row->booking_rate . '</span>';
+                } else if ($row->booking_status == 5) {
+                    $amount = '<span class="text-danger"> ' . $row->booking_rate . '</span>';
+                }
+                return $amount;
+            });
+
             $table->addColumn('action', function ($row) {
 
                 if ($row->booking_status == 1 || $row->booking_status == 2 || $row->booking_status == 3 || $row->booking_status == 4) {
@@ -576,11 +579,12 @@ class RouteController extends Controller
                             data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
                             <i class="ti ti-eye f-20"></i>
                         </a>
-                        <a href="#" class="avtar avtar-xs btn-light-secondary" data-bs-toggle="modal" 
-                            data-bs-target="#updatebooking-' . $row->bookingID . '">
-                            <i class="ti ti-edit f-20"></i>
-                        </a>
+                       
                     ';
+                    // ' <a href="#" class="avtar avtar-xs btn-light-secondary" data-bs-toggle="modal" 
+                    //         data-bs-target="#updatebooking-' . $row->bookingID . '">
+                    //         <i class="ti ti-edit f-20"></i>
+                    //     </a>'
                 } else if ($row->booking_status == 5 || $row->booking_status == 6) {
                     $button =
                         '
@@ -594,11 +598,11 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
+            $table->rawColumns(['client', 'booking_date', 'booking_time', 'booking_status','booking_amount', 'action']);
 
             return $table->make(true);
         }
-        return view('administrator.booking.booking-list-index', [
+        return view('tasker.booking.booking-list-index', [
             'title' => 'All Booking List',
             'books' => $data,
         ]);

@@ -16,7 +16,7 @@
             </div>
             <div class="col-md-12">
               <div class="page-header-title">
-                <h2 class="mb-0">Dashhttp://127.0.0.1:8000/tasker/home#!board</h2>
+                <h2 class="mb-0">Dashboard</h2>
               </div>
             </div>
           </div>
