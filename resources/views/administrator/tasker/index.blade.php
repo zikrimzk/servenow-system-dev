@@ -303,7 +303,22 @@
                             orderable: false,
                             searchable: false
                         }
-                    ]
+                    ],
+                    language: {
+                        emptyTable: "No data available in the table.", // Custom message when there's no data
+                        loadingRecords: "Loading...",
+                        processing: "Processing...",
+                        zeroRecords: "No matching records found.",
+                        paginate: {
+                            first: "First",
+                            last: "Last",
+                            next: "Next",
+                            previous: "Previous"
+                        },
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        infoEmpty: "Showing 0 to 0 of 0 entries",
+                        infoFiltered: "(filtered from _MAX_ total entries)"
+                    }
 
                 });
 

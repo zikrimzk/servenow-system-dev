@@ -495,7 +495,9 @@
                                     <div class="col-sm-12 mb-3">
                                         <div class="d-flex justify-content-center align-items-center">
                                             <p class="fw-normal f-18 text-center">
-                                                This action will not permanently delete the user. You can always change the status back to active if needed. Are you sure you want to deactivate {{ $client->client_firstname }} account?
+                                                This action will not permanently delete the user. You can always change the
+                                                status back to active if needed. Are you sure you want to deactivate
+                                                {{ $client->client_firstname }} account?
                                             </p>
                                         </div>
                                     </div>
@@ -582,14 +584,29 @@
                             orderable: false,
                             searchable: false
                         }
-                    ]
+                    ],
+                    language: {
+                        emptyTable: "No data available in the table.", // Custom message when there's no data
+                        loadingRecords: "Loading...",
+                        processing: "Processing...",
+                        zeroRecords: "No matching records found.",
+                        paginate: {
+                            first: "First",
+                            last: "Last",
+                            next: "Next",
+                            previous: "Previous"
+                        },
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        infoEmpty: "Showing 0 to 0 of 0 entries",
+                        infoFiltered: "(filtered from _MAX_ total entries)"
+                    }
 
                 });
 
                 function updateArea(modal) {
                     var state = modal.find('.addState').val(); // Find the state within the current modal
                     var addCityDropdown = modal.find(
-                    '.addCity'); // Find the city dropdown in the current modal
+                        '.addCity'); // Find the city dropdown in the current modal
                     if (state) {
                         $.ajax({
                             url: '/get-areas/' + state, // Ensure this matches the route
@@ -604,7 +621,7 @@
                             },
                             error: function(xhr, status, error) {
                                 console.error("Error fetching areas: " +
-                                error); // For debugging if request fails
+                                    error); // For debugging if request fails
                             }
                         });
                     } else {
@@ -616,7 +633,7 @@
                 $(document).on('shown.bs.modal', '.modal-up', function() {
                     var modal = $(this); // Current modal being triggered
                     var isArea = modal.find('.isArea')
-                .val(); // Get the area value for the current modal
+                        .val(); // Get the area value for the current modal
 
                     if (isArea && isArea.trim() !== "") {
                         // Area is already selected, no need to update
@@ -631,7 +648,7 @@
                 // AJAX: State change logic (Specific to the modal context)
                 $(document).on('change', '.addState', function() {
                     var modal = $(this).closest(
-                    '.modal'); // Get the modal that contains the state dropdown
+                        '.modal'); // Get the modal that contains the state dropdown
                     updateArea(modal);
                 });
             });

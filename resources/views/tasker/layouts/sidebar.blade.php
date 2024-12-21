@@ -98,6 +98,8 @@
                     </a>
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="{{ route('tasker-booking-management') }}">My Booking</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-booking-list') }}">Booking List</a></li>
+
                     </ul>
                 </li>
             </ul>

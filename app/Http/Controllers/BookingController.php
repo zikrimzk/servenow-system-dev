@@ -212,7 +212,7 @@ class BookingController extends Controller
         // echo $result;
         // dd($obj);
 
-        return redirect('https://dev.toyyibpay.com/'. $obj[0]->BillCode);
+        return redirect('https://dev.toyyibpay.com/' . $obj[0]->BillCode);
 
         try {
             $booking = $request->validate([
@@ -463,6 +463,27 @@ class BookingController extends Controller
             'message' => 'Event rescheduled successfully',
             'updated_booking' => $booking
         ]);
+    }
+
+    public function adminUpdateBooking(Request $request, $id)
+    {
+        try {
+            $booking = Booking::findOrFail($id);
+            $booking->booking_status = $request->booking_status;
+            if ($booking->booking_address != $request->booking_address) {
+                $address = $request->booking_address;
+                $address = Str::headline($address);
+                $result = $this->geocoder->getCoordinatesForAddress($address);
+                $booking->booking_address = $address;
+                $booking->booking_latitude = $result['lat'];
+                $booking->booking_longitude = $result['lng'];
+            }
+            $booking->save();
+
+            return back()->with('success', 'Booking details has been updated successfully.');
+        } catch (Exception $e) {
+            return back()->with('error', 'Oops! Something went wrong. Please try again.');
+        }
     }
 
     public function taskerChangeBookingStatus(Request $request)

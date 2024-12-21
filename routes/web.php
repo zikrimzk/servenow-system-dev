@@ -10,6 +10,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\AuthenticateController;
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\BookingController;
+use App\Models\Booking;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,6 +116,19 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/create-time-slot', [SettingController::class, 'adminCreateTimeSlot'])->name('admin-timeslot-create');
     Route::post('/update-time-slot-{id}', [SettingController::class, 'adminUpdateTimeSlot'])->name('admin-timeslot-update');
     Route::get('/delete-time-slot-{id}', [SettingController::class, 'adminDeleteTimeSlot'])->name('admin-timeslot-remove');
+
+    // Admin - Booking Management [General]
+    Route::get('/booking-list', [RouteController::class, 'adminBookingListNav'])->name('admin-booking-list');
+    Route::post('/update-booking-details-{id}', [BookingController::class, 'adminUpdateBooking'])->name('admin-booking-update');
+
+    // Admin - Booking Management [Refund]
+    Route::get('/refunded-booking-list', [RouteController::class, 'adminBookingRefundListNav'])->name('admin-refunded-list');
+
+    Route::get('/refund-request', [RouteController::class, 'adminBookingRefundReqNav'])->name('admin-refund-request');
+
+
+
+
 });
 
 /* Admin Route End */
@@ -166,13 +180,17 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::get('/get-time-slot-{date}', [SettingController::class, 'getTaskerTimeSlot'])->name('get-tasker-timeslot');
     Route::post('/update-time-slot-{id}', [SettingController::class, 'taskerUpdateTimeSlot'])->name('tasker-timeslot-update');
 
-    // Tasker - Booking Management
+    // Tasker - Booking Management [Calander]
     Route::get('/my-booking', [RouteController::class, 'taskerBookingManagementNav'])->name('tasker-booking-management');
     Route::get('/get-bookings', [BookingController::class, 'getBookingsDetails'])->name('get-tasker-bookings');
     Route::get('/get-unavailable-slot', [BookingController::class, 'getTaskerUnavailableSlot'])->name('get-unavailable-slot');
     Route::get('/tasker-timeslots-calender', [BookingController::class, 'getRangeTimeSlotsForTaskerCalander'])->name('get-calander-range-tasker');
     Route::post('/reschedule-booking', [BookingController::class, 'rescheduleBookingTimeFunction'])->name('reschedule-booking-tasker');
     Route::post('/change-booking-status-tasker', [BookingController::class, 'taskerChangeBookingStatus'])->name('confirmation-booking-tasker');
+
+    // Tasker - Booking Management [General]
+    Route::get('/all-booking-list', [RouteController::class, 'taskerBookingListNav'])->name('tasker-booking-list');
+
 
 });
 

@@ -1,3 +1,7 @@
+<?php
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+?>
 @extends('administrator.layouts.main')
 
 @section('content')
@@ -11,14 +15,14 @@
                     <div class="row align-items-center">
                         <div class="col-md-12">
                             <ul class="breadcrumb">
-                                <li class="breadcrumb-item">Services</li>
-                                <li class="breadcrumb-item" aria-current="page">Service Approval</li>
+                                <li class="breadcrumb-item">Bookings</li>
+                                <li class="breadcrumb-item" aria-current="page">Refund Request</li>
 
                             </ul>
                         </div>
                         <div class="col-md-12">
                             <div class="page-header-title">
-                                <h2 class="mb-4">Service Approval</h2>
+                                <h2 class="mb-4">Refund Request</h2>
                             </div>
                         </div>
                     </div>
@@ -65,9 +69,10 @@
                                         <tr>
                                             <th scope="col">#</th>
                                             <th scope="col">Tasker</th>
-                                            <th scope="col">Service Name</th>
-                                            <th scope="col">Rate (RM)</th>
-                                            <th scope="col">Status</th>
+                                            <th scope="col">Client</th>
+                                            <th scope="col">Booking Date</th>
+                                            <th scope="col">Booking Time</th>
+                                            <th scope="col">Booking Status</th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -79,83 +84,150 @@
             </div>
 
 
-            @foreach ($services as $sv)
-                <!-- Modal Service Edit Start Here -->
-                <div class="modal fade" id="viewDescModal-{{ $sv->id }}" data-bs-keyboard="false" tabindex="-1"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
-                        <form action="{{ route('tasker-service-create') }}" method="POST">
-                            @csrf
+            @foreach ($books as $b)
+                <!-- Modal View Booking Details Start Here-->
+                <form action="{{ route('admin-booking-update', $b->bookingID) }}" method="POST">
+                    @csrf
+                    <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false"
+                        tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="mb-0">Service Details</h5>
+                                    <h5 class="mb-0">Booking Details</h5>
                                     <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
                                         data-bs-dismiss="modal">
                                         <i class="ti ti-x f-20"></i>
                                     </a>
                                 </div>
+
                                 <div class="modal-body">
                                     <div class="row">
+
+                                        <h5 class="mb-3">A. Tasker Details</h5>
                                         <div class="col-sm-12">
                                             <div class="mb-3">
-                                                <label class="form-label">Service Type</label>
-                                                <select class="form-select" name="service_type_id">
-                                                    @foreach ($types as $type)
-                                                        @if ($sv->service_type_id == $type->id)
-                                                            <option value="{{ $type->id }}" selected>
-                                                                {{ $type->servicetype_name }}
-                                                            </option>
-                                                        @else
-                                                            <option value="{{ $type->id }}" disabled>
-                                                                {{ $type->servicetype_name }}
-                                                            </option>
-                                                        @endif
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Rate</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">RM</span>
-                                                    <input type="text" class="form-control" placeholder="Service Rate"
-                                                        name="service_rate" value="{{ $sv->service_rate }}" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Rate Type</label>
-                                                <select class="form-select" name="service_rate_type">
-                                                    @if ($sv->service_rate_type == 'per hour')
-                                                        <option value="per job" disabled>Per Job</option>
-                                                        <option value="per hour" selected>Per Hour</option>
-                                                    @elseif($sv->service_rate_type == 'per job')
-                                                        <option value="per job" selected>Per Job</option>
-                                                        <option value="per hour" disabled>Per Hour</option>
-                                                    @endif
-                                                </select>
+                                                <label class="form-label">Tasker Code</label>
+                                                <input type="text" class="form-control" value="{{ $b->tasker_code }}"
+                                                    disabled />
                                             </div>
                                         </div>
                                         <div class="col-sm-12">
                                             <div class="mb-3">
-                                                <label class="form-label">Service Description</label>
-                                                <textarea name="service_desc" class="form-control" cols="20" rows="4"
-                                                    placeholder="Enter your description ...">{{ $sv->service_desc }}</textarea>
+                                                <label class="form-label">Tasker Name</label>
+                                                <input type="text" class="form-control"
+                                                    value="{{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) }}"
+                                                    disabled />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Tasker Phone Number</label>
+                                                <input type="text" class="form-control" value="{{ $b->tasker_phoneno }}"
+                                                    disabled />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Tasker Email</label>
+                                                <input type="text" class="form-control" value="{{ $b->tasker_email }}"
+                                                    disabled />
                                             </div>
                                         </div>
 
+                                        <h5 class="mb-3 mt-2">B. Client Details</h5>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Client Name</label>
+                                                <input type="text" class="form-control"
+                                                    value="{{ Str::headline($b->client_firstname . ' ' . $b->client_lastname) }}"
+                                                    disabled />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Client Phone Number</label>
+                                                <input type="text" class="form-control" value="{{ $b->client_phoneno }}"
+                                                    disabled />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Client Email</label>
+                                                <input type="text" class="form-control"
+                                                    value="{{ $b->client_email }}" disabled />
+                                            </div>
+                                        </div>
+
+                                        <h5 class="mb-3 mt-2">C. Booking Details</h5>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Booking Date</label>
+                                                <input type="text" class="form-control"
+                                                    value="{{ Carbon::parse($b->booking_date)->format('d F Y') }}"
+                                                    disabled />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Booking Time</label>
+                                                <input type="text" class="form-control"
+                                                    value="{{ Carbon::parse($b->booking_time_start)->format('g:i A') . ' - ' . Carbon::parse($b->booking_time_end)->format('g:i A') }}"
+                                                    disabled />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Booking Address</label>
+                                                <textarea class="form-control" cols="20" rows="4" disabled>{{ $b->booking_address }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Total Amount Paid</label>
+                                                <input class="form-control" value="{{ $b->booking_rate }}" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label d-block mb-2">Booking Status</label>
+                                                @if ($b->booking_status == 7)
+                                                    <span class="badge bg-light-warning">Pending Refund</span>
+                                                @elseif($b->booking_status == 8)
+                                                    <span class="badge bg-light-success">Refunded</span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <h5 class="mb-3 mt-2">D. Refund Details</h5>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label d-block mb-2">Refund Reason</label>
+                                                <textarea class="form-control" cols="20" rows="4" disabled>test</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="mb-3">
+                                                <label class="form-label d-block mb-2">Amount To be Refunded (RM) <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="cancelrefund_amount">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <div class="modal-footer">
+                                    <button type="reset" class="btn btn-light btn-pc-default"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Approve Refund</button>
+                                </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
-                <!-- Modal Service Edit End  Here -->
+                </form>
+                <!-- Modal View Booking Details End Here-->
 
                 <!-- Modal Approve Start Here -->
-                <div class="modal fade" id="approveModal-{{ $sv->id }}" data-bs-keyboard="false" tabindex="-1"
+                {{-- <div class="modal fade" id="approveModal-{{ $sv->id }}" data-bs-keyboard="false" tabindex="-1"
                     aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
@@ -194,11 +266,11 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
                 <!-- Modal Approve End Here -->
 
                 <!-- Modal Terminate Start Here -->
-                <div class="modal fade" id="terminateModal-{{ $sv->id }}" data-bs-keyboard="false" tabindex="-1"
+                {{-- <div class="modal fade" id="terminateModal-{{ $sv->id }}" data-bs-keyboard="false" tabindex="-1"
                     aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
@@ -233,7 +305,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
                 <!-- Modal Terminate End Here -->
             @endforeach
 
@@ -252,9 +324,8 @@
 
                 var table = $('.data-table').DataTable({
                     processing: true,
-                    serverSide: true,
                     responsive: true,
-                    ajax: "{{ route('admin-service-management') }}",
+                    ajax: "{{ route('admin-refund-request') }}",
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
@@ -265,16 +336,20 @@
                             name: 'tasker'
                         },
                         {
-                            data: 'servicetype_name',
-                            name: 'servicetype_name'
+                            data: 'client',
+                            name: 'client'
                         },
                         {
-                            data: 'service_rate',
-                            name: 'service_rate'
+                            data: 'booking_date',
+                            name: 'booking_date'
                         },
                         {
-                            data: 'service_status',
-                            name: 'service_status'
+                            data: 'booking_time',
+                            name: 'booking_time'
+                        },
+                        {
+                            data: 'booking_status',
+                            name: 'booking_status'
                         },
                         {
                             data: 'action',
@@ -285,8 +360,8 @@
                     ],
                     language: {
                         emptyTable: "No data available in the table.", // Custom message when there's no data
-                        loadingRecords: "Loading...",
-                        processing: "Processing...",
+                        // loadingRecords: "Loading...",
+                        // processing: "Processing...",
                         zeroRecords: "No matching records found.",
                         paginate: {
                             first: "First",

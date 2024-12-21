@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Client;
+use App\Models\Review;
 use App\Models\Tasker;
 use App\Models\Service;
 use App\Models\TimeSlot;
@@ -11,7 +13,6 @@ use App\Models\ServiceType;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
-use App\Models\Review;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -104,7 +105,7 @@ class RouteController extends Controller
             return redirect(route('client-home'));
         }
     }
-    //Client -- Homepage Login
+    //Client - Homepage Login
     public function clientSearchServicesNav()
     {
         return view('client.search-auth', [
@@ -113,7 +114,7 @@ class RouteController extends Controller
 
         ]);
     }
-    //Client -- Profile Homepage
+    //Client - Profile Homepage
     public function clientprofileNav()
     {
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
@@ -176,8 +177,8 @@ class RouteController extends Controller
 
     public function clientPaymentNav(Request $request)
     {
-       
-        return redirect('https://dev.toyyibpay.com/'. $request->billcode);
+
+        return redirect('https://dev.toyyibpay.com/' . $request->billcode);
         // return view('client.booking.payment-return',[
         //     'title' => 'Payment Status'
         // ]);
@@ -243,9 +244,9 @@ class RouteController extends Controller
 
         $groupedBookings = $booking->groupBy('booking_date');
         $refund = collect($booking)
-            ->whereIn('booking_status', [7,8])
+            ->whereIn('booking_status', [7, 8])
             ->groupBy('booking_date');
-        
+
         $review = Review::all();
 
         return view('client.booking.booking-history', [
@@ -254,8 +255,8 @@ class RouteController extends Controller
             'toServeBooking' => $toServeBookings,
             'completed' => $completed,
             'cancelled' => $cancelled,
-            'refund'=>$refund,
-            'review'=>$review
+            'refund' => $refund,
+            'review' => $review
 
         ]);
     }
@@ -482,6 +483,129 @@ class RouteController extends Controller
             'title' => 'My Booking',
         ]);
     }
+
+    // Admin - Booking List
+
+    public function taskerBookingListNav(Request $request)
+    {
+        $data = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->select(
+                'a.id as bookingID',
+                'b.id as serviceID',
+                'c.id as typeID',
+                'd.id as taskerID',
+                'a.booking_date',
+                'a.booking_address',
+                'a.booking_time_start',
+                'a.booking_time_end',
+                'a.booking_status',
+                'a.booking_note',
+                'a.booking_rate',
+                'c.servicetype_name',
+                'd.tasker_firstname',
+                'd.tasker_lastname',
+                'd.tasker_phoneno',
+                'd.email as tasker_email',
+                'd.tasker_code',
+                'e.client_firstname',
+                'e.client_lastname',
+                'e.client_phoneno',
+                'e.email as client_email',
+
+            )
+            ->whereNotIn('a.booking_status', [7,8])
+            ->orderbyDesc('a.booking_date')
+            ->get();
+
+        if ($request->ajax()) {
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('tasker', function ($row) {
+                $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
+                return $tasker;
+            });
+
+            $table->addColumn('client', function ($row) {
+                $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
+                return $client;
+            });
+
+            $table->addColumn('booking_date', function ($row) {
+
+                $date = Carbon::parse($row->booking_date)->format('d F Y');
+                return $date;
+            });
+
+            $table->addColumn('booking_time', function ($row) {
+
+                $startTime = Carbon::parse($row->booking_time_start)->format('g:i A');
+                $endTime = Carbon::parse($row->booking_time_end)->format('g:i A');
+                $time = $startTime . ' - ' . $endTime;
+                return $time;
+            });
+
+            $table->addColumn('booking_status', function ($row) {
+
+                if ($row->booking_status == 1) {
+                    $status = '<span class="badge bg-warning">To Pay</span>';
+                } else if ($row->booking_status == 2) {
+                    $status = '<span class="badge bg-light-success">Paid</span>';
+                } else if ($row->booking_status == 3) {
+                    $status = '<span class="badge bg-success">Confirmed</span>';
+                } else if ($row->booking_status == 4) {
+                    $status = '<span class="badge bg-warning">Rescheduled</span>';
+                } else if ($row->booking_status == 5) {
+                    $status = '<span class="badge bg-danger">Cancelled</span>';
+                } else if ($row->booking_status == 6) {
+                    $status = '<span class="badge bg-success">Completed</span>';
+                } 
+                return $status;
+            });
+
+            $table->addColumn('action', function ($row) {
+
+                if ($row->booking_status == 1 || $row->booking_status == 2 || $row->booking_status == 3 || $row->booking_status == 4) {
+                    $button =
+                        '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
+                            <i class="ti ti-eye f-20"></i>
+                        </a>
+                        <a href="#" class="avtar avtar-xs btn-light-secondary" data-bs-toggle="modal" 
+                            data-bs-target="#updatebooking-' . $row->bookingID . '">
+                            <i class="ti ti-edit f-20"></i>
+                        </a>
+                    ';
+                } else if ($row->booking_status == 5 || $row->booking_status == 6) {
+                    $button =
+                        '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
+                            <i class="ti ti-eye f-20"></i>
+                        </a>
+                    ';
+                }
+
+                return $button;
+            });
+
+            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
+
+            return $table->make(true);
+        }
+        return view('administrator.booking.booking-list-index', [
+            'title' => 'All Booking List',
+            'books' => $data,
+        ]);
+    }
+
+
+
 
     /**** Tasker Route Function - End ****/
 
@@ -799,15 +923,6 @@ class RouteController extends Controller
         ]);
     }
 
-    // Admin - Time Slot Setting
-
-    public function adminSystemSettingNav()
-    {
-        return view('administrator.setting.system-index', [
-            'title' => 'System Settings',
-
-        ]);
-    }
 
     // Admin - Time Slot Setting
     //Updated by: Zikri (5/12/2024)
@@ -935,6 +1050,331 @@ class RouteController extends Controller
             'states' => $states,
         ]);
     }
+
+    // Admin - System Setting
+    // Uncompleted
+    public function adminSystemSettingNav()
+    {
+        return view('administrator.setting.system-index', [
+            'title' => 'System Settings',
+
+        ]);
+    }
+
+    // Admin - Booking List
+
+    public function adminBookingListNav(Request $request)
+    {
+        $data = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->select(
+                'a.id as bookingID',
+                'b.id as serviceID',
+                'c.id as typeID',
+                'd.id as taskerID',
+                'a.booking_date',
+                'a.booking_address',
+                'a.booking_time_start',
+                'a.booking_time_end',
+                'a.booking_status',
+                'a.booking_note',
+                'a.booking_rate',
+                'c.servicetype_name',
+                'd.tasker_firstname',
+                'd.tasker_lastname',
+                'd.tasker_phoneno',
+                'd.email as tasker_email',
+                'd.tasker_code',
+                'e.client_firstname',
+                'e.client_lastname',
+                'e.client_phoneno',
+                'e.email as client_email',
+
+            )
+            ->whereNotIn('a.booking_status', [7,8])
+            ->orderbyDesc('a.booking_date')
+            ->get();
+
+        if ($request->ajax()) {
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('tasker', function ($row) {
+                $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
+                return $tasker;
+            });
+
+            $table->addColumn('client', function ($row) {
+                $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
+                return $client;
+            });
+
+            $table->addColumn('booking_date', function ($row) {
+
+                $date = Carbon::parse($row->booking_date)->format('d F Y');
+                return $date;
+            });
+
+            $table->addColumn('booking_time', function ($row) {
+
+                $startTime = Carbon::parse($row->booking_time_start)->format('g:i A');
+                $endTime = Carbon::parse($row->booking_time_end)->format('g:i A');
+                $time = $startTime . ' - ' . $endTime;
+                return $time;
+            });
+
+            $table->addColumn('booking_status', function ($row) {
+
+                if ($row->booking_status == 1) {
+                    $status = '<span class="badge bg-warning">To Pay</span>';
+                } else if ($row->booking_status == 2) {
+                    $status = '<span class="badge bg-light-success">Paid</span>';
+                } else if ($row->booking_status == 3) {
+                    $status = '<span class="badge bg-success">Confirmed</span>';
+                } else if ($row->booking_status == 4) {
+                    $status = '<span class="badge bg-warning">Rescheduled</span>';
+                } else if ($row->booking_status == 5) {
+                    $status = '<span class="badge bg-danger">Cancelled</span>';
+                } else if ($row->booking_status == 6) {
+                    $status = '<span class="badge bg-success">Completed</span>';
+                } 
+                return $status;
+            });
+
+            $table->addColumn('action', function ($row) {
+
+                if ($row->booking_status == 1 || $row->booking_status == 2 || $row->booking_status == 3 || $row->booking_status == 4) {
+                    $button =
+                        '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
+                            <i class="ti ti-eye f-20"></i>
+                        </a>
+                        <a href="#" class="avtar avtar-xs btn-light-secondary" data-bs-toggle="modal" 
+                            data-bs-target="#updatebooking-' . $row->bookingID . '">
+                            <i class="ti ti-edit f-20"></i>
+                        </a>
+                    ';
+                } else if ($row->booking_status == 5 || $row->booking_status == 6) {
+                    $button =
+                        '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
+                            <i class="ti ti-eye f-20"></i>
+                        </a>
+                    ';
+                }
+
+                return $button;
+            });
+
+            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
+
+            return $table->make(true);
+        }
+        return view('administrator.booking.index', [
+            'title' => 'Booking List',
+            'books' => $data,
+        ]);
+    }
+
+    public function adminBookingRefundListNav(Request $request)
+    {
+        $data = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->select(
+                'a.id as bookingID',
+                'b.id as serviceID',
+                'c.id as typeID',
+                'd.id as taskerID',
+                'a.booking_date',
+                'a.booking_address',
+                'a.booking_time_start',
+                'a.booking_time_end',
+                'a.booking_status',
+                'a.booking_note',
+                'a.booking_rate',
+                'c.servicetype_name',
+                'd.tasker_firstname',
+                'd.tasker_lastname',
+                'd.tasker_phoneno',
+                'd.email as tasker_email',
+                'd.tasker_code',
+                'e.client_firstname',
+                'e.client_lastname',
+                'e.client_phoneno',
+                'e.email as client_email',
+
+            )
+            ->whereIn('a.booking_status', [8])
+            ->orderbyDesc('a.booking_date')
+            ->get();
+
+        if ($request->ajax()) {
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('tasker', function ($row) {
+                $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
+                return $tasker;
+            });
+
+            $table->addColumn('client', function ($row) {
+                $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
+                return $client;
+            });
+
+            $table->addColumn('booking_date', function ($row) {
+
+                $date = Carbon::parse($row->booking_date)->format('d F Y');
+                return $date;
+            });
+
+            $table->addColumn('booking_time', function ($row) {
+
+                $startTime = Carbon::parse($row->booking_time_start)->format('g:i A');
+                $endTime = Carbon::parse($row->booking_time_end)->format('g:i A');
+                $time = $startTime . ' - ' . $endTime;
+                return $time;
+            });
+
+            $table->addColumn('booking_status', function ($row) {
+
+                if ($row->booking_status == 7) {
+                    $status = '<span class="badge bg-light-warning">Pending Refund</span>';
+                } else if ($row->booking_status == 8) {
+                    $status = '<span class="badge bg-light-success">Refunded</span>';
+                }
+                return $status;
+            });
+
+            $table->addColumn('action', function ($row) {
+
+                $button =
+                    '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
+                            <i class="ti ti-eye f-20"></i>
+                        </a>
+                    ';
+
+
+                return $button;
+            });
+
+            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
+
+            return $table->make(true);
+        }
+        return view('administrator.booking.refunded-list-index', [
+            'title' => 'Refunded Booking List',
+            'books' => $data,
+        ]);
+    }
+
+    public function adminBookingRefundReqNav(Request $request)
+    {
+        $data = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->select(
+                'a.id as bookingID',
+                'b.id as serviceID',
+                'c.id as typeID',
+                'd.id as taskerID',
+                'a.booking_date',
+                'a.booking_address',
+                'a.booking_time_start',
+                'a.booking_time_end',
+                'a.booking_status',
+                'a.booking_note',
+                'a.booking_rate',
+                'c.servicetype_name',
+                'd.tasker_firstname',
+                'd.tasker_lastname',
+                'd.tasker_phoneno',
+                'd.email as tasker_email',
+                'd.tasker_code',
+                'e.client_firstname',
+                'e.client_lastname',
+                'e.client_phoneno',
+                'e.email as client_email',
+
+            )
+            ->whereIn('a.booking_status', [7])
+            ->orderbyDesc('a.booking_date')
+            ->get();
+
+        if ($request->ajax()) {
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('tasker', function ($row) {
+                $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
+                return $tasker;
+            });
+
+            $table->addColumn('client', function ($row) {
+                $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
+                return $client;
+            });
+
+            $table->addColumn('booking_date', function ($row) {
+
+                $date = Carbon::parse($row->booking_date)->format('d F Y');
+                return $date;
+            });
+
+            $table->addColumn('booking_time', function ($row) {
+
+                $startTime = Carbon::parse($row->booking_time_start)->format('g:i A');
+                $endTime = Carbon::parse($row->booking_time_end)->format('g:i A');
+                $time = $startTime . ' - ' . $endTime;
+                return $time;
+            });
+
+            $table->addColumn('booking_status', function ($row) {
+
+                if ($row->booking_status == 7) {
+                    $status = '<span class="badge bg-light-warning">Pending Refund</span>';
+                }
+                return $status;
+            });
+
+            $table->addColumn('action', function ($row) {
+
+                $button =
+                    '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
+                            <i class="ti ti-eye f-20"></i>
+                        </a>
+                    ';
+
+
+                return $button;
+            });
+
+            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
+
+            return $table->make(true);
+        }
+        return view('administrator.booking.refund-req-index', [
+            'title' => 'Refund Request',
+            'books' => $data,
+        ]);
+    }
+
+
+
 
     /**** Administrator Route Function - End ****/
 }
