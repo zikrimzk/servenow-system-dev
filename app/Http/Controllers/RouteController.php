@@ -188,19 +188,33 @@ class RouteController extends Controller
         //     'title' => 'Payment Status'
         // ]);
     }
-    public function clientPaymentCallbackNav(Request $request)
+     public function clientPaymentCallbackNav(Request $request)
     {
+        
+       $data = [
+        'refno' => $request->refno,
+        'status' => $request->status,
+        'reason' => $request->reason,
+        'billcode' => $request->billcode,
+        'order_id' => $request->order_id,
+        'amount' => $request->amount,
+        'transaction_time' => $request->transaction_time,
+    ];
 
-        $trasaction = Transaction::create([
-            'trans_refno' => $request->refno,
-            'trans_status' =>$request->status,
-            'trans_reason'=>$request->reason,
-            'trans_billcode'=>$request->billcode,
-            'trans_order_id'=>$request->order_id,
-            'trans_amount'=>$request->amount,
-            'trans_transaction_time'=>$request->transaction_time
-            
-        ]);
+    // Convert data ke dalam format string (contohnya JSON)
+    $dataString = json_encode($data, JSON_PRETTY_PRINT);
+    
+    // Tentukan lokasi fail untuk disimpan (pastikan folder wujud dan mempunyai kebenaran untuk menulis)
+    $filePath = storage_path('app/payment_callback1.txt'); // Menyimpan di folder 'storage/app'
+
+    // Simpan data ke dalam fail
+    file_put_contents($filePath, $dataString . PHP_EOL, FILE_APPEND);
+
+    // Simpan transaksi ke dalam database (sama seperti sebelum ini)
+    $transaction = Transaction::create($data);
+
+    // Response (anda boleh menambah response jika perlu)
+    return response()->json(['message' => 'Transaction processed and logged.'], 200);
        
     }
     
