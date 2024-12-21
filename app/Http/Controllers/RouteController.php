@@ -174,6 +174,15 @@ class RouteController extends Controller
         }
     }
 
+    public function clientPaymentNav(Request $request)
+    {
+       
+        return redirect('https://dev.toyyibpay.com/'. $request->billcode);
+        // return view('client.booking.payment-return',[
+        //     'title' => 'Payment Status'
+        // ]);
+    }
+
     public function clientBookingHistoryNav()
     {
         $booking = DB::table('bookings as a')

@@ -174,6 +174,46 @@ class BookingController extends Controller
 
     public function clientBookFunction(Request $request)
     {
+        $formattedDate = Carbon::parse($request->booking_date)->addDays(3)->format('d-m-Y H:i:s');
+        // dd($formattedDate);
+        $some_data = array(
+            'userSecretKey' => 'xmj59q1q-povy-vgdw-y5xd-ohqv7lrxlhts',
+            'categoryCode' => 'xzn4xeqb',
+            'billName' => 'ServeNow Bill',
+            'billDescription' => 'test',
+            'billPriceSetting' => 1,
+            'billPayorInfo' => 1,
+            'billAmount' => '100',
+            'billReturnUrl' => route('client-payment'),
+            'billCallbackUrl' => 'http://bizapp.my/paystatus',
+            'billExternalReferenceNo' => 'AFR341DFI',
+            'billTo' => Auth::user()->client_firstname . ' ' . Auth::user()->client_lastname,
+            'billEmail' => Auth::user()->email,
+            'billPhone' => Auth::user()->client_phoneno,
+            'billSplitPayment' => 0,
+            'billSplitPaymentArgs' => '',
+            'billPaymentChannel' => '2',
+            'billContentEmail' => 'Thank you for purchasing our product!',
+            'billChargeToCustomer' => 1,
+            'billExpiryDate' =>  $formattedDate,
+            'billExpiryDays' => 3
+        );
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_URL, 'https://dev.toyyibpay.com/index.php/api/createBill');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $some_data);
+
+        $result = curl_exec($curl);
+        $info = curl_getinfo($curl);
+        curl_close($curl);
+        $obj = json_decode($result);
+        // echo $result;
+        // dd($obj);
+
+        return redirect('https://dev.toyyibpay.com/'. $obj[0]->BillCode);
+
         try {
             $booking = $request->validate([
                 'booking_date' => 'required',
@@ -507,7 +547,7 @@ class BookingController extends Controller
     public function clientReviewBooking(Request $request)
     {
         try {
-           
+
             $validated = $request->validate([
                 'review_rating' => 'required|integer|min:1|max:5',
                 'review_description' => 'max:1000',

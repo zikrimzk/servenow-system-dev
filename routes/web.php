@@ -212,6 +212,9 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     Route::get('/get-tasker-details', [BookingController::class, 'getTaskerDetail'])->name('getTaskerDetail');
     Route::post('/client-book-service', [BookingController::class, 'clientBookFunction'])->name('clientBookService');
 
+    // Client - Payment
+    Route::get('/return-payment-status', [RouteController::class, 'clientPaymentNav'])->name('client-payment');
+
     // Client - Booking History
     Route::get('/my-booking-history', [RouteController::class, 'clientBookingHistoryNav'])->name('clientBookHistory');
     Route::get('/change-booking-process/{id}/{taskerid}/{option}', [BookingController::class, 'clientChangeBookingStatus'])->name('client-change-booking-status');

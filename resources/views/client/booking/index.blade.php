@@ -156,29 +156,46 @@ use App\Models\Tasker;
                                                 </div>
                                                 <div class="row mt-4">
                                                     <p class="text-muted fst-italic mb-3">Choose your options</p>
-                                                    <div class="col-xl-12">
-                                                        <div class="address-check border card rounded p-3">
-                                                            <div class="form-check">
-                                                                <input type="radio" class="form-check-input input-primary"
-                                                                    id="useProfileAddress" name="addressOption"
-                                                                    checked="" />
-                                                                <label class="form-check-label d-block"
-                                                                    for="useProfileAddress">
-                                                                    <span class="h6 mb-3 d-block">
-                                                                        {{ Auth::user()->client_firstname . ' ' . Auth::user()->client_lastname }}
-                                                                        <small class="text-muted">(Default)</small>
-                                                                    </span>
-                                                                    <p class="mb-0">
-                                                                        {{ Str::headline(Auth::user()->client_address_one . ', ' . Auth::user()->client_address_two . ', ' . Auth::user()->client_area . ', ' . Auth::user()->client_postcode . ' ' . Auth::user()->client_state) }}
-                                                                    </p>
-                                                                </label>
+                                                    @if (Auth::user()->client_address_one == '' ||
+                                                            Auth::user()->client_address_two == '' ||
+                                                            Auth::user()->client_postcode == '')
+                                                        <div class="col-xl-12">
+                                                            <div class="mb-4">
+                                                                <p class="mb-2">It seems you don't have any address
+                                                                    details. Click the button below to add your address
+                                                                    details or choose different address to continue.</p>
+                                                                <a href="{{ route('client-profile') }}"
+                                                                    class="btn btn-light btn-sm">Add Address Details</a>
+                                                            </div>
+
+                                                        </div>
+                                                    @else
+                                                        <div class="col-xl-12">
+                                                            <div class="address-check border card rounded p-3">
+                                                                <div class="form-check">
+                                                                    <input type="radio"
+                                                                        class="form-check-input input-primary"
+                                                                        id="useProfileAddress" name="addressOption"
+                                                                        checked="" />
+                                                                    <label class="form-check-label d-block"
+                                                                        for="useProfileAddress">
+                                                                        <span class="h6 mb-3 d-block">
+                                                                            {{ Auth::user()->client_firstname . ' ' . Auth::user()->client_lastname }}
+                                                                            <small class="text-muted">(Default)</small>
+                                                                        </span>
+                                                                        <p class="mb-0">
+                                                                            {{ Str::headline(Auth::user()->client_address_one . ', ' . Auth::user()->client_address_two . ', ' . Auth::user()->client_area . ', ' . Auth::user()->client_postcode . ' ' . Auth::user()->client_state) }}
+                                                                        </p>
+                                                                    </label>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    @endif
                                                     <div class="col-xl-12">
                                                         <div class="address-check border card rounded p-3">
                                                             <div class="form-check">
-                                                                <input type="radio" class="form-check-input input-primary"
+                                                                <input type="radio"
+                                                                    class="form-check-input input-primary"
                                                                     id="useDifferentAddress" name="addressOption" />
                                                                 <label class="form-check-label d-block"
                                                                     for="useDifferentAddress">
@@ -367,7 +384,7 @@ use App\Models\Tasker;
                                                                         <div class="col-sm-12 mb-3">
                                                                             <label for="task-date"
                                                                                 class="mb-2">Availability</label>
-                                                                            <input type="text" id=""
+                                                                            <input type="text"
                                                                                 class="form-control task-date"
                                                                                 placeholder="Choose Date">
                                                                         </div>
@@ -418,7 +435,7 @@ use App\Models\Tasker;
                                                             </div>
                                                         </div>
                                                         <div class="row">
-                                                            <!-- Credit Card Option -->
+                                                            <!-- Payment Option -->
                                                             <div class="col-md-6 col-xxl-4">
                                                                 <div class="address-check border rounded my-3">
                                                                     <div class="form-check">
@@ -428,17 +445,18 @@ use App\Models\Tasker;
                                                                         <label class="form-check-label d-block"
                                                                             for="payopn-check-1">
                                                                             <span class="card-body p-3 d-block">
-                                                                                <span class="h5 mb-3 d-block">Credit
-                                                                                    Card</span>
+                                                                                <span class="h5 mb-3 d-block">Online
+                                                                                    Banking</span>
                                                                                 <span class="d-flex align-items-center">
                                                                                     <span
                                                                                         class="f-12 badge bg-success me-3">5%
                                                                                         OFF</span>
-                                                                                    <img src="../assets/images/application/card.png"
+                                                                                    <img src="../assets/images/application/paypal.png"
                                                                                         alt="img"
                                                                                         class="img-fluid ms-1" />
                                                                                 </span>
                                                                             </span>
+
                                                                         </label>
                                                                     </div>
                                                                 </div>
@@ -449,17 +467,16 @@ use App\Models\Tasker;
                                                                     <div class="form-check">
                                                                         <input type="radio" name="payoptradio1"
                                                                             class="form-check-input input-primary"
-                                                                            id="payopn-check-2" />
+                                                                            id="payopn-check-2" disabled />
                                                                         <label class="form-check-label d-block"
                                                                             for="payopn-check-2">
                                                                             <span class="card-body p-3 d-block">
-                                                                                <span class="h5 mb-3 d-block">Online
-                                                                                    Banking</span>
+                                                                                <span class="h5 mb-3 d-block">Credit
+                                                                                    Card</span>
                                                                                 <span class="d-flex align-items-center">
                                                                                     <span
-                                                                                        class="f-12 badge bg-success me-3">5%
-                                                                                        OFF</span>
-                                                                                    <img src="../assets/images/application/paypal.png"
+                                                                                        class="f-12 badge bg-danger me-3">Unavailable</span>
+                                                                                    <img src="../assets/images/application/card.png"
                                                                                         alt="img"
                                                                                         class="img-fluid ms-1" />
                                                                                 </span>
@@ -475,53 +492,10 @@ use App\Models\Tasker;
                                                             <!-- Tambahkan semua elemen form pembayaran di sini -->
                                                             <div class="card p-4">
                                                                 <div id="credit-card-form" class="mt-4">
-                                                                    <h5>Credit Card Details</h5>
-                                                                    <form>
-                                                                        <div class="mb-3">
-                                                                            <label for="cardholder-name"
-                                                                                class="form-label">Cardholder's
-                                                                                Name</label>
-                                                                            <input type="text" class="form-control"
-                                                                                id="cardholder-name"
-                                                                                placeholder="Enter your name">
-                                                                        </div>
-                                                                        <div class="mb-3">
-                                                                            <label for="card-number"
-                                                                                class="form-label">Card
-                                                                                Number</label>
-                                                                            <input type="text" class="form-control"
-                                                                                id="card-number"
-                                                                                placeholder="1234 5678 9012 3456">
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <div class="col-md-6">
-                                                                                <label for="expiration-date"
-                                                                                    class="form-label">Expiration
-                                                                                    Date</label>
-                                                                                <div class="d-flex">
-                                                                                    <select class="form-select me-2"
-                                                                                        id="expiration-month">
-                                                                                        <option>01</option>
-                                                                                        <option>02</option>
-                                                                                        <option>03</option>
-                                                                                    </select>
-                                                                                    <select class="form-select"
-                                                                                        id="expiration-year">
-                                                                                        <option>2023</option>
-                                                                                        <option>2024</option>
-                                                                                        <option>2025</option>
-                                                                                    </select>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-6">
-                                                                                <label for="cvv"
-                                                                                    class="form-label">CVV
-                                                                                    Code</label>
-                                                                                <input type="text" class="form-control"
-                                                                                    id="cvv" placeholder="123">
-                                                                            </div>
-                                                                        </div>
-                                                                    </form>
+                                                                    <h5>Pay with Online Banking</h5>
+                                                                    <p class="text-muted mb-3">Please click button below to continue your payment</p>
+                                                                    <button type="submit" class="btn btn-primary">Proceed to
+                                                                        Payment</button>
                                                                 </div>
                                                             </div>
                                                             <div id="paypal-message" class="mt-4"
@@ -565,8 +539,8 @@ use App\Models\Tasker;
                                                                 <input type="hidden" name="tasker_id" class="taskerID">
                                                             </div>
                                                             <div class="d-grid mt-4 mb-4">
-                                                                <button type="submit" class="btn btn-primary">Proceed to
-                                                                    Payment</button>
+                                                                {{-- <button type="submit" class="btn btn-primary">Proceed to
+                                                                    Payment</button> --}}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -939,6 +913,14 @@ use App\Models\Tasker;
         /******************** MODAL: ASSIGN TASKER DYNAMICLY ********************/
         /******************** *************************** ***********************/
 
+        function formatDateLocal(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+
         document.addEventListener('DOMContentLoaded', function() {
             // Use event delegation on the tasker container
             const taskerContainer = document.getElementById('taskerList');
@@ -950,7 +932,7 @@ use App\Models\Tasker;
                     $('.task-time').val('');
                     if (taskerId) {
                         const today = new Date();
-                        const formattedToday = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                        const formattedToday = formatDateLocal(today); // Format as YYYY-MM-DD
                         localStorage.setItem('selectedTaskerId', taskerId);
                         localStorage.setItem('selectedServiceId', svId);
                         getTaskerTimeSlots(formattedToday);
@@ -993,7 +975,8 @@ use App\Models\Tasker;
         // FLATPICKER : CALANDER
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date();
-            const formattedToday = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+            const formattedToday = formatDateLocal(today); // Format as YYYY-MM-DD
+
             // Initialize Flatpickr
             $('.bookingDate').val(formattedToday);
             flatpickr(".task-date", {
@@ -1114,7 +1097,7 @@ use App\Models\Tasker;
                 url: url,
                 type: "GET",
                 success: function(result) {
-                    console.log("AJAX success:", result); // Debug log
+                    console.log("AJAX successke:", result); // Debug log
                     const data = result.data; // Assuming the server returns an array of time slots
 
                     // Reset dropdown
@@ -1128,6 +1111,8 @@ use App\Models\Tasker;
                         if (validSlots.length > 0) {
                             taskTimeSelect.append(`<option value="" selected>-Select Time-</option>`);
                             validSlots.forEach(function(time) {
+                                console.log("KEPUTUSAN:", time); // Debug log
+
                                 taskTimeSelect.append(`<option value="${time}">${time}</option>`);
                             });
                         } else {
@@ -1270,6 +1255,16 @@ use App\Models\Tasker;
                     $('.serviceID').val(svId);
                     $('.taskerID').val(taskerId);
                     $('.address-details').html($('.booking_address').val());
+
+                    var dateBooking = $('.bookingDate').val();
+                    var date = new Date(dateBooking);
+
+                    // Format to "DD MMMM YYYY" (22 December 2024)
+                    var formattedDate = date.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                    });
                     //INITIALIZE IN INPUT FORM END
 
 
@@ -1285,6 +1280,7 @@ use App\Models\Tasker;
                                         <b>${data.servicetype_name}</b>
                                         <span class="mx-2 text-sm text-decoration-line-through text-muted f-w-400"></span>
                                     </h5>
+                                    <p class="text-muted text-sm mb-1">${formattedDate}</p>
                                     <p class="text-muted text-sm mb-2">${startTimeFormatted} - ${endTimeFormatted}</p>
 
                                 </div>
