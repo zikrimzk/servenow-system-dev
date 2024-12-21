@@ -55,7 +55,7 @@ class RouteController extends Controller
     //Client -Landing Page
 
 
-
+ 
 
     public function gotoIndex()
     {
@@ -191,32 +191,19 @@ class RouteController extends Controller
     public function clientPaymentCallbackNav(Request $request)
     {
 
-        $data = [
+        $trasaction = Transaction::create([
             'trans_refno' => $request->refno,
-            'trans_status' => $request->status,
-            'trans_reason' => $request->reason,
-            'trans_billcode' => $request->billcode,
-            'trans_order_id' => $request->order_id,
-            'trans_amount' => $request->amount,
-            'trans_transaction_time' => $request->transaction_time
-        ];
-
-        // Convert data ke dalam format string (contohnya JSON)
-        $dataString = json_encode($data, JSON_PRETTY_PRINT);
-
-        // Tentukan lokasi fail untuk disimpan (pastikan folder wujud dan mempunyai kebenaran untuk menulis)
-        $filePath = storage_path('app/payment_callback.txt'); // Menyimpan di folder 'storage/app'
-
-        // Simpan data ke dalam fail
-        file_put_contents($filePath, $dataString . PHP_EOL, FILE_APPEND);
-
-        // Simpan transaksi ke dalam database (sama seperti sebelum ini)
-        $transaction = Transaction::create($data);
-
-        // Response (anda boleh menambah response jika perlu)
-        return response()->json(['message' => 'Transaction processed and logged.'], 200);
+            'trans_status' =>$request->status,
+            'trans_reason'=>$request->reason,
+            'trans_billcode'=>$request->billcode,
+            'trans_order_id'=>$request->order_id,
+            'trans_amount'=>$request->amount,
+            'trans_transaction_time'=>$request->transaction_time
+            
+        ]);
+       
     }
-
+    
 
     public function clientBookingHistoryNav()
     {
@@ -553,7 +540,7 @@ class RouteController extends Controller
                 'e.email as client_email',
 
             )
-            ->whereNotIn('a.booking_status', [7, 8])
+            ->whereNotIn('a.booking_status', [7,8])
             ->where('b.tasker_id', Auth::user()->id)
             ->orderbyDesc('a.booking_date')
             ->get();
@@ -595,7 +582,7 @@ class RouteController extends Controller
                     $status = '<span class="badge bg-danger">Cancelled</span>';
                 } else if ($row->booking_status == 6) {
                     $status = '<span class="badge bg-success">Completed</span>';
-                }
+                } 
                 return $status;
             });
 
@@ -639,7 +626,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['client', 'booking_date', 'booking_time', 'booking_status', 'booking_amount', 'action']);
+            $table->rawColumns(['client', 'booking_date', 'booking_time', 'booking_status','booking_amount', 'action']);
 
             return $table->make(true);
         }
@@ -1139,7 +1126,7 @@ class RouteController extends Controller
                 'e.email as client_email',
 
             )
-            ->whereNotIn('a.booking_status', [7, 8])
+            ->whereNotIn('a.booking_status', [7,8])
             ->orderbyDesc('a.booking_date')
             ->get();
 
@@ -1185,7 +1172,7 @@ class RouteController extends Controller
                     $status = '<span class="badge bg-danger">Cancelled</span>';
                 } else if ($row->booking_status == 6) {
                     $status = '<span class="badge bg-success">Completed</span>';
-                }
+                } 
                 return $status;
             });
 
