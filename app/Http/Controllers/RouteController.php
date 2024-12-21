@@ -13,6 +13,7 @@ use App\Models\ServiceType;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -52,6 +53,10 @@ class RouteController extends Controller
     //All Client Route Here ....
 
     //Client -Landing Page
+
+
+ 
+
     public function gotoIndex()
     {
         if (!Auth::guard('client')->check()) {
@@ -183,6 +188,22 @@ class RouteController extends Controller
         //     'title' => 'Payment Status'
         // ]);
     }
+    public function clientPaymentCallbackNav(Request $request)
+    {
+
+        $trasaction = Transaction::create([
+            'trans_refno' => $request->refno,
+            'trans_status' =>$request->status,
+            'trans_reason'=>$request->reason,
+            'trans_billcode'=>$request->billcode,
+            'trans_order_id'=>$request->order_id,
+            'trans_amount'=>$request->amount,
+            'trans_transaction_time'=>$request->transaction_time
+            
+        ]);
+       
+    }
+    
 
     public function clientBookingHistoryNav()
     {
@@ -258,6 +279,13 @@ class RouteController extends Controller
             'refund' => $refund,
             'review' => $review
 
+        ]);
+    }
+
+    public function clientViewReview()
+    {
+        return view('client.booking.view-review', [
+            'title' => 'My Review',
         ]);
     }
 

@@ -376,8 +376,8 @@
                                         <form method="POST" action="{{ route('client-submit-review') }}"
                                             enctype="multipart/form-data">
                                             @csrf
-                                            <div id="reviewModal-{{ $b->bookingID }}" class="modal fade"
-                                                tabindex="-1" role="dialog" aria-labelledby="exampleModalLiveLabel"
+                                            <div id="reviewModal-{{ $b->bookingID }}" class="modal fade" tabindex="-1"
+                                                role="dialog" aria-labelledby="exampleModalLiveLabel"
                                                 aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
                                                     role="document">
@@ -391,8 +391,8 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             <div>
-                                                                <input type=""
-                                                                    value="{{ $b->bookingID }}"name="booking_id">
+                                                                <input type="hidden" value="{{ $b->bookingID }}"
+                                                                    name="booking_id">
                                                             </div>
                                                             <h6 class="mb-3">
                                                                 {{ $b->tasker_firstname . ' ' . $b->tasker_lastname }}
@@ -423,12 +423,12 @@
 
                                                             <div class="d-flex gap-2 justify-content-start mb-2">
                                                                 <div class="photo-slot text-center" id="addPhotoButton">
-                                                                    <label
-                                                                        style="cursor: pointer; display: block;">
+                                                                    <label style="cursor: pointer; display: block;">
                                                                         <input type="file" class="photoInput"
                                                                             accept="image/*" multiple
                                                                             style="display: none;" name="photos[]">
-                                                                        <img src="../../assets/images/image_upload.jpg" alt="Add Picture"
+                                                                        <img src="../../assets/images/image_upload.jpg"
+                                                                            alt="Add Picture"
                                                                             style="width: 50px; height: 50px; opacity: 0.6;">
                                                                     </label>
                                                                 </div>
@@ -711,8 +711,8 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             <div>
-                                                                <input type=""
-                                                                    value="{{ $b->bookingID }}"name="booking_id">
+                                                                <input type="hidden" value="{{ $b->bookingID }}"
+                                                                    name="booking_id" style="display:none;">
                                                             </div>
                                                             <h6 class="mb-3">
                                                                 {{ $b->tasker_firstname . ' ' . $b->tasker_lastname }}
@@ -770,9 +770,7 @@
                                                             </div>
 
                                                             <small class="text-muted">Add 50 characters with 1
-                                                                photo and 1
-                                                                video to
-                                                                earn
+                                                                photo
                                                             </small>
 
 
@@ -906,6 +904,86 @@
 
     <script src="../assets/js/plugins/star-rating.min.js"></script>
     <script>
+        // let uploadedPhotos = [];
+        // const maxPhotos = 4;
+
+        // const photoInputs = document.getElementsByClassName('photoInput');
+        // const errorMessages = document.getElementsByClassName('errorMessage');
+        // const photoCounters = document.getElementsByClassName('photoCounter');
+        // const photoPreviewContainers = document.getElementsByClassName('photoPreviewContainer');
+
+        // // Iterate through all photoInput elements to add event listeners
+        // Array.from(photoInputs).forEach((photoInput, index) => {
+        //     photoInput.addEventListener('change', function(event) {
+        //         const files = Array.from(event.target.files);
+
+        //         // Access corresponding elements for this specific photoInput
+        //         const errorMessage = errorMessages[index];
+        //         const photoCounter = photoCounters[index];
+        //         const photoPreviewContainer = photoPreviewContainers[index];
+
+        //         // Check if the max photo limit is exceeded
+        //         if (uploadedPhotos.length + files.length > maxPhotos) {
+        //             errorMessage.style.display = 'block';
+        //             event.target.value = ''; // Reset the input
+        //             return;
+        //         }
+
+        //         errorMessage.style.display = 'none';
+
+        //         // Process and display each file
+        //         files.forEach(file => {
+        //             if (uploadedPhotos.length < maxPhotos) {
+        //                 const reader = new FileReader();
+
+        //                 reader.onload = function(e) {
+        //                     const div = document.createElement('div');
+        //                     div.classList.add('photo-preview');
+
+        //                     const img = document.createElement('img');
+        //                     img.src = e.target.result;
+        //                     img.style.maxWidth = '100px'; // Optional: Limit the preview size
+
+        //                     const btnRemove = document.createElement('button');
+        //                     btnRemove.innerHTML = 'x';
+        //                     btnRemove.style.marginLeft = '5px'; // Optional: Add spacing
+        //                     btnRemove.addEventListener('click', () => {
+        //                         photoPreviewContainer.removeChild(div);
+        //                         uploadedPhotos = uploadedPhotos.filter(f => f !== file);
+        //                         updateInputFiles(photoInput);
+        //                         updateCounter(photoCounter);
+        //                     });
+
+        //                     div.appendChild(img);
+        //                     div.appendChild(btnRemove);
+        //                     photoPreviewContainer.appendChild(div);
+
+        //                     uploadedPhotos.push(file);
+        //                     updateInputFiles(photoInput);
+        //                     updateCounter(photoCounter);
+        //                 };
+
+        //                 reader.readAsDataURL(file);
+        //             }
+        //         });
+
+        //         event.target.value = ''; // Clear the input after processing files
+        //     });
+        // });
+
+        // function updateInputFiles(photoInput) {
+        //     const dataTransfer = new DataTransfer();
+
+        //     uploadedPhotos.forEach(file => {
+        //         dataTransfer.items.add(file);
+        //     });
+
+        //     photoInput.files = dataTransfer.files;
+        // }
+
+        // function updateCounter(photoCounter) {
+        //     photoCounter.innerText = `${uploadedPhotos.length}/${maxPhotos}`;
+        // }
         let uploadedPhotos = [];
         const maxPhotos = 4;
 
@@ -913,6 +991,7 @@
         const errorMessages = document.getElementsByClassName('errorMessage');
         const photoCounters = document.getElementsByClassName('photoCounter');
         const photoPreviewContainers = document.getElementsByClassName('photoPreviewContainer');
+        const addPhotoButtons = document.querySelectorAll('#addPhotoButton label'); // Select the button container
 
         // Iterate through all photoInput elements to add event listeners
         Array.from(photoInputs).forEach((photoInput, index) => {
@@ -923,10 +1002,12 @@
                 const errorMessage = errorMessages[index];
                 const photoCounter = photoCounters[index];
                 const photoPreviewContainer = photoPreviewContainers[index];
+                const addPhotoButton = addPhotoButtons[index]; // Get the corresponding button
 
                 // Check if the max photo limit is exceeded
                 if (uploadedPhotos.length + files.length > maxPhotos) {
                     errorMessage.style.display = 'block';
+                    event.target.value = ''; // Reset the input
                     return;
                 }
 
@@ -943,14 +1024,18 @@
 
                             const img = document.createElement('img');
                             img.src = e.target.result;
+                            img.style.maxWidth = '100px'; // Optional: Limit the preview size
 
                             const btnRemove = document.createElement('button');
                             btnRemove.innerHTML = 'x';
+                            btnRemove.style.marginLeft = '5px'; // Optional: Add spacing
                             btnRemove.addEventListener('click', () => {
                                 photoPreviewContainer.removeChild(div);
                                 uploadedPhotos = uploadedPhotos.filter(f => f !== file);
                                 updateInputFiles(photoInput);
                                 updateCounter(photoCounter);
+                                toggleAddPhotoButton(
+                                addPhotoButton); // Enable the button again if max is not reached
                             });
 
                             div.appendChild(img);
@@ -960,13 +1045,15 @@
                             uploadedPhotos.push(file);
                             updateInputFiles(photoInput);
                             updateCounter(photoCounter);
+                            toggleAddPhotoButton(
+                            addPhotoButton); // Disable the button if max is reached
                         };
 
                         reader.readAsDataURL(file);
                     }
                 });
 
-                event.target.value = '';
+                event.target.value = ''; // Clear the input after processing files
             });
         });
 
@@ -982,6 +1069,16 @@
 
         function updateCounter(photoCounter) {
             photoCounter.innerText = `${uploadedPhotos.length}/${maxPhotos}`;
+        }
+
+        function toggleAddPhotoButton(addPhotoButton) {
+            if (uploadedPhotos.length >= maxPhotos) {
+                addPhotoButton.style.pointerEvents = 'none'; // Disable click
+                addPhotoButton.style.opacity = '0.5'; // Optional: Add visual indication
+            } else {
+                addPhotoButton.style.pointerEvents = 'auto'; // Enable click
+                addPhotoButton.style.opacity = '1'; // Reset visual indication
+            }
         }
     </script>
     <script>

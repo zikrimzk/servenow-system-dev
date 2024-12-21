@@ -408,6 +408,45 @@ use App\Models\Tasker;
                                                             </div>
                                                         </div>
                                                     </div>
+
+
+                                                    <div class="modal fade" id="taskerReviewModal-{{ $tk->taskerID }}" tabindex="-1"
+                                                        aria-labelledby="taskerProfileModal" aria-hidden="true">
+                                                        <div class="modal-dialog modal-lg">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="taskerReviewModal">
+                                                                        Tasker Profile & Reviews</h5>
+                                                                    <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal"
+                                                                        aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <!-- Dynamic Content will be Injected Here -->
+                                                                    <div id="modalContent">
+                                                                        <!-- Profile Information -->
+                                                                        <div class="text-center mb-4">
+                                                                            <img src="" alt="Profile Photo"
+                                                                                class="rounded-circle mb-3" width="150"
+                                                                                height="150" id="taskerPhoto">
+                                                                            <h5 id="taskerName">{{ $tk->tasker_firstname }}</h5>
+                                                                            <p id="taskerRating"></p>
+                                                                        </div>
+
+                                                                        <!-- Tasker Reviews -->
+                                                                        <h6>Reviews:</h6>
+                                                                        <div id="taskerReviews">
+                                                                            <!-- Reviews will be dynamically injected -->
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary"
+                                                                        data-bs-dismiss="modal">Close</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 @endforeach
                                                 <!-- Tasker Selection [End] -->
                                             </div>
@@ -493,8 +532,10 @@ use App\Models\Tasker;
                                                             <div class="card p-4">
                                                                 <div id="credit-card-form" class="mt-4">
                                                                     <h5>Pay with Online Banking</h5>
-                                                                    <p class="text-muted mb-3">Please click button below to continue your payment</p>
-                                                                    <button type="submit" class="btn btn-primary">Proceed to
+                                                                    <p class="text-muted mb-3">Please click button below to
+                                                                        continue your payment</p>
+                                                                    <button type="submit" class="btn btn-primary">Proceed
+                                                                        to
                                                                         Payment</button>
                                                                 </div>
                                                             </div>
@@ -677,10 +718,17 @@ use App\Models\Tasker;
             // Enable/Disable "Previous" button
             prevButton.disabled = currentIndex === 0;
 
+            // Check if a radio button is selected
+            const hourRadios = document.querySelectorAll('input[name="hour"]');
+            const isHourSelected = Array.from(hourRadios).some(radio => radio.checked);
+
+            // Disable Next button if no radio button is selected
             if (currentIndex === 2) {
+                nextButton.disabled = !isHourSelected; // Disable if no option is selected
                 nextButton.style.display = 'none'; // Hide "Next"
                 nextStepButton.style.display = ''; // Show "Next Step"
             } else {
+                nextButton.disabled = false; // Enable Next button for other steps
                 if (currentIndex === 3) {
                     nextButton.style.display = 'none'; // Hide "Next"
                     nextStepButton.style.display = 'none'; // Show "Next Step"
@@ -688,13 +736,11 @@ use App\Models\Tasker;
                     nextButton.style.display = '';
                     nextStepButton.style.display = 'none';
                 }
-
             }
-
-
 
             updateProgressBar(currentIndex + 1, tabs.length);
         }
+
 
         document.addEventListener('DOMContentLoaded', () => {
             // Lock all tabs except the first one on page load
@@ -717,6 +763,7 @@ use App\Models\Tasker;
                 });
             });
         });
+
 
 
         /******************** *************************** ***********/
@@ -881,7 +928,12 @@ use App\Models\Tasker;
                         <div class="row flex-sm-row  flex-column-reverse">
                             <div class="col-sm-12 col-md-3 col-lg-3">
                                 <div class="d-none d-md-block text-center mt-2 mb-2">
-                                    <a href="#" class=" mb-2  primary p-1">View Profile & Review </a>
+                                    <a href="#" 
+                                        class="btn btn-link text-decoration-none primary p-1 view-profile-btn" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#taskerReviewModal-${tasker.taskerID}" >
+                                        View Profile & Review
+                                        </a>
                                 </div>
                                 <div class="d-grid d-md-flex justify-content-md-center align-items-md-center ">
                                     <button type="button"

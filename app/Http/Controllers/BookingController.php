@@ -174,45 +174,77 @@ class BookingController extends Controller
 
     public function clientBookFunction(Request $request)
     {
-        $formattedDate = Carbon::parse($request->booking_date)->addDays(3)->format('d-m-Y H:i:s');
-        // dd($formattedDate);
-        $some_data = array(
-            'userSecretKey' => 'xmj59q1q-povy-vgdw-y5xd-ohqv7lrxlhts',
-            'categoryCode' => 'xzn4xeqb',
-            'billName' => 'ServeNow Bill',
-            'billDescription' => 'test',
-            'billPriceSetting' => 1,
-            'billPayorInfo' => 1,
-            'billAmount' => '100',
-            'billReturnUrl' => route('client-payment'),
-            'billCallbackUrl' => 'http://bizapp.my/paystatus',
-            'billExternalReferenceNo' => 'AFR341DFI',
-            'billTo' => Auth::user()->client_firstname . ' ' . Auth::user()->client_lastname,
-            'billEmail' => Auth::user()->email,
-            'billPhone' => Auth::user()->client_phoneno,
-            'billSplitPayment' => 0,
-            'billSplitPaymentArgs' => '',
-            'billPaymentChannel' => '2',
-            'billContentEmail' => 'Thank you for purchasing our product!',
-            'billChargeToCustomer' => 1,
-            'billExpiryDate' =>  $formattedDate,
-            'billExpiryDays' => 3
-        );
+        // try {
+            // Format the expiry date
+            $formattedDate = Carbon::parse($request->booking_date)
+                ->addDays(3)
+                ->format('d-m-Y H:i:s');
+        
+            // Prepare data for the API
+            $some_data = [
+                'userSecretKey' => 'xmj59q1q-povy-vgdw-y5xd-ohqv7lrxlhts', // Ensure the key is correct
+                'categoryCode' => 'xzn4xeqb',
+                'billName' => 'ServeNow Bill',
+                'billDescription' => 'test',
+                'billPriceSetting' => 1,
+                'billPayorInfo' => 1,
+                'billAmount' => '100', // Ensure the amount is formatted as a string
+                'billReturnUrl' => route('client-payment'), // Ensure this route exists
+                'billCallbackUrl' => route('client-callback'), // Ensure this callback URL is reachable
+                'billExternalReferenceNo' => 'AFR341DFI',
+                'billTo' => Auth::user()->client_firstname . ' ' . Auth::user()->client_lastname, // Ensure Auth::user() returns a valid user
+                'billEmail' => Auth::user()->email, // Ensure the user's email is valid
+                'billPhone' => Auth::user()->client_phoneno, // Ensure the phone number is valid
+                'billSplitPayment' => 0,
+                'billSplitPaymentArgs' => '',
+                'billPaymentChannel' => '0',
+                'billContentEmail' => 'Thank you for purchasing our product!',
+                'billChargeToCustomer' => 1,
+                'billExpiryDate' => $formattedDate, // Ensure the formatted date is correct
+                'billExpiryDays' => 3
+            ];
+        
+            // Initialize CURL
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_URL, 'https://dev.toyyibpay.com/index.php/api/createBill');
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $some_data);
+        
+            // Execute CURL and handle response
+            $result = curl_exec($curl);
+        
+            // Check for CURL errors
+            if (curl_errno($curl)) {
+                throw new Exception('CURL Error: ' . curl_error($curl));
+            }
+        
+            curl_close($curl);
+        
+            // Decode the response
+            $obj = json_decode($result);
 
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_URL, 'https://dev.toyyibpay.com/index.php/api/createBill');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $some_data);
-
-        $result = curl_exec($curl);
-        $info = curl_getinfo($curl);
-        curl_close($curl);
-        $obj = json_decode($result);
-        // echo $result;
-        // dd($obj);
-
-        return redirect('https://dev.toyyibpay.com/' . $obj[0]->BillCode);
+            // Validate the API response
+            if (is_array($obj) && isset($obj[0]->BillCode)) {
+                // Redirect to the payment page
+                return redirect('https://dev.toyyibpay.com/' . $obj[0]->BillCode);
+            } else {
+                Log::error('Invalid response from ToyyibPay API', [
+                    'response' => $result,
+                    'data_sent' => $some_data
+                ]);
+                return back()->with('error', 'Failed to create a bill. Please try again later.');
+            }
+        // } catch (Exception $e) {
+        //     // Log the error and return with a message
+        //     Log::error('Error in clientBookFunction', [
+        //         'message' => $e->getMessage(),
+        //         'trace' => $e->getTraceAsString()
+        //     ]);
+        //     return back()->with('error', 'An error occurred while processing your request: ' . $e->getMessage());
+        // }
+        
 
         try {
             $booking = $request->validate([
@@ -567,6 +599,8 @@ class BookingController extends Controller
 
     public function clientReviewBooking(Request $request)
     {
+
+        dd($request);
         try {
 
             $validated = $request->validate([

@@ -198,6 +198,8 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
 
 
+
+
 Route::get('/', [RouteController::class, 'gotoIndex'])->name('servenow-home');
 
 Route::get('/register-client', [RouteController::class, 'clientRegisterFormNav'])->name('client-register-form');
@@ -232,11 +234,14 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
 
     // Client - Payment
     Route::get('/return-payment-status', [RouteController::class, 'clientPaymentNav'])->name('client-payment');
+    Route::post('/return-payment-callback', [RouteController::class, 'clientPaymentCallbackNav'])->name('client-callback');
 
     // Client - Booking History
     Route::get('/my-booking-history', [RouteController::class, 'clientBookingHistoryNav'])->name('clientBookHistory');
     Route::get('/change-booking-process/{id}/{taskerid}/{option}', [BookingController::class, 'clientChangeBookingStatus'])->name('client-change-booking-status');
     Route::post('/submit-review', [BookingController::class, 'clientReviewBooking'])->name('client-submit-review');
+    Route::get('/view-Review',[RouteController::class,'clientViewReview'])->name('client-view-review');
+
 
 
 
