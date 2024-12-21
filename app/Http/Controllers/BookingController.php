@@ -192,7 +192,7 @@ class BookingController extends Controller
             'billPriceSetting' => 1,
             'billPayorInfo' => 1,
             'billAmount' => '100', // Ensure the amount is formatted as a string
-            'billReturnUrl' => route('client-payment'), // Ensure this route exists
+            'billReturnUrl' => route('client-payment-status'), // Ensure this route exists
             'billCallbackUrl' => route('client-callback'), // Ensure this callback URL is reachable
             'billExternalReferenceNo' => $orderID,
             'billTo' => Auth::user()->client_firstname . ' ' . Auth::user()->client_lastname, // Ensure Auth::user() returns a valid user

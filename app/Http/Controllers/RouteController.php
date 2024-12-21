@@ -6,6 +6,7 @@ use Exception;
 use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Review;
+use App\Models\Booking;
 use App\Models\Tasker;
 use App\Models\Service;
 use App\Models\TimeSlot;
@@ -55,7 +56,7 @@ class RouteController extends Controller
     //Client -Landing Page
 
 
- 
+
 
     public function gotoIndex()
     {
@@ -180,6 +181,24 @@ class RouteController extends Controller
         }
     }
 
+    public function clientPaymentStatusNav(Request $request)
+    {
+        $data = [
+            'status_id' => $request->query('status_id'),
+            'billcode' => $request->query('billcode'),
+            'order_id' => $request->query('order_id'),
+            'msg' => $request->query('msg'),
+            'transaction_id' => $request->query('transaction_id'),
+            'current_date' => Carbon::now()->format('Y-m-d'),   // Tanggal saat ini
+            'current_time' => Carbon::now()->format('H:i:s'),   // Waktu saat ini
+        ];
+
+        return view('client.booking.payment-return', [
+            'title' => 'Payment',
+            'datas' => $data
+        ]);
+    }
+
     public function clientPaymentNav(Request $request)
     {
 
@@ -188,22 +207,34 @@ class RouteController extends Controller
         //     'title' => 'Payment Status'
         // ]);
     }
+
     public function clientPaymentCallbackNav(Request $request)
     {
 
         $affected = Transaction::where('trans_order_id', $request->order_id)
-        ->update([
-            'trans_refno' => $request->refno,
-            'trans_status' => $request->status,
-            'trans_reason' => $request->reason,
-            'trans_billcode' => $request->billcode,
-            'trans_amount' => $request->amount,
-            'trans_transaction_time' => $request->transaction_time,
-        ]);
-    
-       
+            ->update([
+                'trans_refno' => $request->refno,
+                'trans_status' => $request->status,
+                'trans_reason' => $request->reason,
+                'trans_billcode' => $request->billcode,
+                'trans_amount' => $request->amount,
+                'trans_transaction_time' => $request->transaction_time,
+            ]);
+
+        if ($request->status == '1') {
+            $status_payment = 2;
+        } elseif ($request->status == '3') {
+            $status_payment = 5;
+        } else {
+            $status_payment = 1;
+        }
+        $affected = Booking::where('booking_order_id', $request->order_id)
+            ->update([
+                'booking_status' => $status_payment
+
+            ]);
     }
-    
+
 
     public function clientBookingHistoryNav()
     {
@@ -540,7 +571,7 @@ class RouteController extends Controller
                 'e.email as client_email',
 
             )
-            ->whereNotIn('a.booking_status', [7,8])
+            ->whereNotIn('a.booking_status', [7, 8])
             ->where('b.tasker_id', Auth::user()->id)
             ->orderbyDesc('a.booking_date')
             ->get();
@@ -582,7 +613,7 @@ class RouteController extends Controller
                     $status = '<span class="badge bg-danger">Cancelled</span>';
                 } else if ($row->booking_status == 6) {
                     $status = '<span class="badge bg-success">Completed</span>';
-                } 
+                }
                 return $status;
             });
 
@@ -626,7 +657,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['client', 'booking_date', 'booking_time', 'booking_status','booking_amount', 'action']);
+            $table->rawColumns(['client', 'booking_date', 'booking_time', 'booking_status', 'booking_amount', 'action']);
 
             return $table->make(true);
         }
@@ -1126,7 +1157,7 @@ class RouteController extends Controller
                 'e.email as client_email',
 
             )
-            ->whereNotIn('a.booking_status', [7,8])
+            ->whereNotIn('a.booking_status', [7, 8])
             ->orderbyDesc('a.booking_date')
             ->get();
 
@@ -1172,7 +1203,7 @@ class RouteController extends Controller
                     $status = '<span class="badge bg-danger">Cancelled</span>';
                 } else if ($row->booking_status == 6) {
                     $status = '<span class="badge bg-success">Completed</span>';
-                } 
+                }
                 return $status;
             });
 

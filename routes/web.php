@@ -197,6 +197,8 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 /* Tasker Route End */
 
 
+Route::post('/return-payment-callback', [RouteController::class, 'clientPaymentCallbackNav'])->name('client-callback');
+
 
 
 
@@ -234,7 +236,8 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
 
     // Client - Payment
     Route::get('/return-payment-status', [RouteController::class, 'clientPaymentNav'])->name('client-payment');
-    Route::post('/return-payment-callback', [RouteController::class, 'clientPaymentCallbackNav'])->name('client-callback');
+    Route::get('/return-payment-status', [RouteController::class, 'clientPaymentStatusNav'])->name('client-payment-status');
+   
 
     // Client - Booking History
     Route::get('/my-booking-history', [RouteController::class, 'clientBookingHistoryNav'])->name('clientBookHistory');
