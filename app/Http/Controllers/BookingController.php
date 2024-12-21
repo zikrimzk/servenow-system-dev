@@ -182,8 +182,8 @@ class BookingController extends Controller
         
             // Prepare data for the API
             $some_data = [
-                'userSecretKey' => 'ed103o3f-6o3q-x6j6-blfm-4r9jq5fjl4ba', // Ensure the key is correct
-                'categoryCode' => 'uigbj4ai',
+                'userSecretKey' => 'xmj59q1q-povy-vgdw-y5xd-ohqv7lrxlhts', // Ensure the key is correct
+                'categoryCode' => 'xzn4xeqb',
                 'billName' => 'ServeNow Bill',
                 'billDescription' => 'test',
                 'billPriceSetting' => 1,
@@ -207,7 +207,7 @@ class BookingController extends Controller
             // Initialize CURL
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_URL, 'https://toyyibpay.com/index.php/api/createBill');
+            curl_setopt($curl, CURLOPT_URL, 'https://dev.toyyibpay.com/index.php/api/createBill');
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $some_data);
@@ -228,7 +228,7 @@ class BookingController extends Controller
             // Validate the API response
             if (is_array($obj) && isset($obj[0]->BillCode)) {
                 // Redirect to the payment page
-                return redirect('https://toyyibpay.com/' . $obj[0]->BillCode);
+                return redirect('https://dev.toyyibpay.com/' . $obj[0]->BillCode);
             } else {
                 Log::error('Invalid response from ToyyibPay API', [
                     'response' => $result,
