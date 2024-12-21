@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->date('booking_date');
             $table->text('booking_address');
+            $table->string('booking_order_id')->referances('trans_order_id')->on('transaction');
             $table->decimal('booking_latitude', 10, 8)->nullable();
             $table->decimal('booking_longitude', 11, 8)->nullable();
             $table->time('booking_time_start')->nullable();
@@ -24,6 +25,7 @@ return new class extends Migration
             $table->decimal('booking_rate', 8, 2); 
             $table->foreignId('client_id')->references('id')->on('clients');
             $table->foreignId('service_id')->references('id')->on('services');
+            
             $table->timestamps();
         });
     }

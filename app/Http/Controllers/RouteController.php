@@ -191,16 +191,16 @@ class RouteController extends Controller
     public function clientPaymentCallbackNav(Request $request)
     {
 
-        $trasaction = Transaction::create([
+        $affected = Transaction::where('trans_order_id', $request->order_id)
+        ->update([
             'trans_refno' => $request->refno,
-            'trans_status' =>$request->status,
-            'trans_reason'=>$request->reason,
-            'trans_billcode'=>$request->billcode,
-            'trans_order_id'=>$request->order_id,
-            'trans_amount'=>$request->amount,
-            'trans_transaction_time'=>$request->transaction_time
-            
+            'trans_status' => $request->status,
+            'trans_reason' => $request->reason,
+            'trans_billcode' => $request->billcode,
+            'trans_amount' => $request->amount,
+            'trans_transaction_time' => $request->transaction_time,
         ]);
+    
        
     }
     

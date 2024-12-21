@@ -21,6 +21,8 @@ class Booking extends Model
         'booking_rate',
         'client_id',
         'service_id',
+        'booking_order_id'
+
 
     ];
     
