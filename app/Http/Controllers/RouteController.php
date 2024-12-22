@@ -189,8 +189,8 @@ class RouteController extends Controller
             'order_id' => $request->query('order_id'),
             'msg' => $request->query('msg'),
             'transaction_id' => $request->query('transaction_id'),
-            'current_date' => Carbon::now()->format('Y-m-d'),   // Tanggal saat ini
-            'current_time' => Carbon::now()->format('H:i:s'),   // Waktu saat ini
+            'current_date' => Carbon::now()->format('Y-m-d'),   
+            'current_time' => Carbon::now()->format('H:i:s'),  
         ];
 
         return view('client.booking.payment-return', [
@@ -201,17 +201,13 @@ class RouteController extends Controller
 
     public function clientPaymentNav(Request $request)
     {
-
         return redirect('https://dev.toyyibpay.com/' . $request->billcode);
-        // return view('client.booking.payment-return',[
-        //     'title' => 'Payment Status'
-        // ]);
     }
 
     public function clientPaymentCallbackNav(Request $request)
     {
 
-        $affected = Transaction::where('trans_order_id', $request->order_id)
+        Transaction::where('trans_order_id', $request->order_id)
             ->update([
                 'trans_refno' => $request->refno,
                 'trans_status' => $request->status,
@@ -228,10 +224,10 @@ class RouteController extends Controller
         } else {
             $status_payment = 1;
         }
-        $affected = Booking::where('booking_order_id', $request->order_id)
+
+        Booking::where('booking_order_id', $request->order_id)
             ->update([
                 'booking_status' => $status_payment
-
             ]);
     }
 

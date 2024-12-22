@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
-            
             $table->string('trans_order_id')->primary(); 
             $table->string('trans_refno')->unique()->nullable();
             $table->integer('trans_status')->nullable();
@@ -21,7 +20,6 @@ return new class extends Migration
             // $table->foreignId('booking_id')->references('id')->on('bookings');
             $table->string('trans_amount')->nullable();
             $table->timestamp('trans_transaction_time')->nullable();
-            
             $table->timestamps();
 
         });
