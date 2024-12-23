@@ -63,6 +63,38 @@ Route::middleware('auth:sanctum')->post('/tasker-working-type-change', [TaskerAP
 Route::middleware('auth:sanctum')->get('/create-time-slot-{date}', [TaskerAPIController::class, 'taskerCreateTimeSlotAPI'])->name('taskerTimeSlotCreateAPI');
 Route::middleware('auth:sanctum')->get('/get-tasker-time-slot-{date}', [TaskerAPIController::class, 'getTaskerTimeSlotAPI'])->name('getTaskerTimeSlot');
 
+// Tasker - Booking Management API
+Route::middleware('auth:sanctum')->get('/get-bookings-details', [TaskerAPIController::class, 'getBookingsDetailsAPI']);
+Route::middleware('auth:sanctum')->get('/get-unavailable-time', [TaskerAPIController::class, 'getTaskerUnavailableSlotAPI']);
+Route::middleware('auth:sanctum')->post('/booking-reschedule', [TaskerAPIController::class, 'rescheduleBookingTimeFunctionAPI']);
+/* 
+NOTE: URL /booking-reschedule akan Post details :
+
+/booking-reschedule?id=?&date=?&start=?&end=?
+ex http://127.0.0.1:8000/api/booking-reschedule?id=4&date=2024-12-16&start=17:00:00&end=18:00:00
+
+id - ID BOOKING
+date - date reschedule yang baru
+start - start time baru
+end- end time baru
+
+*/
+
+Route::middleware('auth:sanctum')->post('/change-booking-status', [TaskerAPIController::class, 'taskerChangeBookingStatusAPI']);
+/* 
+NOTE: URL /change-booking-status akan Post details :
+
+/change-booking-status?id=?&option=?
+ex http://127.0.0.1:8000/api/change-booking-status?id=4&option=2
+
+id - ID BOOKING
+option - 1 = Confirmed booking
+         2 = Cancel booking
+
+*/
+
+
+
 
 
 

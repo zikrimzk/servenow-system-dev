@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Tasker;
+use App\Models\Booking;
 use App\Models\Service;
 use App\Models\TimeSlot;
 use App\Models\ServiceType;
@@ -445,6 +446,207 @@ class TaskerAPIController extends Controller
             return response()->json([
                 'message' => 'Failed to fetch your time. Please try again.'
             ], 500); 
+        }
+    }
+
+    // Get Booking Details
+    public function getBookingsDetailsAPI()
+    {
+        try {
+            // $bookings = Booking::all();
+            $bookings = DB::table('bookings as a')
+                ->join('clients as b', 'a.client_id', '=', 'b.id')
+                ->join('services as c', 'a.service_id', '=', 'c.id')
+                ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
+                ->join('taskers as e', 'c.tasker_id', '=', 'e.id')
+                ->where('e.id', '=', Auth::user()->id)
+                ->whereIn('a.booking_status', [1, 2, 3, 4, 6])
+                ->select(
+                    'a.id as bookingID',
+                    'a.booking_date',
+                    'a.booking_address',
+                    'a.booking_latitude',
+                    'a.booking_longitude',
+                    'a.booking_time_start',
+                    'a.booking_time_end',
+                    'a.booking_note',
+                    'a.booking_rate',
+                    'a.booking_status',
+                    'd.servicetype_name',
+                    'b.client_firstname',
+                    'b.client_lastname',
+                    'b.email',
+                    'b.client_phoneno',
+                    'b.latitude',
+                    'b.longitude',
+                )
+                ->get();
+            // dd($bookings);
+            $events = $bookings->map(function ($booking) {
+                $className = '';
+                $editable = true;
+
+                if ($booking->booking_status == 3) {
+                    $className = 'event-success';
+                    $editable = false;
+                } elseif ($booking->booking_status == 6) {
+                    $className = 'event-unavailable';
+                    $editable = false;
+                }
+                return [
+                    'id' => $booking->bookingID,
+                    'title' => $booking->client_firstname . ' (' . $booking->servicetype_name . ')',
+                    'date' => $booking->booking_date,
+                    'startTime'=> $booking->booking_time_start,
+                    'endTime' => $booking->booking_time_end,
+                    'address' => $booking->booking_address,
+                    'status' => $booking->booking_status,
+                    'task' => $booking->servicetype_name,
+                    'client_name' => $booking->client_firstname . ' ' . $booking->client_lastname,
+                    'client_phoneno' => $booking->client_phoneno,
+                    'lat' => $booking->booking_latitude,
+                    'long' => $booking->booking_longitude,
+                    'booking_note' => $booking->booking_note,
+                    'className' => $className,
+                    'editable' => $editable,
+                ];
+            });
+            return response()->json([
+                'booking' => $events
+            ], 200);
+
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    // Get Tasker Unavailable Slot
+    public function getTaskerUnavailableSlotAPI()
+    {
+        try {
+            // Fetch all slots with statuses
+            $slots = DB::table('tasker_time_slots as a')
+                ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                ->where('a.tasker_id', Auth::user()->id)
+                ->where('a.slot_status', 0)
+                ->select(
+                    'a.id as slotID',
+                    'a.slot_status',
+                    'a.slot_date',
+                    'b.time as slot_time'
+                )
+                ->get();
+
+            $events = $slots->map(function ($slot) {
+                return [
+                    'slot_id' => $slot->slotID,
+                    'title' => 'Unavailable',
+                    'date' => $slot->slot_date,
+                    'startTime'=>$slot->slot_time,
+                    'endTime' =>  date('H:i:s', strtotime('+1 hour', strtotime($slot->slot_time))),
+                    'slot_status' => $slot->slot_status,
+                    'editable' => false,
+                ];
+            });
+            return response()->json($events);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to fetch your time. Please try again.'], 500);
+        }
+    }
+
+    // Booking Reschedule API   
+    public function rescheduleBookingTimeFunctionAPI(Request $request)
+    {
+        // Find the booking by ID
+        $booking = Booking::find($request->id);
+
+        // Get the old time range
+        $oldDate = $booking->booking_date;
+        $oldStartTime = $booking->booking_time_start;
+        $oldEndTime = $booking->booking_time_end;
+
+        // Update the booking start and end times
+        $booking->booking_date = $request->date;
+        $booking->booking_status = 4;
+        $booking->booking_time_start = Carbon::parse($request->start)->format('H:i:s');
+        $booking->booking_time_end = Carbon::parse($request->end)->format('H:i:s');
+        $booking->save();
+
+        // Calculate new end time for slot adjustment (minus one hour)
+        $newEndTime = date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($request->end)->format('H:i:s'))));
+
+        // 1. Set old slots back to available (status = 1)
+        DB::table('tasker_time_slots as a')
+            ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+            ->where('a.tasker_id', '=', Auth::user()->id)
+            ->where('a.slot_date', '=', $oldDate)
+            ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
+            ->update(['a.slot_status' => 1]);
+
+        // 2. Set new slots to booked (status = 2)
+        $newSlots = DB::table('tasker_time_slots as a')
+            ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+            ->where('a.tasker_id', '=', Auth::user()->id)
+            ->where('a.slot_date', '=', $request->date)
+            ->whereBetween('b.time', [Carbon::parse($request->start)->format('H:i:s'), $newEndTime])
+            ->where('a.slot_status', '=', 1)
+            ->select('a.id as tasker_time_id', 'b.time')
+            ->get();
+
+        foreach ($newSlots as $slot) {
+            DB::table('tasker_time_slots')
+                ->where('id', '=', $slot->tasker_time_id)
+                ->update(['slot_status' => 2]);
+        }
+
+        // Return a response confirming the update
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Event rescheduled successfully',
+            'updated_booking' => $booking
+        ]);
+    }
+
+    // Tasker Change Booking Status API
+    public function taskerChangeBookingStatusAPI(Request $request)
+    {
+        try {
+            $booking = Booking::findOrFail($request->id);
+            if ($request->option == 1) {
+                $booking->booking_status = 3;
+                $booking->save();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Booking Confirmed!',
+                    'updated_booking' => $booking,
+                ],200);
+            } else if ($request->option == 2) {
+                $booking->booking_status = 5;
+                $booking->save();
+
+                $oldDate = $booking->booking_date;
+                $oldStartTime = $booking->booking_time_start;
+                $oldEndTime = $booking->booking_time_end;
+
+                DB::table('tasker_time_slots as a')
+                    ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                    ->where('a.tasker_id', '=', Auth::user()->id)
+                    ->where('a.slot_date', '=', $oldDate)
+                    ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
+                    ->update(['a.slot_status' => 1]);
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Booking Cancelled!',
+                    'updated_booking' => $booking,
+                ],200);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 
