@@ -755,6 +755,17 @@ class BookingController extends Controller
         $booking->booking_status = 7;
         $booking->save();
 
+        // $oldDate = $booking->booking_date;
+        // $oldStartTime = $booking->booking_time_start;
+        // $oldEndTime = $booking->booking_time_end;
+
+        // DB::table('tasker_time_slots as a')
+        //     ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+        //     ->where('a.tasker_id', '=', Auth::user()->id)
+        //     ->where('a.slot_date', '=', $oldDate)
+        //     ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
+        //     ->update(['a.slot_status' => 1]);
+
         return back()->with('success', 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account. ');
     }
 
