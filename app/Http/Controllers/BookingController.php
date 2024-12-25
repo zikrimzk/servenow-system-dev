@@ -602,7 +602,7 @@ class BookingController extends Controller
                     'updated_booking' => $booking,
                 ]);
             } else if ($request->option == 2) {
-                $booking->booking_status = 5;
+                $booking->booking_status = 9;
                 $booking->save();
 
                 $oldDate = $booking->booking_date;
@@ -616,9 +616,24 @@ class BookingController extends Controller
                     ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
                     ->update(['a.slot_status' => 1]);
 
+                $formattedDate = Carbon::parse(Carbon::now())
+                    ->format('Y-m-d');
+                $reason = 'Tasker: ' . Auth()->user()->tasker_firstname . ' ' . Auth()->user()->tasker_lastname . ' unable to serve the services. Full refund requested by tasker.';
+                $validated = [
+                    'cr_date' => $formattedDate,
+                    'cr_reason' => $reason,
+                    'cr_status' => 0,
+                    'cr_amount' => $booking->booking_rate,
+                    'cr_bank_name' => '-',
+                    'cr_account_name' => '-',
+                    'cr_account_number' => '-',
+                    'booking_id' => $request->id,
+                ];
+                CancelRefundBooking::create($validated);
+
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Booking Cancelled!',
+                    'message' => 'Refund Request will be processed. Please inform the client to update their bank information in their booking history refund section.',
                     'updated_booking' => $booking,
                 ]);
             }
@@ -739,6 +754,21 @@ class BookingController extends Controller
         $booking = Booking::findOrFail($id);
         $booking->booking_status = 7;
         $booking->save();
+
+        return back()->with('success', 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account. ');
+    }
+
+    public function clientUpdateRefundRequest(Request $request, $id)
+    {
+        $refund = CancelRefundBooking::findOrFail($id);
+        $validated = $request->validate([
+            'cr_bank_name' => 'required',
+            'cr_account_name' => 'required',
+            'cr_account_number' => 'required',
+        ]);
+        $validated['cr_status'] = 1;
+        CancelRefundBooking::where('id', $id)->update($validated);
+        Booking::where('id', $refund->booking_id)->update(['booking_status' => 7]);
 
         return back()->with('success', 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account. ');
     }

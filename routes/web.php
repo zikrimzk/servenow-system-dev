@@ -246,6 +246,8 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     Route::get('/view-Review',[RouteController::class,'clientViewReview'])->name('client-view-review');
     Route::post('/client-topay-redirect', [BookingController::class, 'clientToPayFunction'])->name('client-topay-function');
     Route::post('/client-refund-request-{id}', [BookingController::class, 'clientRefundRequest'])->name('client-refund-request');
+    Route::post('/update-client-refund-request-{id}', [BookingController::class, 'clientUpdateRefundRequest'])->name('client-update-refund-request');
+
 
 
 

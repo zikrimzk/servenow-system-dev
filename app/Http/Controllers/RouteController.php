@@ -307,7 +307,7 @@ class RouteController extends Controller
 
         $groupedBookings = $booking->groupBy('booking_date');
         $refund = collect($booking)
-            ->whereIn('booking_status', [7, 8])
+            ->whereIn('booking_status', [7, 8 , 9])
             ->groupBy('booking_date');
 
         $review = Review::all();
@@ -325,7 +325,7 @@ class RouteController extends Controller
             'refund' => $refund,
             'review' => $review,
             'bank' => $bank,
-            'refunds' => $refund
+            'refunds' => $refunds
         ]);
     }
 
@@ -1388,7 +1388,7 @@ class RouteController extends Controller
                 'e.email as client_email',
 
             )
-            ->whereIn('a.booking_status', [7])
+            ->whereIn('a.booking_status', [7,9])
             ->orderbyDesc('a.booking_date')
             ->get();
 
@@ -1424,7 +1424,10 @@ class RouteController extends Controller
 
                 if ($row->booking_status == 7) {
                     $status = '<span class="badge bg-light-warning">Pending Refund</span>';
+                } else if ($row->booking_status == 9) {
+                    $status = '<span class="badge bg-light-danger">Require Update</span>';
                 }
+                
                 return $status;
             });
 

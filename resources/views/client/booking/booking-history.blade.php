@@ -1113,6 +1113,8 @@
                                                         <span class="badge bg-light-warning">Pending Refund</span>
                                                     @elseif($b->booking_status == 8)
                                                         <span class="badge bg-light-success">Refunded</span>
+                                                    @elseif($b->booking_status == 9)
+                                                        <span class="badge bg-light-danger">Update Required</span>
                                                     @endif
                                                 </div>
                                                 <hr>
@@ -1143,9 +1145,15 @@
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <span class="fw-bold">Total: <span
                                                             class="text-danger">RM{{ $b->booking_rate }}</span></span>
-                                                    <button class="btn btn-light-secondary" type="button"
-                                                        data-bs-target="#refundDetails-{{ $b->bookingID }}"
-                                                        data-bs-toggle="modal">View Refund Details</button>
+                                                    @if ($b->booking_status == 9)
+                                                        <button class="btn btn-light-danger" type="button"
+                                                            data-bs-target="#refundDetails-{{ $b->bookingID }}"
+                                                            data-bs-toggle="modal">Update Details</button>
+                                                    @else
+                                                        <button class="btn btn-light-secondary" type="button"
+                                                            data-bs-target="#refundDetails-{{ $b->bookingID }}"
+                                                            data-bs-toggle="modal">View Refund Details</button>
+                                                    @endif
                                                 </div>
                                             </div>
                                         @endforeach
@@ -1168,121 +1176,156 @@
                                     </div>
                                 </div>
                             @endif
-                            {{-- @foreach ($refunds as $rf)
-                                <div class="modal fade" id="refundDetails"
-                                    data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-body">
-                                                <div class="row">
-                                                    <div class="col-sm-12 mb-3">
-                                                        <h4>Refund Details</h4>
-                                                        <div class="row">
-                                                            <div class="col-sm-12">
-                                                                <div class="mb-3">
-                                                                    <label for="cr_reason" class="form-label">Refund
-                                                                        Reason
-                                                                        <span class="text-danger">*</span></label>
-                                                                    <textarea name="cr_reason" id="cr_reason" cols="30" rows="10" class="form-control"
-                                                                        placeholder="Enter your reason ...">{{ $rf->cr_reason }}</textarea>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-12">
-                                                                <div class="mb-3">
-                                                                    <label for="cr_bank_name" class="form-label">Bank
-                                                                        Name<span class="text-danger">*</span></label>
-                                                                    <select name="cr_bank_name"
-                                                                        class="form-control @error('cr_bank_name') is-invalid @enderror"
-                                                                        id="cr_bank_name">
-                                                                        <option value="">Select
-                                                                            Bank
-                                                                        </option>
-                                                                        @foreach ($bank as $banks)
-                                                                            <option value="{{ $banks['bank'] }}">
-                                                                                {{ $banks['bank'] }}
-                                                                            </option>
-                                                                        @endforeach
-                                                                    </select>
-                                                                    @error('cr_bank_name')
-                                                                        <div class="invalid-feedback">
-                                                                            {{ $message }}</div>
-                                                                    @enderror
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-12">
-                                                                <div class="mb-3">
-                                                                    <label for="cr_account_name"
-                                                                        class="form-label">Account
-                                                                        Holder Name</label>
-                                                                    <input type="text" class="form-control"
-                                                                        name="cr_account_name"
-                                                                        placeholder="Enter your account holder name"
-                                                                        id="cr_account_name"
-                                                                        value="{{ $rf->cr_account_name }}">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-12">
-                                                                <div class="mb-3">
-                                                                    <label for="cr_account_number"
-                                                                        class="form-label">Account
-                                                                        Number<span class="text-danger">*</span></label>
-                                                                    <input type="text"
-                                                                        class="form-control @error('cr_account_number') is-invalid @enderror"
-                                                                        name="cr_account_number"
-                                                                        placeholder="Enter your account number"
-                                                                        id="cr_account_number">
-                                                                    @error('cr_account_number')
-                                                                        <div class="invalid-feedback">
-                                                                            {{ $message }}</div>
-                                                                    @enderror
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-12">
-                                                                <div class="mb-3">
-                                                                    <table class="table-refund">
-                                                                        <tr class="mb-3">
-                                                                            <td>Total Paid</td>
-                                                                            <td>{{ $b->booking_rate }}
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr class="mb-3">
-                                                                            <td class="text-danger">Service
-                                                                                Charge (3%)</td>
-                                                                            <td class="text-danger">
-                                                                                {{ number_format($b->booking_rate * 0.03, 2) }}
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr class="mb-3">
-                                                                            <td>Amount to be refunded
-                                                                            </td>
-                                                                            <td>{{ $b->booking_rate - number_format($b->booking_rate * 0.03, 2) }}
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
-                                                                    <input type="hidden" class="form-control"
-                                                                        name="cr_amount"
-                                                                        value ="{{ $b->booking_rate - number_format($b->booking_rate * 0.03, 2) }}">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-12">
-                                                        <div
-                                                            class="d-flex justify-content-between gap-3 align-items-center">
-                                                            <button type="button" class="btn btn-light btn-pc-default"
-                                                                data-bs-dismiss="modal">Cancel</button>
-                                                            <button type="submit" class="btn btn-light-danger"
-                                                                data-bs-dismiss="modal">Confirm
-                                                                Refund</button>
 
+                            @foreach ($refunds as $rf)
+                                <form action="{{ route('client-update-refund-request', $rf->id) }}" method="POST">
+                                    @csrf
+                                    <div class="modal fade" id="refundDetails-{{ $rf->booking_id }}"
+                                        data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="mb-0">Refund Details</h5>
+                                                    <a href="#"
+                                                        class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
+                                                        data-bs-dismiss="modal">
+                                                        <i class="ti ti-x f-20"></i>
+                                                    </a>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-sm-12 mb-3">
+                                                            <div class="row">
+                                                                <div class="col-sm-12">
+                                                                    <div class="mb-3">
+                                                                        <label for="cr_reason" class="form-label">Refund
+                                                                            Reason
+                                                                            <span class="text-danger">*</span></label>
+                                                                        <textarea cols="25" rows="10" class="form-control" readonly>{{ $rf->cr_reason }}</textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-12">
+                                                                    <div class="mb-3">
+                                                                        <label for="cr_bank_name"
+                                                                            class="form-label">Refund
+                                                                            Status</label>
+                                                                        @if ($rf->cr_status == 0)
+                                                                            <input type="text" class="form-control"
+                                                                                value="Require Update" readonly />
+                                                                        @elseif ($rf->cr_status == 1)
+                                                                            <input type="text" class="form-control"
+                                                                                value="Pending Request" readonly />
+                                                                        @elseif($rf->cr_status == 2)
+                                                                            <input type="text" class="form-control"
+                                                                                value="Approved" readonly />
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-12">
+                                                                    <div class="mb-3">
+                                                                        <label for="cr_bank_name" class="form-label">Bank
+                                                                            Name<span class="text-danger">*</span></label>
+                                                                        @if ($rf->cr_status == 0)
+                                                                            <select name="cr_bank_name"
+                                                                                class="form-control @error('cr_bank_name') is-invalid @enderror"
+                                                                                id="cr_bank_name">
+                                                                                <option value="">Select
+                                                                                    Bank
+                                                                                </option>
+                                                                                @foreach ($bank as $banks)
+                                                                                    <option value="{{ $banks['bank'] }}">
+                                                                                        {{ $banks['bank'] }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                            @error('cr_bank_name')
+                                                                                <div class="invalid-feedback">
+                                                                                    {{ $message }}</div>
+                                                                            @enderror
+                                                                        @else
+                                                                            <input type="text" class="form-control"
+                                                                                value="{{ $rf->cr_bank_name }}"
+                                                                                readonly />
+                                                                        @endif
+
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-12">
+                                                                    <div class="mb-3">
+                                                                        <label for="cr_account_name"
+                                                                            class="form-label">Account
+                                                                            Holder Name</label>
+                                                                        @if ($rf->cr_status == 0)
+                                                                            <input type="text"
+                                                                                class="form-control @error('cr_account_name') is-invalid @enderror"
+                                                                                name="cr_account_name"
+                                                                                placeholder="Enter your account holder name"
+                                                                                id="cr_account_name">
+                                                                            @error('cr_account_name')
+                                                                                <div class="invalid-feedback">
+                                                                                    {{ $message }}</div>
+                                                                            @enderror
+                                                                        @else
+                                                                            <input type="text" class="form-control"
+                                                                                value="{{ $rf->cr_account_name }}"
+                                                                                readonly />
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-12">
+                                                                    <div class="mb-3">
+                                                                        <label for="cr_account_number"
+                                                                            class="form-label">Account
+                                                                            Number</label>
+                                                                        @if ($rf->cr_status == 0)
+                                                                            <input type="text"
+                                                                                class="form-control @error('cr_account_number') is-invalid @enderror"
+                                                                                name="cr_account_number"
+                                                                                placeholder="Enter your account number"
+                                                                                id="cr_account_number">
+                                                                            @error('cr_account_number')
+                                                                                <div class="invalid-feedback">
+                                                                                    {{ $message }}</div>
+                                                                            @enderror
+                                                                        @else
+                                                                            <input type="text" class="form-control"
+                                                                                value="{{ $rf->cr_account_number }}"
+                                                                                readonly />
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-12">
+                                                                    <div class="mb-3">
+                                                                        <label for="cr_account_number"
+                                                                            class="form-label">Total Amount to be
+                                                                            Refunded</label>
+                                                                        <input type="text" class="form-control"
+                                                                            value="{{ $rf->cr_amount }}" readonly />
+                                                                    </div>
+                                                                </div>
+                                                                @if ($rf->cr_status == 0)
+                                                                    <div class="col-sm-12">
+                                                                        <div
+                                                                            class="d-flex justify-content-between gap-3 align-items-center">
+                                                                            <button type="button"
+                                                                                class="btn btn-light btn-pc-default"
+                                                                                data-bs-dismiss="modal">Cancel</button>
+                                                                            <button type="submit"
+                                                                                class="btn btn-light-danger"
+                                                                                data-bs-dismiss="modal">Save
+                                                                                Changes</button>
+                                                                        </div>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endforeach --}}
+                                </form>
+                            @endforeach
                         </div>
                     </div>
                 </div>
