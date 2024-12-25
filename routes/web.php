@@ -244,8 +244,8 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     Route::get('/change-booking-process/{id}/{taskerid}/{option}', [BookingController::class, 'clientChangeBookingStatus'])->name('client-change-booking-status');
     Route::post('/submit-review', [BookingController::class, 'clientReviewBooking'])->name('client-submit-review');
     Route::get('/view-Review',[RouteController::class,'clientViewReview'])->name('client-view-review');
-
-
+    Route::post('/client-topay-redirect', [BookingController::class, 'clientToPayFunction'])->name('client-topay-function');
+    Route::post('/client-refund-request-{id}', [BookingController::class, 'clientRefundRequest'])->name('client-refund-request');
 
 
 
@@ -254,3 +254,5 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
 
 
 Route::get('/get-areas/{state}', [RouteController::class, 'getAreas'])->name('get-area');
+Route::get('/get-bank', [RouteController::class, 'getBank'])->name('get-bank');
+

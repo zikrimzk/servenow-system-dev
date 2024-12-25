@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
-            $table->string('trans_order_id')->primary(); 
+            $table->id(); 
             $table->string('trans_refno')->unique()->nullable();
             $table->integer('trans_status')->nullable();
             $table->string('trans_reason')->nullable();
             $table->string('trans_billcode')->nullable();
-            // $table->foreignId('booking_id')->references('id')->on('bookings');
+            $table->string('booking_order_id');
+            $table->foreign('booking_order_id')->references('booking_order_id')->on('bookings');
             $table->string('trans_amount')->nullable();
             $table->timestamp('trans_transaction_time')->nullable();
             $table->timestamps();

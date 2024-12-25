@@ -15,7 +15,7 @@
                     <a class="nav-link" href="{{ route('client-home') }}">Home</a>
                 </li>
                 <li class="nav-item px-1">
-                    <a class="nav-link" href="{{ route('clientBookHistory') }}">My Task</a>
+                    <a class="nav-link" href="{{ route('clientBookHistory') }}">My Booking</a>
                 </li>
                 <li class="nav-item px-1 me-2 mb-2 mb-md-0">
                 </li>

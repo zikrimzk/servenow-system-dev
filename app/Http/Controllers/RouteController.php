@@ -6,16 +6,17 @@ use Exception;
 use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Review;
-use App\Models\Booking;
 use App\Models\Tasker;
+use App\Models\Booking;
 use App\Models\Service;
 use App\Models\TimeSlot;
 use App\Models\ServiceType;
+use App\Models\Transaction;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
-use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
+use App\Models\CancelRefundBooking;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\DataTables\Facades\DataTables;
@@ -42,6 +43,21 @@ class RouteController extends Controller
         }
 
         return response()->json($areas);
+    }
+
+    // Get Bank API
+    public function getBank()
+    {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_POST, 0);
+        curl_setopt($curl, CURLOPT_URL, 'https://toyyibpay.com/index.php/api/getBank');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+        $result = curl_exec($curl);
+        $info = curl_getinfo($curl);
+        curl_close($curl);
+
+        return response()->json($result);
     }
 
     /**** General Route Function - End ****/
@@ -189,8 +205,8 @@ class RouteController extends Controller
             'order_id' => $request->query('order_id'),
             'msg' => $request->query('msg'),
             'transaction_id' => $request->query('transaction_id'),
-            'current_date' => Carbon::now()->format('Y-m-d'),   
-            'current_time' => Carbon::now()->format('H:i:s'),  
+            'current_date' => Carbon::now()->format('Y-m-d'),
+            'current_time' => Carbon::now()->format('H:i:s'),
         ];
 
         return view('client.booking.payment-return', [
@@ -207,7 +223,7 @@ class RouteController extends Controller
     public function clientPaymentCallbackNav(Request $request)
     {
 
-        Transaction::where('trans_order_id', $request->order_id)
+        Transaction::where('booking_order_id', $request->order_id)
             ->update([
                 'trans_refno' => $request->refno,
                 'trans_status' => $request->status,
@@ -219,8 +235,6 @@ class RouteController extends Controller
 
         if ($request->status == '1') {
             $status_payment = 2;
-        } elseif ($request->status == '3') {
-            $status_payment = 5;
         } else {
             $status_payment = 1;
         }
@@ -249,6 +263,7 @@ class RouteController extends Controller
                 'a.booking_status',
                 'a.booking_note',
                 'a.booking_rate',
+                'a.booking_order_id',
                 'a.client_id',
                 'a.service_id',
                 'a.created_at',
@@ -277,7 +292,7 @@ class RouteController extends Controller
         // Grouping berdasarkan booking_date
         $groupedBookings = $booking->groupBy('booking_date');
         $toServeBookings = collect($booking)
-            ->whereIn('booking_status', [2, 3, 4])
+            ->whereIn('booking_status', [1, 2, 3, 4])
             ->groupBy('booking_date');
 
         $groupedBookings = $booking->groupBy('booking_date');
@@ -296,6 +311,10 @@ class RouteController extends Controller
             ->groupBy('booking_date');
 
         $review = Review::all();
+        $refunds = DB::table('cancel_refund_bookings')->get();
+        // dd($refunds->booking_id);
+        
+        $bank = json_decode(file_get_contents(public_path('assets/json/bank.json')), true);
 
         return view('client.booking.booking-history', [
             'title' => 'My Booking History',
@@ -304,8 +323,9 @@ class RouteController extends Controller
             'completed' => $completed,
             'cancelled' => $cancelled,
             'refund' => $refund,
-            'review' => $review
-
+            'review' => $review,
+            'bank' => $bank,
+            'refunds' => $refund
         ]);
     }
 

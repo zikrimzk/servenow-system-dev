@@ -1,6 +1,8 @@
 @extends('client.layouts.main')
 
+
 @section('content')
+
     <style>
         .nav-tabs .nav-link.active {
             background-color: #16325b;
@@ -73,15 +75,41 @@
             height: 20px;
             text-align: center;
         }
+
+        .table-refund {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-refund td,
+        .table-refund th {
+            padding: 8px;
+        }
+
+        .table-refund td {
+            text-align: right;
+        }
+
+        .table-refund th {
+            text-align: left;
+        }
+
+        .table-refund tr {
+            border-bottom: 1px solid #ddd;
+        }
     </style>
+
 
     <div class="pc-container mb-5">
         <div class="pc-content">
             <div class="row">
 
                 <div class="col-sm-8 col-md-12">
+
+                    <h1 class="my-4 mx-3">My Booking</h1>
+
                     <!-- Start Alert -->
-                    <div>
+                    <div class="mx-3">
                         @if (session()->has('success'))
                             <div class="alert alert-success alert-dismissible" role="alert">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -111,17 +139,15 @@
                     </div>
                     <!-- End Alert -->
 
-                    <h1 class="my-4">My Task</h1>
-
-                    <ul class="nav nav-tabs mb-3 fw-bold border-bottom border-3 light-primary" id="myTab"
+                    <ul class="nav nav-tabs mb-3 fw-bold border-bottom border-3 light-primary mx-3 my-1" id="myTab"
                         role="tablist">
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link active text-uppercase" id="home-tab" data-bs-toggle="tab" href="#allbooking"
                                 role="tab" aria-controls="home" aria-selected="true">All</a>
-                        </li>
+                        </li> --}}
                         <li class="nav-item">
-                            <a class="nav-link text-uppercase" id="profile-tab" data-bs-toggle="tab" href="#toserve"
-                                role="tab" aria-controls="profile" aria-selected="false">Upcoming</a>
+                            <a class="nav-link text-uppercase active" id="profile-tab" data-bs-toggle="tab" href="#toserve"
+                                role="tab" aria-controls="profile" aria-selected="true">Upcoming</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-uppercase" id="contact-tab" data-bs-toggle="tab" href="#completed"
@@ -138,9 +164,11 @@
                     </ul>
                 </div>
 
+
                 <div class="col-sm-8 col-md-12">
-                    <div class="tab-content" id="myTabContent">
-                        <div class="tab-pane fade show active" id="allbooking" role="tabpanel"
+                    <div class="tab-content mx-3 my-1" id="myTabContent">
+
+                        {{-- <div class="tab-pane fade show active" id="allbooking" role="tabpanel"
                             aria-labelledby="allbooking-tab">
                             @foreach ($book as $date => $book)
                                 <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
@@ -486,414 +514,775 @@
                                     @endforeach
                                 </div>
                             @endforeach
-                        </div>
+                        </div> --}}
 
+                        <div class="tab-pane fade show active" id="toserve" role="tabpanel" aria-labelledby="toserve-tab">
+                            @if ($toServeBooking->count() >= 1)
+                                @foreach ($toServeBooking as $date => $bookings)
+                                    <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                                        <h3 class="mb-3 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}
+                                        </h3>
+                                        @foreach ($bookings as $b)
+                                            <form action="{{ route('client-topay-function') }}" method="POST">
+                                                @csrf
+                                                <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
+                                                        @if ($b->booking_status == 1)
+                                                            <span class="badge bg-warning">To Pay</span>
+                                                        @elseif ($b->booking_status == 2)
+                                                            <span class="badge bg-light-success">Paid</span>
+                                                        @elseif($b->booking_status == 3)
+                                                            <span class="badge bg-success">Confirmed</span>
+                                                        @elseif($b->booking_status == 4)
+                                                            <span class="badge bg-warning">Rescheduled</span>
+                                                        @endif
+                                                    </div>
+                                                    <hr>
+                                                    <div class="d-flex">
+                                                        <img src="{{ asset('storage/' . $b->tasker_photo) }}"
+                                                            alt="Tasker Photo" width="100" height="100">
+                                                        <div class="ms-3">
+                                                            <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
+                                                            <p class="mb-1">{{ $b->tasker_code }}</p>
+                                                            <p class="mb-1">#{{ $b->booking_order_id }}</p>
+                                                            <p class="mb-0">
+                                                                {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
+                                                                -
+                                                                {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="text-muted">{{ $b->booking_address }}</span>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="fw-bold">Total: <span
+                                                                class="text-danger">RM{{ $b->booking_rate }}</span></span>
+                                                        @if ($b->booking_status == 1)
+                                                            <div>
+                                                                <input type="hidden" name="booking_date"
+                                                                    value="{{ $b->booking_date }}">
+                                                                <input type="hidden" name="booking_order_id"
+                                                                    value="{{ $b->booking_order_id }}">
+                                                                <button class="btn btn-light-warning">Proceed to
+                                                                    Pay</button>
+                                                                <button class="btn btn-light-danger" type="button"
+                                                                    data-bs-target="#cancelBookingModal-{{ $b->bookingID }}"
+                                                                    data-bs-toggle="modal">
+                                                                    Cancel Booking
+                                                                </button>
+                                                            </div>
+                                                        @elseif ($b->booking_status == 2 || $b->booking_status == 4)
+                                                            <div>
+                                                                <button class="btn btn-light-danger" type="button"
+                                                                    data-bs-target="#refundBookingModalTwo-{{ $b->bookingID }}"
+                                                                    data-bs-toggle="modal"
+                                                                    data-booking-id="{{ $b->bookingID }}"
+                                                                    onclick="saveBookingIDToLocalStorage(this)">Request
+                                                                    Refund</button>
 
-                        <div class="tab-pane fade" id="toserve" role="tabpanel" aria-labelledby="toserve-tab">
-                            @foreach ($toServeBooking as $date => $bookings)
+                                                                <button class="btn btn-light-secondary"
+                                                                    type="button">Contact
+                                                                    Tasker</button>
+                                                            </div>
+                                                        @elseif($b->booking_status == 3)
+                                                            <div>
+                                                                <button class="btn btn-light-primary" type="button"
+                                                                    data-bs-target="#completeBookingModalTwo-{{ $b->bookingID }}"
+                                                                    data-bs-toggle="modal">Service Completed</button>
+                                                                <button class="btn btn-light-secondary"
+                                                                    type="button">Contact
+                                                                    Tasker</button>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </form>
+
+                                            <div class="modal fade" id="cancelBookingModal-{{ $b->bookingID }}"
+                                                data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                <div class="col-sm-12 mb-4">
+                                                                    <div
+                                                                        class="d-flex justify-content-center align-items-center mb-3">
+                                                                        <i class="ti ti-info-circle text-warning"
+                                                                            style="font-size: 100px"></i>
+                                                                    </div>
+
+                                                                </div>
+                                                                <div class="col-sm-12">
+                                                                    <div
+                                                                        class="d-flex justify-content-center align-items-center">
+                                                                        <h2>Cancel Booking Request</h2>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-12 mb-3">
+                                                                    <div
+                                                                        class="d-flex justify-content-center align-items-center">
+                                                                        <p class="fw-normal f-18 text-center">Are you sure
+                                                                            you
+                                                                            want to
+                                                                            cancel this
+                                                                            booking? </p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-12">
+                                                                    <div
+                                                                        class="d-flex justify-content-between gap-3 align-items-center">
+                                                                        <button type="button"
+                                                                            class="btn btn-light btn-pc-default"
+                                                                            data-bs-dismiss="modal">Cancel</button>
+                                                                        <div>
+                                                                            <a href="{{ route('client-change-booking-status', [$b->bookingID, $b->taskerID, 1]) }}"
+                                                                                class="btn btn-light-danger">Cancel
+                                                                                Booking</a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <form action="{{ route('client-refund-request', $b->bookingID) }}"
+                                                method="POST"> @csrf
+                                                <div class="modal fade refundBookingModalTwo"
+                                                    id="refundBookingModalTwo-{{ $b->bookingID }}"
+                                                    data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-body">
+                                                                <div class="row">
+                                                                    <div class="col-sm-12 mb-3">
+                                                                        <h4>Refund Booking Request</h4>
+                                                                        <div class="row">
+                                                                            <div class="col-sm-12">
+                                                                                <div class="mb-3">
+                                                                                    <label for="cr_reason"
+                                                                                        class="form-label">Refund
+                                                                                        Reason
+                                                                                        <span
+                                                                                            class="text-danger">*</span></label>
+                                                                                    <textarea name="cr_reason" id="cr_reason" cols="30" rows="10"
+                                                                                        class="form-control @error('cr_reason') is-invalid @enderror" placeholder="Enter your reason ..."></textarea>
+                                                                                    @error('cr_reason')
+                                                                                        <div class="invalid-feedback">
+                                                                                            {{ $message }}</div>
+                                                                                    @enderror
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-sm-12">
+                                                                                <div class="mb-3">
+                                                                                    <label for="cr_bank_name"
+                                                                                        class="form-label">Bank
+                                                                                        Name<span
+                                                                                            class="text-danger">*</span></label>
+                                                                                    <select name="cr_bank_name"
+                                                                                        class="form-control @error('cr_bank_name') is-invalid @enderror"
+                                                                                        id="cr_bank_name">
+                                                                                        <option value="">Select
+                                                                                            Bank
+                                                                                        </option>
+                                                                                        @foreach ($bank as $banks)
+                                                                                            <option
+                                                                                                value="{{ $banks['bank'] }}">
+                                                                                                {{ $banks['bank'] }}
+                                                                                            </option>
+                                                                                        @endforeach
+                                                                                    </select>
+                                                                                    @error('cr_bank_name')
+                                                                                        <div class="invalid-feedback">
+                                                                                            {{ $message }}</div>
+                                                                                    @enderror
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-sm-12">
+                                                                                <div class="mb-3">
+                                                                                    <label for="cr_account_name"
+                                                                                        class="form-label">Account
+                                                                                        Holder Name<span
+                                                                                            class="text-danger">*</span></label>
+                                                                                    <input type="text"
+                                                                                        class="form-control @error('cr_account_name') is-invalid @enderror"
+                                                                                        name="cr_account_name"
+                                                                                        placeholder="Enter your account holder name"
+                                                                                        id="cr_account_name">
+                                                                                    @error('cr_account_name')
+                                                                                        <div class="invalid-feedback">
+                                                                                            {{ $message }}</div>
+                                                                                    @enderror
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-sm-12">
+                                                                                <div class="mb-3">
+                                                                                    <label for="cr_account_number"
+                                                                                        class="form-label">Account
+                                                                                        Number<span
+                                                                                            class="text-danger">*</span></label>
+                                                                                    <input type="text"
+                                                                                        class="form-control @error('cr_account_number') is-invalid @enderror"
+                                                                                        name="cr_account_number"
+                                                                                        placeholder="Enter your account number"
+                                                                                        id="cr_account_number">
+                                                                                    @error('cr_account_number')
+                                                                                        <div class="invalid-feedback">
+                                                                                            {{ $message }}</div>
+                                                                                    @enderror
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-sm-12">
+                                                                                <div class="mb-3">
+                                                                                    <table class="table-refund">
+                                                                                        <tr class="mb-3">
+                                                                                            <td>Total Paid</td>
+                                                                                            <td>{{ $b->booking_rate }}
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                        <tr class="mb-3">
+                                                                                            <td class="text-danger">Service
+                                                                                                Charge (3%)</td>
+                                                                                            <td class="text-danger">
+                                                                                                {{ number_format($b->booking_rate * 0.03, 2) }}
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                        <tr class="mb-3">
+                                                                                            <td>Amount to be refunded
+                                                                                            </td>
+                                                                                            <td>{{ $b->booking_rate - number_format($b->booking_rate * 0.03, 2) }}
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    </table>
+                                                                                    <input type="hidden"
+                                                                                        class="form-control"
+                                                                                        name="cr_amount"
+                                                                                        value ="{{ $b->booking_rate - number_format($b->booking_rate * 0.03, 2) }}">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-12">
+                                                                        <div
+                                                                            class="d-flex justify-content-between gap-3 align-items-center">
+                                                                            <button type="button"
+                                                                                class="btn btn-light btn-pc-default"
+                                                                                data-bs-dismiss="modal">Cancel</button>
+                                                                            <button type="submit"
+                                                                                class="btn btn-light-danger"
+                                                                                data-bs-dismiss="modal">Confirm
+                                                                                Refund</button>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+
+                                            <div class="modal fade" id="completeBookingModalTwo-{{ $b->bookingID }}"
+                                                data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                <div class="col-sm-12 mb-4">
+                                                                    <div
+                                                                        class="d-flex justify-content-center align-items-center mb-3">
+                                                                        <i class="ti ti-info-circle text-warning"
+                                                                            style="font-size: 100px"></i>
+                                                                    </div>
+
+                                                                </div>
+                                                                <div class="col-sm-12">
+                                                                    <div
+                                                                        class="d-flex justify-content-center align-items-center">
+                                                                        <h2>Confirmation</h2>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-12 mb-3">
+                                                                    <div
+                                                                        class="d-flex justify-content-center align-items-center">
+                                                                        <p class="fw-normal f-18 text-center">Are you sure
+                                                                            you
+                                                                            want to mark
+                                                                            this booking as complete ?</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-12">
+                                                                    <div
+                                                                        class="d-flex justify-content-between gap-3 align-items-center">
+                                                                        <button type="button"
+                                                                            class="btn btn-light btn-pc-default"
+                                                                            data-bs-dismiss="modal">Cancel</button>
+                                                                        <div>
+                                                                            <a href="{{ route('client-change-booking-status', [$b->bookingID, $b->taskerID, 3]) }}"
+                                                                                class="btn btn-success">Completed</a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endforeach
+                            @else
                                 <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
-                                    <h3 class="mb-3 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}</h3>
-                                    @foreach ($bookings as $b)
-                                        <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
-                                                @if ($b->booking_status == 2)
-                                                    <span class="badge bg-light-success">Paid</span>
-                                                @elseif($b->booking_status == 3)
-                                                    <span class="badge bg-success">Confirmed</span>
-                                                @elseif($b->booking_status == 4)
-                                                    <span class="badge bg-warning">Rescheduled</span>
-                                                @endif
-                                            </div>
-                                            <hr>
-                                            <div class="d-flex">
-                                                <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Tasker Photo"
-                                                    width="100" height="100">
-                                                <div class="ms-3">
-                                                    <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
-                                                    <p class="mb-1">{{ $b->tasker_code }}</p>
-                                                    <p class="mb-0">
-                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
-                                                        -
-                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
-                                                    </p>
+                                    <div class="d-flex justify-content-center align-items-center vh-100">
+                                        <div class="row justify-content-center">
+                                            <div class="col-12 mb-3">
+                                                <div class="text-center">
+                                                    <i class="fas fa-calendar-week f-68"></i>
+
                                                 </div>
                                             </div>
-                                            <hr>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="text-muted">{{ $b->booking_address }}</span>
-                                            </div>
-                                            <hr>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="fw-bold">Total: <span
-                                                        class="text-danger">RM{{ $b->booking_rate }}</span></span>
-                                                @if ($b->booking_status == 2 || $b->booking_status == 4)
-                                                    <div>
-                                                        <button class="btn btn-danger"
-                                                            data-bs-target="#refundBookingModalTwo-{{ $b->bookingID }}"
-                                                            data-bs-toggle="modal">Request Refund</button>
-
-                                                        <button class="btn btn-outline-secondary">Contact Tasker</button>
-                                                    </div>
-                                                @elseif($b->booking_status == 3)
-                                                    <div>
-                                                        <button class="btn btn-primary"
-                                                            data-bs-target="#completeBookingModalTwo-{{ $b->bookingID }}"
-                                                            data-bs-toggle="modal">Service Completed</button>
-                                                        <button class="btn btn-outline-secondary">Contact Tasker</button>
-                                                    </div>
-                                                @endif
+                                            <div class="col-12">
+                                                <p class="mb-0 text-center f-18">No booking yet</p>
                                             </div>
                                         </div>
-
-                                        <div class="modal fade" id="refundBookingModalTwo-{{ $b->bookingID }}"
-                                            data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-body">
-                                                        <div class="row">
-                                                            <div class="col-sm-12 mb-4">
-                                                                <div
-                                                                    class="d-flex justify-content-center align-items-center mb-3">
-                                                                    <i class="ti ti-info-circle text-warning"
-                                                                        style="font-size: 100px"></i>
-                                                                </div>
-
-                                                            </div>
-                                                            <div class="col-sm-12">
-                                                                <div
-                                                                    class="d-flex justify-content-center align-items-center">
-                                                                    <h2>Refund Booking Request</h2>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-12 mb-3">
-                                                                <div
-                                                                    class="d-flex justify-content-center align-items-center">
-                                                                    <p class="fw-normal f-18 text-center">Are you sure you
-                                                                        want to
-                                                                        request a
-                                                                        refund? This action will cancel your booking, and it
-                                                                        may take up
-                                                                        to 5
-                                                                        working days to process your refund. </p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-12">
-                                                                <div
-                                                                    class="d-flex justify-content-between gap-3 align-items-center">
-                                                                    <button type="reset"
-                                                                        class="btn btn-light btn-pc-default"
-                                                                        data-bs-dismiss="modal">Cancel</button>
-                                                                    <div>
-                                                                        <a href="{{ route('client-change-booking-status', [$b->bookingID, $b->taskerID, 2]) }}"
-                                                                            class="btn btn-light-danger">Refund</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="modal fade" id="completeBookingModalTwo-{{ $b->bookingID }}"
-                                            data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-body">
-                                                        <div class="row">
-                                                            <div class="col-sm-12 mb-4">
-                                                                <div
-                                                                    class="d-flex justify-content-center align-items-center mb-3">
-                                                                    <i class="ti ti-info-circle text-warning"
-                                                                        style="font-size: 100px"></i>
-                                                                </div>
-
-                                                            </div>
-                                                            <div class="col-sm-12">
-                                                                <div
-                                                                    class="d-flex justify-content-center align-items-center">
-                                                                    <h2>Confirmation</h2>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-12 mb-3">
-                                                                <div
-                                                                    class="d-flex justify-content-center align-items-center">
-                                                                    <p class="fw-normal f-18 text-center">Are you sure you
-                                                                        want to mark
-                                                                        this booking as complete ?</p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-12">
-                                                                <div
-                                                                    class="d-flex justify-content-between gap-3 align-items-center">
-                                                                    <button type="reset"
-                                                                        class="btn btn-light btn-pc-default"
-                                                                        data-bs-dismiss="modal">Cancel</button>
-                                                                    <div>
-                                                                        <a href="{{ route('client-change-booking-status', [$b->bookingID, $b->taskerID, 3]) }}"
-                                                                            class="btn btn-success">Completed</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
+                                    </div>
                                 </div>
-                            @endforeach
+                            @endif
                         </div>
 
                         <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="allbooking-tab">
-                            @foreach ($completed as $date => $booking)
-                                <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
-                                    <h3 class="mb-3 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}</h3>
-                                    @foreach ($booking as $b)
-                                        <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
-                                                <span class="badge bg-success">Completed</span>
-                                            </div>
-                                            <hr>
-                                            <div class="d-flex">
-                                                <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Product Image"
-                                                    width="100" height="100" class="">
-                                                <div class="ms-3">
-                                                    <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
-                                                    <p class="mb-1">{{ $b->tasker_code }}</p>
-                                                    <p class="mb-0">{{ $b->service_rate }}/{{ $b->service_rate_type }}
-                                                    </p>
-                                                    <p class="mb-0">
-                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
-                                                        -
-                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
-                                                    </p>
+                            @if ($completed->count() >= 1)
+                                @foreach ($completed as $date => $booking)
+                                    <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                                        <h3 class="mb-3 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}
+                                        </h3>
+                                        @foreach ($booking as $b)
+                                            <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
+                                                    <span class="badge bg-success">Completed</span>
+                                                </div>
+                                                <hr>
+                                                <div class="d-flex">
+                                                    <img src="{{ asset('storage/' . $b->tasker_photo) }}"
+                                                        alt="Product Image" width="100" height="100"
+                                                        class="">
+                                                    <div class="ms-3">
+                                                        <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
+                                                        <p class="mb-1">{{ $b->tasker_code }}</p>
+                                                        <p class="mb-1">#{{ $b->booking_order_id }}</p>
+                                                        <p class="mb-0">
+                                                            {{ $b->service_rate }}/{{ $b->service_rate_type }}
+                                                        </p>
+                                                        <p class="mb-0">
+                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
+                                                            -
+                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
+                                                        </p>
 
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="text-muted">{{ $b->booking_address }}</span>
+                                                </div>
+                                                <hr>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="fw-bold">Total: <span
+                                                            class="text-danger">RM{{ $b->booking_rate }}</span></span>
+                                                    @if ($review->where('booking_id', $b->bookingID)->count() == 0)
+                                                        <div>
+                                                            <button class="btn btn-light-primary"data-bs-toggle="modal"
+                                                                data-bs-target="#reviewModalTwo-{{ $b->bookingID }}">Submit
+                                                                your
+                                                                review</button>
+                                                        </div>
+                                                    @else
+                                                        <div class="text-muted fst-italic"> Review Submitted </div>
+                                                    @endif
                                                 </div>
                                             </div>
-                                            <hr>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="text-muted">{{ $b->booking_address }}</span>
-                                            </div>
-                                            <hr>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="fw-bold">Total: <span
-                                                        class="text-danger">RM{{ $b->booking_rate }}</span></span>
-                                                @if ($review->where('booking_id', $b->bookingID)->count() == 0)
-                                                    <div>
-                                                        <button class="btn btn-primary"data-bs-toggle="modal"
-                                                            data-bs-target="#reviewModalTwo-{{ $b->bookingID }}">Submit
-                                                            your
-                                                            review</button>
+                                        @endforeach
+                                    </div>
+                                    <form method="POST" action="{{ route('client-submit-review') }}"
+                                        enctype="multipart/form-data">
+                                        @csrf
+                                        <div id="reviewModalTwo-{{ $b->bookingID }}" class="modal fade" tabindex="-1"
+                                            role="dialog" aria-labelledby="exampleModalLiveLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                                                role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLiveLabel">
+                                                            Review &
+                                                            Rate</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
                                                     </div>
-                                                @else
-                                                    <div class="text-muted fst-italic"> Review Submitted </div>
-                                                @endif
+                                                    <div class="modal-body">
+                                                        <div>
+                                                            <input type="hidden" value="{{ $b->bookingID }}"
+                                                                name="booking_id" style="display:none;">
+                                                        </div>
+                                                        <h6 class="mb-3">
+                                                            {{ $b->tasker_firstname . ' ' . $b->tasker_lastname }}
+                                                        </h6>
+                                                        <p class="text-muted small mb-4">
+                                                            {{ $b->tasker_code }}</p>
+                                                        <div class="mb-3">
+                                                            <label for="glsr-ltr" class="form-label"><strong>Work
+                                                                    Quality</strong></label>
+                                                            <select id="glsr-ltr" class="star-rating-old"
+                                                                name="review_rating">
+                                                                <option value="">Select a rating</option>
+                                                                <option value="5">Fantastic</option>
+                                                                <option value="4">Great</option>
+                                                                <option value="3">Good</option>
+                                                                <option value="2">Poor</option>
+                                                                <option value="1">Terrible</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="qualityInput"
+                                                                class="form-label"><strong>Review</strong></label>
+                                                            <textarea class="form-control" id="qualityInput" rows="8" cols="5"
+                                                                placeholder="Share your thoughts on the services to help other buyers." name="review_description"></textarea>
+                                                        </div>
+
+                                                        <div class="d-flex gap-2 justify-content-start mb-2">
+                                                            <div class="photo-slot text-center" id="addPhotoButton">
+                                                                <label
+                                                                    style="cursor: pointer; display: block; width: 100%;">
+                                                                    <input type="file" class="photoInput"
+                                                                        accept="image/*" multiple style="display: none;"
+                                                                        name="photos[]">
+                                                                    <img src="../../assets/images/image_upload.jpg"
+                                                                        alt="Add Picture"
+                                                                        style="width: 70%; display:block; margin: 0 auto; opacity: 0.6;">
+                                                                </label>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="mt-2 d-flex gap-2 photoPreviewContainer">
+
+                                                        </div>
+                                                        <p class="photoCounter" style="font-size: 14px;">0/4</p>
+                                                        <p class="errorMessage" style="color: red; display: none;">You
+                                                            can only
+                                                            upload up
+                                                            to 4 photos!</p>
+
+                                                        <div class="photoPreviewContainer" class="mt-2">
+                                                            <img class="photoPreview"
+                                                                style="max-width: 200px; display: none;"
+                                                                alt="Photo Preview">
+                                                        </div>
+
+                                                        <small class="text-muted">Add 50 characters with 1
+                                                            photo
+                                                        </small>
+
+
+                                                    </div>
+                                                    <div class="modal-footer justify-content-between align-items-center">
+
+                                                        <div class="center-form-check mb-3 mt-3">
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input"
+                                                                    id="anonymousCheck" name="review_type"
+                                                                    value="2">
+                                                                <label class="form-check-label small"
+                                                                    for="anonymousCheck">
+                                                                    Leave your review anonymously
+                                                                </label>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger">Submit</button>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <form method="POST" action="{{ route('client-submit-review') }}"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            <div id="reviewModalTwo-{{ $b->bookingID }}" class="modal fade"
-                                                tabindex="-1" role="dialog" aria-labelledby="exampleModalLiveLabel"
-                                                aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-                                                    role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="exampleModalLiveLabel">
-                                                                Review &
-                                                                Rate</h5>
-                                                            <button type="button" class="btn-close"
-                                                                data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <div>
-                                                                <input type="hidden" value="{{ $b->bookingID }}"
-                                                                    name="booking_id" style="display:none;">
-                                                            </div>
-                                                            <h6 class="mb-3">
-                                                                {{ $b->tasker_firstname . ' ' . $b->tasker_lastname }}
-                                                            </h6>
-                                                            <p class="text-muted small mb-4">
-                                                                {{ $b->tasker_code }}</p>
-                                                            <div class="mb-3">
-                                                                <label for="glsr-ltr" class="form-label"><strong>Work
-                                                                        Quality</strong></label>
-                                                                <select id="glsr-ltr" class="star-rating-old"
-                                                                    name="review_rating">
-                                                                    <option value="">Select a rating</option>
-                                                                    <option value="5">Fantastic</option>
-                                                                    <option value="4">Great</option>
-                                                                    <option value="3">Good</option>
-                                                                    <option value="2">Poor</option>
-                                                                    <option value="1">Terrible</option>
-                                                                </select>
-                                                            </div>
+                                    </form>
+                                @endforeach
+                            @else
+                                <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                                    <div class="d-flex justify-content-center align-items-center vh-100">
+                                        <div class="row justify-content-center">
+                                            <div class="col-12 mb-3">
+                                                <div class="text-center">
+                                                    <i class="fas fa-calendar-week f-68"></i>
 
-
-                                                            <div class="mb-3">
-                                                                <label for="qualityInput"
-                                                                    class="form-label"><strong>Review</strong></label>
-                                                                <textarea class="form-control" id="qualityInput" rows="8" cols="5"
-                                                                    placeholder="Share your thoughts on the services to help other buyers." name="review_description"></textarea>
-                                                            </div>
-
-                                                            <div class="d-flex gap-2 justify-content-start mb-2">
-                                                                <div class="photo-slot text-center" id="addPhotoButton">
-                                                                    <label
-                                                                        style="cursor: pointer; display: block; width: 100%; height: 100%;">
-                                                                        <input type="file" class="photoInput"
-                                                                            accept="image/*" multiple
-                                                                            style="display: none;" name="photos[]">
-                                                                        <img src="image.png" alt="Add Picture"
-                                                                            style="width: 50px; height: 50px; opacity: 0.6;">
-                                                                    </label>
-                                                                </div>
-
-                                                            </div>
-                                                            <div class="mt-2 d-flex gap-2 photoPreviewContainer">
-
-                                                            </div>
-                                                            <p class="photoCounter" style="font-size: 14px;">0/4</p>
-                                                            <p class="errorMessage" style="color: red; display: none;">You
-                                                                can only
-                                                                upload up
-                                                                to 4 photos!</p>
-
-                                                            <div class="photoPreviewContainer" class="mt-2">
-                                                                <img class="photoPreview"
-                                                                    style="max-width: 200px; display: none;"
-                                                                    alt="Photo Preview">
-                                                            </div>
-
-                                                            <small class="text-muted">Add 50 characters with 1
-                                                                photo
-                                                            </small>
-
-
-                                                        </div>
-                                                        <div
-                                                            class="modal-footer justify-content-between align-items-center">
-
-                                                            <div class="center-form-check mb-3 mt-3">
-                                                                <div class="form-check">
-                                                                    <input type="checkbox" class="form-check-input"
-                                                                        id="anonymousCheck" name="review_type"
-                                                                        value="2">
-                                                                    <label class="form-check-label small"
-                                                                        for="anonymousCheck">
-                                                                        Leave your review anonymously
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-
-                                                            <div>
-                                                                <button type="button" class="btn btn-secondary"
-                                                                    data-bs-dismiss="modal">Cancel</button>
-                                                                <button type="submit"
-                                                                    class="btn btn-danger">Submit</button>
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
                                                 </div>
                                             </div>
-                                        </form>
-                                    @endforeach
+                                            <div class="col-12">
+                                                <p class="mb-0 text-center f-18">No booking yet</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            @endforeach
+                            @endif
                         </div>
 
                         <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="allbooking-tab">
-                            @foreach ($cancelled as $date => $booking)
-                                <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
-                                    <h3 class="mb-3 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}</h3>
-                                    @foreach ($booking as $b)
-                                        <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
-                                                <span class="badge bg-danger">Cancelled</span>
+                            @if ($cancelled->count() >= 1)
+                                @foreach ($cancelled as $date => $booking)
+                                    <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                                        <h3 class="mb-3 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}
+                                        </h3>
+                                        @foreach ($booking as $b)
+                                            <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
+                                                    <span class="badge bg-danger">Cancelled</span>
+                                                </div>
+                                                <hr>
+                                                <div class="d-flex">
+                                                    <img src="{{ asset('storage/' . $b->tasker_photo) }}"
+                                                        alt="Product Image" width="100" height="100"
+                                                        class="">
+                                                    <div class="ms-3">
+                                                        <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
+                                                        <p class="mb-1">{{ $b->tasker_code }}</p>
+                                                        <p class="mb-1">#{{ $b->booking_order_id }}</p>
+                                                        <p class="mb-0">
+                                                            {{ $b->service_rate }}/{{ $b->service_rate_type }}
+                                                        </p>
+                                                        <p class="mb-0">
+                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
+                                                            -
+                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
+                                                        </p>
+
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="d-flex justify-content-between align-items-center">
+
+                                                    <span class="text-muted">{{ $b->booking_address }}</span>
+                                                </div>
+                                                <hr>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="fw-bold">Total: <span
+                                                            class="text-danger">RM{{ $b->booking_rate }}</span></span>
+                                                </div>
                                             </div>
-                                            <hr>
-                                            <div class="d-flex">
-                                                <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Product Image"
-                                                    width="100" height="100" class="">
-                                                <div class="ms-3">
-                                                    <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
-                                                    <p class="mb-1">{{ $b->tasker_code }}</p>
-                                                    <p class="mb-0">{{ $b->service_rate }}/{{ $b->service_rate_type }}
-                                                    </p>
-                                                    <p class="mb-0">
-                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
-                                                        -
-                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
-                                                    </p>
+                                        @endforeach
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                                    <div class="d-flex justify-content-center align-items-center vh-100">
+                                        <div class="row justify-content-center">
+                                            <div class="col-12 mb-3">
+                                                <div class="text-center">
+                                                    <i class="fas fa-calendar-week f-68"></i>
 
                                                 </div>
                                             </div>
-                                            <hr>
-                                            <div class="d-flex justify-content-between align-items-center">
-
-                                                <span class="text-muted">{{ $b->booking_address }}</span>
-                                            </div>
-                                            <hr>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="fw-bold">Total: <span
-                                                        class="text-danger">RM{{ $b->booking_rate }}</span></span>
+                                            <div class="col-12">
+                                                <p class="mb-0 text-center f-18">No booking yet</p>
                                             </div>
                                         </div>
-                                    @endforeach
+                                    </div>
                                 </div>
-                            @endforeach
+                            @endif
                         </div>
+
                         <div class="tab-pane fade" id="refund" role="tabpanel" aria-labelledby="allbooking-tab">
-                            @foreach ($refund as $date => $booking)
-                                <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
-                                    <h3 class="mb-3 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}</h3>
-                                    @foreach ($booking as $b)
-                                        <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
-                                                @if ($b->booking_status == 7)
-                                                    <span class="badge bg-light-warning">Pending Refund</span>
-                                                @elseif($b->booking_status == 8)
-                                                    <span class="badge bg-light-success">Refunded</span>
-                                                @endif
+                            @if ($refund->count() >= 1)
+                                @foreach ($refund as $date => $booking)
+                                    <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                                        <h3 class="mb-3 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}
+                                        </h3>
+                                        @foreach ($booking as $b)
+                                            <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
+                                                    @if ($b->booking_status == 7)
+                                                        <span class="badge bg-light-warning">Pending Refund</span>
+                                                    @elseif($b->booking_status == 8)
+                                                        <span class="badge bg-light-success">Refunded</span>
+                                                    @endif
+                                                </div>
+                                                <hr>
+                                                <div class="d-flex">
+                                                    <img src="{{ asset('storage/' . $b->tasker_photo) }}"
+                                                        alt="Product Image" width="100" height="100"
+                                                        class="">
+                                                    <div class="ms-3">
+                                                        <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
+                                                        <p class="mb-1">{{ $b->tasker_code }}</p>
+                                                        <p class="mb-1">#{{ $b->booking_order_id }}</p>
+                                                        <p class="mb-0">
+                                                            {{ $b->service_rate }}/{{ $b->service_rate_type }}
+                                                        </p>
+                                                        <p class="mb-0">
+                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
+                                                            -
+                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
+                                                        </p>
+
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="text-muted">{{ $b->booking_address }}</span>
+                                                </div>
+                                                <hr>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="fw-bold">Total: <span
+                                                            class="text-danger">RM{{ $b->booking_rate }}</span></span>
+                                                    <button class="btn btn-light-secondary" type="button"
+                                                        data-bs-target="#refundDetails-{{ $b->bookingID }}"
+                                                        data-bs-toggle="modal">View Refund Details</button>
+                                                </div>
                                             </div>
-                                            <hr>
-                                            <div class="d-flex">
-                                                <img src="{{ asset('storage/' . $b->tasker_photo) }}" alt="Product Image"
-                                                    width="100" height="100" class="">
-                                                <div class="ms-3">
-                                                    <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
-                                                    <p class="mb-1">{{ $b->tasker_code }}</p>
-                                                    <p class="mb-0">{{ $b->service_rate }}/{{ $b->service_rate_type }}
-                                                    </p>
-                                                    <p class="mb-0">
-                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_start)->format('g:i A') }}
-                                                        -
-                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
-                                                    </p>
+                                        @endforeach
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
+                                    <div class="d-flex justify-content-center align-items-center vh-100">
+                                        <div class="row justify-content-center">
+                                            <div class="col-12 mb-3">
+                                                <div class="text-center">
+                                                    <i class="fas fa-calendar-week f-68"></i>
 
                                                 </div>
                                             </div>
-                                            <hr>
-                                            <div class="d-flex justify-content-between align-items-center">
-
-                                                <span class="text-muted">{{ $b->booking_address }}</span>
-                                            </div>
-                                            <hr>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="fw-bold">Total: <span
-                                                        class="text-danger">RM{{ $b->booking_rate }}</span></span>
+                                            <div class="col-12">
+                                                <p class="mb-0 text-center f-18">No booking yet</p>
                                             </div>
                                         </div>
-                                    @endforeach
+                                    </div>
                                 </div>
-                            @endforeach
+                            @endif
+                            {{-- @foreach ($refunds as $rf)
+                                <div class="modal fade" id="refundDetails"
+                                    data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-sm-12 mb-3">
+                                                        <h4>Refund Details</h4>
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="mb-3">
+                                                                    <label for="cr_reason" class="form-label">Refund
+                                                                        Reason
+                                                                        <span class="text-danger">*</span></label>
+                                                                    <textarea name="cr_reason" id="cr_reason" cols="30" rows="10" class="form-control"
+                                                                        placeholder="Enter your reason ...">{{ $rf->cr_reason }}</textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-12">
+                                                                <div class="mb-3">
+                                                                    <label for="cr_bank_name" class="form-label">Bank
+                                                                        Name<span class="text-danger">*</span></label>
+                                                                    <select name="cr_bank_name"
+                                                                        class="form-control @error('cr_bank_name') is-invalid @enderror"
+                                                                        id="cr_bank_name">
+                                                                        <option value="">Select
+                                                                            Bank
+                                                                        </option>
+                                                                        @foreach ($bank as $banks)
+                                                                            <option value="{{ $banks['bank'] }}">
+                                                                                {{ $banks['bank'] }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                    @error('cr_bank_name')
+                                                                        <div class="invalid-feedback">
+                                                                            {{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-12">
+                                                                <div class="mb-3">
+                                                                    <label for="cr_account_name"
+                                                                        class="form-label">Account
+                                                                        Holder Name</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="cr_account_name"
+                                                                        placeholder="Enter your account holder name"
+                                                                        id="cr_account_name"
+                                                                        value="{{ $rf->cr_account_name }}">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-12">
+                                                                <div class="mb-3">
+                                                                    <label for="cr_account_number"
+                                                                        class="form-label">Account
+                                                                        Number<span class="text-danger">*</span></label>
+                                                                    <input type="text"
+                                                                        class="form-control @error('cr_account_number') is-invalid @enderror"
+                                                                        name="cr_account_number"
+                                                                        placeholder="Enter your account number"
+                                                                        id="cr_account_number">
+                                                                    @error('cr_account_number')
+                                                                        <div class="invalid-feedback">
+                                                                            {{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-12">
+                                                                <div class="mb-3">
+                                                                    <table class="table-refund">
+                                                                        <tr class="mb-3">
+                                                                            <td>Total Paid</td>
+                                                                            <td>{{ $b->booking_rate }}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr class="mb-3">
+                                                                            <td class="text-danger">Service
+                                                                                Charge (3%)</td>
+                                                                            <td class="text-danger">
+                                                                                {{ number_format($b->booking_rate * 0.03, 2) }}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr class="mb-3">
+                                                                            <td>Amount to be refunded
+                                                                            </td>
+                                                                            <td>{{ $b->booking_rate - number_format($b->booking_rate * 0.03, 2) }}
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                    <input type="hidden" class="form-control"
+                                                                        name="cr_amount"
+                                                                        value ="{{ $b->booking_rate - number_format($b->booking_rate * 0.03, 2) }}">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div
+                                                            class="d-flex justify-content-between gap-3 align-items-center">
+                                                            <button type="button" class="btn btn-light btn-pc-default"
+                                                                data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-light-danger"
+                                                                data-bs-dismiss="modal">Confirm
+                                                                Refund</button>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach --}}
                         </div>
                     </div>
                 </div>
@@ -984,6 +1373,23 @@
         // function updateCounter(photoCounter) {
         //     photoCounter.innerText = `${uploadedPhotos.length}/${maxPhotos}`;
         // }
+
+
+        function saveBookingIDToLocalStorage(button) {
+            // Get the booking ID from the data attribute
+            const bookingID = button.getAttribute('data-booking-id');
+            // Save it to localStorage
+            localStorage.setItem('selectedBookingID', bookingID);
+            console.log('Booking ID saved to localStorage:', bookingID); // Optional: For debugging
+
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            @if ($errors->any())
+                var booking = localStorage.getItem('selectedBookingID');
+                var modal = new bootstrap.Modal(document.getElementById('refundBookingModalTwo-' + booking));
+                modal.show();
+            @endif
+        });
         let uploadedPhotos = [];
         const maxPhotos = 4;
 
@@ -1035,7 +1441,8 @@
                                 updateInputFiles(photoInput);
                                 updateCounter(photoCounter);
                                 toggleAddPhotoButton(
-                                addPhotoButton); // Enable the button again if max is not reached
+                                    addPhotoButton
+                                ); // Enable the button again if max is not reached
                             });
 
                             div.appendChild(img);
@@ -1046,7 +1453,7 @@
                             updateInputFiles(photoInput);
                             updateCounter(photoCounter);
                             toggleAddPhotoButton(
-                            addPhotoButton); // Disable the button if max is reached
+                                addPhotoButton); // Disable the button if max is reached
                         };
 
                         reader.readAsDataURL(file);

@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
+            $table->string('booking_order_id')->unique();
             $table->date('booking_date');
             $table->text('booking_address');
-            $table->string('booking_order_id')->references('trans_order_id')->on('transaction');
             $table->decimal('booking_latitude', 10, 8)->nullable();
             $table->decimal('booking_longitude', 11, 8)->nullable();
             $table->time('booking_time_start')->nullable();

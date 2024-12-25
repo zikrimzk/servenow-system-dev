@@ -1,0 +1,107 @@
+[
+    {
+        "id": "2",
+        "bank": "CIMB Bank",
+        "status": "1"
+    },
+    {
+        "id": "3",
+        "bank": "Bank Islam",
+        "status": "1"
+    },
+    {
+        "id": "4",
+        "bank": "Public Bank",
+        "status": "1"
+    },
+    {
+        "id": "5",
+        "bank": "Hong Leong Bank",
+        "status": "1"
+    },
+    {
+        "id": "6",
+        "bank": "RHB Bank",
+        "status": "1"
+    },
+    {
+        "id": "7",
+        "bank": "Ambank",
+        "status": "1"
+    },
+    {
+        "id": "8",
+        "bank": "Bank Rakyat",
+        "status": "1"
+    },
+    {
+        "id": "9",
+        "bank": "Alliance Bank",
+        "status": "1"
+    },
+    {
+        "id": "10",
+        "bank": "Affin Bank",
+        "status": "1"
+    },
+    {
+        "id": "11",
+        "bank": "Bank Muamalat",
+        "status": "1"
+    },
+    {
+        "id": "12",
+        "bank": "Bank Simpanan Nasional",
+        "status": "1"
+    },
+    {
+        "id": "13",
+        "bank": "Standard Chartered",
+        "status": "1"
+    },
+    {
+        "id": "14",
+        "bank": "OCBC Bank",
+        "status": "1"
+    },
+    {
+        "id": "15",
+        "bank": "Agro Bank",
+        "status": "1"
+    },
+    {
+        "id": "16",
+        "bank": "UOB Bank",
+        "status": "1"
+    },
+    {
+        "id": "17",
+        "bank": "HSBC",
+        "status": "1"
+    },
+    {
+        "id": "18",
+        "bank": "Kuwait Finance House",
+        "status": "1"
+    },
+    {
+        "id": "21",
+        "bank": "Al Rajhi Bank",
+        "status": "1"
+    },
+    {
+        "id": "22",
+        "bank": "Citibank Berhad",
+        "status": "1"
+    },
+    {
+        "id": "23",
+        "bank": "Maybank",
+        "status": "1"
+    },
+    {
+        "id": "24",
+        "bank": "MBSB Bank",
+        "status": "1"
+    }
+]

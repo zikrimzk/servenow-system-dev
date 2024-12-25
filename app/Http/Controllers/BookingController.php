@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Tasker;
 use App\Models\Booking;
+use App\Models\CancelRefundBooking;
 use App\Models\Review;
 use App\Models\TimeSlot;
 use Illuminate\Support\Str;
@@ -177,7 +178,7 @@ class BookingController extends Controller
         try {
             //PAYMENT GATEWAY CODE HERE
             $formattedDate = Carbon::parse($request->booking_date)
-                ->addDays(3)
+                ->addDays(7)
                 ->format('d-m-Y H:i:s');
 
             $now = Carbon::now();
@@ -263,6 +264,7 @@ class BookingController extends Controller
                 ->where('a.slot_date', '=', $booking['booking_date'])
                 ->whereBetween('b.time', [$booking['booking_time_start'], $new_end_time])
                 ->where('a.slot_status', '=', 1)
+                ->lockForUpdate()
                 ->select('a.id as tasker_time_id', 'b.id as time_id', 'a.slot_date', 'a.slot_status', 'a.slot_id', 'b.time', 'b.slot_category')
                 ->get();
 
@@ -271,12 +273,80 @@ class BookingController extends Controller
                     ->where('id', '=', $s->tasker_time_id)
                     ->update(['slot_status' => 2]);
             }
-            
-            DB::table('transactions')->insert([
-                'trans_order_id' => $orderID
-            ]);
 
             Booking::create($booking);
+            DB::table('transactions')->insert([
+                'booking_order_id' => $orderID
+            ]);
+
+            //REDIRECTED TO PAYMENT PAGE
+            if (is_array($obj) && isset($obj[0]->BillCode)) {
+                // Redirect to the payment page
+                return redirect('https://dev.toyyibpay.com/' . $obj[0]->BillCode);
+            } else {
+                Log::error('Invalid response from ToyyibPay API', [
+                    'response' => $result,
+                    'data_sent' => $some_data
+                ]);
+                return back()->with('error', 'Failed to create a bill. Please try again later.');
+            }
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function clientToPayFunction(Request $request)
+    {
+        try {
+            //PAYMENT GATEWAY CODE HERE
+            $formattedDate = Carbon::parse($request->booking_date)
+                ->addDays(7)
+                ->format('d-m-Y H:i:s');
+
+            // Prepare data for the API
+            $some_data = [
+                'userSecretKey' => 'xmj59q1q-povy-vgdw-y5xd-ohqv7lrxlhts', // Ensure the key is correct
+                'categoryCode' => 'xzn4xeqb',
+                'billName' => 'ServeNow Bill',
+                'billDescription' => 'test',
+                'billPriceSetting' => 1,
+                'billPayorInfo' => 1,
+                'billAmount' => '100', // Ensure the amount is formatted as a string
+                'billReturnUrl' => route('client-payment-status'), // Ensure this route exists
+                'billCallbackUrl' => route('client-callback'), // Ensure this callback URL is reachable
+                'billExternalReferenceNo' => $request->orderID,
+                'billTo' => Auth::user()->client_firstname . ' ' . Auth::user()->client_lastname, // Ensure Auth::user() returns a valid user
+                'billEmail' => Auth::user()->email, // Ensure the user's email is valid
+                'billPhone' => Auth::user()->client_phoneno, // Ensure the phone number is valid
+                'billSplitPayment' => 0,
+                'billSplitPaymentArgs' => '',
+                'billPaymentChannel' => '0',
+                'billContentEmail' => 'Thank you for purchasing our product!',
+                'billChargeToCustomer' => 1,
+                'billExpiryDate' => $formattedDate, // Ensure the formatted date is correct
+                'billExpiryDays' => 3
+            ];
+
+            // Initialize CURL
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_URL, 'https://dev.toyyibpay.com/index.php/api/createBill');
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $some_data);
+
+            // Execute CURL and handle response
+            $result = curl_exec($curl);
+
+            // Check for CURL errors
+            if (curl_errno($curl)) {
+                throw new Exception('CURL Error: ' . curl_error($curl));
+            }
+
+            curl_close($curl);
+
+            // Decode the response
+            $obj = json_decode($result);
 
             //REDIRECTED TO PAYMENT PAGE
             if (is_array($obj) && isset($obj[0]->BillCode)) {
@@ -599,8 +669,6 @@ class BookingController extends Controller
 
     public function clientReviewBooking(Request $request)
     {
-
-        dd($request);
         try {
 
             $validated = $request->validate([
@@ -650,5 +718,28 @@ class BookingController extends Controller
 
             return back()->with('error', 'An unexpected error occurred. Please try again.');
         }
+    }
+
+    public function clientRefundRequest(Request $request, $id)
+    {
+        $formattedDate = Carbon::parse(Carbon::now())
+            ->format('Y-m-d');
+        $validated = $request->validate([
+            'cr_reason' => 'required',
+            'cr_amount' => 'required',
+            'cr_bank_name' => 'required',
+            'cr_account_name' => 'required',
+            'cr_account_number' => 'required',
+        ]);
+        $validated['cr_date'] = $formattedDate;
+        $validated['cr_status'] = 1;
+        $validated['booking_id'] = $id;
+        CancelRefundBooking::create($validated);
+
+        $booking = Booking::findOrFail($id);
+        $booking->booking_status = 7;
+        $booking->save();
+
+        return back()->with('success', 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account. ');
     }
 }
