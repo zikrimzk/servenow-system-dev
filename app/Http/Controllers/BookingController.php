@@ -714,7 +714,7 @@ class BookingController extends Controller
             }
             $imagePaths = array_pad($imagePaths, 4, null);
 
-            $review = Review::create([
+            Review::create([
                 'review_rating' => $validated['review_rating'],
                 'review_description' => $validated['review_description'],
                 'review_imageOne' => $imagePaths[0],
@@ -725,6 +725,25 @@ class BookingController extends Controller
                 'review_date_time' => now(),
                 'booking_id' => $validated['booking_id']
             ]);
+
+            $totalreviewcount = DB::table('reviews as a')
+                ->join('bookings as b', 'a.booking_id', '=', 'b.id')
+                ->join('services as c', 'b.service_id', '=', 'c.id')
+                ->where('c.tasker_id', '=', $request->tasker_id)
+                ->select('a.id')
+                ->count();
+            $totalRating =  DB::table('reviews as a')
+                ->join('bookings as b', 'a.booking_id', '=', 'b.id')
+                ->join('services as c', 'b.service_id', '=', 'c.id')
+                ->where('c.tasker_id', '=', $request->tasker_id)
+                ->select('a.review_rating')
+                ->sum('a.review_rating');
+
+            $finalRating =  number_format($totalRating / $totalreviewcount, 1);
+
+            Tasker::where('id', $request->tasker_id)->update(['tasker_rating' =>  $finalRating]);
+
+
             return back()->with('success', 'Review submitted successfully!');
         } catch (Exception $e) {
 
@@ -805,12 +824,11 @@ class BookingController extends Controller
     public function adminBookingRefundProcess($bookingid, $refundid, $option)
     {
         try {
-        
+
             if ($option == 1) {
                 Booking::where('id', $bookingid)->update(['booking_status' => 10]);
                 CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 3]);
                 $message = 'Refund Request Rejected';
-
             } else if ($option == 2) {
                 Booking::where('id', $bookingid)->update(['booking_status' => 8]);
                 CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 2]);
@@ -825,7 +843,7 @@ class BookingController extends Controller
                     ->update(['c.tasker_selfrefund_count' => DB::raw('tasker_selfrefund_count + 1')]);
 
                 $message = 'Refund Request Approved + Penalize Tasker';
-            }else{
+            } else {
                 return back()->with('error', 'Opps , invalid option. Please try again.');
             }
 

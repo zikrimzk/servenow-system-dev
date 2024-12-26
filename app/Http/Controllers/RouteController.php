@@ -630,7 +630,7 @@ class RouteController extends Controller
                     $status = '<span class="badge bg-danger">Cancelled</span>';
                 } else if ($row->booking_status == 6) {
                     $status = '<span class="badge bg-success">Completed</span>';
-                }else if ($row->booking_status == 6) {
+                } else if ($row->booking_status == 6) {
                     $status = '<span class="badge bg-success">Completed</span>';
                 }
                 return $status;
@@ -726,7 +726,7 @@ class RouteController extends Controller
                 'f.cr_account_name',
                 'f.cr_account_number'
             )
-            ->whereIn('a.booking_status', [7,8])
+            ->whereIn('a.booking_status', [7, 8])
             ->where('b.tasker_id', Auth::user()->id)
             ->orderbyDesc('a.booking_date')
             ->get();
@@ -769,10 +769,8 @@ class RouteController extends Controller
 
                 if ($row->booking_status == 7) {
                     $status = '<span class="badge bg-light-warning">Pending Refund</span>';
-
                 } else if ($row->booking_status == 8) {
                     $status = '<span class="badge bg-light-success">Refunded</span>';
-                    
                 }
                 return $status;
             });
@@ -791,7 +789,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['client', 'booking_date', 'booking_time','refund_amount', 'booking_status', 'action']);
+            $table->rawColumns(['client', 'booking_date', 'booking_time', 'refund_amount', 'booking_status', 'action']);
 
             return $table->make(true);
         }
@@ -1279,7 +1277,7 @@ class RouteController extends Controller
                 'a.booking_status',
                 'a.booking_note',
                 'a.booking_rate',
-                'a.booking_order_id', 
+                'a.booking_order_id',
                 'c.servicetype_name',
                 'd.tasker_firstname',
                 'd.tasker_lastname',
@@ -1486,12 +1484,12 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time','refund_amount', 'booking_status', 'action']);
+            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time', 'refund_amount', 'booking_status', 'action']);
 
             return $table->make(true);
         }
         return view('administrator.booking.refunded-list-index', [
-            'title' => 'Refunded Booking List',
+            'title' => 'Refund Booking List',
             'books' => $data,
         ]);
     }
@@ -1602,6 +1600,118 @@ class RouteController extends Controller
             'books' => $data,
         ]);
     }
+
+    //to be continue..
+    public function adminReviewManagementNav(Request $request)
+    {
+        $data = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->select(
+                'a.id as bookingID',
+                'b.id as serviceID',
+                'c.id as typeID',
+                'd.id as taskerID',
+                'f.id as refundID',
+                'a.booking_date',
+                'a.booking_address',
+                'a.booking_time_start',
+                'a.booking_time_end',
+                'a.booking_status',
+                'a.booking_note',
+                'a.booking_rate',
+                'a.booking_order_id',
+                'c.servicetype_name',
+                'd.tasker_firstname',
+                'd.tasker_lastname',
+                'd.tasker_phoneno',
+                'd.email as tasker_email',
+                'd.tasker_code',
+                'e.client_firstname',
+                'e.client_lastname',
+                'e.client_phoneno',
+                'e.email as client_email',
+                'f.review_status',
+                'f.review_rating',
+                'f.review_description',
+                'f.review_date_time',
+                'f.review_imageOne',
+                'f.review_imageTwo',
+                'f.review_imageThree',
+                'f.review_imageFour',
+                'f.review_type',
+            )
+            ->orderbyDesc('a.booking_date')
+            ->get();
+
+        if ($request->ajax()) {
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('booking_order_id', function ($row) {
+                $tasker = '<button class="btn btn-link link-primary">' . $row->booking_order_id . '</button>';
+                return $tasker;
+            });
+
+            $table->addColumn('client', function ($row) {
+                $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
+                return $client;
+            });
+
+            $table->addColumn('review_rating', function ($row) {
+
+                $rating='';
+                for ($i = 1; $i <= $row->review_rating; $i++) {
+                    $rating .= '<i class="fas fa-star text-warning"></i>';
+                }
+                return $rating;
+            });
+
+
+            $table->addColumn('review_date_time', function ($row) {
+
+                $datetime = Carbon::parse($row->review_date_time)->setTimezone('Asia/Kuala_Lumpur')->format('d F Y g:i A');
+                return $datetime;
+            });
+
+            $table->addColumn('review_status', function ($row) {
+
+                if ($row->review_status == 1) {
+                    $status = '<span class="badge bg-success">Show</span>';
+                } else if ($row->review_status == 2) {
+                    $status = '<span class="badge bg-danger">Hide</span>';
+                }
+
+                return $status;
+            });
+
+            $table->addColumn('action', function ($row) {
+
+                $button =
+                    '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
+                            <i class="ti ti-eye f-20"></i>
+                        </a>
+                    ';
+
+
+                return $button;
+            });
+
+            $table->rawColumns(['booking_order_id', 'client', 'review_rating', 'review_date_time', 'review_status', 'action']);
+
+            return $table->make(true);
+        }
+        return view('administrator.performance.review-index', [
+            'title' => 'Review Management',
+        ]);
+    }
+
+
 
 
 

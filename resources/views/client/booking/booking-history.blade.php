@@ -516,7 +516,7 @@
                             @endforeach
                         </div> --}}
 
-                        <div class="tab-pane fade show active" id="toserve" role="tabpanel" aria-labelledby="toserve-tab">
+                        <div class="tab-pane fade show active" id="toserve" role="tabpanel">
                             @if ($toServeBooking->count() >= 1)
                                 @foreach ($toServeBooking as $date => $bookings)
                                     <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
@@ -856,7 +856,7 @@
                             @endif
                         </div>
 
-                        <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="allbooking-tab">
+                        <div class="tab-pane fade" id="completed" role="tabpanel">
                             @if ($completed->count() >= 1)
                                 @foreach ($completed as $date => $booking)
                                     <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
@@ -899,7 +899,7 @@
                                                     @if ($review->where('booking_id', $b->bookingID)->count() == 0)
                                                         <div>
                                                             <button class="btn btn-light-primary"data-bs-toggle="modal"
-                                                                data-bs-target="#reviewModalTwo-{{ $b->bookingID }}">Submit
+                                                                data-bs-target="#reviewModal-{{ $b->booking_order_id }}">Submit
                                                                 your
                                                                 review</button>
                                                         </div>
@@ -913,7 +913,8 @@
                                     <form method="POST" action="{{ route('client-submit-review') }}"
                                         enctype="multipart/form-data">
                                         @csrf
-                                        <div id="reviewModalTwo-{{ $b->bookingID }}" class="modal fade" tabindex="-1"
+
+                                        <div id="reviewModal-{{ $b->booking_order_id }}" class="modal fade" tabindex="-1"
                                             role="dialog" aria-labelledby="exampleModalLiveLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
                                                 role="document">
@@ -928,7 +929,9 @@
                                                     <div class="modal-body">
                                                         <div>
                                                             <input type="hidden" value="{{ $b->bookingID }}"
-                                                                name="booking_id" style="display:none;">
+                                                                name="booking_id">
+                                                            <input type="hidden" value="{{ $b->taskerID }}"
+                                                                name="tasker_id">
                                                         </div>
                                                         <h6 class="mb-3">
                                                             {{ $b->tasker_firstname . ' ' . $b->tasker_lastname }}
@@ -1035,7 +1038,7 @@
                             @endif
                         </div>
 
-                        <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="allbooking-tab">
+                        <div class="tab-pane fade" id="cancelled" role="tabpanel">
                             @if ($cancelled->count() >= 1)
                                 @foreach ($cancelled as $date => $booking)
                                     <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
@@ -1100,7 +1103,7 @@
                             @endif
                         </div>
 
-                        <div class="tab-pane fade" id="refund" role="tabpanel" aria-labelledby="allbooking-tab">
+                        <div class="tab-pane fade" id="refund" role="tabpanel">
                             @if ($refund->count() >= 1)
                                 @foreach ($refund as $date => $booking)
                                     <div class="card p-3 mb-3 border border-2 shadow shadow-sm">

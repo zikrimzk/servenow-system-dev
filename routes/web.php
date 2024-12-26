@@ -127,7 +127,9 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     // Admin - Booking Management [Refund Request]
     Route::get('/refund-request', [RouteController::class, 'adminBookingRefundReqNav'])->name('admin-refund-request');
     Route::get('/approve-reject-refund/{bookingid}/{refundid}/{option}', [BookingController::class, 'adminBookingRefundProcess'])->name('admin-change-refund-status');
-
+ 
+    // Admin - Performance > Review Management\
+    Route::get('/review-management', [RouteController::class, 'adminReviewManagementNav'])->name('admin-review-management');
 
 
 
