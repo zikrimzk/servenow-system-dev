@@ -307,13 +307,13 @@ class RouteController extends Controller
 
         $groupedBookings = $booking->groupBy('booking_date');
         $refund = collect($booking)
-            ->whereIn('booking_status', [7, 8 , 9])
+            ->whereIn('booking_status', [7, 8, 9, 10])
             ->groupBy('booking_date');
 
         $review = Review::all();
         $refunds = DB::table('cancel_refund_bookings')->get();
         // dd($refunds->booking_id);
-        
+
         $bank = json_decode(file_get_contents(public_path('assets/json/bank.json')), true);
 
         return view('client.booking.booking-history', [
@@ -587,7 +587,7 @@ class RouteController extends Controller
                 'e.email as client_email',
 
             )
-            ->whereNotIn('a.booking_status', [7, 8])
+            ->whereNotIn('a.booking_status', [7, 8, 9, 10])
             ->where('b.tasker_id', Auth::user()->id)
             ->orderbyDesc('a.booking_date')
             ->get();
@@ -1173,7 +1173,7 @@ class RouteController extends Controller
                 'e.email as client_email',
 
             )
-            ->whereNotIn('a.booking_status', [7, 8])
+            ->whereNotIn('a.booking_status', [7, 8, 9, 10])
             ->orderbyDesc('a.booking_date')
             ->get();
 
@@ -1291,7 +1291,7 @@ class RouteController extends Controller
                 'e.email as client_email',
 
             )
-            ->whereIn('a.booking_status', [8])
+            ->whereIn('a.booking_status', [8, 10])
             ->orderbyDesc('a.booking_date')
             ->get();
 
@@ -1325,10 +1325,10 @@ class RouteController extends Controller
 
             $table->addColumn('booking_status', function ($row) {
 
-                if ($row->booking_status == 7) {
-                    $status = '<span class="badge bg-light-warning">Pending Refund</span>';
-                } else if ($row->booking_status == 8) {
+                if ($row->booking_status == 8) {
                     $status = '<span class="badge bg-light-success">Refunded</span>';
+                } else if ($row->booking_status == 10) {
+                    $status = '<span class="badge bg-light-danger">Rejected</span>';
                 }
                 return $status;
             });
@@ -1360,6 +1360,7 @@ class RouteController extends Controller
     public function adminBookingRefundReqNav(Request $request)
     {
         $data = DB::table('bookings as a')
+            ->join('cancel_refund_bookings as f', 'a.id', 'f.booking_id')
             ->join('services as b', 'a.service_id', 'b.id')
             ->join('service_types as c', 'b.service_type_id', 'c.id')
             ->join('taskers as d', 'b.tasker_id', 'd.id')
@@ -1369,6 +1370,7 @@ class RouteController extends Controller
                 'b.id as serviceID',
                 'c.id as typeID',
                 'd.id as taskerID',
+                'f.id as refundID',
                 'a.booking_date',
                 'a.booking_address',
                 'a.booking_time_start',
@@ -1376,6 +1378,7 @@ class RouteController extends Controller
                 'a.booking_status',
                 'a.booking_note',
                 'a.booking_rate',
+                'a.booking_order_id',
                 'c.servicetype_name',
                 'd.tasker_firstname',
                 'd.tasker_lastname',
@@ -1386,9 +1389,15 @@ class RouteController extends Controller
                 'e.client_lastname',
                 'e.client_phoneno',
                 'e.email as client_email',
-
+                'f.cr_reason',
+                'f.cr_status',
+                'f.cr_date',
+                'f.cr_amount',
+                'f.cr_bank_name',
+                'f.cr_account_name',
+                'f.cr_account_number'
             )
-            ->whereIn('a.booking_status', [7,9])
+            ->whereIn('a.booking_status', [7, 9])
             ->orderbyDesc('a.booking_date')
             ->get();
 
@@ -1427,7 +1436,7 @@ class RouteController extends Controller
                 } else if ($row->booking_status == 9) {
                     $status = '<span class="badge bg-light-danger">Require Update</span>';
                 }
-                
+
                 return $status;
             });
 

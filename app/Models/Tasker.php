@@ -41,5 +41,6 @@ class Tasker extends Authenticatable
         'latitude',
         'longitude',
         'working_radius',
+        'tasker_selfrefund_count',
     ];
 }

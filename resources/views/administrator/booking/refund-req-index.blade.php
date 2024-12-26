@@ -71,7 +71,7 @@ use Carbon\Carbon;
                                             <th scope="col">Tasker</th>
                                             <th scope="col">Client</th>
                                             <th scope="col">Booking Date</th>
-                                            <th scope="col">Booking Time</th>
+                                            <th scope="col">Refund Amount</th>
                                             <th scope="col">Booking Status</th>
                                             <th scope="col">Action</th>
                                         </tr>
@@ -86,144 +86,166 @@ use Carbon\Carbon;
 
             @foreach ($books as $b)
                 <!-- Modal View Booking Details Start Here-->
-                <form action="{{ route('admin-booking-update', $b->bookingID) }}" method="POST">
-                    @csrf
-                    <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false"
-                        tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="mb-0">Booking Details</h5>
-                                    <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
-                                        data-bs-dismiss="modal">
-                                        <i class="ti ti-x f-20"></i>
-                                    </a>
-                                </div>
 
-                                <div class="modal-body">
-                                    <div class="row">
+                <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false" tabindex="-1"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="mb-0">Booking Details ({{ $b->booking_order_id }})</h5>
+                                <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
+                                    data-bs-dismiss="modal">
+                                    <i class="ti ti-x f-20"></i>
+                                </a>
+                            </div>
 
-                                        <h5 class="mb-3">A. Tasker Details</h5>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Tasker Code</label>
-                                                <input type="text" class="form-control" value="{{ $b->tasker_code }}"
-                                                    disabled />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Tasker Name</label>
-                                                <input type="text" class="form-control"
-                                                    value="{{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) }}"
-                                                    disabled />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Tasker Phone Number</label>
-                                                <input type="text" class="form-control" value="{{ $b->tasker_phoneno }}"
-                                                    disabled />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Tasker Email</label>
-                                                <input type="text" class="form-control" value="{{ $b->tasker_email }}"
-                                                    disabled />
-                                            </div>
-                                        </div>
+                            <div class="modal-body">
+                                <div class="row">
 
-                                        <h5 class="mb-3 mt-2">B. Client Details</h5>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Client Name</label>
-                                                <input type="text" class="form-control"
-                                                    value="{{ Str::headline($b->client_firstname . ' ' . $b->client_lastname) }}"
-                                                    disabled />
-                                            </div>
+                                    <h5 class="mb-3">A. Tasker Details</h5>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Tasker Code</label>
+                                            <input type="text" class="form-control" value="{{ $b->tasker_code }}"
+                                                disabled />
                                         </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Client Phone Number</label>
-                                                <input type="text" class="form-control" value="{{ $b->client_phoneno }}"
-                                                    disabled />
-                                            </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Tasker Name</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) }}"
+                                                disabled />
                                         </div>
-                                        <div class="col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Client Email</label>
-                                                <input type="text" class="form-control"
-                                                    value="{{ $b->client_email }}" disabled />
-                                            </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Tasker Phone Number</label>
+                                            <input type="text" class="form-control" value="{{ $b->tasker_phoneno }}"
+                                                disabled />
                                         </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Tasker Email</label>
+                                            <input type="text" class="form-control" value="{{ $b->tasker_email }}"
+                                                disabled />
+                                        </div>
+                                    </div>
 
-                                        <h5 class="mb-3 mt-2">C. Booking Details</h5>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Booking Date</label>
-                                                <input type="text" class="form-control"
-                                                    value="{{ Carbon::parse($b->booking_date)->format('d F Y') }}"
-                                                    disabled />
-                                            </div>
+                                    <h5 class="mb-3 mt-2">B. Client Details</h5>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Client Name</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ Str::headline($b->client_firstname . ' ' . $b->client_lastname) }}"
+                                                disabled />
                                         </div>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Booking Time</label>
-                                                <input type="text" class="form-control"
-                                                    value="{{ Carbon::parse($b->booking_time_start)->format('g:i A') . ' - ' . Carbon::parse($b->booking_time_end)->format('g:i A') }}"
-                                                    disabled />
-                                            </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Client Phone Number</label>
+                                            <input type="text" class="form-control" value="{{ $b->client_phoneno }}"
+                                                disabled />
                                         </div>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Booking Address</label>
-                                                <textarea class="form-control" cols="20" rows="4" disabled>{{ $b->booking_address }}</textarea>
-                                            </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Client Email</label>
+                                            <input type="text" class="form-control" value="{{ $b->client_email }}"
+                                                disabled />
                                         </div>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Total Amount Paid</label>
-                                                <input class="form-control" value="{{ $b->booking_rate }}" disabled>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label d-block mb-2">Booking Status</label>
-                                                @if ($b->booking_status == 7)
-                                                    <span class="badge bg-light-warning">Pending Refund</span>
-                                                @elseif($b->booking_status == 8)
-                                                    <span class="badge bg-light-success">Refunded</span>
-                                                @endif
-                                            </div>
-                                        </div>
+                                    </div>
 
-                                        <h5 class="mb-3 mt-2">D. Refund Details</h5>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label d-block mb-2">Refund Reason</label>
-                                                <textarea class="form-control" cols="20" rows="4" disabled>test</textarea>
-                                            </div>
+                                    <h5 class="mb-3 mt-2">C. Booking Details</h5>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Booking Date</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ Carbon::parse($b->booking_date)->format('d F Y') }}" disabled />
                                         </div>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label d-block mb-2">Amount To be Refunded (RM) <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" name="cancelrefund_amount">
-                                            </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Booking Time</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ Carbon::parse($b->booking_time_start)->format('g:i A') . ' - ' . Carbon::parse($b->booking_time_end)->format('g:i A') }}"
+                                                disabled />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Booking Address</label>
+                                            <textarea class="form-control" cols="20" rows="4" disabled>{{ $b->booking_address }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Total Amount Paid</label>
+                                            <input class="form-control" value="{{ $b->booking_rate }}" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Booking Status</label>
+                                            @if ($b->booking_status == 7)
+                                                <span class="badge bg-light-warning">Pending Refund</span>
+                                            @elseif($b->booking_status == 8)
+                                                <span class="badge bg-light-success">Refunded</span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <h5 class="mb-3 mt-2">D. Refund Details</h5>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Refund Reason</label>
+                                            <textarea class="form-control" cols="20" rows="4" disabled>{{ $b->cr_reason }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Amount To be Refunded (RM) </label>
+                                            <input type="text" class="form-control" value="{{ $b->cr_amount }}"
+                                                disabled />
+                                        </div>
+                                    </div>
+
+                                    <h5 class="mb-3 mt-2">E. Payment Details</h5>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Bank</label>
+                                            <input type="text" class="form-control" value="{{ $b->cr_bank_name }}"
+                                                disabled />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Account Holder Name</label>
+                                            <input type="text" class="form-control" value="{{ $b->cr_account_name }}"
+                                                disabled />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Account Number</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $b->cr_account_number }}" disabled />
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="modal-footer">
-                                    <button type="reset" class="btn btn-light btn-pc-default"
-                                        data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Approve Refund</button>
-                                </div>
+                            <div class="modal-footer">
+                                <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '1']) }}" class="btn btn-light">Cancel Refund</a>
+                                <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '3']) }}" class="btn btn-danger">Penalize Tasker</a>
+                                <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '2']) }}" class="btn btn-primary">Approve Refund</a>
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
+
                 <!-- Modal View Booking Details End Here-->
 
                 <!-- Modal Approve Start Here -->
@@ -344,8 +366,8 @@ use Carbon\Carbon;
                             name: 'booking_date'
                         },
                         {
-                            data: 'booking_time',
-                            name: 'booking_time'
+                            data: 'cr_amount',
+                            name: 'cr_amount'
                         },
                         {
                             data: 'booking_status',

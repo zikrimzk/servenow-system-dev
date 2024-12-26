@@ -124,7 +124,11 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     // Admin - Booking Management [Refund]
     Route::get('/refunded-booking-list', [RouteController::class, 'adminBookingRefundListNav'])->name('admin-refunded-list');
 
+    // Admin - Booking Management [Refund Request]
     Route::get('/refund-request', [RouteController::class, 'adminBookingRefundReqNav'])->name('admin-refund-request');
+    Route::get('/approve-reject-refund/{bookingid}/{refundid}/{option}', [BookingController::class, 'adminBookingRefundProcess'])->name('admin-change-refund-status');
+
+
 
 
 

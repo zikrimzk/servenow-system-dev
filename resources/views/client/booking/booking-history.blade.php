@@ -1116,6 +1116,8 @@
                                                         <span class="badge bg-light-success">Refunded</span>
                                                     @elseif($b->booking_status == 9)
                                                         <span class="badge bg-light-danger">Update Required</span>
+                                                    @elseif($b->booking_status == 10)
+                                                        <span class="badge bg-danger">Refund Rejected</span>
                                                     @endif
                                                 </div>
                                                 <hr>
@@ -1202,6 +1204,9 @@
                                                                             @elseif($rf->cr_status == 2)
                                                                                 <input type="text" class="form-control"
                                                                                     value="Approved" readonly />
+                                                                            @elseif($rf->cr_status == 3)
+                                                                                <input type="text" class="form-control"
+                                                                                    value="Rejected" readonly />
                                                                             @endif
                                                                         </div>
                                                                     </div>
@@ -1209,8 +1214,7 @@
                                                                         <div class="mb-3">
                                                                             <label for="cr_bank_name"
                                                                                 class="form-label">Bank
-                                                                                Name<span
-                                                                                    class="text-danger">*</span></label>
+                                                                                Name</label>
                                                                             @if ($rf->cr_status == 0)
                                                                                 <select name="cr_bank_name"
                                                                                     class="form-control @error('cr_bank_name') is-invalid @enderror"

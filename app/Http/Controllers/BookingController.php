@@ -631,6 +631,8 @@ class BookingController extends Controller
                 ];
                 CancelRefundBooking::create($validated);
 
+                Tasker::where('id', Auth::user()->id)->update(['tasker_selfrefund_count' => DB::raw('tasker_selfrefund_count + 1')]);
+
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Refund Request will be processed. Please inform the client to update their bank information in their booking history refund section.',
@@ -745,6 +747,12 @@ class BookingController extends Controller
             'cr_bank_name' => 'required',
             'cr_account_name' => 'required',
             'cr_account_number' => 'required',
+        ], [], [
+            'cr_reason' => 'Reason',
+            'cr_amount' => 'Amount',
+            'cr_bank_name' => 'Bank Name',
+            'cr_account_name' => 'Account Name',
+            'cr_account_number' => 'Account Number',
         ]);
         $validated['cr_date'] = $formattedDate;
         $validated['cr_status'] = 1;
@@ -755,16 +763,24 @@ class BookingController extends Controller
         $booking->booking_status = 7;
         $booking->save();
 
-        // $oldDate = $booking->booking_date;
-        // $oldStartTime = $booking->booking_time_start;
-        // $oldEndTime = $booking->booking_time_end;
+        $tasker = DB::table('services as a')
+            ->join('taskers as b', 'a.tasker_id', '=', 'b.id')
+            ->join('bookings as c', 'a.id', '=', 'c.service_id')
+            ->where('c.id', '=', $booking->service_id)
+            ->select('b.id')
+            ->first();
+        // dd($tasker->id);
 
-        // DB::table('tasker_time_slots as a')
-        //     ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
-        //     ->where('a.tasker_id', '=', Auth::user()->id)
-        //     ->where('a.slot_date', '=', $oldDate)
-        //     ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
-        //     ->update(['a.slot_status' => 1]);
+        $oldDate = $booking->booking_date;
+        $oldStartTime = $booking->booking_time_start;
+        $oldEndTime = $booking->booking_time_end;
+
+        DB::table('tasker_time_slots as a')
+            ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+            ->where('a.tasker_id', '=', $tasker->id)
+            ->where('a.slot_date', '=', $oldDate)
+            ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
+            ->update(['a.slot_status' => 1]);
 
         return back()->with('success', 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account. ');
     }
@@ -782,5 +798,39 @@ class BookingController extends Controller
         Booking::where('id', $refund->booking_id)->update(['booking_status' => 7]);
 
         return back()->with('success', 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account. ');
+    }
+
+
+    public function adminBookingRefundProcess($bookingid, $refundid, $option)
+    {
+        try {
+        
+            if ($option == 1) {
+                Booking::where('id', $bookingid)->update(['booking_status' => 10]);
+                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 3]);
+                $message = 'Refund Request Rejected';
+
+            } else if ($option == 2) {
+                Booking::where('id', $bookingid)->update(['booking_status' => 8]);
+                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 2]);
+                $message = 'Refund Request Approved';
+            } else if ($option == 3) {
+                Booking::where('id', $bookingid)->update(['booking_status' => 8]);
+                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 2]);
+                DB::table('bookings as a')
+                    ->join('services as b', 'a.service_id', '=', 'b.id')
+                    ->join('taskers as c', 'b.tasker_id', '=', 'c.id')
+                    ->where('a.id', '=', $bookingid)
+                    ->update(['c.tasker_selfrefund_count' => DB::raw('tasker_selfrefund_count + 1')]);
+
+                $message = 'Refund Request Approved + Penalize Tasker';
+            }else{
+                return back()->with('error', 'Opps , invalid option. Please try again.');
+            }
+
+            return back()->with('success', $message);
+        } catch (Exception $e) {
+            return back()->with('error', 'Opps , there was an unexpected error to execute the operation. Please try again.');
+        }
     }
 }
