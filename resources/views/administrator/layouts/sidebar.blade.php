@@ -99,7 +99,7 @@
                     </a>
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="{{ route('admin-booking-list') }}">Booking List</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-refunded-list') }}">Refunded Booking List</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-refunded-list') }}">Refund Booking List</a></li>
                         <li class="pc-item"><a class="pc-link" href="{{ route('admin-refund-request') }}">Refund Request</a></li>
 
                     </ul>

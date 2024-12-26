@@ -2,7 +2,7 @@
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 ?>
-@extends('administrator.layouts.main')
+@extends('tasker.layouts.main')
 
 @section('content')
     <!-- [ Main Content ] start -->
@@ -16,13 +16,13 @@ use Carbon\Carbon;
                         <div class="col-md-12">
                             <ul class="breadcrumb">
                                 <li class="breadcrumb-item">Bookings</li>
-                                <li class="breadcrumb-item" aria-current="page">Refund Request</li>
+                                <li class="breadcrumb-item" aria-current="page">Refund Booking List</li>
 
                             </ul>
                         </div>
                         <div class="col-md-12">
                             <div class="page-header-title">
-                                <h2 class="mb-4">Refund Request</h2>
+                                <h2 class="mb-4">Refund Booking List</h2>
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,6 @@ use Carbon\Carbon;
                                     <thead>
                                         <tr>
                                             <th scope="col">Booking ID</th>
-                                            <th scope="col">Tasker</th>
                                             <th scope="col">Client</th>
                                             <th scope="col">Booking Date</th>
                                             <th scope="col">Refund Amount (RM)</th>
@@ -91,7 +90,7 @@ use Carbon\Carbon;
                     <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="mb-0">Booking Details ({{ $b->booking_order_id }})</h5>
+                                <h5 class="mb-0">Booking Details</h5>
                                 <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
                                     data-bs-dismiss="modal">
                                     <i class="ti ti-x f-20"></i>
@@ -100,39 +99,7 @@ use Carbon\Carbon;
 
                             <div class="modal-body">
                                 <div class="row">
-
-                                    <h5 class="mb-3">A. Tasker Details</h5>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label">Tasker Code</label>
-                                            <input type="text" class="form-control" value="{{ $b->tasker_code }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label">Tasker Name</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Tasker Phone Number</label>
-                                            <input type="text" class="form-control" value="{{ $b->tasker_phoneno }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Tasker Email</label>
-                                            <input type="text" class="form-control" value="{{ $b->tasker_email }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-3 mt-2">B. Client Details</h5>
+                                    <h5 class="mb-3">A. Client Details</h5>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
                                             <label class="form-label">Client Name</label>
@@ -156,7 +123,7 @@ use Carbon\Carbon;
                                         </div>
                                     </div>
 
-                                    <h5 class="mb-3 mt-2">C. Booking Details</h5>
+                                    <h5 class="mb-3 mt-2">B. Booking Details</h5>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
                                             <label class="form-label">Booking Date</label>
@@ -195,7 +162,7 @@ use Carbon\Carbon;
                                         </div>
                                     </div>
 
-                                    <h5 class="mb-3 mt-2">D. Refund Details</h5>
+                                    <h5 class="mb-3 mt-2">C. Refund Details</h5>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
                                             <label class="form-label d-block mb-2">Refund Reason</label>
@@ -209,41 +176,12 @@ use Carbon\Carbon;
                                                 disabled />
                                         </div>
                                     </div>
-
-                                    <h5 class="mb-3 mt-2">E. Payment Details</h5>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Bank</label>
-                                            <input type="text" class="form-control" value="{{ $b->cr_bank_name }}"
-                                                disabled />
-
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Account Holder Name</label>
-                                            <input type="text" class="form-control" value="{{ $b->cr_account_name }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Account Number</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ $b->cr_account_number }}" disabled />
-                                        </div>
-                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="modal-footer">
-                                <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '1']) }}" class="btn btn-light">Cancel Refund</a>
-                                <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '3']) }}" class="btn btn-danger">Penalize Tasker</a>
-                                <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '2']) }}" class="btn btn-primary">Approve Refund</a>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <!-- Modal View Booking Details End Here-->
             @endforeach
 
@@ -264,15 +202,11 @@ use Carbon\Carbon;
                     processing: true,
                     serverSide: true,
                     responsive: true,
-                    ajax: "{{ route('admin-refund-request') }}",
+                    ajax: "{{ route('tasker-refund-booking-list') }}",
                     columns: [
                         {
                             data: 'booking_order_id',
                             name: 'booking_order_id'
-                        },
-                        {
-                            data: 'tasker',
-                            name: 'tasker'
                         },
                         {
                             data: 'client',
@@ -283,8 +217,8 @@ use Carbon\Carbon;
                             name: 'booking_date'
                         },
                         {
-                            data: 'cr_amount',
-                            name: 'cr_amount'
+                            data: 'refund_amount',
+                            name: 'refund_amount'
                         },
                         {
                             data: 'booking_status',

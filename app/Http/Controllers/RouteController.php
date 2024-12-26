@@ -580,6 +580,7 @@ class RouteController extends Controller
                 'a.booking_status',
                 'a.booking_note',
                 'a.booking_rate',
+                'a.booking_order_id',
                 'c.servicetype_name',
                 'e.client_firstname',
                 'e.client_lastname',
@@ -628,6 +629,8 @@ class RouteController extends Controller
                 } else if ($row->booking_status == 5) {
                     $status = '<span class="badge bg-danger">Cancelled</span>';
                 } else if ($row->booking_status == 6) {
+                    $status = '<span class="badge bg-success">Completed</span>';
+                }else if ($row->booking_status == 6) {
                     $status = '<span class="badge bg-success">Completed</span>';
                 }
                 return $status;
@@ -679,6 +682,121 @@ class RouteController extends Controller
         }
         return view('tasker.booking.booking-list-index', [
             'title' => 'All Booking List',
+            'books' => $data,
+        ]);
+    }
+
+    public function taskerRefundBookingListNav(Request $request)
+    {
+        $data = DB::table('bookings as a')
+            ->join('cancel_refund_bookings as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->select(
+                'a.id as bookingID',
+                'b.id as serviceID',
+                'c.id as typeID',
+                'd.id as taskerID',
+                'f.id as refundID',
+                'a.booking_date',
+                'a.booking_address',
+                'a.booking_time_start',
+                'a.booking_time_end',
+                'a.booking_status',
+                'a.booking_note',
+                'a.booking_rate',
+                'a.booking_order_id',
+                'c.servicetype_name',
+                'd.tasker_firstname',
+                'd.tasker_lastname',
+                'd.tasker_phoneno',
+                'd.email as tasker_email',
+                'd.tasker_code',
+                'e.client_firstname',
+                'e.client_lastname',
+                'e.client_phoneno',
+                'e.email as client_email',
+                'f.cr_reason',
+                'f.cr_status',
+                'f.cr_date',
+                'f.cr_amount',
+                'f.cr_bank_name',
+                'f.cr_account_name',
+                'f.cr_account_number'
+            )
+            ->whereIn('a.booking_status', [7,8])
+            ->where('b.tasker_id', Auth::user()->id)
+            ->orderbyDesc('a.booking_date')
+            ->get();
+
+        if ($request->ajax()) {
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('client', function ($row) {
+                $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
+                return $client;
+            });
+
+            $table->addColumn('booking_date', function ($row) {
+
+                $date = Carbon::parse($row->booking_date)->format('d F Y');
+                return $date;
+            });
+
+            $table->addColumn('booking_time', function ($row) {
+
+                $startTime = Carbon::parse($row->booking_time_start)->format('g:i A');
+                $endTime = Carbon::parse($row->booking_time_end)->format('g:i A');
+                $time = $startTime . ' - ' . $endTime;
+                return $time;
+            });
+
+            $table->addColumn('refund_amount', function ($row) {
+
+                if ($row->booking_status == 7) {
+                    $amount = '<span class="text-warning text-center"> ' . $row->cr_amount . '</span>';
+                } else if ($row->booking_status == 8) {
+                    $amount = '<span class="text-danger text-center"> ' . $row->cr_amount . '</span>';
+                }
+                return $amount;
+            });
+
+
+            $table->addColumn('booking_status', function ($row) {
+
+                if ($row->booking_status == 7) {
+                    $status = '<span class="badge bg-light-warning">Pending Refund</span>';
+
+                } else if ($row->booking_status == 8) {
+                    $status = '<span class="badge bg-light-success">Refunded</span>';
+                    
+                }
+                return $status;
+            });
+
+            $table->addColumn('action', function ($row) {
+
+                $button =
+                    '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
+                            <i class="ti ti-eye f-20"></i>
+                        </a>
+                    ';
+
+
+                return $button;
+            });
+
+            $table->rawColumns(['client', 'booking_date', 'booking_time','refund_amount', 'booking_status', 'action']);
+
+            return $table->make(true);
+        }
+        return view('tasker.booking.refund-list-index', [
+            'title' => 'Refund Booking List',
             'books' => $data,
         ]);
     }
@@ -1161,6 +1279,7 @@ class RouteController extends Controller
                 'a.booking_status',
                 'a.booking_note',
                 'a.booking_rate',
+                'a.booking_order_id', 
                 'c.servicetype_name',
                 'd.tasker_firstname',
                 'd.tasker_lastname',
@@ -1263,6 +1382,7 @@ class RouteController extends Controller
     public function adminBookingRefundListNav(Request $request)
     {
         $data = DB::table('bookings as a')
+            ->join('cancel_refund_bookings as f', 'a.id', 'f.booking_id')
             ->join('services as b', 'a.service_id', 'b.id')
             ->join('service_types as c', 'b.service_type_id', 'c.id')
             ->join('taskers as d', 'b.tasker_id', 'd.id')
@@ -1272,6 +1392,7 @@ class RouteController extends Controller
                 'b.id as serviceID',
                 'c.id as typeID',
                 'd.id as taskerID',
+                'f.id as refundID',
                 'a.booking_date',
                 'a.booking_address',
                 'a.booking_time_start',
@@ -1279,6 +1400,7 @@ class RouteController extends Controller
                 'a.booking_status',
                 'a.booking_note',
                 'a.booking_rate',
+                'a.booking_order_id',
                 'c.servicetype_name',
                 'd.tasker_firstname',
                 'd.tasker_lastname',
@@ -1289,7 +1411,13 @@ class RouteController extends Controller
                 'e.client_lastname',
                 'e.client_phoneno',
                 'e.email as client_email',
-
+                'f.cr_reason',
+                'f.cr_status',
+                'f.cr_date',
+                'f.cr_amount',
+                'f.cr_bank_name',
+                'f.cr_account_name',
+                'f.cr_account_number'
             )
             ->whereIn('a.booking_status', [8, 10])
             ->orderbyDesc('a.booking_date')
@@ -1323,6 +1451,17 @@ class RouteController extends Controller
                 return $time;
             });
 
+            $table->addColumn('refund_amount', function ($row) {
+
+                if ($row->booking_status == 8) {
+                    $amount = '<span class="text-danger text-center"> ' . $row->cr_amount . '</span>';
+                } else if ($row->booking_status == 10) {
+                    $amount = '<span class="text-success text-center"> ' . $row->cr_amount . '</span>';
+                }
+                return $amount;
+            });
+
+
             $table->addColumn('booking_status', function ($row) {
 
                 if ($row->booking_status == 8) {
@@ -1347,7 +1486,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
+            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time','refund_amount', 'booking_status', 'action']);
 
             return $table->make(true);
         }

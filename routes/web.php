@@ -122,7 +122,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/update-booking-details-{id}', [BookingController::class, 'adminUpdateBooking'])->name('admin-booking-update');
 
     // Admin - Booking Management [Refund]
-    Route::get('/refunded-booking-list', [RouteController::class, 'adminBookingRefundListNav'])->name('admin-refunded-list');
+    Route::get('/refund-booking-list', [RouteController::class, 'adminBookingRefundListNav'])->name('admin-refunded-list');
 
     // Admin - Booking Management [Refund Request]
     Route::get('/refund-request', [RouteController::class, 'adminBookingRefundReqNav'])->name('admin-refund-request');
@@ -194,6 +194,10 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
     // Tasker - Booking Management [General]
     Route::get('/all-booking-list', [RouteController::class, 'taskerBookingListNav'])->name('tasker-booking-list');
+
+    // Tasker - Booking Management [Refund]
+    Route::get('/refund-booking-list', [RouteController::class, 'taskerRefundBookingListNav'])->name('tasker-refund-booking-list');
+
 
 
 });

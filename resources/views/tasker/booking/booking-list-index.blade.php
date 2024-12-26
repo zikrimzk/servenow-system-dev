@@ -67,7 +67,7 @@ use Carbon\Carbon;
                                 <table class="table data-table table-hover nowrap">
                                     <thead>
                                         <tr>
-                                            <th scope="col">#</th>
+                                            <th scope="col">Booking ID</th>
                                             <th scope="col">Client</th>
                                             <th scope="col">Booking Date</th>
                                             <th scope="col">Booking Time</th>
@@ -196,7 +196,7 @@ use Carbon\Carbon;
     <script type="text/javascript">
         $(document).ready(function() {
 
-            // DATATABLE : SERVICES
+            // DATATABLE : BOOKINGS
             $(function() {
 
                 var table = $('.data-table').DataTable({
@@ -204,10 +204,11 @@ use Carbon\Carbon;
                     serverSide: true,
                     responsive: true,
                     ajax: "{{ route('tasker-booking-list') }}",
-                    columns: [{
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
-                            searchable: false
+                    columns: [
+                        {
+                            data: 'booking_order_id',
+                            name: 'booking_order_id'
+                         
                         },
                         {
                             data: 'client',

@@ -386,6 +386,7 @@ class BookingController extends Controller
                     'a.booking_note',
                     'a.booking_rate',
                     'a.booking_status',
+                    'a.booking_order_id',
                     'd.servicetype_name',
                     'b.client_firstname',
                     'b.client_lastname',
@@ -408,7 +409,7 @@ class BookingController extends Controller
                     $editable = false;
                 }
                 return [
-                    'title' => $booking->client_firstname . ' (' . $booking->servicetype_name . ')',
+                    'title' => $booking->booking_order_id . ' (' . $booking->servicetype_name . ')',
                     'start' => $booking->booking_date . 'T' . $booking->booking_time_start,
                     'end' => $booking->booking_date . 'T' . $booking->booking_time_end,
                     'description' => $booking->booking_address,

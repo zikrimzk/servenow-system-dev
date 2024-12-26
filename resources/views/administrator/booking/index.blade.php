@@ -67,7 +67,7 @@ use Carbon\Carbon;
                                 <table class="table data-table table-hover nowrap">
                                     <thead>
                                         <tr>
-                                            <th scope="col">#</th>
+                                            <th scope="col">Booking ID</th>
                                             <th scope="col">Tasker</th>
                                             <th scope="col">Client</th>
                                             <th scope="col">Booking Date</th>
@@ -91,7 +91,7 @@ use Carbon\Carbon;
                     <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="mb-0">Booking Details</h5>
+                                <h5 class="mb-0">Booking Details ({{ $b->booking_order_id }})</h5>
                                 <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
                                     data-bs-dismiss="modal">
                                     <i class="ti ti-x f-20"></i>
@@ -217,7 +217,7 @@ use Carbon\Carbon;
                         <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="mb-0">Update Booking</h5>
+                                    <h5 class="mb-0">Update Booking ({{ $b->booking_order_id }})</h5>
                                     <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
                                         data-bs-dismiss="modal">
                                         <i class="ti ti-x f-20"></i>
@@ -270,92 +270,8 @@ use Carbon\Carbon;
                         </div>
                     </div>
                 </form>
-
                 <!-- Modal Update Booking Details End Here-->
 
-
-
-                <!-- Modal Approve Start Here -->
-                {{-- <div class="modal fade" id="approveModal-{{ $sv->id }}" data-bs-keyboard="false" tabindex="-1"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-sm-12 mb-4">
-                                        <div class="d-flex justify-content-center align-items-center mb-3">
-                                            <i class="ti ti-info-circle text-warning" style="font-size: 100px"></i>
-                                        </div>
-
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="d-flex justify-content-center align-items-center">
-                                            <h2>Service Request Approval</h2>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 mb-3">
-                                        <div class="d-flex justify-content-center align-items-center">
-                                            <p class="fw-normal f-18 text-center">Are you sure you want to approve this
-                                                request ?</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="d-flex justify-content-between gap-3 align-items-center">
-                                            <button type="reset" class="btn btn-light btn-pc-default"
-                                                data-bs-dismiss="modal">Cancel</button>
-                                            <div>
-                                                <a href="{{ route('admin-reject-service', $sv->id) }}"
-                                                    class="btn btn-light-danger">Reject</a>
-                                                <a href="{{ route('admin-approve-service', $sv->id) }}"
-                                                    class="btn btn-light-success">Approve</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> --}}
-                <!-- Modal Approve End Here -->
-
-                <!-- Modal Terminate Start Here -->
-                {{-- <div class="modal fade" id="terminateModal-{{ $sv->id }}" data-bs-keyboard="false" tabindex="-1"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-sm-12 mb-4">
-                                        <div class="d-flex justify-content-center align-items-center mb-3">
-                                            <i class="ti ti-info-circle text-warning" style="font-size: 100px"></i>
-                                        </div>
-
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="d-flex justify-content-center align-items-center">
-                                            <h2>Terminate Service</h2>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 mb-3">
-                                        <div class="d-flex justify-content-center align-items-center">
-                                            <p class="fw-normal f-18 text-center">Are you sure to terminate this
-                                                services ?</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="d-flex justify-content-center gap-3 align-items-center">
-                                            <button type="reset" class="btn btn-light btn-pc-default"
-                                                data-bs-dismiss="modal">Cancel</button>
-                                            <a href="{{ route('admin-terminate-service', $sv->id) }}"
-                                                class="btn btn-light-danger">Terminate</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> --}}
-                <!-- Modal Terminate End Here -->
             @endforeach
 
 
@@ -376,10 +292,10 @@ use Carbon\Carbon;
                     serverSide: true,
                     responsive: true,
                     ajax: "{{ route('admin-booking-list') }}",
-                    columns: [{
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
-                            searchable: false
+                    columns: [
+                        {
+                            data: 'booking_order_id',
+                            name: 'booking_order_id'
                         },
                         {
                             data: 'tasker',
