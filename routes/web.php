@@ -10,6 +10,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\AuthenticateController;
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PerformanceController;
 use App\Models\Booking;
 
 /*
@@ -109,7 +110,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     // Admin - System Setting
     Route::get('/system-setting', [RouteController::class, 'adminSystemSettingNav'])->name('admin-system-setting');
-    
+
 
     // Admin - Time Slot Setting
     Route::get('/time-slot-setting', [RouteController::class, 'adminTimeSlotNav'])->name('admin-timeslot-setting');
@@ -127,14 +128,11 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     // Admin - Booking Management [Refund Request]
     Route::get('/refund-request', [RouteController::class, 'adminBookingRefundReqNav'])->name('admin-refund-request');
     Route::get('/approve-reject-refund/{bookingid}/{refundid}/{option}', [BookingController::class, 'adminBookingRefundProcess'])->name('admin-change-refund-status');
- 
-    // Admin - Performance > Review Management\
+
+    // Admin - Performance > Review Management
     Route::get('/review-management', [RouteController::class, 'adminReviewManagementNav'])->name('admin-review-management');
-
-
-
-
-
+    Route::post('/update-review-{id}', [PerformanceController::class, 'adminReviewUpdateStatus'])->name('admin-review-update');
+    Route::post('/admin-reply-review/{id}', [PerformanceController::class, 'adminReplyReview'])->name('admin-reply-review');
 });
 
 /* Admin Route End */
@@ -200,7 +198,10 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     // Tasker - Booking Management [Refund]
     Route::get('/refund-booking-list', [RouteController::class, 'taskerRefundBookingListNav'])->name('tasker-refund-booking-list');
 
-
+    // Tasker - Review Management
+    Route::get('/review-management', [RouteController::class, 'taskerReviewManagementNav'])->name('tasker-review-management');
+    Route::post('/update-review-{id}', [PerformanceController::class, 'taskerReviewUpdateStatus'])->name('tasker-review-update');
+    Route::post('/tasker-reply-review/{id}', [PerformanceController::class, 'taskerReplyReview'])->name('tasker-reply-review');
 
 });
 
@@ -239,7 +240,7 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     Route::get('/fetch-tasker/{taskid}', [BookingController::class, 'fetchTaskers'])->name('booking-fetch-tasker');
     Route::post('/generate-coordinates-booking', [BookingController::class, 'getCoordinates'])->name('booking-generate-coordinates');
 
-    
+
     Route::get('/tasker-get-time/{date}/{taskerid}', [BookingController::class, 'getBookingTime'])->name('client-tasker-get-time');
     Route::get('/get-tasker-details', [BookingController::class, 'getTaskerDetail'])->name('getTaskerDetail');
     Route::post('/client-book-service', [BookingController::class, 'clientBookFunction'])->name('clientBookService');
@@ -247,24 +248,18 @@ Route::prefix('client')->middleware('auth:client')->group(function () {
     // Client - Payment
     Route::get('/return-payment-status', [RouteController::class, 'clientPaymentNav'])->name('client-payment');
     Route::get('/return-payment-status', [RouteController::class, 'clientPaymentStatusNav'])->name('client-payment-status');
-   
+
 
     // Client - Booking History
     Route::get('/my-booking-history', [RouteController::class, 'clientBookingHistoryNav'])->name('clientBookHistory');
     Route::get('/change-booking-process/{id}/{taskerid}/{option}', [BookingController::class, 'clientChangeBookingStatus'])->name('client-change-booking-status');
     Route::post('/submit-review', [BookingController::class, 'clientReviewBooking'])->name('client-submit-review');
-    Route::get('/view-Review',[RouteController::class,'clientViewReview'])->name('client-view-review');
+    Route::get('/view-Review', [RouteController::class, 'clientViewReview'])->name('client-view-review');
     Route::post('/client-topay-redirect', [BookingController::class, 'clientToPayFunction'])->name('client-topay-function');
     Route::post('/client-refund-request-{id}', [BookingController::class, 'clientRefundRequest'])->name('client-refund-request');
     Route::post('/update-client-refund-request-{id}', [BookingController::class, 'clientUpdateRefundRequest'])->name('client-update-refund-request');
-
-
-
-
-
 });
 
 
 Route::get('/get-areas/{state}', [RouteController::class, 'getAreas'])->name('get-area');
 Route::get('/get-bank', [RouteController::class, 'getBank'])->name('get-bank');
-

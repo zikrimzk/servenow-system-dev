@@ -2,8 +2,12 @@
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+
+$currentMonth = Carbon::now()->month;
+$currentYear = Carbon::now()->year;
+
 ?>
-@extends('administrator.layouts.main')
+@extends('tasker.layouts.main')
 
 @section('content')
     <!-- [ Main Content ] start -->
@@ -75,9 +79,7 @@ use Illuminate\Support\Facades\DB;
                     <div class="card">
                         <div class="card-body">
                             <h6 class="mb-2 f-w-400 text-muted">Total Reviews ({{ Carbon::now()->format('F') }})</h6>
-                            <h4 class="mb-3">
-                                {{ $totalreviewsbymonth }}
-                            </h4>
+                            <h4 class="mb-3">{{ $totalreviewsbymonth }}</h4>
                             <p class="mb-0 text-muted text-sm">users</p>
                         </div>
                     </div>
@@ -99,7 +101,8 @@ use Illuminate\Support\Facades\DB;
                         <div class="card-body">
                             <h6 class="mb-2 f-w-400 text-muted">Total Unreview Booking</h6>
                             <h4 class="mb-3 text-danger">
-                                {{ $totalunreview }}</h4>
+                                {{ $totalunreview }}
+                            </h4>
                             <p class="mb-0 text-muted text-sm">users</p>
                         </div>
                     </div>
@@ -108,7 +111,7 @@ use Illuminate\Support\Facades\DB;
                 <div class="col-md-6 col-xl-3">
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="mb-2 f-w-400 text-muted">Average Rating (All)</h6>
+                            <h6 class="mb-2 f-w-400 text-muted">Average Rating</h6>
                             <h4 class="mb-3">{{ number_format($averageRating, 1) }}</h4>
                             <p class="mb-0 text-muted text-sm">stars</p>
                         </div>
@@ -135,6 +138,7 @@ use Illuminate\Support\Facades\DB;
                     </div>
                 </div>
 
+
                 <div class="col-md-6 col-xl-3">
                     <div class="card">
                         <div class="card-body">
@@ -142,28 +146,6 @@ use Illuminate\Support\Facades\DB;
                             <h4 class="mb-3 text-danger">
                                 {{ $negrev }} %</h4>
                             <p class="mb-0 text-muted text-sm">of total reviews</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-xl-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h6 class="mb-2 f-w-400 text-muted">Review Growth Rate</h6>
-                            <h4 class="mb-3 {{ $growthRate >= 0 ? 'text-success' : 'text-danger' }}">
-                                {{ number_format($growthRate, 2) }}%
-                            </h4>
-                            <p class="mb-0 text-muted text-sm">{{ $growthRate >= 0 ? 'increase' : 'decrease' }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-xl-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h6 class="mb-2 f-w-400 text-muted">Most Reviewed Service</h6>
-                            <h4 class="mb-3">{{ $topService->servicetype_name ?? 'N/A' }}</h4>
-                            <p class="mb-0 text-muted text-sm">{{ $topService->total_reviews ?? 0 }} reviews</p>
                         </div>
                     </div>
                 </div>
@@ -317,39 +299,7 @@ use Illuminate\Support\Facades\DB;
                             </div>
                             <div class="modal-body">
                                 <div class="row">
-
-                                    <h5 class="mb-3">A. Tasker Details</h5>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label">Tasker Code</label>
-                                            <input type="text" class="form-control" value="{{ $b->tasker_code }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label">Tasker Name</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Tasker Phone Number</label>
-                                            <input type="text" class="form-control" value="{{ $b->tasker_phoneno }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Tasker Email</label>
-                                            <input type="text" class="form-control" value="{{ $b->tasker_email }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-3 mt-2">B. Client Details</h5>
+                                    <h5 class="mb-3">A. Client Details</h5>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
                                             <label class="form-label">Client Name</label>
@@ -373,7 +323,7 @@ use Illuminate\Support\Facades\DB;
                                         </div>
                                     </div>
 
-                                    <h5 class="mb-3 mt-2">C. Booking Details</h5>
+                                    <h5 class="mb-3 mt-2">B. Booking Details</h5>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
                                             <label class="form-label">Booking Date</label>
@@ -425,7 +375,7 @@ use Illuminate\Support\Facades\DB;
                 <!-- Modal View Booking Details End Here-->
 
                 <!-- Modal View Review Details Start Here-->
-                <form action="{{ route('admin-review-update', $b->reviewID) }}" method="POST">
+                <form action="{{ route('tasker-review-update', $b->reviewID) }}" method="POST">
                     @csrf
                     <div class="modal fade" id="viewReviewDetails-{{ $b->reviewID }}" data-bs-keyboard="false"
                         tabindex="-1" aria-hidden="true">
@@ -445,14 +395,6 @@ use Illuminate\Support\Facades\DB;
                                                 <label class="form-label">Review by</label>
                                                 <div class="fw-bold">
                                                     {{ Str::headline($b->client_firstname . ' ' . $b->client_lastname) }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Review for</label>
-                                                <div class="fw-bold">
-                                                    {{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) . ' (' . $b->tasker_code . ')' }}
                                                 </div>
                                             </div>
                                         </div>
@@ -543,13 +485,8 @@ use Illuminate\Support\Facades\DB;
                                                         <div class="card-body">
                                                             <div
                                                                 class="d-flex justify-content-between align-items-center mb-2">
-                                                                <span class="fw-bold">
-                                                                    @if ($r->reply_by == 1)
-                                                                        Administrator
-                                                                    @else
-                                                                        {{ Str::headline($b->tasker_firstname)  }}
-                                                                    @endif
-                                                                </span>
+                                                                <span
+                                                                    class="fw-bold">@if($r->reply_by == 1) Administrator @else You @endif</span>
                                                                 <span>{{ Carbon::parse($r->reply_date_time)->setTimezone('Asia/Kuala_Lumpur')->format('d/m/Y g:i A') }}</span>
                                                             </div>
                                                             <div class="d-flex justify-content-start align-items-center">
@@ -585,7 +522,7 @@ use Illuminate\Support\Facades\DB;
                 <!-- Modal View Review Details End Here-->
 
                 <!-- Modal Reply Review Start Here-->
-                <form action="{{ route('admin-reply-review', $b->reviewID) }}" method="POST">
+                <form action="{{ route('tasker-reply-review', $b->reviewID) }}" method="POST">
                     @csrf
                     <div class="modal fade" id="replyReview-{{ $b->reviewID }}" data-bs-keyboard="false"
                         tabindex="-1" aria-hidden="true">
@@ -695,7 +632,7 @@ use Illuminate\Support\Facades\DB;
     <script type="text/javascript">
         $(document).ready(function() {
 
-            // DATATABLE : SERVICES
+            // DATATABLE : REVIEWS
             $(function() {
 
                 var table = $('.data-table').DataTable({
@@ -703,7 +640,7 @@ use Illuminate\Support\Facades\DB;
                     serverSide: true,
                     responsive: true,
                     ajax: {
-                        url: "{{ route('admin-review-management') }}",
+                        url: "{{ route('tasker-review-management') }}",
                         data: function(d) {
                             d.startDate = $('#startDate').val();
                             d.endDate = $('#endDate').val();

@@ -100,11 +100,23 @@
                         <li class="pc-item"><a class="pc-link" href="{{ route('tasker-booking-management') }}">My Booking</a></li>
                         <li class="pc-item"><a class="pc-link" href="{{ route('tasker-booking-list') }}">Booking List</a></li>
                         <li class="pc-item"><a class="pc-link" href="{{ route('tasker-refund-booking-list') }}">Refund Booking List</a></li>
-
-                       
-
                     </ul>
                 </li>
+
+                <li class="pc-item pc-hasmenu">
+                    <a href="#!" class="pc-link">
+                        <span class="pc-micon">
+                            <i class="fas fa-tachometer-alt pc-icon "></i> 
+                        </span>
+                        <span class="pc-mtext">Performance</span>
+                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                    </a>
+                    <ul class="pc-submenu">
+                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-review-management') }}">Review Management</a></li>
+                        <li class="pc-item"><a class="pc-link" href="#">Performance Analysis</a></li>
+                    </ul>
+                </li>
+
             </ul>
             <!-- SideBar Menu Item End -->
         </div>

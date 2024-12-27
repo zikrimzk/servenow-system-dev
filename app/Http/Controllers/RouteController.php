@@ -10,6 +10,7 @@ use App\Models\Tasker;
 use App\Models\Booking;
 use App\Models\Service;
 use App\Models\TimeSlot;
+use App\Models\ReviewReply;
 use App\Models\ServiceType;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
@@ -796,6 +797,228 @@ class RouteController extends Controller
         return view('tasker.booking.refund-list-index', [
             'title' => 'Refund Booking List',
             'books' => $data,
+        ]);
+    }
+    public function taskerReviewManagementNav(Request $request)
+    {
+        $data = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->select(
+                'a.id as bookingID',
+                'b.id as serviceID',
+                'c.id as typeID',
+                'd.id as taskerID',
+                'f.id as reviewID',
+                'a.booking_date',
+                'a.booking_address',
+                'a.booking_time_start',
+                'a.booking_time_end',
+                'a.booking_status',
+                'a.booking_note',
+                'a.booking_rate',
+                'a.booking_order_id',
+                'c.servicetype_name',
+                'd.tasker_firstname',
+                'd.tasker_lastname',
+                'd.tasker_phoneno',
+                'd.email as tasker_email',
+                'd.tasker_code',
+                'e.client_firstname',
+                'e.client_lastname',
+                'e.client_phoneno',
+                'e.email as client_email',
+                'f.review_status',
+                'f.review_rating',
+                'f.review_description',
+                'f.review_date_time',
+                'f.review_imageOne',
+                'f.review_imageTwo',
+                'f.review_imageThree',
+                'f.review_imageFour',
+                'f.review_type',
+            )
+            ->where('d.id', Auth::user()->id);
+
+        // Apply date range filter before calling get()
+        if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
+            $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
+            $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
+
+            if ($startDate && $endDate) {
+                $data->whereBetween(DB::raw("DATE(f.review_date_time)"), [$startDate, $endDate]);
+            }
+        }
+
+        if ($request->has('rating_filter') && $request->input('rating_filter') != '') {
+            $ratingFilter = $request->input('rating_filter');
+            if ($ratingFilter == '1') {
+                $data->orderByDesc('f.review_rating'); // Highest rating first
+            } elseif ($ratingFilter == '2') {
+                $data->orderBy('f.review_rating'); // Lowest rating first
+            }
+        } else {
+            $data->orderByDesc('f.review_date_time');
+        }
+
+        $data = $data->get();
+
+        if ($request->ajax()) {
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('booking_order_id', function ($row) {
+                $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
+                return $orderid;
+            });
+
+            $table->addColumn('client', function ($row) {
+                $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
+                return $client;
+            });
+
+            $table->addColumn('review_rating', function ($row) {
+
+                $rating = '';
+                for ($i = 1; $i <= $row->review_rating; $i++) {
+                    $rating .= '<i class="fas fa-star text-warning"></i>';
+                }
+                return $rating;
+            });
+
+
+            $table->addColumn('review_date_time', function ($row) {
+
+                $datetime = Carbon::parse($row->review_date_time)->setTimezone('Asia/Kuala_Lumpur')->format('d F Y g:i A');
+                return $datetime;
+            });
+
+            $table->addColumn('review_status', function ($row) {
+
+                if ($row->review_status == 1) {
+                    $status = '<span class="badge bg-success">Show</span>';
+                } else if ($row->review_status == 2) {
+                    $status = '<span class="badge bg-danger">Hide</span>';
+                }
+
+                return $status;
+            });
+
+            $table->addColumn('action', function ($row) {
+                $button =
+                    '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#viewReviewDetails-' . $row->reviewID . '">
+                            <i class="ti ti-eye f-20"></i>
+                        </a>
+                        <a href="#" class="avtar avtar-xs btn-light-warning" data-bs-toggle="modal"
+                            data-bs-target="#replyReview-' . $row->reviewID . '">
+                            <i class="ti ti-repeat f-20"></i>
+                        </a>
+                    ';
+                return $button;
+            });
+
+            $table->rawColumns(['booking_order_id', 'client', 'review_rating', 'review_date_time', 'review_status', 'action']);
+
+            return $table->make(true);
+        }
+
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $totalreview = $data->count();
+
+
+        // Count total reviews by month
+        $totalreviewsbymonth = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->whereMonth('f.review_date_time', $currentMonth)
+            ->whereYear('f.review_date_time', $currentYear)
+            ->where('d.id', auth()->user()->id)
+            ->count();
+
+        // Count total reviews by year
+
+        $totalreviewsbyyear = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->whereYear('f.review_date_time', $currentYear)
+            ->where('d.id', auth()->user()->id)
+            ->count();
+
+        // Count total unreviewed bookings
+        $totalcompletedBooking = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->where('a.booking_status', 6)
+            ->where('d.id', auth()->user()->id)
+            ->count();
+
+        $totalunreview = $totalcompletedBooking - $totalreview;
+
+        // Count total average rating
+        $averageRating = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->where('d.id', auth()->user()->id)
+            ->avg('f.review_rating');
+
+        // Count Percentage of Positive and Negative Reviews and Nuetral Reviews
+        $csat =
+            $totalreview > 0
+            ? number_format(
+                ($data->where('review_rating', '>=', 4)->count() / $totalreview) * 100,
+                2,
+            )
+            : 0;
+        $neutralrev =
+            $totalreview > 0
+            ? number_format(
+                ($data->where('review_rating', '=', 3)->count() / $totalreview) * 100,
+                2,
+            )
+            : 0;
+        $negrev =
+            $totalreview > 0
+            ? number_format(
+                ($data->where('review_rating', '<', 3)->count() / $totalreview) * 100,
+                2,
+            )
+            : 0;
+
+        $reply = DB::table('reviews as a')
+            ->join('bookings as b', 'a.booking_id', 'b.id')
+            ->join('services as c', 'b.service_id', 'c.id')
+            ->join('taskers as d', 'c.tasker_id', 'd.id')
+            ->join('review_replies as e', 'a.id', 'e.review_id')
+            ->whereNotNull('e.reply_message')
+            ->get();
+
+        // dd($reply);
+
+        return view('tasker.performance.review-index', [
+            'title' => 'Review Management',
+            'data' => $data,
+            'totalreviewsbymonth' => $totalreviewsbymonth,
+            'totalreviewsbyyear' => $totalreviewsbyyear,
+            'totalunreview' => $totalunreview,
+            'averageRating' => $averageRating,
+            'csat' => $csat,
+            'negrev' => $negrev,
+            'neutralrev' => $neutralrev,
+            'reply' => $reply
         ]);
     }
 
@@ -1595,13 +1818,13 @@ class RouteController extends Controller
 
             return $table->make(true);
         }
+
         return view('administrator.booking.refund-req-index', [
             'title' => 'Refund Request',
-            'books' => $data,
+            'books' => $data
         ]);
     }
 
-    //to be continue..
     public function adminReviewManagementNav(Request $request)
     {
         $data = DB::table('bookings as a')
@@ -1615,7 +1838,7 @@ class RouteController extends Controller
                 'b.id as serviceID',
                 'c.id as typeID',
                 'd.id as taskerID',
-                'f.id as refundID',
+                'f.id as reviewID',
                 'a.booking_date',
                 'a.booking_address',
                 'a.booking_time_start',
@@ -1643,17 +1866,38 @@ class RouteController extends Controller
                 'f.review_imageThree',
                 'f.review_imageFour',
                 'f.review_type',
-            )
-            ->orderbyDesc('a.booking_date')
-            ->get();
+            );
+
+        // Apply date range filter before calling get()
+        if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
+            $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
+            $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
+
+            if ($startDate && $endDate) {
+                $data->whereBetween(DB::raw("DATE(f.review_date_time)"), [$startDate, $endDate]);
+            }
+        }
+
+        if ($request->has('rating_filter') && $request->input('rating_filter') != '') {
+            $ratingFilter = $request->input('rating_filter');
+            if ($ratingFilter == '1') {
+                $data->orderByDesc('f.review_rating'); // Highest rating first
+            } elseif ($ratingFilter == '2') {
+                $data->orderBy('f.review_rating'); // Lowest rating first
+            }
+        } else {
+            $data->orderByDesc('f.review_date_time');
+        }
+
+        $data = $data->get();
 
         if ($request->ajax()) {
 
             $table = DataTables::of($data)->addIndexColumn();
 
             $table->addColumn('booking_order_id', function ($row) {
-                $tasker = '<button class="btn btn-link link-primary">' . $row->booking_order_id . '</button>';
-                return $tasker;
+                $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
+                return $orderid;
             });
 
             $table->addColumn('client', function ($row) {
@@ -1663,7 +1907,7 @@ class RouteController extends Controller
 
             $table->addColumn('review_rating', function ($row) {
 
-                $rating='';
+                $rating = '';
                 for ($i = 1; $i <= $row->review_rating; $i++) {
                     $rating .= '<i class="fas fa-star text-warning"></i>';
                 }
@@ -1689,16 +1933,17 @@ class RouteController extends Controller
             });
 
             $table->addColumn('action', function ($row) {
-
                 $button =
                     '
                         <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
+                            data-bs-target="#viewReviewDetails-' . $row->reviewID . '">
                             <i class="ti ti-eye f-20"></i>
                         </a>
+                         <a href="#" class="avtar avtar-xs btn-light-danger" data-bs-toggle="modal"
+                            data-bs-target="#replyReview-' . $row->reviewID . '">
+                            <i class="ti ti-repeat f-20"></i>
+                        </a>
                     ';
-
-
                 return $button;
             });
 
@@ -1706,8 +1951,117 @@ class RouteController extends Controller
 
             return $table->make(true);
         }
+
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $totalreview = $data->count();
+
+
+        // Count total reviews by month
+        $totalreviewsbymonth = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->whereMonth('f.review_date_time', $currentMonth)
+            ->whereYear('f.review_date_time', $currentYear)
+            ->count();
+
+        // Count total reviews by year
+
+        $totalreviewsbyyear = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->whereYear('f.review_date_time', $currentYear)
+            ->count();
+
+        // Count total unreviewed bookings
+        $totalcompletedBooking = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->where('a.booking_status', 6)
+            ->count();
+
+        $totalunreview = $totalcompletedBooking - $totalreview;
+
+        // Count total average rating
+        $averageRating = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->avg('f.review_rating');
+
+        // Count Percentage of Positive and Negative Reviews and Nuetral Reviews
+        $csat =
+            $totalreview > 0
+            ? number_format(
+                ($data->where('review_rating', '>=', 4)->count() / $totalreview) * 100,
+                2,
+            )
+            : 0;
+        $neutralrev =
+            $totalreview > 0
+            ? number_format(
+                ($data->where('review_rating', '=', 3)->count() / $totalreview) * 100,
+                2,
+            )
+            : 0;
+        $negrev =
+            $totalreview > 0
+            ? number_format(
+                ($data->where('review_rating', '<', 3)->count() / $totalreview) * 100,
+                2,
+            )
+            : 0;
+        // Count Growth Rate by last month
+        $currentMonthReviews = DB::table('reviews')
+            ->whereMonth('review_date_time', Carbon::now()->month)
+            ->count();
+        $lastMonthReviews = DB::table('reviews')
+            ->whereMonth('review_date_time', Carbon::now()->subMonth()->month)
+            ->count();
+        $growthRate =
+            $lastMonthReviews > 0
+            ? (($currentMonthReviews - $lastMonthReviews) / $lastMonthReviews) * 100
+            : 0;
+
+        // Get top service type with most reviews
+        $topService = DB::table('reviews as a')
+            ->join('bookings as b', 'a.booking_id', '=', 'b.id')
+            ->join('services as c', 'b.service_id', '=', 'c.id')
+            ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
+            ->select('d.servicetype_name', DB::raw('count(*) as total_reviews'))
+            ->groupBy('d.servicetype_name')
+            ->orderByDesc('total_reviews')
+            ->first();
+        
+        // Get reviews with replies
+        $reply = DB::table('reviews as a')
+            ->join('bookings as b', 'a.booking_id', 'b.id')
+            ->join('services as c', 'b.service_id', 'c.id')
+            ->join('taskers as d', 'c.tasker_id', 'd.id')
+            ->join('review_replies as e', 'a.id', 'e.review_id')
+            ->whereNotNull('e.reply_message')
+            ->get();
+
         return view('administrator.performance.review-index', [
             'title' => 'Review Management',
+            'data' => $data,
+            'totalreviewsbymonth' => $totalreviewsbymonth,
+            'totalreviewsbyyear' => $totalreviewsbyyear,
+            'totalunreview' => $totalunreview,
+            'averageRating' => $averageRating,
+            'csat' => $csat,
+            'negrev' => $negrev,
+            'neutralrev' => $neutralrev,
+            'growthRate' => $growthRate,
+            'topService' => $topService,
+            'reply' => $reply,
         ]);
     }
 

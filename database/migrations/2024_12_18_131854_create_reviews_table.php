@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('review_imageFour')->nullable();
             $table->integer('review_type')->default(1); // 1 - Normal 2 - Anonymous
             $table->integer('review_status')->default(1); // 0 - hide 1 - show 
-            $table->integer('review_by')->default(0); //  0 - client 1 - tasker 
             $table->datetime('review_date_time');
             $table->foreignId('booking_id')->references('id')->on('bookings');
             $table->timestamps(); 
