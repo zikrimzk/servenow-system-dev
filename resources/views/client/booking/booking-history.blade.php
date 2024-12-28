@@ -863,7 +863,7 @@
                                         <h3 class="mb-3 mt-2 fw-bold">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}
                                         </h3>
                                         @foreach ($booking as $b)
-                                            <div class="card p-3 mb-3  border border-2 shadow shadow-sm">
+                                            <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <h6 class="mb-0">{{ $b->servicetype_name }}</h6>
                                                     <span class="badge bg-success">Completed</span>
@@ -871,8 +871,7 @@
                                                 <hr>
                                                 <div class="d-flex">
                                                     <img src="{{ asset('storage/' . $b->tasker_photo) }}"
-                                                        alt="Product Image" width="100" height="100"
-                                                        class="">
+                                                        alt="Product Image" width="100" height="100">
                                                     <div class="ms-3">
                                                         <p class="mb-1 fw-bold">{{ $b->tasker_firstname }}</p>
                                                         <p class="mb-1">{{ $b->tasker_code }}</p>
@@ -885,7 +884,6 @@
                                                             -
                                                             {{ \Carbon\Carbon::createFromFormat('H:i:s', $b->booking_time_end)->format('g:i A') }}
                                                         </p>
-
                                                     </div>
                                                 </div>
                                                 <hr>
@@ -894,130 +892,140 @@
                                                 </div>
                                                 <hr>
                                                 <div class="d-flex justify-content-between align-items-center">
-                                                    <span class="fw-bold">Total: <span
-                                                            class="text-danger">RM{{ $b->booking_rate }}</span></span>
+                                                    <span class="fw-bold">Total:
+                                                        <span class="text-danger">RM{{ $b->booking_rate }}</span>
+                                                    </span>
                                                     @if ($review->where('booking_id', $b->bookingID)->count() == 0)
                                                         <div>
-                                                            <button class="btn btn-light-primary"data-bs-toggle="modal"
-                                                                data-bs-target="#reviewModal-{{ $b->booking_order_id }}">Submit
-                                                                your
-                                                                review</button>
+                                                            <button class="btn btn-light-primary" data-bs-toggle="modal"
+                                                                data-bs-target="#reviewModal-{{ $b->booking_order_id }}">
+                                                                Submit your review
+                                                            </button>
                                                         </div>
                                                     @else
-                                                        <div class="text-muted fst-italic"> Review Submitted </div>
+                                                        <div class="text-muted fst-italic">Review Submitted</div>
                                                     @endif
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    </div>
-                                    <form method="POST" action="{{ route('client-submit-review') }}"
-                                        enctype="multipart/form-data">
-                                        @csrf
+                                            <form method="POST" action="{{ route('client-submit-review') }}"
+                                                enctype="multipart/form-data">
+                                                @csrf
+                                                <div id="reviewModal-{{ $b->booking_order_id }}" class="modal fade"
+                                                    tabindex="-1" role="dialog" aria-labelledby="exampleModalLiveLabel"
+                                                    aria-hidden="true">
 
-                                        <div id="reviewModal-{{ $b->booking_order_id }}" class="modal fade" tabindex="-1"
-                                            role="dialog" aria-labelledby="exampleModalLiveLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-                                                role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLiveLabel">
-                                                            Review &
-                                                            Rate</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div>
-                                                            <input type="hidden" value="{{ $b->bookingID }}"
-                                                                name="booking_id">
-                                                            <input type="hidden" value="{{ $b->taskerID }}"
-                                                                name="tasker_id">
-                                                        </div>
-                                                        <h6 class="mb-3">
-                                                            {{ $b->tasker_firstname . ' ' . $b->tasker_lastname }}
-                                                        </h6>
-                                                        <p class="text-muted small mb-4">
-                                                            {{ $b->tasker_code }}</p>
-                                                        <div class="mb-3">
-                                                            <label for="glsr-ltr" class="form-label"><strong>Work
-                                                                    Quality</strong></label>
-                                                            <select id="glsr-ltr" class="star-rating-old"
-                                                                name="review_rating">
-                                                                <option value="">Select a rating</option>
-                                                                <option value="5">Fantastic</option>
-                                                                <option value="4">Great</option>
-                                                                <option value="3">Good</option>
-                                                                <option value="2">Poor</option>
-                                                                <option value="1">Terrible</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label for="qualityInput"
-                                                                class="form-label"><strong>Review</strong></label>
-                                                            <textarea class="form-control" id="qualityInput" rows="8" cols="5"
-                                                                placeholder="Share your thoughts on the services to help other buyers." name="review_description"></textarea>
-                                                        </div>
+                                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                                                        role="document">
+                                                        <div class="modal-content">
 
-                                                        <div class="d-flex gap-2 justify-content-start mb-2">
-                                                            <div class="photo-slot text-center" id="addPhotoButton">
-                                                                <label
-                                                                    style="cursor: pointer; display: block; width: 100%;">
-                                                                    <input type="file" class="photoInput"
-                                                                        accept="image/*" multiple style="display: none;"
-                                                                        name="photos[]">
-                                                                    <img src="../../assets/images/image_upload.jpg"
-                                                                        alt="Add Picture"
-                                                                        style="width: 70%; display:block; margin: 0 auto; opacity: 0.6;">
-                                                                </label>
+
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLiveLabel">Review
+                                                                    & Rate
+                                                                </h5>
+                                                                <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
 
-                                                        </div>
-                                                        <div class="mt-2 d-flex gap-2 photoPreviewContainer">
 
-                                                        </div>
-                                                        <p class="photoCounter" style="font-size: 14px;">0/4</p>
-                                                        <p class="errorMessage" style="color: red; display: none;">You
-                                                            can only
-                                                            upload up
-                                                            to 4 photos!</p>
+                                                            <div class="modal-body">
+                                                                <div>
+                                                                    <input type="hidden" value="{{ $b->bookingID }}"
+                                                                        name="booking_id">
+                                                                    <input type="hidden" value="{{ $b->taskerID }}"
+                                                                        name="tasker_id">
+                                                                </div>
+                                                                <h6 class="mb-3">
+                                                                    {{ $b->tasker_firstname . ' ' . $b->tasker_lastname }}
+                                                                </h6>
+                                                                <p class="text-muted small mb-4">
+                                                                    {{ $b->tasker_code }}
+                                                                </p>
 
-                                                        <div class="photoPreviewContainer" class="mt-2">
-                                                            <img class="photoPreview"
-                                                                style="max-width: 200px; display: none;"
-                                                                alt="Photo Preview">
-                                                        </div>
+                                                                <div class="mb-3">
+                                                                    <label for="glsr-ltr" class="form-label"><strong>Work
+                                                                            Quality</strong></label>
+                                                                    <select id="glsr-ltr" class="star-rating-old"
+                                                                        name="review_rating">
+                                                                        <option value="">Select a rating</option>
+                                                                        <option value="5">Fantastic</option>
+                                                                        <option value="4">Great</option>
+                                                                        <option value="3">Good</option>
+                                                                        <option value="2">Poor</option>
+                                                                        <option value="1">Terrible</option>
+                                                                    </select>
+                                                                </div>
 
-                                                        <small class="text-muted">Add 50 characters with 1
-                                                            photo
-                                                        </small>
+                                                                <div class="mb-3">
+                                                                    <label for="qualityInput"
+                                                                        class="form-label"><strong>Review</strong></label>
+                                                                    <textarea class="form-control" id="qualityInput" rows="8" cols="5"
+                                                                        placeholder="Share your thoughts on the services to help other buyers." name="review_description"></textarea>
+                                                                </div>
 
 
-                                                    </div>
-                                                    <div class="modal-footer justify-content-between align-items-center">
+                                                                <div class="d-flex gap-2 justify-content-start mb-2">
 
-                                                        <div class="center-form-check mb-3 mt-3">
-                                                            <div class="form-check">
-                                                                <input type="checkbox" class="form-check-input"
-                                                                    id="anonymousCheck" name="review_type"
-                                                                    value="2">
-                                                                <label class="form-check-label small"
-                                                                    for="anonymousCheck">
-                                                                    Leave your review anonymously
-                                                                </label>
+                                                                    <div class="photo-slot text-center addPhotoButton">
+                                                                        <label
+                                                                            style="cursor: pointer; display: block; width: 100%;">
+                                                                            <input type="file" class="photoInput"
+                                                                                accept="image/*" multiple
+                                                                                style="display: none;" name="photos[]">
+                                                                            <img src="{{ asset('assets/images/image_upload.jpg') }}"
+                                                                                alt="Add Picture"
+                                                                                style="width: 70%; display:block; margin: 0 auto; opacity: 0.6;">
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+
+
+                                                                <div class="mt-2 d-flex gap-2 photoPreviewContainer"></div>
+                                                                <p class="photoCounter" style="font-size: 14px;">0/4</p>
+                                                                <p class="errorMessage"
+                                                                    style="color: red; display: none;">
+                                                                    You can only upload up to 4 photos!
+                                                                </p>
+
+                                                                <div class="photoPreviewContainer" class="mt-2">
+                                                                    <img class="photoPreview"
+                                                                        style="max-width: 200px; display: none;"
+                                                                        alt="Photo Preview">
+                                                                </div>
+                                                                <small class="text-muted">Add 50 characters with 1
+                                                                    photo</small>
+
                                                             </div>
-                                                        </div>
 
-                                                        <div>
-                                                            <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">Cancel</button>
-                                                            <button type="submit" class="btn btn-danger">Submit</button>
-
+                                                            <div
+                                                                class="modal-footer justify-content-between align-items-center">
+                                                                <div class="center-form-check mb-3 mt-3">
+                                                                    <div class="form-check">
+                                                                        <input type="checkbox" class="form-check-input"
+                                                                            id="anonymousCheck" name="review_type"
+                                                                            value="2">
+                                                                        <label class="form-check-label small"
+                                                                            for="anonymousCheck">
+                                                                            Leave your review anonymously
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <button type="button" class="btn btn-secondary"
+                                                                        data-bs-dismiss="modal">
+                                                                        Cancel
+                                                                    </button>
+                                                                    <button type="submit" class="btn btn-danger">
+                                                                        Submit
+                                                                    </button>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </form>
+                                            </form>
+                                        @endforeach
+                                    </div>
                                 @endforeach
                             @else
                                 <div class="card p-3 mb-3 border border-2 shadow shadow-sm">
@@ -1026,7 +1034,6 @@
                                             <div class="col-12 mb-3">
                                                 <div class="text-center">
                                                     <i class="fas fa-calendar-week f-68"></i>
-
                                                 </div>
                                             </div>
                                             <div class="col-12">
@@ -1037,6 +1044,7 @@
                                 </div>
                             @endif
                         </div>
+
 
                         <div class="tab-pane fade" id="cancelled" role="tabpanel">
                             @if ($cancelled->count() >= 1)
@@ -1347,200 +1355,132 @@
 
     <script src="../assets/js/plugins/star-rating.min.js"></script>
     <script>
-        // let uploadedPhotos = [];
-        // const maxPhotos = 4;
-
-        // const photoInputs = document.getElementsByClassName('photoInput');
-        // const errorMessages = document.getElementsByClassName('errorMessage');
-        // const photoCounters = document.getElementsByClassName('photoCounter');
-        // const photoPreviewContainers = document.getElementsByClassName('photoPreviewContainer');
-
-        // // Iterate through all photoInput elements to add event listeners
-        // Array.from(photoInputs).forEach((photoInput, index) => {
-        //     photoInput.addEventListener('change', function(event) {
-        //         const files = Array.from(event.target.files);
-
-        //         // Access corresponding elements for this specific photoInput
-        //         const errorMessage = errorMessages[index];
-        //         const photoCounter = photoCounters[index];
-        //         const photoPreviewContainer = photoPreviewContainers[index];
-
-        //         // Check if the max photo limit is exceeded
-        //         if (uploadedPhotos.length + files.length > maxPhotos) {
-        //             errorMessage.style.display = 'block';
-        //             event.target.value = ''; // Reset the input
-        //             return;
-        //         }
-
-        //         errorMessage.style.display = 'none';
-
-        //         // Process and display each file
-        //         files.forEach(file => {
-        //             if (uploadedPhotos.length < maxPhotos) {
-        //                 const reader = new FileReader();
-
-        //                 reader.onload = function(e) {
-        //                     const div = document.createElement('div');
-        //                     div.classList.add('photo-preview');
-
-        //                     const img = document.createElement('img');
-        //                     img.src = e.target.result;
-        //                     img.style.maxWidth = '100px'; // Optional: Limit the preview size
-
-        //                     const btnRemove = document.createElement('button');
-        //                     btnRemove.innerHTML = 'x';
-        //                     btnRemove.style.marginLeft = '5px'; // Optional: Add spacing
-        //                     btnRemove.addEventListener('click', () => {
-        //                         photoPreviewContainer.removeChild(div);
-        //                         uploadedPhotos = uploadedPhotos.filter(f => f !== file);
-        //                         updateInputFiles(photoInput);
-        //                         updateCounter(photoCounter);
-        //                     });
-
-        //                     div.appendChild(img);
-        //                     div.appendChild(btnRemove);
-        //                     photoPreviewContainer.appendChild(div);
-
-        //                     uploadedPhotos.push(file);
-        //                     updateInputFiles(photoInput);
-        //                     updateCounter(photoCounter);
-        //                 };
-
-        //                 reader.readAsDataURL(file);
-        //             }
-        //         });
-
-        //         event.target.value = ''; // Clear the input after processing files
-        //     });
-        // });
-
-        // function updateInputFiles(photoInput) {
-        //     const dataTransfer = new DataTransfer();
-
-        //     uploadedPhotos.forEach(file => {
-        //         dataTransfer.items.add(file);
-        //     });
-
-        //     photoInput.files = dataTransfer.files;
-        // }
-
-        // function updateCounter(photoCounter) {
-        //     photoCounter.innerText = `${uploadedPhotos.length}/${maxPhotos}`;
-        // }
-
-
         function saveBookingIDToLocalStorage(button) {
-            // Get the booking ID from the data attribute
-            const bookingID = button.getAttribute('data-booking-id');
-            // Save it to localStorage
-            localStorage.setItem('selectedBookingID', bookingID);
-            console.log('Booking ID saved to localStorage:', bookingID); // Optional: For debugging
 
+            const bookingID = button.getAttribute('data-booking-id');
+
+            localStorage.setItem('selectedBookingID', bookingID);
+            console.log('Booking ID saved to localStorage:', bookingID);
         }
+
         document.addEventListener('DOMContentLoaded', function() {
+
             @if ($errors->any())
                 var booking = localStorage.getItem('selectedBookingID');
+
                 var modal = new bootstrap.Modal(document.getElementById('refundBookingModalTwo-' + booking));
                 modal.show();
             @endif
-        });
-        let uploadedPhotos = [];
-        const maxPhotos = 4;
 
-        const photoInputs = document.getElementsByClassName('photoInput');
-        const errorMessages = document.getElementsByClassName('errorMessage');
-        const photoCounters = document.getElementsByClassName('photoCounter');
-        const photoPreviewContainers = document.getElementsByClassName('photoPreviewContainer');
-        const addPhotoButtons = document.querySelectorAll('#addPhotoButton label'); // Select the button container
 
-        // Iterate through all photoInput elements to add event listeners
-        Array.from(photoInputs).forEach((photoInput, index) => {
-            photoInput.addEventListener('change', function(event) {
-                const files = Array.from(event.target.files);
+            const modals = document.querySelectorAll('[id^="reviewModal-"]');
 
-                // Access corresponding elements for this specific photoInput
-                const errorMessage = errorMessages[index];
-                const photoCounter = photoCounters[index];
-                const photoPreviewContainer = photoPreviewContainers[index];
-                const addPhotoButton = addPhotoButtons[index]; // Get the corresponding button
 
-                // Check if the max photo limit is exceeded
-                if (uploadedPhotos.length + files.length > maxPhotos) {
-                    errorMessage.style.display = 'block';
-                    event.target.value = ''; // Reset the input
+            modals.forEach((modal, modalIndex) => {
+                const maxPhotos = 4;
+
+                let uploadedPhotos = [];
+
+
+                const photoInput = modal.querySelector('.photoInput');
+                const errorMessage = modal.querySelector('.errorMessage');
+                const photoCounter = modal.querySelector('.photoCounter');
+                const photoPreviewContainer = modal.querySelector('.photoPreviewContainer');
+                const addPhotoButtonLabel = modal.querySelector('.addPhotoButton label');
+
+                if (!photoInput) {
                     return;
                 }
 
-                errorMessage.style.display = 'none';
 
-                // Process and display each file
-                files.forEach(file => {
-                    if (uploadedPhotos.length < maxPhotos) {
-                        const reader = new FileReader();
+                photoInput.addEventListener('change', function(event) {
+                    const files = Array.from(event.target.files);
 
-                        reader.onload = function(e) {
-                            const div = document.createElement('div');
-                            div.classList.add('photo-preview');
 
-                            const img = document.createElement('img');
-                            img.src = e.target.result;
-                            img.style.maxWidth = '100px'; // Optional: Limit the preview size
-
-                            const btnRemove = document.createElement('button');
-                            btnRemove.innerHTML = 'x';
-                            btnRemove.style.marginLeft = '5px'; // Optional: Add spacing
-                            btnRemove.addEventListener('click', () => {
-                                photoPreviewContainer.removeChild(div);
-                                uploadedPhotos = uploadedPhotos.filter(f => f !== file);
-                                updateInputFiles(photoInput);
-                                updateCounter(photoCounter);
-                                toggleAddPhotoButton(
-                                    addPhotoButton
-                                ); // Enable the button again if max is not reached
-                            });
-
-                            div.appendChild(img);
-                            div.appendChild(btnRemove);
-                            photoPreviewContainer.appendChild(div);
-
-                            uploadedPhotos.push(file);
-                            updateInputFiles(photoInput);
-                            updateCounter(photoCounter);
-                            toggleAddPhotoButton(
-                                addPhotoButton); // Disable the button if max is reached
-                        };
-
-                        reader.readAsDataURL(file);
+                    if (uploadedPhotos.length + files.length > maxPhotos) {
+                        errorMessage.style.display = 'block';
+                        event.target.value = '';
+                        return;
                     }
+
+                    errorMessage.style.display = 'none';
+
+
+                    files.forEach(file => {
+                        if (uploadedPhotos.length < maxPhotos) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                const div = document.createElement('div');
+                                div.classList.add('photo-preview');
+                                div.style.position = 'relative';
+
+                                const img = document.createElement('img');
+                                img.src = e.target.result;
+                                img.style.maxWidth = '100px';
+
+                                // Butang remove
+                                const btnRemove = document.createElement('button');
+                                btnRemove.innerHTML = 'x';
+                                btnRemove.style.marginLeft = '5px';
+                                btnRemove.style.position = 'absolute';
+                                btnRemove.style.top = '0';
+                                btnRemove.style.right = '0';
+                                btnRemove.style.cursor = 'pointer';
+
+                                btnRemove.addEventListener('click', () => {
+                                    photoPreviewContainer.removeChild(div);
+
+                                    uploadedPhotos = uploadedPhotos.filter(f =>
+                                        f !== file);
+                                    updateInputFiles();
+                                    updateCounter();
+                                    toggleAddPhotoButton();
+                                });
+
+                                div.appendChild(img);
+                                div.appendChild(btnRemove);
+                                photoPreviewContainer.appendChild(div);
+
+
+                                uploadedPhotos.push(file);
+                                updateInputFiles();
+                                updateCounter();
+                                toggleAddPhotoButton();
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+
+
+                    event.target.value = '';
                 });
 
-                event.target.value = ''; // Clear the input after processing files
+
+                function updateInputFiles() {
+                    const dataTransfer = new DataTransfer();
+                    uploadedPhotos.forEach(file => {
+                        dataTransfer.items.add(file);
+                    });
+                    photoInput.files = dataTransfer.files;
+                }
+
+
+                function updateCounter() {
+                    photoCounter.innerText = `${uploadedPhotos.length}/${maxPhotos}`;
+                }
+
+
+                function toggleAddPhotoButton() {
+                    if (uploadedPhotos.length >= maxPhotos) {
+                        addPhotoButtonLabel.style.pointerEvents = 'none';
+                        addPhotoButtonLabel.style.opacity = '0.5';
+                    } else {
+                        addPhotoButtonLabel.style.pointerEvents = 'auto';
+                        addPhotoButtonLabel.style.opacity = '1';
+                    }
+                }
             });
         });
-
-        function updateInputFiles(photoInput) {
-            const dataTransfer = new DataTransfer();
-
-            uploadedPhotos.forEach(file => {
-                dataTransfer.items.add(file);
-            });
-
-            photoInput.files = dataTransfer.files;
-        }
-
-        function updateCounter(photoCounter) {
-            photoCounter.innerText = `${uploadedPhotos.length}/${maxPhotos}`;
-        }
-
-        function toggleAddPhotoButton(addPhotoButton) {
-            if (uploadedPhotos.length >= maxPhotos) {
-                addPhotoButton.style.pointerEvents = 'none'; // Disable click
-                addPhotoButton.style.opacity = '0.5'; // Optional: Add visual indication
-            } else {
-                addPhotoButton.style.pointerEvents = 'auto'; // Enable click
-                addPhotoButton.style.opacity = '1'; // Reset visual indication
-            }
-        }
     </script>
     <script>
         var destroyed = false;
