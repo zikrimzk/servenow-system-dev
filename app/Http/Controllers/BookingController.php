@@ -632,8 +632,6 @@ class BookingController extends Controller
                 ];
                 CancelRefundBooking::create($validated);
 
-                Tasker::where('id', Auth::user()->id)->update(['tasker_selfrefund_count' => DB::raw('tasker_selfrefund_count + 1')]);
-
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Refund Request will be processed. Please inform the client to update their bank information in their booking history refund section.',
@@ -835,14 +833,14 @@ class BookingController extends Controller
                 $message = 'Refund Request Approved';
             } else if ($option == 3) {
                 Booking::where('id', $bookingid)->update(['booking_status' => 8]);
-                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 2]);
+                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 2, 'cr_penalized'=> 1]);
                 DB::table('bookings as a')
                     ->join('services as b', 'a.service_id', '=', 'b.id')
                     ->join('taskers as c', 'b.tasker_id', '=', 'c.id')
                     ->where('a.id', '=', $bookingid)
                     ->update(['c.tasker_selfrefund_count' => DB::raw('tasker_selfrefund_count + 1')]);
 
-                $message = 'Refund Request Approved + Penalize Tasker';
+                $message = 'Refund Request Approved with Penalty';
             } else {
                 return back()->with('error', 'Opps , invalid option. Please try again.');
             }

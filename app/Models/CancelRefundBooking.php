@@ -17,6 +17,7 @@ class CancelRefundBooking extends Model
         'cr_bank_name',
         'cr_account_name',
         'cr_account_number',
+        'cr_penalized',
         'booking_id',
     ];
 }

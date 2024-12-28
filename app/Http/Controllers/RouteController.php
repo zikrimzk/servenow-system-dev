@@ -956,7 +956,6 @@ class RouteController extends Controller
 
         // Count total unreviewed bookings
         $totalcompletedBooking = DB::table('bookings as a')
-            ->join('reviews as f', 'a.id', 'f.booking_id')
             ->join('services as b', 'a.service_id', 'b.id')
             ->join('service_types as c', 'b.service_type_id', 'c.id')
             ->join('taskers as d', 'b.tasker_id', 'd.id')
@@ -2039,7 +2038,7 @@ class RouteController extends Controller
             ->groupBy('d.servicetype_name')
             ->orderByDesc('total_reviews')
             ->first();
-        
+
         // Get reviews with replies
         $reply = DB::table('reviews as a')
             ->join('bookings as b', 'a.booking_id', 'b.id')
@@ -2062,6 +2061,307 @@ class RouteController extends Controller
             'growthRate' => $growthRate,
             'topService' => $topService,
             'reply' => $reply,
+        ]);
+    }
+
+    public function adminTaskerPerformanceNav(Request $request)
+    {
+        $taskers = DB::table('taskers')
+            ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
+            ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
+            ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
+            ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
+            ->select(
+                'taskers.tasker_code',
+                'taskers.id',
+                DB::raw("CONCAT(taskers.tasker_firstname, ' ', taskers.tasker_lastname) AS tasker_name"),
+                DB::raw("AVG(reviews.review_rating) AS average_rating"),
+                DB::raw("
+                CASE 
+                    WHEN AVG(reviews.review_rating) >= 4 THEN '1'
+                    WHEN AVG(reviews.review_rating) >= 3 THEN '2'
+                    ELSE '3'
+                END AS satisfaction_reaction
+            "),
+                // 'taskers.tasker_selfrefund_count AS total_self_cancel_refunds',
+                DB::raw("COUNT(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 END) AS total_self_cancel_refunds"),
+                DB::raw("COUNT(CASE WHEN bookings.booking_status = '6' THEN 1 END) AS total_completed_bookings"),
+                DB::raw("
+                    ROUND(
+                        (
+                            (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
+                            + (CASE WHEN AVG(reviews.review_rating) >= 4 THEN 15 ELSE 0 END) -- Satisfaction bonus (15%)
+                            - LEAST(taskers.tasker_selfrefund_count * 2.5, 25) -- Refund penalty capped at 25%
+                        ), 2
+                    ) AS performance_score_percentage
+                "),
+            )
+            ->groupBy('taskers.id');
+
+        if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
+            $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
+            $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
+
+            if ($startDate && $endDate) {
+                $taskers->whereBetween('bookings.booking_date', [$request->startDate, $request->endDate]);
+            }
+        }
+        if ($request->has('rating_filter') && $request->input('rating_filter') != '') {
+            $taskers->havingRaw('ROUND(AVG(reviews.review_rating)) = ?', [$request->rating_filter]);
+        }
+
+        if ($request->has('reaction_filter') && $request->input('reaction_filter') != '') {
+            $taskers->having('satisfaction_reaction', '=', $request->reaction_filter);
+        }
+
+        if ($request->has('penalized_filter') && $request->input('penalized_filter') != '') {
+            if ($request->input('penalized_filter') == 1) {
+                $taskers->orderBy('total_self_cancel_refunds', 'asc');
+            } else  if ($request->input('penalized_filter') == 2) {
+                $taskers->orderBy('total_self_cancel_refunds', 'desc');
+            }
+        }
+
+        if ($request->has('score_filter_min') && $request->input('score_filter_min') != '' && $request->has('score_filter_max') && $request->input('score_filter_max') != '') {
+            $scoreMin = $request->input('score_filter_min');
+            $scoreMax = $request->input('score_filter_max');
+
+            if (!empty($scoreMin) && !empty($scoreMax)) {
+                $taskers->havingRaw(
+                    'performance_score_percentage BETWEEN ? AND ?',
+                    [$scoreMin, $scoreMax]
+                );
+            }
+        }
+        $data = $taskers->get();
+
+        // Overall performance
+        $overallPerformance = $data->avg('performance_score_percentage');
+
+        //calculate highest penalized tasker
+        $highestPerformers = $data
+            ->filter(function ($tasker) {
+                return $tasker->performance_score_percentage >= 60;
+            })
+            ->sortByDesc('performance_score_percentage')
+            ->values()
+            ->map(function ($tasker, $index) {
+                return [
+                    'name' => $tasker->tasker_name,
+                    'score' => $tasker->performance_score_percentage,
+                ];
+            });
+
+        $lowestPerformers = $data
+            ->filter(function ($tasker) {
+                return $tasker->performance_score_percentage < 40;
+            })
+            ->sortBy('performance_score_percentage')
+            ->values()
+            ->map(function ($tasker, $index) {
+                return [
+                    'name' => $tasker->tasker_name,
+                    'score' => $tasker->performance_score_percentage,
+                ];
+            });
+
+        $highestSelfRefund = $data
+            ->filter(function ($tasker) {
+                return $tasker->total_self_cancel_refunds;
+            })
+            ->sortByDesc('total_self_cancel_refunds')
+            ->take(1)
+            ->map(function ($tasker) {
+                return [
+                    'name' => $tasker->tasker_name,
+                    'values' => $tasker->total_self_cancel_refunds,
+                ];
+            })
+            ->first();
+
+
+        if ($request->ajax()) {
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('checkbox', function ($row) {
+                return '<input type="checkbox" class="tasker-checkbox form-check-input" value="' . $row->id . '">';
+            });
+
+            $table->addColumn('tasker_code', function ($row) {
+                $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link link-primary">' . $row->tasker_code . '</a>';
+                return $tasker;
+            });
+
+            $table->addColumn('average_rating', function ($row) {
+                $averageRating = round($row->average_rating * 2) / 2; // Round to nearest 0.5
+                $fullStars = floor($averageRating); // Number of full stars
+                $halfStar = $averageRating - $fullStars > 0 ? 1 : 0; // Check if there's a half star
+                $emptyStars = 5 - $fullStars - $halfStar; // Remaining empty stars
+
+                $stars = '';
+                for ($i = 0; $i < $fullStars; $i++) {
+                    $stars .= '<i class="fas fa-star text-warning"></i>'; // Full star icon
+                }
+                if ($halfStar) {
+                    $stars .= '<i class="fas fa-star-half-alt text-warning"></i>'; // Half star icon
+                }
+                for ($i = 0; $i < $emptyStars; $i++) {
+                    $stars .= '<i class="far fa-star text-muted"></i>'; // Empty star icon
+                }
+
+                return $stars;
+            });
+
+            $table->addColumn('satisfaction_reaction', function ($row) {
+                if ($row->satisfaction_reaction == 1) {
+                    // Happy
+                    return '<i class="fas fa-smile text-success f-22" title="Happy"></i>';
+                } elseif ($row->satisfaction_reaction == 2) {
+                    // Neutral 
+                    return '<i class="fas fa-meh text-warning f-22" title="Neutral"></i>';
+                } elseif ($row->satisfaction_reaction == 3) {
+                    // Unhappy 
+                    return '<i class="fas fa-frown text-danger f-22" title="Unhappy"></i>';
+                } else {
+                    // Default for no reaction
+                    return '<i class="fas fa-question-circle text-muted f-22" title="No Reaction"></i>';
+                }
+            });
+
+            $table->addColumn('total_self_cancel_refunds', function ($row) {
+
+                $cancelRefunds = '<span class="badge bg-danger">' . $row->total_self_cancel_refunds . '</span>';
+                return $cancelRefunds;
+            });
+
+
+            $table->addColumn('total_completed_bookings', function ($row) {
+
+                $completedBookings = '<span class="badge bg-success">' . $row->total_completed_bookings . '</span>';
+                return $completedBookings;
+            });
+
+            $table->addColumn('p_score', function ($row) {
+                $scorePercentage = $row->performance_score_percentage;
+                $progressColor = 'bg-success';
+
+                if ($scorePercentage >= 70) {
+                    $progressColor = 'bg-success';
+                } elseif ($scorePercentage >= 40) {
+                    $progressColor = 'bg-warning';
+                } else {
+                    $progressColor = 'bg-danger';
+                }
+
+                return '
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar ' . $progressColor . '" role="progressbar" style="width: ' . $scorePercentage . '%;" aria-valuenow="' . $scorePercentage . '" aria-valuemin="0" aria-valuemax="100">
+                            ' . $scorePercentage . '%
+                        </div>
+                    </div>
+                ';
+            });
+
+            $table->rawColumns(['checkbox', 'tasker_code', 'average_rating', 'satisfaction_reaction', 'total_self_cancel_refunds', 'total_completed_bookings', 'p_score']);
+
+            return $table->make(true);
+        }
+        $taskers = DB::table('taskers')
+            ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
+            ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
+            ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
+            ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
+            ->select(
+                'taskers.tasker_code',
+                'taskers.id',
+                DB::raw("CONCAT(taskers.tasker_firstname, ' ', taskers.tasker_lastname) AS tasker_name"),
+                DB::raw("AVG(reviews.review_rating) AS average_rating"),
+                DB::raw("CASE 
+            WHEN AVG(reviews.review_rating) >= 4 THEN '1'
+            WHEN AVG(reviews.review_rating) >= 3 THEN '2'
+            ELSE '3'
+         END AS satisfaction_reaction"),
+                DB::raw("COUNT(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 END) AS total_self_cancel_refunds"),
+                DB::raw("COUNT(CASE WHEN bookings.booking_status = '6' THEN 1 END) AS total_completed_bookings"),
+                DB::raw("ROUND(
+            (
+                (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
+                + (CASE WHEN AVG(reviews.review_rating) >= 4 THEN 15 ELSE 0 END) -- Satisfaction bonus (15%)
+                - LEAST(taskers.tasker_selfrefund_count * 2.5, 25) -- Refund penalty capped at 25%
+            ), 2
+        ) AS performance_score_percentage"),
+                DB::raw("LAST_DAY(bookings.booking_date) AS last_booking_date") // Last day of the month
+            )
+            ->whereNotNull('bookings.booking_date') // Only consider valid dates
+            ->groupBy('taskers.id', 'last_booking_date');
+
+        $data = $taskers->get();
+
+        // Calculate monthly labels
+        $monthlyLabels = collect(range(1, 12))->map(function ($month) {
+            return Carbon::create()->month($month)->format('F');
+        });
+
+        // Calculate monthly scores
+        $monthlyScores = collect(range(1, 12))->map(function ($month) use ($data) {
+            return $data->filter(function ($item) use ($month) {
+                return Carbon::parse($item->last_booking_date)->month === $month;
+            })->avg('performance_score_percentage');
+        });
+
+        // Group data by year and month
+        $groupedData = $data->groupBy(function ($item) {
+            return Carbon::parse($item->last_booking_date)->year; // Group by year
+        });
+
+        // Prepare data for the chart
+        $chartData = $groupedData->map(function ($items, $year) {
+            $monthlyScores = collect(range(1, 12))->map(function ($month) use ($items) {
+                return $items->filter(function ($item) use ($month) {
+                    return Carbon::parse($item->last_booking_date)->month === $month;
+                })->avg('performance_score_percentage') ?? 0; // Default to 0 if no data
+            });
+
+            return [
+                'year' => $year,
+                'scores' => $monthlyScores,
+            ];
+        })->values(); // Reset array keys
+
+
+        $yearlyAverages = $chartData->map(function ($data) {
+            // Filter out scores with value 0
+            $validScores = collect($data['scores'])->filter(function ($score) {
+                return $score > 0;
+            });
+
+            // Calculate the average for the year
+            $average = $validScores->avg();
+
+            return [
+                'year' => $data['year'],
+                'average_performance' => round($average, 2), // Round to 2 decimal places
+            ];
+        });
+
+        // dd($chartData, $yearlyAverages);
+
+
+
+        // dd($data, $overallPerformance);
+        return view('administrator.performance.tasker-performance-index', [
+            'title' => 'Tasker Performance',
+            'data' => $data,
+            'overallPerformance' => $overallPerformance,
+            'monthlyLabels' => $monthlyLabels,
+            'chartData' => $chartData,
+            'monthlyScores' => $monthlyScores,
+            'highestPerformers' => $highestPerformers,
+            'lowestPerformers' => $lowestPerformers,
+            'highestSelfRefund' => $highestSelfRefund,
+            'yearlyAverages' => $yearlyAverages
+            
         ]);
     }
 

@@ -115,7 +115,7 @@
                     </a>
                     <ul class="pc-submenu">
                         <li class="pc-item"><a class="pc-link" href="{{ route('admin-review-management') }}">Review Management</a></li>
-                        <li class="pc-item"><a class="pc-link" href="#">Tasker Rating</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-tasker-performance') }}">Tasker Performance</a></li>
                     </ul>
                 </li>
 

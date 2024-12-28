@@ -10,6 +10,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\AuthenticateController;
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\PerformanceController;
 use App\Models\Booking;
 
@@ -133,6 +134,10 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/review-management', [RouteController::class, 'adminReviewManagementNav'])->name('admin-review-management');
     Route::post('/update-review-{id}', [PerformanceController::class, 'adminReviewUpdateStatus'])->name('admin-review-update');
     Route::post('/admin-reply-review/{id}', [PerformanceController::class, 'adminReplyReview'])->name('admin-reply-review');
+
+    // Admin - Performance > Tasker Performance
+    Route::get('/tasker-performance', [RouteController::class, 'adminTaskerPerformanceNav'])->name('admin-tasker-performance');
+    Route::post('/send-performance-report', [EmailController::class, 'adminSendPerformanceReport'])->name('admin-send-performance-report');
 });
 
 /* Admin Route End */

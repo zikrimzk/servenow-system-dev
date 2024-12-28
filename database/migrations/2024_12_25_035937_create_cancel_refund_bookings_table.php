@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('cr_bank_name');
             $table->string('cr_account_name');
             $table->string('cr_account_number');
+            $table->boolean('cr_penalized')->default(false);
             $table->foreignId('booking_id')->references('id')->on('bookings');
             $table->timestamps();
         });

@@ -191,6 +191,8 @@ use Carbon\Carbon;
                                                 <span class="badge bg-light-warning">Pending Refund</span>
                                             @elseif($b->booking_status == 8)
                                                 <span class="badge bg-light-success">Refunded</span>
+                                            @elseif($b->booking_status == 10)
+                                                <span class="badge bg-light-danger">Require Update</span>
                                             @endif
                                         </div>
                                     </div>
@@ -235,12 +237,16 @@ use Carbon\Carbon;
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '1']) }}" class="btn btn-light">Cancel Refund</a>
-                                <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '3']) }}" class="btn btn-danger">Penalize Tasker</a>
-                                <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '2']) }}" class="btn btn-primary">Approve Refund</a>
-                            </div>
+                            @if ($b->booking_status == 7)
+                                <div class="modal-footer">
+                                    <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '1']) }}"
+                                        class="btn btn-light">Cancel Refund</a>
+                                    <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '3']) }}"
+                                        class="btn btn-danger">Penalize Tasker</a>
+                                    <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '2']) }}"
+                                        class="btn btn-primary">Approve Refund</a>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -265,8 +271,7 @@ use Carbon\Carbon;
                     serverSide: true,
                     responsive: true,
                     ajax: "{{ route('admin-refund-request') }}",
-                    columns: [
-                        {
+                    columns: [{
                             data: 'booking_order_id',
                             name: 'booking_order_id'
                         },

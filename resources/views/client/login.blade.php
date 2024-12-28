@@ -4,13 +4,14 @@
 <!-- [Head] start -->
 
 <head>
-    <title>ServeNow |{{ $title }}</title>
 
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta meta name="viewport" content= "width=device-width, user-scalable=no" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>ServeNow | {{ $title }}</title>
+
 
     <!-- [Favicon] icon -->
     <link rel="icon" href="assets/images/logo-test-white.png" type="image/x-icon" />
@@ -44,7 +45,7 @@
     </div>
     <!-- [ Pre-loader ] End -->
 
-    <div class="auth-main border">
+    <div class="auth-main">
         <div class="auth-wrapper v1">
             <div class="auth-form">
                 <div class="card border border-0" style="background-color: transparent">
@@ -116,12 +117,12 @@
                                     <label class="form-check-label text-muted" for="customCheckc1">Remember
                                         me?</label>
                                 </div>
-                                <h6 class="text-secondary f-w-400 mb-0">
-                                    <a href="forgot-password-v1.html"> Forgot Password? </a>
+                                <h6 class="f-w-400 mb-0">
+                                    <a href="#" class="link-primary"> Forgot Password? </a>
                                 </h6>
                             </div>
                             <div class="d-grid mt-4">
-                                <button type="submit" class="btn btn-primary"
+                                <button type="submit" class="btn btn-primary btn-lg"
                                     style="background-color: #16325b;">Login</button>
                             </div>
                             <div class="mt-4 text-center">
@@ -133,8 +134,6 @@
                         </div>
                     </form>
                 </div>
-
-
             </div>
         </div>
     </div>

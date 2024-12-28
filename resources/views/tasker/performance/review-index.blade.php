@@ -237,26 +237,27 @@ $currentYear = Carbon::now()->year;
                 <div class="col-sm-12">
                     <div class="card table-card">
                         <div class="card-header">
-                            <div class="row justify-content-center align-items-center">
-                                <div class="col-sm-3">
-                                    <label for="startDate" class="form-label">Start Date</label>
-                                    <input type="date" id="startDate" name="startDate" class="form-control">
+                            <div class="row align-items-center">
+                                <div class="col-sm-6 mb-3">
+                                    <label for="score_filter" class="form-label">Date Range</label>
+                                    <div class="d-flex align-items-center">
+                                        <input type="date" id="startDate" name="startDate" class="form-control">
+                                        <span class="mx-2">to</span>
+                                        <input type="date" id="endDate" name="endDate" class="form-control">
+                                    </div>
                                 </div>
-                                <div class="col-sm-3">
-                                    <label for="endDate" class="form-label">End Date</label>
-                                    <input type="date" id="endDate" name="endDate" class="form-control">
-                                </div>
-                                <div class="col-sm-3">
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-sm-3 mb-3">
                                     <label for="endDate" class="form-label">Filter by</label>
                                     <select id="rating_filter" class="form-control" name="rating_filter">
-                                        <option value="">All Rating</option>
+                                        <option value="">Rating</option>
                                         <option value="1">Highest Rating</option>
                                         <option value="2">Lowest Rating</option>
                                     </select>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-3 mb-3">
                                     <label for="endDate" class="form-label text-white">Action</label>
-
                                     <div class="d-flex justify-content-start align-items-end">
                                         <a href="" class="link-primary" id="clearAllBtn">Clear All</a>
                                     </div>
@@ -485,8 +486,13 @@ $currentYear = Carbon::now()->year;
                                                         <div class="card-body">
                                                             <div
                                                                 class="d-flex justify-content-between align-items-center mb-2">
-                                                                <span
-                                                                    class="fw-bold">@if($r->reply_by == 1) Administrator @else You @endif</span>
+                                                                <span class="fw-bold">
+                                                                    @if ($r->reply_by == 1)
+                                                                        Administrator
+                                                                    @else
+                                                                        You
+                                                                    @endif
+                                                                </span>
                                                                 <span>{{ Carbon::parse($r->reply_date_time)->setTimezone('Asia/Kuala_Lumpur')->format('d/m/Y g:i A') }}</span>
                                                             </div>
                                                             <div class="d-flex justify-content-start align-items-center">
