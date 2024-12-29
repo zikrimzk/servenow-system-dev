@@ -853,6 +853,30 @@ class RouteController extends Controller
             }
         }
 
+        if ($request->has('status_filter') && $request->input('status_filter') != '') {
+            $data->where('f.review_status', $request->input('status_filter'));
+        }
+
+        if ($request->has('media_filter') && $request->input('media_filter') != '') {
+            if ($request->input('media_filter') == '1') {
+                // Filter for reviews that have at least one image
+                $data->where(function ($query) {
+                    $query->whereNotNull('f.review_imageOne')
+                        ->orWhereNotNull('f.review_imageTwo')
+                        ->orWhereNotNull('f.review_imageThree')
+                        ->orWhereNotNull('f.review_imageFour');
+                });
+            } elseif ($request->input('media_filter') == '2') {
+                // Filter for reviews that have no images
+                $data->where(function ($query) {
+                    $query->whereNull('f.review_imageOne')
+                        ->whereNull('f.review_imageTwo')
+                        ->whereNull('f.review_imageThree')
+                        ->whereNull('f.review_imageFour');
+                });
+            }
+        }
+
         if ($request->has('rating_filter') && $request->input('rating_filter') != '') {
             $ratingFilter = $request->input('rating_filter');
             if ($ratingFilter == '1') {
@@ -896,6 +920,26 @@ class RouteController extends Controller
                 return $datetime;
             });
 
+            $table->addColumn('review_description', function ($row) {
+                // Define maximum rows and columns
+                $maxRows = 3;
+                $maxCols = 18;
+
+                // Calculate the maximum number of characters that can fit
+                $maxCharsPerRow = $maxCols;
+                $maxTotalChars = $maxRows * $maxCharsPerRow;
+
+                // Truncate the description to fit within the maximum allowed size
+                $description = strlen($row->review_description) > $maxTotalChars
+                    ? substr($row->review_description, 0, $maxTotalChars) . '...'
+                    : $row->review_description;
+
+                // Create the textarea element
+                return '<textarea class="form-control" rows="' . $maxRows . '" cols="' . $maxCols . '" readonly style="resize: none;">'
+                    . htmlspecialchars($description)
+                    . '</textarea>';
+            });
+
             $table->addColumn('review_status', function ($row) {
 
                 if ($row->review_status == 1) {
@@ -922,7 +966,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['booking_order_id', 'client', 'review_rating', 'review_date_time', 'review_status', 'action']);
+            $table->rawColumns(['booking_order_id', 'client', 'review_rating', 'review_date_time', 'review_description', 'review_status', 'action']);
 
             return $table->make(true);
         }
@@ -1021,9 +1065,12 @@ class RouteController extends Controller
         ]);
     }
 
-
-
-
+    public function taskerPerformanceAnalysisNav()
+    {
+        return view('tasker.performance.performance-analysis-index', [
+            'title' => 'Performance Analysis'
+        ]);
+    }
     /**** Tasker Route Function - End ****/
 
 
@@ -1254,90 +1301,157 @@ class RouteController extends Controller
     public function adminServiceManagementNav(Request $request)
     {
 
-        if ($request->ajax()) {
+        try {
+            if ($request->ajax()) {
 
-            $data = DB::table('services as a')
-                ->join('service_types as b', 'a.service_type_id', 'b.id')
-                ->join('taskers as c', 'a.tasker_id', 'c.id')
-                ->where('a.service_status', '!=', 3)
-                ->where('a.service_status', '!=', 4)
-                ->select('a.id', 'b.servicetype_name', 'a.service_rate', 'a.service_rate_type', 'a.service_status', 'c.tasker_code', 'c.tasker_firstname')
+                $data = DB::table('services as a')
+                    ->join('service_types as b', 'a.service_type_id', 'b.id')
+                    ->join('taskers as c', 'a.tasker_id', 'c.id')
+                    ->select('a.id', 'b.servicetype_name', 'a.service_rate', 'a.service_rate_type', 'a.service_status', 'a.created_at', 'c.tasker_code', 'c.tasker_firstname')
+                    ->orderBy('a.service_status', 'asc')
+                    ->orderBy('a.created_at', 'desc');
+
+                if ($request->has('status_filter') && $request->input('status_filter') != '') {
+                    $data->having('service_status', '=', $request->status_filter);
+                }
+
+                $data = $data->get();
+
+                $table = DataTables::of($data)->addIndexColumn();
+
+                $table->addColumn('checkbox', function ($row) {
+                    return '<input type="checkbox" class="service-checkbox form-check-input" value="' . $row->id . '">';
+                });
+
+                $table->addColumn('tasker', function ($row) {
+
+                    $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
+                    return $tasker;
+                });
+
+                $table->addColumn('service_rate', function ($row) {
+
+                    $rate = $row->service_rate . ' / ' . $row->service_rate_type;
+                    return $rate;
+                });
+
+                $table->addColumn('service_status', function ($row) {
+
+                    if ($row->service_status == 0) {
+                        $status = ' <span class="badge text-bg-warning text-white">Pending</span>';
+                    } else if ($row->service_status == 1) {
+                        $status = '<span class="badge text-bg-success text-white">Active</span>';
+                    } else if ($row->service_status == 2) {
+                        $status = '<span class="badge text-bg-secondary text-white">Inactive</span>';
+                    } else if ($row->service_status == 3) {
+                        $status = '<span class="badge bg-danger">Rejected</span>';
+                    } else if ($row->service_status == 4) {
+                        $status = '<span class="badge bg-light-danger">Terminated</span>';
+                    }
+
+                    return $status;
+                });
+
+                $table->addColumn('action', function ($row) {
+
+                    if ($row->service_status == 0) {
+                        $button =
+                            '
+                            <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                                data-bs-target="#viewDescModal-' . $row->id . '">
+                                <i class="ti ti-eye f-20"></i>
+                            </a>
+                            <a href="#" class="avtar avtar-xs btn-light-success" data-bs-toggle="modal" 
+                                data-bs-target="#approveModal-' . $row->id . '">
+                                <i class="ti ti-check f-20"></i>
+                            </a>
+                        ';
+                    } else if ($row->service_status == 1) {
+                        $button =
+                            '
+                            <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                                data-bs-target="#viewDescModal-' . $row->id . '">
+                                <i class="ti ti-eye f-20"></i>
+                            </a>
+                            <a href="#" class="avtar avtar-xs btn-light-danger " data-bs-toggle="modal" 
+                                data-bs-target="#terminateModal-' . $row->id . '">
+                                <i class="ti ti-x f-20"></i>
+                            </a>
+                    ';
+                    } else if ($row->service_status == 2 || $row->service_status == 3 || $row->service_status == 4) {
+                        $button = '';
+                    }
+
+                    return $button;
+                });
+
+                $table->rawColumns(['checkbox', 'tasker', 'service_rate', 'service_status', 'action']);
+
+                return $table->make(true);
+            }
+
+            //calculation for total no of services enrolled
+            $totalService = DB::table('services')->count();
+
+            //calculation for total no of pending services
+            $totalPendingService = DB::table('services')
+                ->where('service_status', 0)
+                ->count();
+
+            //calculation for total no of active services
+            $totalActiveService = DB::table('services')
+                ->where('service_status', 1)
+                ->count();
+
+            //calculation for total no of inactive services
+            $totalInactiveService = DB::table('services')
+                ->where('service_status', 2)
+                ->count();
+
+            //calculation for total no of rejected services
+            $totalRejectedService = DB::table('services')
+                ->where('service_status', 3)
+                ->count();
+
+            //calculation for total no of terminated services
+            $totalTerminatedService = DB::table('services')
+                ->where('service_status', 4)
+                ->count();
+
+            //calculation for top 10 taskers
+            $taskerServiceCounts = DB::table('services as a')
+                ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
+                ->select('c.tasker_code', 'c.tasker_firstname', DB::raw('COUNT(a.id) as service_count'))
+                ->groupBy('a.tasker_id', 'c.tasker_code', 'c.tasker_firstname')
+                ->orderBy('service_count', 'desc')
+                ->take(10) // Optional: Limit to the top 10 taskers
                 ->get();
 
-            $table = DataTables::of($data)->addIndexColumn();
+            //calculation for popular service types
+            $popularServiceTypes = DB::table('services as a')
+                ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
+                ->select('b.servicetype_name', DB::raw('COUNT(a.id) as service_count'))
+                ->groupBy('b.servicetype_name')
+                ->orderBy('service_count', 'desc')
+                ->get();
 
-            $table->addColumn('tasker', function ($row) {
+            return view('administrator.service.index', [
+                'title' => 'Service Approval',
+                'services' => Service::get(),
+                'types' => ServiceType::where('servicetype_status', 1)->get(),
+                'totalService' => $totalService,
+                'totalPendingService' => $totalPendingService,
+                'totalActiveService' => $totalActiveService,
+                'totalInactiveService' => $totalInactiveService,
+                'totalRejectedService' => $totalRejectedService,
+                'totalTerminatedService' => $totalTerminatedService,
+                'taskerServiceCounts' => $taskerServiceCounts,
+                'popularServiceTypes' => $popularServiceTypes
 
-                $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
-                return $tasker;
-            });
-
-            $table->addColumn('service_rate', function ($row) {
-
-                $rate = $row->service_rate . ' / ' . $row->service_rate_type;
-                return $rate;
-            });
-
-            $table->addColumn('service_status', function ($row) {
-
-                if ($row->service_status == 0) {
-                    $status = ' <span class="badge text-bg-warning text-white">Pending</span>';
-                } else if ($row->service_status == 1) {
-                    $status = '<span class="badge text-bg-success text-white">Active</span>';
-                } else if ($row->service_status == 2) {
-                    $status = '<span class="badge text-bg-danger text-white">Inactive</span>';
-                } else if ($row->service_status == 3) {
-                    $status = '<span class="badge bg-danger">Rejected</span>';
-                } else if ($row->service_status == 4) {
-                    $status = '<span class="badge bg-light-danger">Terminated</span>';
-                }
-
-                return $status;
-            });
-
-            $table->addColumn('action', function ($row) {
-
-                if ($row->service_status == 0) {
-                    $button =
-                        '
-                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#viewDescModal-' . $row->id . '">
-                            <i class="ti ti-eye f-20"></i>
-                        </a>
-                        <a href="#" class="avtar avtar-xs btn-light-success" data-bs-toggle="modal" 
-                            data-bs-target="#approveModal-' . $row->id . '">
-                            <i class="ti ti-check f-20"></i>
-                        </a>
-                    ';
-                } else if ($row->service_status == 1) {
-                    $button =
-                        '
-                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#viewDescModal-' . $row->id . '">
-                            <i class="ti ti-eye f-20"></i>
-                        </a>
-                        <a href="#" class="avtar avtar-xs btn-light-danger " data-bs-toggle="modal" 
-                            data-bs-target="#terminateModal-' . $row->id . '">
-                            <i class="ti ti-x f-20"></i>
-                        </a>
-                ';
-                } else if ($row->service_status == 2 || $row->service_status == 4) {
-                    $button = '';
-                }
-
-                return $button;
-            });
-
-            $table->rawColumns(['tasker', 'service_rate', 'service_status', 'action']);
-
-            return $table->make(true);
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        return view('administrator.service.index', [
-            'title' => 'Service Approval',
-            'services' => Service::get(),
-            'types' => ServiceType::where('servicetype_status', 1)->get()
-        ]);
     }
 
 
@@ -1877,6 +1991,36 @@ class RouteController extends Controller
             }
         }
 
+        if ($request->has('tasker_filter') && $request->input('tasker_filter') != '') {
+            $data->where('d.id', $request->input('tasker_filter'));
+        }
+
+
+        if ($request->has('status_filter') && $request->input('status_filter') != '') {
+            $data->where('f.review_status', $request->input('status_filter'));
+        }
+
+        if ($request->has('media_filter') && $request->input('media_filter') != '') {
+            if ($request->input('media_filter') == '1') {
+                // Filter for reviews that have at least one image
+                $data->where(function ($query) {
+                    $query->whereNotNull('f.review_imageOne')
+                        ->orWhereNotNull('f.review_imageTwo')
+                        ->orWhereNotNull('f.review_imageThree')
+                        ->orWhereNotNull('f.review_imageFour');
+                });
+            } elseif ($request->input('media_filter') == '2') {
+                // Filter for reviews that have no images
+                $data->where(function ($query) {
+                    $query->whereNull('f.review_imageOne')
+                        ->whereNull('f.review_imageTwo')
+                        ->whereNull('f.review_imageThree')
+                        ->whereNull('f.review_imageFour');
+                });
+            }
+        }
+
+
         if ($request->has('rating_filter') && $request->input('rating_filter') != '') {
             $ratingFilter = $request->input('rating_filter');
             if ($ratingFilter == '1') {
@@ -1913,11 +2057,31 @@ class RouteController extends Controller
                 return $rating;
             });
 
-
             $table->addColumn('review_date_time', function ($row) {
 
                 $datetime = Carbon::parse($row->review_date_time)->setTimezone('Asia/Kuala_Lumpur')->format('d F Y g:i A');
                 return $datetime;
+            });
+
+
+            $table->addColumn('review_description', function ($row) {
+                // Define maximum rows and columns
+                $maxRows = 3;
+                $maxCols = 18;
+
+                // Calculate the maximum number of characters that can fit
+                $maxCharsPerRow = $maxCols;
+                $maxTotalChars = $maxRows * $maxCharsPerRow;
+
+                // Truncate the description to fit within the maximum allowed size
+                $description = strlen($row->review_description) > $maxTotalChars
+                    ? substr($row->review_description, 0, $maxTotalChars) . '...'
+                    : $row->review_description;
+
+                // Create the textarea element
+                return '<textarea class="form-control" rows="' . $maxRows . '" cols="' . $maxCols . '" readonly style="resize: none;">'
+                    . htmlspecialchars($description)
+                    . '</textarea>';
             });
 
             $table->addColumn('review_status', function ($row) {
@@ -1946,7 +2110,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['booking_order_id', 'client', 'review_rating', 'review_date_time', 'review_status', 'action']);
+            $table->rawColumns(['booking_order_id', 'client', 'review_rating', 'review_date_time', 'review_description', 'review_status', 'action']);
 
             return $table->make(true);
         }
@@ -2316,8 +2480,8 @@ class RouteController extends Controller
 
 
         $yearlyAverages = $chartData
-            ->sortByDesc('year') 
-            ->take(3) 
+            ->sortByDesc('year')
+            ->take(3)
             ->map(function ($data) {
                 $validScores = collect($data['scores'])->filter(function ($score) {
                     return $score > 0;
@@ -2329,8 +2493,9 @@ class RouteController extends Controller
                     'average_performance' => round($average, 2),
                 ];
             })
-            ->sortBy('year') 
+            ->sortBy('year')
             ->values();
+
         return view('administrator.performance.tasker-performance-index', [
             'title' => 'Tasker Performance',
             'data' => $data,

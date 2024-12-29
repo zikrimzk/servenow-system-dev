@@ -22,7 +22,6 @@ $currentYear = Carbon::now()->year;
                             <ul class="breadcrumb">
                                 <li class="breadcrumb-item">Performance</li>
                                 <li class="breadcrumb-item" aria-current="page">Review Management</li>
-
                             </ul>
                         </div>
                         <div class="col-md-12">
@@ -248,13 +247,28 @@ $currentYear = Carbon::now()->year;
                                 </div>
                             </div>
                             <div class="row align-items-center">
-                                <div class="col-sm-3 mb-3">
-                                    <label for="endDate" class="form-label">Filter by</label>
-                                    <select id="rating_filter" class="form-control" name="rating_filter">
-                                        <option value="">Rating</option>
-                                        <option value="1">Highest Rating</option>
-                                        <option value="2">Lowest Rating</option>
-                                    </select>
+                                <div class="col-sm-9 mb-3">
+                                    <label for="rating_filter" class="form-label">Filter by</label>
+                                    <div class="d-block  d-md-flex justify-content-between align-items-center gap-2">
+                                        <select id="rating_filter" class="form-control mb-3 mb-md-0"
+                                            name="rating_filter">
+                                            <option value="">Rating</option>
+                                            <option value="1">Highest Rating</option>
+                                            <option value="2">Lowest Rating</option>
+                                        </select>
+
+                                        <select id="status_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Status (All)</option>
+                                            <option value="1">Show</option>
+                                            <option value="2">Hide</option>
+                                        </select>
+
+                                        <select id="media_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Photo (All)</option>
+                                            <option value="1">With Photo</option>
+                                            <option value="2">Without Photo</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="col-sm-3 mb-3">
                                     <label for="endDate" class="form-label text-white">Action</label>
@@ -273,6 +287,7 @@ $currentYear = Carbon::now()->year;
                                             <th scope="col">Date</th>
                                             <th scope="col">Booking ID</th>
                                             <th scope="col">Rating</th>
+                                            <th scope="col">Comment</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">Action</th>
                                         </tr>
@@ -651,6 +666,8 @@ $currentYear = Carbon::now()->year;
                             d.startDate = $('#startDate').val();
                             d.endDate = $('#endDate').val();
                             d.rating_filter = $('#rating_filter').val();
+                            d.status_filter = $('#status_filter').val();
+                            d.media_filter = $('#media_filter').val();
                         }
                     },
                     // ajax: "{{ route('admin-review-management') }}",
@@ -671,7 +688,10 @@ $currentYear = Carbon::now()->year;
                             data: 'review_rating',
                             name: 'review_rating'
                         },
-
+                        {
+                            data: 'review_description',
+                            name: 'review_description'
+                        },
                         {
                             data: 'review_status',
                             name: 'review_status'
@@ -711,15 +731,28 @@ $currentYear = Carbon::now()->year;
                     table.draw();
                 });
 
-                $('#clearAllBtn').on('click', function(e) {
-                    e.preventDefault();
-                    $('#startDate').val('');
-                    $('#endDate').val('');
-                    $('#rating_filter').val('');
+                $('#status_filter').on('change', function() {
                     table.ajax.reload();
                     table.draw();
                 });
 
+                $('#media_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+
+                $('#clearAllBtn').on('click', function(e) {
+                    e.preventDefault();
+                    $('#startDate').val('');
+                    $('#endDate').val('');
+                    $('#tasker_filter').val('');
+                    $('#rating_filter').val('');
+                    $('#status_filter').val('');
+                    $('#media_filter').val('');
+                    table.ajax.reload();
+                    table.draw();
+                });
             });
 
 

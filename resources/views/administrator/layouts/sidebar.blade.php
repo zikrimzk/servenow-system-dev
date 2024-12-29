@@ -85,7 +85,7 @@
                         <li class="pc-item"><a class="pc-link"
                                 href="{{ route('admin-service-type-management') }}">Service Type </a></li>
                         <li class="pc-item"><a class="pc-link" href="{{ route('admin-service-management') }}">Service
-                                Approval</a></li>
+                                Management</a></li>
                     </ul>
                 </li>
 

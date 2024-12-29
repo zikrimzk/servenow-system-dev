@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Service;
 use App\Models\ServiceType;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Mail\TaskerServiceApproved;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class ServiceController extends Controller
 {
@@ -141,9 +146,60 @@ class ServiceController extends Controller
     {
         try {
             Service::where('id', $id)->update(['service_status' => 1]);
+
+            $datas = DB::table('taskers as a')
+                ->join('services as b', 'a.id', '=', 'b.tasker_id')
+                ->join('service_types as c', 'b.service_type_id', '=', 'c.id')
+                ->where('b.id', '=', $id)
+                ->get();
+
+
+            foreach ($datas as $data) {
+                Mail::to($data->email)->send(new TaskerServiceApproved([
+                    'name' => Str::headline($data->tasker_firstname . ' ' . $data->tasker_lastname),
+                    'service_name' => $data->servicetype_name,
+                    'approval_date' => Carbon::now()->format('d F Y g:i A'),
+                    'service_rate' => $data->service_rate,
+                    'service_rate_type' => $data->service_rate_type,
+                    'service_desc' => $data->service_desc,
+                    'service_status' => $data->service_status
+                ]));
+            }
+
             return redirect(route('admin-service-management'))->with('success', 'Service has been approved !');
         } catch (Exception $e) {
             return redirect(route('admin-service-management'))->with('error', 'Error : ' . $e->getMessage());
+        }
+    }
+
+    public function adminApproveMultipleService(Request $request)
+    {
+        try {
+            $seviceIds = $request->input('selected_service');
+
+            Service::whereIn('id', $seviceIds)->update(['service_status' => 1]);
+
+            $datas = DB::table('taskers as a')
+                ->join('services as b', 'a.id', '=', 'b.tasker_id')
+                ->join('service_types as c', 'b.service_type_id', '=', 'c.id')
+                ->whereIn('b.id', $seviceIds)
+                ->get();
+
+
+            foreach ($datas as $data) {
+                Mail::to($data->email)->send(new TaskerServiceApproved([
+                    'name' => Str::headline($data->tasker_firstname . ' ' . $data->tasker_lastname),
+                    'service_name' => $data->servicetype_name,
+                    'approval_date' => Carbon::now()->format('d F Y g:i A'),
+                    'service_rate' => $data->service_rate,
+                    'service_rate_type' => $data->service_rate_type,
+                    'service_desc' => $data->service_desc,
+                    'service_status' => $data->service_status
+                ]));
+            }
+            return response()->json(['success' => 'All selected services has been approved !', 'service' => $seviceIds]);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error : ' . $e->getMessage()]);
         }
     }
 
@@ -151,9 +207,59 @@ class ServiceController extends Controller
     {
         try {
             Service::where('id', $id)->update(['service_status' => 3]);
+
+            $datas = DB::table('taskers as a')
+                ->join('services as b', 'a.id', '=', 'b.tasker_id')
+                ->join('service_types as c', 'b.service_type_id', '=', 'c.id')
+                ->where('b.id', '=', $id)
+                ->get();
+
+            foreach ($datas as $data) {
+                Mail::to($data->email)->send(new TaskerServiceApproved([
+                    'name' => Str::headline($data->tasker_firstname . ' ' . $data->tasker_lastname),
+                    'service_name' => $data->servicetype_name,
+                    'approval_date' => Carbon::now()->format('d F Y g:i A'),
+                    'service_rate' => $data->service_rate,
+                    'service_rate_type' => $data->service_rate_type,
+                    'service_desc' => $data->service_desc,
+                    'service_status' => $data->service_status
+                ]));
+            }
             return redirect(route('admin-service-management'))->with('success', 'Service has been rejected !');
         } catch (Exception $e) {
             return redirect(route('admin-service-management'))->with('error', 'Error : ' . $e->getMessage());
+        }
+    }
+
+    public function adminRejectMultipleService(Request $request)
+    {
+        try {
+            $seviceIds = $request->input('selected_service');
+
+            Service::whereIn('id', $seviceIds)->update(['service_status' => 3]);
+
+            $datas = DB::table('taskers as a')
+                ->join('services as b', 'a.id', '=', 'b.tasker_id')
+                ->join('service_types as c', 'b.service_type_id', '=', 'c.id')
+                ->whereIn('b.id', $seviceIds)
+                ->get();
+
+
+            foreach ($datas as $data) {
+                Mail::to($data->email)->send(new TaskerServiceApproved([
+                    'name' => Str::headline($data->tasker_firstname . ' ' . $data->tasker_lastname),
+                    'service_name' => $data->servicetype_name,
+                    'approval_date' => Carbon::now()->format('d F Y g:i A'),
+                    'service_rate' => $data->service_rate,
+                    'service_rate_type' => $data->service_rate_type,
+                    'service_desc' => $data->service_desc,
+                    'service_status' => $data->service_status
+                ]));
+            }
+
+            return response()->json(['success' => 'All selected services has been rejected !', 'service' => $seviceIds]);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error : ' . $e->getMessage()]);
         }
     }
 
@@ -161,9 +267,57 @@ class ServiceController extends Controller
     {
         try {
             Service::where('id', $id)->update(['service_status' => 4]);
+
+            $datas = DB::table('taskers as a')
+                ->join('services as b', 'a.id', '=', 'b.tasker_id')
+                ->join('service_types as c', 'b.service_type_id', '=', 'c.id')
+                ->where('b.id', '=', $id)
+                ->get();
+
+            foreach ($datas as $data) {
+                Mail::to($data->email)->send(new TaskerServiceApproved([
+                    'name' => Str::headline($data->tasker_firstname . ' ' . $data->tasker_lastname),
+                    'service_name' => $data->servicetype_name,
+                    'approval_date' => Carbon::now()->format('d F Y g:i A'),
+                    'service_rate' => $data->service_rate,
+                    'service_rate_type' => $data->service_rate_type,
+                    'service_desc' => $data->service_desc,
+                    'service_status' => $data->service_status
+                ]));
+            }
+
             return redirect(route('admin-service-management'))->with('success', 'Service has been terminated !');
         } catch (Exception $e) {
             return redirect(route('admin-service-management'))->with('error', 'Error : ' . $e->getMessage());
+        }
+    }
+
+    public function adminTerminateMultipleService(Request $request)
+    {
+        try {
+            $seviceIds = $request->input('selected_service');
+            Service::whereIn('id', $seviceIds)->update(['service_status' => 4]);
+
+            $datas = DB::table('taskers as a')
+                ->join('services as b', 'a.id', '=', 'b.tasker_id')
+                ->join('service_types as c', 'b.service_type_id', '=', 'c.id')
+                ->whereIn('b.id', $seviceIds)
+                ->get();
+                
+            foreach ($datas as $data) {
+                Mail::to($data->email)->send(new TaskerServiceApproved([
+                    'name' => Str::headline($data->tasker_firstname . ' ' . $data->tasker_lastname),
+                    'service_name' => $data->servicetype_name,
+                    'approval_date' => Carbon::now()->format('d F Y g:i A'),
+                    'service_rate' => $data->service_rate,
+                    'service_rate_type' => $data->service_rate_type,
+                    'service_desc' => $data->service_desc,
+                    'service_status' => $data->service_status
+                ]));
+            }
+            return response()->json(['success' => 'All selected services has been terminated !', 'service' => $seviceIds]);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error : ' . $e->getMessage()]);
         }
     }
 }

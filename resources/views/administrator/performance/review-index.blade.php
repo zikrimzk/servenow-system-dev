@@ -257,22 +257,46 @@ use Illuminate\Support\Facades\DB;
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col-sm-6 mb-3">
-                                    <label for="score_filter" class="form-label">Date Range</label>
+                                    <label for="date_range" class="form-label">Date Range</label>
                                     <div class="d-flex align-items-center">
                                         <input type="date" id="startDate" name="startDate" class="form-control">
                                         <span class="mx-2">to</span>
                                         <input type="date" id="endDate" name="endDate" class="form-control">
                                     </div>
                                 </div>
+
+                                <div class="col-sm-6 mb-3">
+                                    <label for="tasker_filter" class="form-label">Tasker</label>
+                                    <select id="tasker_filter" class="form-control">
+                                        <option value="">All Taskers</option>
+                                        @foreach ($data->unique('taskerID') as $b)
+                                            <option value="{{ $b->taskerID }}">{{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) . ' (' . $b->tasker_code . ')' }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                             <div class="row align-items-center">
-                                <div class="col-sm-3 mb-3">
-                                    <label for="endDate" class="form-label">Filter by</label>
-                                    <select id="rating_filter" class="form-control" name="rating_filter">
-                                        <option value="">Rating</option>
-                                        <option value="1">Highest Rating</option>
-                                        <option value="2">Lowest Rating</option>
-                                    </select>
+                                <div class="col-sm-9 mb-3">
+                                    <label for="rating_filter" class="form-label">Filter by</label>
+                                    <div class="d-block  d-md-flex justify-content-between align-items-center gap-2">
+                                        <select id="rating_filter" class="form-control mb-3 mb-md-0" name="rating_filter">
+                                            <option value="">Rating</option>
+                                            <option value="1">Highest Rating</option>
+                                            <option value="2">Lowest Rating</option>
+                                        </select>
+
+                                        <select id="status_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Status (All)</option>
+                                            <option value="1">Show</option>
+                                            <option value="2">Hide</option>
+                                        </select>
+
+                                        <select id="media_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Photo (All)</option>
+                                            <option value="1">With Photo</option>
+                                            <option value="2">Without Photo</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="col-sm-3 mb-3">
                                     <label for="endDate" class="form-label text-white">Action</label>
@@ -291,6 +315,7 @@ use Illuminate\Support\Facades\DB;
                                             <th scope="col">Date</th>
                                             <th scope="col">Booking ID</th>
                                             <th scope="col">Rating</th>
+                                            <th scope="col">Comment</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">Action</th>
                                         </tr>
@@ -708,10 +733,12 @@ use Illuminate\Support\Facades\DB;
                         data: function(d) {
                             d.startDate = $('#startDate').val();
                             d.endDate = $('#endDate').val();
+                            d.tasker_filter = $('#tasker_filter').val();
                             d.rating_filter = $('#rating_filter').val();
+                            d.status_filter = $('#status_filter').val();
+                            d.media_filter = $('#media_filter').val();
                         }
                     },
-                    // ajax: "{{ route('admin-review-management') }}",
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
@@ -729,7 +756,10 @@ use Illuminate\Support\Facades\DB;
                             data: 'review_rating',
                             name: 'review_rating'
                         },
-
+                        {
+                            data: 'review_description',
+                            name: 'review_description'
+                        },
                         {
                             data: 'review_status',
                             name: 'review_status'
@@ -764,16 +794,35 @@ use Illuminate\Support\Facades\DB;
                     table.draw();
                 });
 
+                $('#tasker_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
                 $('#rating_filter').on('change', function() {
                     table.ajax.reload();
                     table.draw();
                 });
 
+                $('#status_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#media_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+                
+
                 $('#clearAllBtn').on('click', function(e) {
                     e.preventDefault();
                     $('#startDate').val('');
                     $('#endDate').val('');
+                    $('#tasker_filter').val('');
                     $('#rating_filter').val('');
+                    $('#status_filter').val('');
+                    $('#media_filter').val('');
                     table.ajax.reload();
                     table.draw();
                 });

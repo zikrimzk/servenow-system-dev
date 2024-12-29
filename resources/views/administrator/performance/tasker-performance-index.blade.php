@@ -341,8 +341,6 @@ use Illuminate\Support\Facades\DB;
                             d.score_filter_min = $('#score_filter_min').val();
                             d.score_filter_max = $('#score_filter_max').val();
                             d.penalized_filter = $('#penalized_filter').val();
-
-
                         }
                     },
                     columns: [{
@@ -448,7 +446,7 @@ use Illuminate\Support\Facades\DB;
                     $('.tasker-checkbox:checked').each(function() {
                         selectedTaskers.push($(this).val());
                     });
-
+            
                     if (selectedTaskers.length > 0) {
                         $.ajax({
                             url: "{{ route('admin-send-performance-report') }}",

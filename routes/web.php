@@ -106,8 +106,12 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     // Admin - Service Management
     Route::get('/service-management', [RouteController::class, 'adminServiceManagementNav'])->name('admin-service-management');
     Route::get('/approve-service-{id}', [ServiceController::class, 'adminApproveService'])->name('admin-approve-service');
+    Route::post('/multiple-approve-service', [ServiceController::class, 'adminApproveMultipleService'])->name('admin-approve-multiple-service');
+    Route::post('/multiple-reject-service', [ServiceController::class, 'adminRejectMultipleService'])->name('admin-reject-multiple-service');
     Route::get('/reject-service-{id}', [ServiceController::class, 'adminRejectService'])->name('admin-reject-service');
     Route::get('/terminate-service-{id}', [ServiceController::class, 'adminTerminateService'])->name('admin-terminate-service');
+    Route::post('/multiple-terminate-service', [ServiceController::class, 'adminTerminateMultipleService'])->name('admin-terminate-multiple-service');
+
 
     // Admin - System Setting
     Route::get('/system-setting', [RouteController::class, 'adminSystemSettingNav'])->name('admin-system-setting');
@@ -207,6 +211,9 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::get('/review-management', [RouteController::class, 'taskerReviewManagementNav'])->name('tasker-review-management');
     Route::post('/update-review-{id}', [PerformanceController::class, 'taskerReviewUpdateStatus'])->name('tasker-review-update');
     Route::post('/tasker-reply-review/{id}', [PerformanceController::class, 'taskerReplyReview'])->name('tasker-reply-review');
+
+    // Tasker - Performance Analysis
+    Route::get('/performance-analysis', [RouteController::class, 'taskerPerformanceAnalysisNav'])->name('tasker-performance-analysis');
 
 });
 
