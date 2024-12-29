@@ -2165,21 +2165,6 @@ class RouteController extends Controller
                 ];
             });
 
-        $highestSelfRefund = $data
-            ->filter(function ($tasker) {
-                return $tasker->total_self_cancel_refunds;
-            })
-            ->sortByDesc('total_self_cancel_refunds')
-            ->take(1)
-            ->map(function ($tasker) {
-                return [
-                    'name' => $tasker->tasker_name,
-                    'values' => $tasker->total_self_cancel_refunds,
-                ];
-            })
-            ->first();
-
-
         if ($request->ajax()) {
 
             $table = DataTables::of($data)->addIndexColumn();
@@ -2320,36 +2305,32 @@ class RouteController extends Controller
             $monthlyScores = collect(range(1, 12))->map(function ($month) use ($items) {
                 return $items->filter(function ($item) use ($month) {
                     return Carbon::parse($item->last_booking_date)->month === $month;
-                })->avg('performance_score_percentage') ?? 0; // Default to 0 if no data
+                })->avg('performance_score_percentage') ?? 0;
             });
 
             return [
                 'year' => $year,
                 'scores' => $monthlyScores,
             ];
-        })->values(); // Reset array keys
+        })->values();
 
 
-        $yearlyAverages = $chartData->map(function ($data) {
-            // Filter out scores with value 0
-            $validScores = collect($data['scores'])->filter(function ($score) {
-                return $score > 0;
-            });
+        $yearlyAverages = $chartData
+            ->sortByDesc('year') 
+            ->take(3) 
+            ->map(function ($data) {
+                $validScores = collect($data['scores'])->filter(function ($score) {
+                    return $score > 0;
+                });
+                $average = $validScores->avg();
 
-            // Calculate the average for the year
-            $average = $validScores->avg();
-
-            return [
-                'year' => $data['year'],
-                'average_performance' => round($average, 2), // Round to 2 decimal places
-            ];
-        });
-
-        // dd($chartData, $yearlyAverages);
-
-
-
-        // dd($data, $overallPerformance);
+                return [
+                    'year' => $data['year'],
+                    'average_performance' => round($average, 2),
+                ];
+            })
+            ->sortBy('year') 
+            ->values();
         return view('administrator.performance.tasker-performance-index', [
             'title' => 'Tasker Performance',
             'data' => $data,
@@ -2359,9 +2340,8 @@ class RouteController extends Controller
             'monthlyScores' => $monthlyScores,
             'highestPerformers' => $highestPerformers,
             'lowestPerformers' => $lowestPerformers,
-            'highestSelfRefund' => $highestSelfRefund,
             'yearlyAverages' => $yearlyAverages
-            
+
         ]);
     }
 

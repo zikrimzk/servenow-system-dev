@@ -189,25 +189,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- State Field -->
-                                    <div class="col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">State</label>
-                                            <select name="client_state"
-                                                class="form-control @error('client_state') is-invalid @enderror">
-                                                <option value="" selected>Select State</option>
-                                                @foreach ($states['states'] as $state)
-                                                    <option value="{{ strtolower($state['name']) }}">
-                                                        {{ $state['name'] }}</option>
-                                                @endforeach
-                                            </select>
-                                            @error('client_state')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-
-                                        </div>
-                                    </div>
-
                                     <!-- Account Status Field -->
                                     <div class="col-sm-6">
                                         <div class="mb-3">

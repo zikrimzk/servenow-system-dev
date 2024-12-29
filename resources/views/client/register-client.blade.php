@@ -40,7 +40,7 @@
 <!-- [Body] Start -->
 
 <body data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr"
-    data-pc-theme_contrast="" data-pc-theme="dark">
+    data-pc-theme_contrast="" data-pc-theme="light">
 
     <!-- [ Pre-loader ] start -->
     <div class="page-loader">
@@ -62,8 +62,8 @@
 
                             </div>
                             <div class="my-3"></div>
-                            <h1 class="f-w-500 mb-1 text-start"style="color:#16325b">Sign up</h1>
-                            <h5 class="f-w-500 mb-3 text-start">It’s Quick and Easy!</h5>
+                            <h1 class="f-w-500 mb-1 text-center"style="color:#16325b">Sign up</h1>
+                            <h5 class="f-w-500 mb-3 text-center">It’s Quick and Easy!</h5>
 
 
                             <div class="row">
@@ -88,61 +88,73 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-
                                 </div>
                             </div>
-                            <div class="form-floating mb-3">
-                                <input type="tel" class="form-control @error('client_phoneno') is-invalid @enderror"
-                                    id="ClientPhoneNo" placeholder="Phone Number" name="client_phoneno" maxlength="15"
-                                    required />
-                                <label for="ClientPhoneNo">Phone Number</label>
-                                @error('client_phoneno')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div id="phone-error-message" class="text-danger" style="display: none;">
-                                    Phone number must be in a valid format (10 or 11 digits)!
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="tel"
+                                            class="form-control @error('client_phoneno') is-invalid @enderror"
+                                            id="ClientPhoneNo" placeholder="Phone Number" name="client_phoneno"
+                                            maxlength="15" required />
+                                        <label for="ClientPhoneNo">Phone Number</label>
+                                        @error('client_phoneno')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <div id="phone-error-message" class="text-danger" style="display: none;">
+                                            Phone number must be in a valid format (10 or 11 digits)!
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                                <div class="col-sm-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                            id="floatingInput" placeholder="Email" name="email" />
+                                        <label for="floatingInput">Email</label>
+                                        @error('email')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="password"
+                                            class="form-control @error('password') is-invalid @enderror"
+                                            id="floatingInput" placeholder="Password" name="password" />
+                                        <label for="floatingInput">Password</label>
+                                        @error('password')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="password"
+                                            class="form-control  @error('cpassword') is-invalid @enderror"
+                                            id="floatingInput" placeholder="Confirm Password" name="cpassword" />
+                                        <label for="floatingInput">Confirm Password</label>
+                                        @error('cpassword')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <select name="client_state"
+                                            class="form-select @error('client_state') is-invalid @enderror"
+                                            id="addState">
+                                            <option value="" selected>Select State</option>
+                                            @foreach ($states['states'] as $state)
+                                                <option value="{{ strtolower($state['name']) }}">
+                                                    {{ $state['name'] }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('client_state')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
 
-
-                            
-                            <div class="form-floating mb-3">
-                                <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                    id="floatingInput" placeholder="Email" name="email" />
-                                <label for="floatingInput">Email</label>
-                                @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="form-floating mb-3">
-                                <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                    id="floatingInput" placeholder="Password" name="password" />
-                                <label for="floatingInput">Password</label>
-                                @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="form-floating mb-3">
-                                <input type="password" class="form-control  @error('cpassword') is-invalid @enderror"
-                                    id="floatingInput" placeholder="Confirm Password" name="cpassword" />
-                                <label for="floatingInput">Confirm Password</label>
-                                @error('cpassword')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <select name="client_state"
-                                    class="form-control @error('client_state') is-invalid @enderror" id="addState">
-                                    <option value="" selected>Select State</option>
-                                    @foreach ($states['states'] as $state)
-                                        <option value="{{ strtolower($state['name']) }}">
-                                            {{ $state['name'] }}</option>
-                                    @endforeach
-                                </select>
-                                @error('client_state')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-
+                                    </div>
+                                </div>
                             </div>
                             <div class="d-flex mt-1 justify-content-between">
                                 <div class="form-check">
@@ -213,30 +225,6 @@
                 errorMessage.style.display = 'block';
             }
         });
-    </script>
-
-    <script>
-        layout_change('light');
-    </script>
-
-    <script>
-        change_box_container('false');
-    </script>
-
-    <script>
-        layout_caption_change('true');
-    </script>
-
-    <script>
-        layout_rtl_change('false');
-    </script>
-
-    <script>
-        preset_change('preset-1');
-    </script>
-
-    <script>
-        main_layout_change('vertical');
     </script>
 
 </body>

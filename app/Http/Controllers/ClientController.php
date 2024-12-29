@@ -31,7 +31,6 @@ class ClientController extends Controller
                 'client_phoneno' => 'required|string|min:10|max:11',
                 'email' => 'required|email|unique:clients',
                 'password' => 'required|min:8',
-                'client_state' => 'required',
                 'client_status' => 'required',
             ],
             [],
@@ -41,7 +40,6 @@ class ClientController extends Controller
                 'client_phoneno' => 'Phone number',
                 'email' => 'Email',
                 'password' => 'Password',
-                'client_state' => 'State',
                 'client_status' => 'Status',
             ]
         );
@@ -50,7 +48,7 @@ class ClientController extends Controller
         $clients['password'] = bcrypt($clients['password']);
 
         Client::create($clients);
-        return back()->with('success', 'The Client account has been successfully created! Please remind theClient to update their password upon logging in.');
+        return back()->with('success', 'The Client account has been successfully created! Please remind the client to update their password upon logging in.');
     }
 
     public function adminUpdateClient(Request $req, $id)
@@ -112,7 +110,6 @@ class ClientController extends Controller
                 'email' => 'required|email|unique:clients',
                 'password' => 'required|same:cpassword|min:8',
                 'cpassword' => 'required|min:8',
-                'client_state' => 'required',
             ],
             [],
             [
@@ -122,8 +119,6 @@ class ClientController extends Controller
                 'email' => 'Email',
                 'password' => 'Password',
                 'cpassword' => 'Confirm password',
-                'client_state' => 'State',
-
             ]
         );
 

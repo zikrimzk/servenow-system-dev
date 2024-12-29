@@ -81,16 +81,6 @@ use Illuminate\Support\Facades\DB;
                         </div>
                     </div>
                 @endforeach
-
-                <div class="col-md-6 col-xl-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h6 class="mb-2 f-w-400 text-muted">Highest Penalized Tasker</h6>
-                            <h4 class="mb-3 text-danger">{{ $highestSelfRefund['values'] }}</h4>
-                            <p class="mb-0 text-muted text-sm">points - {{ $highestSelfRefund['name'] }}</p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div class="row">
@@ -98,7 +88,7 @@ use Illuminate\Support\Facades\DB;
                 <div class="col-md-12 col-xl-6">
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="mb-3 f-w-400 text-muted">Highest Performers Tasker</h6>
+                            <h6 class="mb-3 f-w-400 text-muted">Highest Performance Score</h6>
                             <canvas id="highestPerformersChart"></canvas>
                         </div>
                     </div>
@@ -106,7 +96,7 @@ use Illuminate\Support\Facades\DB;
                 <div class="col-md-12 col-xl-6">
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="mb-3 f-w-400 text-muted">Lowest Performers Tasker</h6>
+                            <h6 class="mb-3 f-w-400 text-muted">Lowest Performance Score</h6>
                             <canvas id="lowestPerformersChart"></canvas>
                         </div>
                     </div>
