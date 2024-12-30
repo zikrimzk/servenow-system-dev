@@ -1067,8 +1067,120 @@ class RouteController extends Controller
 
     public function taskerPerformanceAnalysisNav()
     {
+        $bookings = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->where('b.tasker_id', auth()->user()->id)
+            ->get();
+
+        $completedBookings = $bookings->where('booking_status', 6)->count();
+        // $completedBookings = 201;
+
+        // Calculate progress
+        if ($completedBookings <= 20) {
+            $progress = ($completedBookings / 20) * 100;
+        } elseif ($completedBookings <= 80) {
+            $progress = (($completedBookings - 20) / 60) * 100;
+        } else {
+            $progress = 100; // Max progress for Experienced Tasker
+        }
+
+        $taskerId = auth()->user()->id;
+
+        // Get the current date and calculate the two previous months' ranges
+        $twoMonthsAgo = now()->subMonths(2)->startOfMonth();
+        $lastMonth = now()->subMonth()->startOfMonth();
+        $endLastMonth = now()->subMonth()->endOfMonth();
+
+        // label for the chart
+        $dateLabel = [
+            'currentDate' => now()->format('d F Y'),
+            'lastMonth' => $lastMonth->format('F Y'),
+            'twoMonthsAgo' => $twoMonthsAgo->format('F Y'),
+        ];
+
+        $taskers = DB::table('taskers')
+            ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
+            ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
+            ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
+            ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
+            ->select(
+                'taskers.tasker_code',
+                'taskers.id',
+                DB::raw("CONCAT(taskers.tasker_firstname, ' ', taskers.tasker_lastname) AS tasker_name"),
+                DB::raw("AVG(reviews.review_rating) AS average_rating"),
+                DB::raw("
+                CASE 
+                    WHEN AVG(reviews.review_rating) >= 4 THEN '1'
+                    WHEN AVG(reviews.review_rating) >= 3 THEN '2'
+                    ELSE '3'
+                END AS satisfaction_reaction
+            "),
+                // 'taskers.tasker_selfrefund_count AS total_self_cancel_refunds',
+                DB::raw("COUNT(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 END) AS total_self_cancel_refunds"),
+                DB::raw("COUNT(CASE WHEN bookings.booking_status = '6' THEN 1 END) AS total_completed_bookings"),
+                DB::raw("
+                    ROUND(
+                        (
+                            (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
+                            + (CASE WHEN AVG(reviews.review_rating) >= 4 THEN 15 ELSE 0 END) -- Satisfaction bonus (15%)
+                            - LEAST(taskers.tasker_selfrefund_count * 2.5, 25) -- Refund penalty capped at 25%
+                        ), 2
+                    ) AS performance_score_percentage
+                "),
+            )
+            ->groupBy('taskers.id')
+            ->where('taskers.id', $taskerId);
+
+        $pastPerformance = DB::table('taskers')
+            ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
+            ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
+            ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
+            ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
+            ->select(
+                DB::raw("DATE_FORMAT(bookings.booking_date, '%Y-%m') AS month"),
+                DB::raw("AVG(reviews.review_rating) AS average_rating"),
+                DB::raw("
+                    ROUND(
+                        (
+                            (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
+                            + (CASE WHEN AVG(reviews.review_rating) >= 4 THEN 15 ELSE 0 END) -- Satisfaction bonus (15%)
+                            - LEAST(SUM(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 ELSE 0 END) * 2.5, 25) -- Refund penalty capped at 25%
+                        ), 2
+                    ) AS performance_score_percentage
+                ")
+            )
+            ->where('taskers.id', $taskerId)
+            ->whereBetween('bookings.booking_date', [$twoMonthsAgo, $endLastMonth])
+            ->groupBy(DB::raw("DATE_FORMAT(bookings.booking_date, '%Y-%m')"))
+            ->get();
+
+        $taskers = $taskers->first();
+
+        $taskerMonthlyRefunds = DB::table('taskers')
+            ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
+            ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
+            ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
+            ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
+            ->select(
+                DB::raw("DATE_FORMAT(bookings.booking_date, '%Y-%m') AS month"), // Extract year and month
+                DB::raw("COUNT(cancel_refund_bookings.id) AS total_refunds"),   // Total refunds
+                DB::raw("SUM(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 ELSE 0 END) AS penalized_refunds"), // Penalized refunds
+            )
+            ->where('taskers.id', $taskerId)
+            ->groupBy('month')
+            ->orderBy('month', 'desc')
+            ->get();
+
+        // dd($taskerMonthlyRefunds);
+
         return view('tasker.performance.performance-analysis-index', [
-            'title' => 'Performance Analysis'
+            'title' => 'Performance Analysis',
+            'completedBookings' => $completedBookings,
+            'progress' => $progress,
+            'taskers' => $taskers,
+            'pastPerformance' => $pastPerformance,
+            'date' => $dateLabel,
+            'taskerMonthlyRefunds' => $taskerMonthlyRefunds
         ]);
     }
     /**** Tasker Route Function - End ****/

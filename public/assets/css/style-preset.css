@@ -95,6 +95,11 @@ $btn-border-radius-lg: 14px; */
   color: #ffffff !important;
   background-color: RGBA(70, 128, 255, var(--bs-bg-opacity, 1)) !important;
 }
+
+[data-pc-preset=preset-1] .bg-primary {
+  color: #ffffff !important;
+  background-color: RGBA(70, 128, 255, var(--bs-bg-opacity, 1)) !important;
+}
 [data-pc-preset=preset-1] .accordion {
   --bs-accordion-btn-focus-border-color: #16325b;
   --bs-accordion-btn-focus-box-shadow: 0 0 0 0.2rem rgba(70, 128, 255, 0.25);

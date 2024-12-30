@@ -7079,6 +7079,11 @@ textarea.is-invalid.dataTable-input {
   content: "";
 }
 
+.bg-primary-custom {
+  color: #ffffff !important;
+  background-color: RGBA(var(--bs-primary-rgb), var(--bs-bg-opacity, 1)) !important;
+}
+
 .text-bg-theme {
   color: #ffffff !important;
   background-color: RGBA(var(--bs-theme-rgb), var(--bs-bg-opacity, 1)) !important;
