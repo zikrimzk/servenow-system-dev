@@ -611,7 +611,7 @@
                     $('.service-checkbox:checked').each(function() {
                         const row = $(this).closest('tr');
                         const status = row.find('td:nth-child(6) .badge')
-                    .text(); // Adjust column index for "status"
+                            .text(); // Adjust column index for "status"
 
                         // If any status is not 'Pending', disable Approve/Reject
                         if (status !== 'Pending') hasOnlyPending = false;
@@ -680,6 +680,7 @@
 
                 // Approve/Reject Action
                 $('#approveBtn').on('click', function() {
+                    const $buttonOne = $(this);
                     const selectedPending = [];
                     $('.service-checkbox:checked').each(function() {
                         const row = $(this).closest('tr');
@@ -692,6 +693,10 @@
                     });
 
                     if (selectedPending.length > 0) {
+                        // Disable the button and show loading text
+                        $buttonOne.prop('disabled', true).html(
+                            '<span class="spinner-border spinner-border-sm me-2"></span> Approving...'
+                        );
                         $.ajax({
                             url: "{{ route('admin-approve-multiple-service') }}",
                             type: "POST",
@@ -715,6 +720,7 @@
 
                 // Reject Action
                 $('#rejectBtn').on('click', function() {
+                    const $buttonTwo = $(this);
                     const selectedPending = [];
                     $('.service-checkbox:checked').each(function() {
                         const row = $(this).closest('tr');
@@ -727,6 +733,10 @@
                     });
 
                     if (selectedPending.length > 0) {
+                        // Disable the button and show loading text
+                        $buttonTwo.prop('disabled', true).html(
+                            '<span class="spinner-border spinner-border-sm me-2"></span> Rejecting...'
+                        );
                         $.ajax({
                             url: "{{ route('admin-reject-multiple-service') }}",
                             type: "POST",
@@ -749,6 +759,7 @@
 
                 // Terminate Action
                 $('#terminateBtn').on('click', function() {
+                    const $buttonThree = $(this);
                     const selectedActive = [];
                     $('.service-checkbox:checked').each(function() {
                         const row = $(this).closest('tr');
@@ -761,6 +772,10 @@
                     });
 
                     if (selectedActive.length > 0) {
+                        // Disable the button and show loading text
+                        $buttonThree.prop('disabled', true).html(
+                            '<span class="spinner-border spinner-border-sm me-2"></span> Terminating...'
+                        );
                         $.ajax({
                             url: "{{ route('admin-terminate-multiple-service') }}",
                             type: "POST",

@@ -124,8 +124,9 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/delete-time-slot-{id}', [SettingController::class, 'adminDeleteTimeSlot'])->name('admin-timeslot-remove');
 
     // Admin - Booking Management [General]
-    Route::get('/booking-list', [RouteController::class, 'adminBookingListNav'])->name('admin-booking-list');
+    Route::get('/booking-management', [RouteController::class, 'adminBookingManagementNav'])->name('admin-booking-management');
     Route::post('/update-booking-details-{id}', [BookingController::class, 'adminUpdateBooking'])->name('admin-booking-update');
+    Route::post('/update-multiple-booking-status', [BookingController::class, 'adminChangeMultipleBookingStatus'])->name('admin-change-multiple-booking-status');
 
     // Admin - Booking Management [Refund]
     Route::get('/refund-booking-list', [RouteController::class, 'adminBookingRefundListNav'])->name('admin-refunded-list');

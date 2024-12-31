@@ -1171,8 +1171,6 @@ class RouteController extends Controller
             ->orderBy('month', 'desc')
             ->get();
 
-        // dd($taskerMonthlyRefunds);
-
         return view('tasker.performance.performance-analysis-index', [
             'title' => 'Performance Analysis',
             'completedBookings' => $completedBookings,
@@ -1409,11 +1407,12 @@ class RouteController extends Controller
     }
 
     // Admin - Service Approval Navigation
-    //Updated by: Zikri (5/12/2024)
+    //Updated by: Zikri (31/12/2024)
     public function adminServiceManagementNav(Request $request)
     {
 
         try {
+
             if ($request->ajax()) {
 
                 $data = DB::table('services as a')
@@ -1491,7 +1490,13 @@ class RouteController extends Controller
                             </a>
                     ';
                     } else if ($row->service_status == 2 || $row->service_status == 3 || $row->service_status == 4) {
-                        $button = '';
+                        $button =
+                            '
+                            <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                                data-bs-target="#viewDescModal-' . $row->id . '">
+                                <i class="ti ti-eye f-20"></i>
+                            </a>
+                        ';
                     }
 
                     return $button;
@@ -1704,9 +1709,20 @@ class RouteController extends Controller
         ]);
     }
 
-    // Admin - Booking List
+    private function extractState($address)
+    {
+        // Match the postal code (5 digits) followed by the state at the end
+        $pattern = '/\d{5}\s*([A-Za-z\s]+)$/';
+        if (preg_match($pattern, $address, $matches)) {
+            return trim($matches[1]); // Return the state
+        }
+        return 'Unknown'; // Default if no match is found
+    }
 
-    public function adminBookingListNav(Request $request)
+
+    // Admin Booking Management
+    //Updated by: Zikri (31/12/2024)
+    public function adminBookingManagementNav(Request $request)
     {
         $data = DB::table('bookings as a')
             ->join('services as b', 'a.service_id', 'b.id')
@@ -1746,6 +1762,10 @@ class RouteController extends Controller
 
             $table = DataTables::of($data)->addIndexColumn();
 
+            $table->addColumn('checkbox', function ($row) {
+                return '<input type="checkbox" class="booking-checkbox form-check-input" value="' . $row->bookingID . '">';
+            });
+
             $table->addColumn('tasker', function ($row) {
                 $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
                 return $tasker;
@@ -1777,7 +1797,7 @@ class RouteController extends Controller
                 } else if ($row->booking_status == 2) {
                     $status = '<span class="badge bg-light-success">Paid</span>';
                 } else if ($row->booking_status == 3) {
-                    $status = '<span class="badge bg-success">Confirmed</span>';
+                    $status = '<span class="badge bg-light-success">Confirmed</span>';
                 } else if ($row->booking_status == 4) {
                     $status = '<span class="badge bg-warning">Rescheduled</span>';
                 } else if ($row->booking_status == 5) {
@@ -1815,13 +1835,84 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
+            $table->rawColumns(['checkbox', 'tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
 
             return $table->make(true);
         }
+
+        //calculate total booking
+        $totalBooking = $data->count();
+
+        //calculate total booking Unpaid
+        $totalUnpaid = $data->where('booking_status', 1)->count();
+
+        //calculate total booking Confirmed
+        $totalConfirmed = $data->where('booking_status', 3)->count();
+
+        //calculate total booking Completed
+        $totalCompleted = $data->where('booking_status', 6)->count();
+
+        //calculate total booking Cancelled
+        $totalCancelled = $data->where('booking_status', 5)->count();
+
+        $bookings = DB::table('bookings')
+            ->select('booking_address', 'booking_status')
+            ->get();
+
+        $stateCounts = [];
+        $completedCounts = [];
+        $unpaidCounts = [];
+        $cancelledCounts = [];
+
+        // Initialize counts for each state and status
+        foreach ($bookings as $booking) {
+            $state = $this->extractState($booking->booking_address);
+
+            if (!isset($stateCounts[$state])) {
+                $stateCounts[$state] = 0;
+                $completedCounts[$state] = 0;
+                $unpaidCounts[$state] = 0;
+                $cancelledCounts[$state] = 0;
+            }
+
+            // Increment total bookings for the state
+            $stateCounts[$state]++;
+
+            // Increment based on booking status
+            switch ($booking->booking_status) {
+                case 6: // Completed
+                    $completedCounts[$state]++;
+                    break;
+                case 1: // Unpaid
+                    $unpaidCounts[$state]++;
+                    break;
+                case 5: // Cancelled
+                    $cancelledCounts[$state]++;
+                    break;
+            }
+        }
+
+        // Prepare data for the chart
+        $dataChart = [
+            'states' => array_keys($stateCounts),
+            'totalBookings' => array_values($stateCounts),
+            'completedBookings' => array_values($completedCounts),
+            'unpaidBookings' => array_values($unpaidCounts),
+            'cancelledBookings' => array_values($cancelledCounts),
+        ];
+
         return view('administrator.booking.index', [
-            'title' => 'Booking List',
+            'title' => 'Booking Management',
             'books' => $data,
+            'totalBooking' => $totalBooking,
+            'totalUnpaid' => $totalUnpaid,
+            'totalConfirmed' => $totalConfirmed,
+            'totalCompleted' => $totalCompleted,
+            'totalCancelled' => $totalCancelled,
+            'stateCounts' => $stateCounts,
+            'dataChart' => $dataChart // Data for the chart
+
+
         ]);
     }
 

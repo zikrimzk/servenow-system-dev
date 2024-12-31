@@ -48,7 +48,7 @@
                 <li class="pc-item">
                     <a href="{{ route('admin-home') }}" class="pc-link">
                         <span class="pc-micon">
-                            <i class="fas fa-home pc-icon "></i> 
+                            <i class="fas fa-home pc-icon "></i>
                         </span>
                         <span class="pc-mtext">Dashboard</span>
                     </a>
@@ -61,22 +61,25 @@
                 <li class="pc-item pc-hasmenu">
                     <a href="#!" class="pc-link">
                         <span class="pc-micon">
-                            <i class="fas fa-users-cog pc-icon "></i> 
+                            <i class="fas fa-users-cog pc-icon "></i>
                         </span>
                         <span class="pc-mtext">Users</span>
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-management') }}">Administrator Management</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-client-management') }}">Client Management</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-tasker-management') }}">Tasker Management</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-management') }}">Administrator
+                                Management</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-client-management') }}">Client
+                                Management</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-tasker-management') }}">Tasker
+                                Management</a></li>
                     </ul>
                 </li>
 
                 <li class="pc-item pc-hasmenu">
                     <a href="#!" class="pc-link">
                         <span class="pc-micon">
-                            <i class="fas fa-hammer pc-icon "></i> 
+                            <i class="fas fa-hammer pc-icon "></i>
                         </span>
                         <span class="pc-mtext">Services</span>
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
@@ -92,44 +95,83 @@
                 <li class="pc-item pc-hasmenu">
                     <a href="#!" class="pc-link">
                         <span class="pc-micon">
-                            <i class="fas fa-calendar-alt pc-icon "></i> 
+                            <i class="fas fa-calendar-alt pc-icon "></i>
                         </span>
                         <span class="pc-mtext">Bookings</span>
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-booking-list') }}">Booking List</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-refunded-list') }}">Refund Booking List</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-refund-request') }}">Refund Request</a></li>
-
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-booking-management') }}">Booking
+                                Management</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-refunded-list') }}">Refund Booking
+                                List</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-refund-request') }}">Refund
+                                Request</a></li>
                     </ul>
                 </li>
 
                 <li class="pc-item pc-hasmenu">
                     <a href="#!" class="pc-link">
                         <span class="pc-micon">
-                            <i class="fas fa-tachometer-alt pc-icon "></i> 
+                            <i class="fas fa-tachometer-alt pc-icon "></i>
                         </span>
                         <span class="pc-mtext">Performance</span>
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-review-management') }}">Review Management</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-tasker-performance') }}">Tasker Performance</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-review-management') }}">Review
+                                Management</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-tasker-performance') }}">Tasker
+                                Performance</a></li>
                     </ul>
+                </li>
+
+                <li class="pc-item">
+                    <a href="#" class="pc-link">
+                        <span class="pc-micon">
+                            <i class="fas fa-file-invoice-dollar pc-icon "></i>
+                        </span>
+                        <span class="pc-mtext">e-Statement</span>
+                    </a>
+                </li>
+
+                <li class="pc-item pc-caption">
+                    <label>System Log</label>
                 </li>
 
                 <li class="pc-item pc-hasmenu">
                     <a href="#!" class="pc-link">
                         <span class="pc-micon">
-                            <i class="fas fa-cogs pc-icon "></i> 
+                            <i class="fas fa-id-card pc-icon "></i>
+                        </span>
+                        <span class="pc-mtext">e-KYC</span>
+                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                    </a>
+                    <ul class="pc-submenu">
+                        <li class="pc-item"><a class="pc-link" href="#">Card
+                                Verification Log</a></li>
+                        <li class="pc-item"><a class="pc-link" href="#">Face
+                                Verification Log</a></li>
+                    </ul>
+                </li>
+
+                <li class="pc-item pc-caption">
+                    <label>System Setting</label>
+                </li>
+
+                <li class="pc-item pc-hasmenu">
+                    <a href="#!" class="pc-link">
+                        <span class="pc-micon">
+                            <i class="fas fa-cogs pc-icon "></i>
                         </span>
                         <span class="pc-mtext">Setting</span>
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-system-setting') }}">System</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-timeslot-setting') }}">Time Slot</a></li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-system-setting') }}">System</a>
+                        </li>
+                        <li class="pc-item"><a class="pc-link" href="{{ route('admin-timeslot-setting') }}">Time
+                                Slot</a></li>
                     </ul>
                 </li>
 

@@ -5,18 +5,20 @@ namespace App\Http\Controllers;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Client;
+use App\Models\Review;
 use App\Models\Tasker;
 use App\Models\Booking;
-use App\Models\CancelRefundBooking;
-use App\Models\Review;
 use App\Models\TimeSlot;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Spatie\Geocoder\Geocoder;
 use App\Models\TaskerTimeSlot;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use App\Models\CancelRefundBooking;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TaskerClientBookingStatus;
 
 class BookingController extends Controller
 {
@@ -589,6 +591,85 @@ class BookingController extends Controller
         }
     }
 
+    private function sendBookingStatusEmail($data, $userType)
+    {
+        // Booking Status
+        if ($data->booking_status == 2) {
+            $status = 'Paid';
+        } elseif ($data->booking_status == 3) {
+            $status = 'Confirmed';
+        } elseif ($data->booking_status == 5) {
+            $status = 'Cancelled';
+        } elseif ($data->booking_status == 6) {
+            $status = 'Completed';
+        } else {
+            $status = 'Undefined Status';
+        }
+
+        // Booking Note
+        if ($data->booking_note != null) {
+            $note = $data->booking_note;
+        } else {
+            $note = '-';
+        }
+        // User Name
+        if ($userType == 1) {
+
+            $name = $data->client_firstname . ' ' . $data->client_lastname;
+        } elseif ($userType == 2) {
+
+            $name = $data->tasker_firstname . ' ' . $data->tasker_lastname;
+        }
+
+        Mail::to('zikrimzk@gmail.com')->send(new TaskerClientBookingStatus([
+            'users' => $userType,
+            'name' => Str::headline($name),
+            'service_name' => $data->servicetype_name,
+            'booking_order_id' => $data->booking_order_id,
+            'change_date' => Carbon::now()->format('d F Y g:i A'),
+            'booking_date' => $data->booking_date,
+            'booking_time_start' => Carbon::parse($data->booking_time_start)->format('g:i A'),
+            'booking_time_end' => Carbon::parse($data->booking_time_end)->format('g:i A'),
+            'booking_rate' => $data->booking_rate,
+            'booking_address' => $data->booking_address,
+            'booking_status' => $status,
+            'booking_note' => $note,
+
+        ]));
+    }
+    public function adminChangeMultipleBookingStatus(Request $request)
+    {
+        try {
+            $bookingIds = $request->input('selected_bookings');
+            Booking::whereIn('id', $bookingIds)->update(['booking_status' => $request->input('booking_status')]);
+
+            $datasTasker = DB::table('taskers as a')
+                ->join('services as b', 'a.id', '=', 'b.tasker_id')
+                ->join('bookings as c', 'b.id', '=', 'c.service_id')
+                ->join('service_types as d', 'b.service_type_id', '=', 'd.id')
+                ->whereIn('c.id', $bookingIds)
+                ->get();
+
+            $datasClient = DB::table('clients as a')
+                ->join('bookings as b', 'a.id', '=', 'b.client_id')
+                ->join('services as c', 'b.service_id', '=', 'c.id')
+                ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
+                ->whereIn('b.id', $bookingIds)
+                ->get();
+
+            foreach ($datasClient as $data) {
+                $this->sendBookingStatusEmail($data, 1);
+            }
+
+            foreach ($datasTasker as $data) {
+                $this->sendBookingStatusEmail($data, 2);
+            }
+            return response()->json(['success' => 'All selected booking details has been updated successfully!', 'bookings' => $bookingIds]);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error : ' . $e->getMessage()]);
+        }
+    }
+
     public function taskerChangeBookingStatus(Request $request)
     {
         try {
@@ -833,7 +914,7 @@ class BookingController extends Controller
                 $message = 'Refund Request Approved';
             } else if ($option == 3) {
                 Booking::where('id', $bookingid)->update(['booking_status' => 8]);
-                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 2, 'cr_penalized'=> 1]);
+                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 2, 'cr_penalized' => 1]);
                 DB::table('bookings as a')
                     ->join('services as b', 'a.service_id', '=', 'b.id')
                     ->join('taskers as c', 'b.tasker_id', '=', 'c.id')

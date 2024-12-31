@@ -5,6 +5,28 @@ use Carbon\Carbon;
 @extends('administrator.layouts.main')
 
 @section('content')
+    <style>
+        .dataTables_processing {
+            display: none !important;
+        }
+
+        .card-all {
+            border-left: 4px solid #10100f;
+        }
+
+        .card-unpaid {
+            border-left: 4px solid #ffc107;
+        }
+
+        .card-confirmed {
+            border-left: 4px solid #28a745;
+
+        }
+
+        .card-completed {
+            border-left: 4px solid #005013;
+        }
+    </style>
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
@@ -16,19 +38,20 @@ use Carbon\Carbon;
                         <div class="col-md-12">
                             <ul class="breadcrumb">
                                 <li class="breadcrumb-item">Bookings</li>
-                                <li class="breadcrumb-item" aria-current="page">Booking List</li>
+                                <li class="breadcrumb-item" aria-current="page">Booking Management</li>
 
                             </ul>
                         </div>
                         <div class="col-md-12">
                             <div class="page-header-title">
-                                <h2 class="mb-4">Booking List</h2>
+                                <h2 class="mb-4">Booking Management</h2>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- [ breadcrumb ] end -->
+
 
             <!-- Start Alert -->
             <div>
@@ -57,22 +80,134 @@ use Carbon\Carbon;
                     </div>
                 @endif
             </div>
-
             <!-- End Alert -->
+
+            <!-- Analytics Start -->
+            <div class="row">
+                <div class="col-md-6 col-xl-3">
+                    <div class="card card-all">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-dark">Total Bookings</h6>
+                            <h4 class="mb-3">{{ $totalBooking }}</h4>
+                            <p class="mb-0 text-muted text-sm">services</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="card card-unpaid">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-warning">Unpaid Services</h6>
+                            <h4 class="mb-3">{{ $totalUnpaid }}</h4>
+                            <p class="mb-0 text-muted text-sm">services unpaid</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="card card-confirmed">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-success">Confirmed Services</h6>
+                            <h4 class="mb-3">{{ $totalConfirmed }}</h4>
+                            <p class="mb-0 text-muted text-sm">services confirmed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-3">
+                    <div class="card card-completed">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400" style="color: #005013">Completed Services</h6>
+                            <h4 class="mb-3">{{ $totalCompleted }}</h4>
+                            <p class="mb-0 text-muted text-sm">services completed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 col-xl-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-3 f-w-400 text-dark">Bookings by State</h6>
+                            <canvas id="stateChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Analytics End -->
+
+
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card table-card">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col-sm-6 mb-3">
+                                    <label for="date_range" class="form-label">Date Range</label>
+                                    <div class="d-flex align-items-center">
+                                        <input type="date" id="startDate" name="startDate" class="form-control">
+                                        <span class="mx-2">to</span>
+                                        <input type="date" id="endDate" name="endDate" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-sm-9 mb-3">
+                                    <label for="rating_filter" class="form-label">Filter by</label>
+                                    <div class="d-block  d-md-flex justify-content-between align-items-center gap-2">
+
+                                        <select id="tasker_filter" class="form-control">
+                                            <option value="">All Taskers</option>
+                                            {{-- @foreach ($data->unique('taskerID') as $b)
+                                                <option value="{{ $b->taskerID }}">
+                                                    {{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) . ' (' . $b->tasker_code . ')' }}
+                                                </option>
+                                            @endforeach --}}
+                                        </select>
+                                        <select id="rating_filter" class="form-control mb-3 mb-md-0" name="rating_filter">
+                                            <option value="">All State</option>
+                                            
+                                        </select>
+
+                                        <select id="status_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">All Status</option>
+                                            <option value="1">To Pay</option>
+                                            <option value="2">Paid</option>
+                                            <option value="3">Confirmed</option>
+                                            <option value="4">Rescheduled</option>
+                                            <option value="5">Cancelled</option>
+                                            <option value="6">Completed</option>
+                                        </select>
+
+                                       
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 mb-3">
+                                    <label for="endDate" class="form-label text-white">Action</label>
+                                    <div class="d-flex justify-content-start align-items-end">
+                                        <a href="" class="link-primary" id="clearAllBtn">Clear All</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-header border-0">
+                            <div class="d-flex justify-content-end align-items-center">
+                                <div>
+                                    <button type="button" data-bs-toggle="modal" data-bs-target="#changeStatusModal"
+                                        class="btn btn-primary disabled" id="changeStatusModalBtn">Change Status</button>
+                                </div>
+                            </div>
+
+                        </div>
                         <div class="card-body">
                             <div class="dt-responsive table-responsive my-4 mx-0 mx-md-4">
                                 <table class="table data-table table-hover nowrap">
                                     <thead>
                                         <tr>
+                                            <th><input type="checkbox" id="select-all" class="form-check-input"></th>
                                             <th scope="col">Booking ID</th>
-                                            <th scope="col">Tasker</th>
-                                            <th scope="col">Client</th>
                                             <th scope="col">Booking Date</th>
                                             <th scope="col">Booking Time</th>
                                             <th scope="col">Booking Status</th>
+                                            <th scope="col">Tasker</th>
+                                            <th scope="col">Client</th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -83,11 +218,48 @@ use Carbon\Carbon;
                 </div>
             </div>
 
+            <!-- Modal Update Status Booking Start Here-->
+            <div class="modal fade" id="changeStatusModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="mb-0">Change Status</h5>
+                            <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
+                                data-bs-dismiss="modal">
+                                <i class="ti ti-x f-20"></i>
+                            </a>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="mb-3">
+                                        <label class="form-label d-block mb-2">Booking Status</label>
+                                        <select class="form-control mb-2" id="booking_status">
+                                            <option value="" selected>Select Status</option>
+                                            <option value="2">Paid</option>
+                                            <option value="3">Confirmed</option>
+                                            <option value="5">Cancelled</option>
+                                            <option value="6">Completed</option>
+                                        </select>
+                                        <span id="selectionCount" class="text-primary">0</span> bookings selected.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="reset" class="btn btn-light btn-pc-default"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="updateStatusBtn">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Update Status Booking End Here-->
 
             @foreach ($books as $b)
                 <!-- Modal View Booking Details Start Here-->
-                <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false" tabindex="-1"
-                    aria-hidden="true">
+                <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false"
+                    tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -209,7 +381,6 @@ use Carbon\Carbon;
 
 
                 <!-- Modal Update Booking Details Start Here-->
-
                 <form action="{{ route('admin-booking-update', $b->bookingID) }}" method="POST">
                     @csrf
                     <div class="modal fade" id="updatebooking-{{ $b->bookingID }}" data-bs-keyboard="false"
@@ -251,11 +422,6 @@ use Carbon\Carbon;
                                                     <option value="6"
                                                         @if ($b->booking_status == 6) selected @endif>Completed
                                                     </option>
-                                                    <option value="7"
-                                                        @if ($b->booking_status == 7) selected @endif>Pending Refund
-                                                    </option>
-                                                    <option value="8"
-                                                        @if ($b->booking_status == 8) selected @endif>Refunded</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -271,7 +437,6 @@ use Carbon\Carbon;
                     </div>
                 </form>
                 <!-- Modal Update Booking Details End Here-->
-
             @endforeach
 
 
@@ -279,31 +444,82 @@ use Carbon\Carbon;
 
     </div>
     <!-- [ Main Content ] end -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const dataChart = @json($dataChart);
 
+        const ctx = document.getElementById('stateChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dataChart.states, // States as x-axis labels
+                datasets: [{
+                        label: 'Total Bookings',
+                        data: dataChart.totalBookings,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Completed Bookings',
+                        data: dataChart.completedBookings,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Unpaid Bookings',
+                        data: dataChart.unpaidBookings,
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Cancelled Bookings',
+                        data: dataChart.cancelledBookings,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 
     <script type="text/javascript">
         $(document).ready(function() {
 
-            // DATATABLE : SERVICES
+            // DATATABLE : BOOKINGS
             $(function() {
 
                 var table = $('.data-table').DataTable({
                     processing: true,
                     serverSide: true,
                     responsive: true,
-                    ajax: "{{ route('admin-booking-list') }}",
-                    columns: [
+                    ajax: {
+                        url: "{{ route('admin-booking-management') }}",
+                        // data: function(d) {
+                        //     // d.status_filter = $('#status_filter').val();
+                        // }
+                    },
+                    columns: [{
+                            data: 'checkbox',
+                            name: 'checkbox',
+                            orderable: false,
+                            searchable: false,
+
+                        },
                         {
                             data: 'booking_order_id',
                             name: 'booking_order_id'
-                        },
-                        {
-                            data: 'tasker',
-                            name: 'tasker'
-                        },
-                        {
-                            data: 'client',
-                            name: 'client'
                         },
                         {
                             data: 'booking_date',
@@ -317,6 +533,17 @@ use Carbon\Carbon;
                             data: 'booking_status',
                             name: 'booking_status'
                         },
+                        {
+                            data: 'tasker',
+                            name: 'tasker',
+                            visible: false
+                        },
+                        {
+                            data: 'client',
+                            name: 'client',
+                            visible: false
+                        },
+
                         {
                             data: 'action',
                             name: 'action',
@@ -341,6 +568,138 @@ use Carbon\Carbon;
                     }
 
                 });
+
+                // // Refresh the table every 5 seconds
+                // setInterval(function() {
+                //     table.ajax.reload(null, false); // Reloads without resetting pagination
+                //     $('.dataTables_processing').hide();
+                // }, 5000);
+
+                let selectedBooking = {}; // Track selected rows
+
+                // Function to update selection count and button states
+                function updateSelectionCountAndButtons() {
+                    const selectedCount = Object.keys(selectedBooking).length;
+
+                    // Update selection counts
+                    $('#selectionCount').text(selectedCount);
+
+                    // Track if there is any "Completed" status in the selected rows
+                    let hasCompleted = false;
+
+                    // Check the status of each selected row
+                    $('.booking-checkbox:checked').each(function() {
+                        const row = $(this).closest('tr'); // Get the row of the selected checkbox
+                        const status = row.find('td:nth-child(5)').text()
+                            .trim(); // Extract the booking status from the 5th column
+
+                        if (status === 'Completed') {
+                            hasCompleted = true; // If status is "Completed", set flag to true
+                        }
+                    });
+
+                    // Enable or disable the "Change Status" button based on the presence of "Completed" status
+                    if (hasCompleted || selectedCount === 0) {
+                        $('#changeStatusModalBtn').addClass('disabled'); // Disable button
+                    } else {
+                        $('#changeStatusModalBtn').removeClass('disabled'); // Enable button
+                    }
+                }
+
+                // Handle checkbox selection
+                $('.data-table').on('change', '.booking-checkbox', function() {
+                    const bookingId = $(this).val();
+                    if (this.checked) {
+                        selectedBooking[bookingId] = true; // Add to selected
+                    } else {
+                        delete selectedBooking[bookingId]; // Remove from selected
+                    }
+                    updateSelectionCountAndButtons();
+                });
+
+                // Handle "Select All" checkbox
+                $('#select-all').on('change', function() {
+                    const isChecked = this.checked;
+                    $('.booking-checkbox').each(function() {
+                        const bookingId = $(this).val();
+                        if (isChecked) {
+                            selectedBooking[bookingId] = true;
+                        } else {
+                            delete selectedBooking[bookingId];
+                        }
+                        $(this).prop('checked', isChecked);
+                    });
+                    updateSelectionCountAndButtons();
+                });
+
+                // On table redraw
+                $('.data-table').on('draw.dt', function() {
+                    $('.booking-checkbox').each(function() {
+                        const bookingId = $(this).val();
+                        $(this).prop('checked', selectedBooking[bookingId] === true);
+                    });
+
+                    // Update "Select All" state
+                    const totalCheckboxes = $('.booking-checkbox').length;
+                    const checkedCheckboxes = $('.booking-checkbox:checked').length;
+                    $('#select-all').prop('checked', totalCheckboxes > 0 && totalCheckboxes ===
+                        checkedCheckboxes);
+
+                    updateSelectionCountAndButtons();
+                });
+
+                // Change status button click event
+                $('#updateStatusBtn').on('click', function() {
+                    const $button = $(this);
+                    const selectedBookings = [];
+                    const excludedStatuses = [
+                        'Completed'
+                    ]; // Define statuses that cannot be updated
+
+                    $('.booking-checkbox:checked').each(function() {
+                        const row = $(this).closest('tr');
+                        const status = row.find('td:nth-child(5)').text()
+                            .trim(); // Adjust column index for "status"
+
+                        // Only add bookings that are not in excluded statuses
+                        if (!excludedStatuses.includes(status)) {
+                            selectedBookings.push($(this).val());
+                        }
+                    });
+
+                    // alert(selectedBookings);
+
+                    if (selectedBookings.length > 0) {
+
+                        // Disable the button and show loading text
+                        $button.prop('disabled', true).html(
+                            '<span class="spinner-border spinner-border-sm me-2"></span>Saving...'
+                        );
+
+                        $.ajax({
+                            url: "{{ route('admin-change-multiple-booking-status') }}",
+                            type: "POST",
+                            data: {
+                                selected_bookings: selectedBookings,
+                                booking_status: $('#booking_status').val(),
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                window.location.reload();
+                            },
+                            error: function(xhr) {
+                                console.error(xhr.responseText);
+                                alert("Error: " + xhr.responseText);
+                            }
+                        });
+                    } else {
+                        alert(
+                            "No valid bookings selected for status change. Ensure none of the selected bookings are 'Completed'."
+                        );
+                    }
+                });
+
+
 
             });
 
