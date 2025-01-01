@@ -591,8 +591,19 @@ class RouteController extends Controller
             )
             ->whereNotIn('a.booking_status', [7, 8, 9, 10])
             ->where('b.tasker_id', Auth::user()->id)
-            ->orderbyDesc('a.booking_date')
-            ->get();
+            ->orderbyDesc('a.booking_date');
+
+        // if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
+        //     $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
+        //     $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
+
+        //     if ($startDate && $endDate) {
+        //         $data->whereBetween('a.booking_date', [$request->startDate, $request->endDate]);
+        //     }
+        // }
+        // $data->whereBetween('a.booking_date', ['2024-12-30', '2024-12-31']);
+        $data = $data->get();
+        // dd($data);
 
         if ($request->ajax()) {
 
@@ -1755,8 +1766,27 @@ class RouteController extends Controller
 
             )
             ->whereNotIn('a.booking_status', [7, 8, 9, 10])
-            ->orderbyDesc('a.booking_date')
-            ->get();
+            ->orderbyDesc('a.booking_date');
+
+        if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
+            $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
+            $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
+
+            if ($startDate && $endDate) {
+                $data->whereBetween('a.booking_date', [$request->startDate, $request->endDate]);
+            }
+        }
+
+        if ($request->has('status_filter') && $request->input('status_filter') != '') {
+            $data->where('a.booking_status', $request->input('status_filter'));
+        }
+
+        if ($request->has('state_filter') && $request->input('state_filter') != '') {
+            $stateFilter = $request->input('state_filter');
+            $data->whereRaw("TRIM(SUBSTRING_INDEX(a.booking_address, ' ', -1)) = ?", [$stateFilter]);
+        }
+
+        $data = $data->get();
 
         if ($request->ajax()) {
 
@@ -1901,6 +1931,9 @@ class RouteController extends Controller
             'cancelledBookings' => array_values($cancelledCounts),
         ];
 
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+
+
         return view('administrator.booking.index', [
             'title' => 'Booking Management',
             'books' => $data,
@@ -1910,7 +1943,9 @@ class RouteController extends Controller
             'totalCompleted' => $totalCompleted,
             'totalCancelled' => $totalCancelled,
             'stateCounts' => $stateCounts,
-            'dataChart' => $dataChart // Data for the chart
+            'dataChart' => $dataChart,
+            'states' => $states,
+
 
 
         ]);
