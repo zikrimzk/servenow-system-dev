@@ -155,15 +155,17 @@ use Carbon\Carbon;
 
                                         <select id="tasker_filter" class="form-control">
                                             <option value="">All Taskers</option>
-                                            {{-- @foreach ($data->unique('taskerID') as $b)
+                                            @foreach ($books->unique('taskerID') as $b)
                                                 <option value="{{ $b->taskerID }}">
                                                     {{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) . ' (' . $b->tasker_code . ')' }}
                                                 </option>
-                                            @endforeach --}}
+                                            @endforeach
                                         </select>
-                                        <select id="rating_filter" class="form-control mb-3 mb-md-0" name="rating_filter">
+                                        <select id="state_filter" class="form-control mb-3 mb-md-0" name="rating_filter">
                                             <option value="">All State</option>
-                                            
+                                            @foreach ($states['states'] as $state)
+                                                <option value="{{ strtolower($state['name']) }}">{{ $state['name'] }}</option>
+                                            @endforeach
                                         </select>
 
                                         <select id="status_filter" class="form-select mb-3 mb-md-0">
@@ -176,7 +178,7 @@ use Carbon\Carbon;
                                             <option value="6">Completed</option>
                                         </select>
 
-                                       
+
                                     </div>
                                 </div>
                                 <div class="col-sm-3 mb-3">
@@ -506,9 +508,12 @@ use Carbon\Carbon;
                     responsive: true,
                     ajax: {
                         url: "{{ route('admin-booking-management') }}",
-                        // data: function(d) {
-                        //     // d.status_filter = $('#status_filter').val();
-                        // }
+                        data: function(d) {
+                            d.startDate = $('#startDate').val();
+                            d.endDate = $('#endDate').val();
+                            d.status_filter = $('#status_filter').val();
+                            d.state_filter = $('#state_filter').val();
+                        }
                     },
                     columns: [{
                             data: 'checkbox',
@@ -574,6 +579,22 @@ use Carbon\Carbon;
                 //     table.ajax.reload(null, false); // Reloads without resetting pagination
                 //     $('.dataTables_processing').hide();
                 // }, 5000);
+
+                $('#startDate, #endDate').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#status_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#state_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
 
                 let selectedBooking = {}; // Track selected rows
 
