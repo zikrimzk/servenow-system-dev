@@ -50,6 +50,35 @@ use App\Models\Tasker;
             border-color: transparent;
         }
     }
+
+    .nav-link.disabled {
+        pointer-events: none;
+        /* Matikan klik */
+
+        /* Contoh efek kabur sikit - optional */
+        cursor: not-allowed;
+        /* Tukar cursor - optional */
+    }
+
+    .avatar-s {
+        width: 70px;
+        height: 70px;
+        overflow: hidden;
+        border-radius: 50%;
+    }
+
+    .avatar-s img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .scrollable-reviews {
+        height: 300px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
 </style>
 
 
@@ -408,46 +437,206 @@ use App\Models\Tasker;
                                                             </div>
                                                         </div>
                                                     </div>
-
-
-                                                    <div class="modal fade" id="taskerReviewModal-{{ $tk->taskerID }}" tabindex="-1"
-                                                        aria-labelledby="taskerProfileModal" aria-hidden="true">
+                                                    <div class="modal fade" id="taskerReviewModal-{{ $tk->taskerID }}"
+                                                        tabindex="-1" aria-labelledby="taskerProfileModal"
+                                                        aria-hidden="true">
                                                         <div class="modal-dialog modal-lg">
+
                                                             <div class="modal-content">
+
+                                                                <!-- Modal Header -->
                                                                 <div class="modal-header">
-                                                                    <h5 class="modal-title" id="taskerReviewModal">
-                                                                        Tasker Profile & Reviews</h5>
+                                                                    <!-- Gantikan teks di sini jika mahu -->
+                                                                    <h5 class="modal-title" id="jobModalLabel">Profile &
+                                                                        Review</h5>
                                                                     <button type="button" class="btn-close"
                                                                         data-bs-dismiss="modal"
                                                                         aria-label="Close"></button>
                                                                 </div>
-                                                                <div class="modal-body">
-                                                                    <!-- Dynamic Content will be Injected Here -->
-                                                                    <div id="modalContent">
-                                                                        <!-- Profile Information -->
-                                                                        <div class="text-center mb-4">
-                                                                            <img src="" alt="Profile Photo"
-                                                                                class="rounded-circle mb-3" width="150"
-                                                                                height="150" id="taskerPhoto">
-                                                                            <h5 id="taskerName">{{ $tk->tasker_firstname }}</h5>
-                                                                            <p id="taskerRating"></p>
-                                                                        </div>
 
-                                                                        <!-- Tasker Reviews -->
-                                                                        <h6>Reviews:</h6>
-                                                                        <div id="taskerReviews">
-                                                                            <!-- Reviews will be dynamically injected -->
+                                                                <!-- Modal Body -->
+                                                                <div class="modal-body">
+                                                                    <!-- Bahagian asal card-header -->
+                                                                    <div class="d-flex align-items-start mb-3">
+                                                                        <div class="flex-shrink-0">
+                                                                            <div class="avatar avatar-s">
+                                                                                <img src="{{ $tk->tasker_photo ? asset('storage/' . $tk->tasker_photo) : asset('images/default-profile.png') }}"
+                                                                                    alt="{{ $tk->tasker_firstname }}"
+                                                                                    class="rounded-circle">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex-grow-1 mx-3">
+                                                                            <p class="mb-1">
+                                                                                {{ Str::headline($tk->tasker_firstname . ' ' . $tk->tasker_lastname) }}
+                                                                            </p>
+                                                                            @php
+
+                                                                                $taskerReviews = $review->where(
+                                                                                    'taskerID',
+                                                                                    $tk->taskerID,
+                                                                                );
+
+                                                                                $totalRating = $taskerReviews->avg(
+                                                                                    'review_rating',
+                                                                                );
+
+                                                                                $totalReviews = $taskerReviews->count();
+                                                                            @endphp
+
+                                                                            <h6 class="mb-0">
+                                                                                <i class="fas fa-star"
+                                                                                    style="margin-right: 5px;"></i>
+                                                                                {{ number_format($totalRating, 1) }}
+                                                                                <span
+                                                                                    style="font-size: 0.9em; color: gray;">({{ $totalReviews }}
+                                                                                    review)</span>
+                                                                            </h6>
+
+                                                                            <p class="mt-3 text-muted">
+                                                                                {{ $tk->tasker_bio ? $tk->tasker_bio : 'No bio available.' }}
+                                                                            </p>
+
+                                                                        </div>
+                                                                        <div class="flex-shrink-0">
+                                                                            <a href="#"
+                                                                                class="avtar avtar-s btn-link-secondary">
+                                                                                <i class="ti ti-bookmarks f-18"></i>
+                                                                            </a>
                                                                         </div>
                                                                     </div>
+                                                                    <hr>
+
+                                                                    <!-- Bahagian asal card-body -->
+                                                                    <div class="scrollable-reviews"
+                                                                        style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
+                                                                        @foreach ($review->where('taskerID', $tk->taskerID) as $r)
+                                                                            <div class="card mb-3">
+                                                                                <div class="card-body">
+                                                                                    @if ($r->review_type == 1)
+                                                                                        <h6>{{ Str::headline($r->client_firstname . ' ' . $r->client_lastname) }}
+                                                                                        </h6>
+                                                                                    @else
+                                                                                        <h6>Anonymous</h6>
+                                                                                    @endif
+                                                                                    <p>
+                                                                                        {{ $r->review_description }}
+                                                                                    </p>
+
+                                                                                    <div class="d-flex pt-2">
+                                                                                        @php
+                                                                                            $images = [
+                                                                                                $r->review_imageOne,
+                                                                                                $r->review_imageTwo,
+                                                                                                $r->review_imageThree,
+                                                                                                $r->review_imageFour,
+                                                                                            ];
+                                                                                            $hasImage = array_filter(
+                                                                                                $images,
+                                                                                            ); // Check if at least one image exists
+                                                                                        @endphp
+
+                                                                                        @if ($hasImage)
+                                                                                            @if ($r->review_imageOne)
+                                                                                                <div class="me-2">
+                                                                                                    <a
+                                                                                                        data-lightbox="{{ asset('storage/' . $r->review_imageOne) }}">
+                                                                                                        <img src="{{ asset('storage/' . $r->review_imageOne) }}"
+                                                                                                            alt="Image1"
+                                                                                                            class="img-fluid"
+                                                                                                            style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0;">
+                                                                                                    </a>
+                                                                                                </div>
+                                                                                            @endif
+                                                                                            @if ($r->review_imageTwo)
+                                                                                                <div class="me-2">
+                                                                                                    <a
+                                                                                                        data-lightbox="{{ asset('storage/' . $r->review_imageTwo) }}">
+                                                                                                        <img src="{{ asset('storage/' . $r->review_imageTwo) }}"
+                                                                                                            alt="Image2"
+                                                                                                            class="img-fluid"
+                                                                                                            style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0;">
+                                                                                                    </a>
+                                                                                                </div>
+                                                                                            @endif
+                                                                                            @if ($r->review_imageThree)
+                                                                                                <div class="me-2">
+                                                                                                    <a
+                                                                                                        data-lightbox="{{ asset('storage/' . $r->review_imageThree) }}">
+                                                                                                        <img src="{{ asset('storage/' . $r->review_imageThree) }}"
+                                                                                                            alt="Image3"
+                                                                                                            class="img-fluid"
+                                                                                                            style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0;">
+                                                                                                    </a>
+                                                                                                </div>
+                                                                                            @endif
+                                                                                            @if ($r->review_imageFour)
+                                                                                                <div class="me-2">
+                                                                                                    <a
+                                                                                                        data-lightbox="{{ asset('storage/' . $r->review_imageFour) }}">
+                                                                                                        <img src="{{ asset('storage/' . $r->review_imageFour) }}"
+                                                                                                            alt="Image4"
+                                                                                                            class="img-fluid"
+                                                                                                            style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0;">
+                                                                                                    </a>
+                                                                                                </div>
+                                                                                            @endif
+                                                                                        @else
+                                                                                            <span
+                                                                                                style="font-size: 12px; color: gray;">No
+                                                                                                image uploaded</span>
+                                                                                        @endif
+                                                                                    </div>
+
+                                                                                    <div
+                                                                                        class="d-flex align-items-center justify-content-between mt-4">
+                                                                                        <ul class="list-inline mb-0 me-2">
+                                                                                            <li class="list-inline-item">
+                                                                                                <i
+                                                                                                    class="text-muted ti ti-map-pin"></i>
+                                                                                                {{ $r->client_area }},
+                                                                                                {{ $r->client_state }}
+                                                                                            </li>
+                                                                                            <li class="list-inline-item">
+                                                                                                <i
+                                                                                                    class="text-muted ti ti-clock"></i>
+                                                                                                {{ \Carbon\Carbon::parse($r->review_date_time)->diffForHumans() }}
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        @endforeach
+                                                                    </div>
+
                                                                 </div>
+
+                                                                <!-- Modal Footer -->
                                                                 <div class="modal-footer">
+                                                                    <!-- Butang tutup -->
                                                                     <button type="button" class="btn btn-secondary"
                                                                         data-bs-dismiss="modal">Close</button>
                                                                 </div>
+
                                                             </div>
+
                                                         </div>
                                                     </div>
                                                 @endforeach
+
+                                                <div class="modal fade modal-lightbox" id="lightboxModal" tabindex="-1"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            <div class="modal-body">
+                                                                <img src="../assets/images/light-box/l1.jpg"
+                                                                    alt="images" class="modal-image img-fluid" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                                 <!-- Tasker Selection [End] -->
                                             </div>
                                             <!-- TASKER SELECTION TAB [END] -->
@@ -612,6 +801,44 @@ use App\Models\Tasker;
         </div>
     </div>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var lightboxModal = new bootstrap.Modal(document.getElementById('lightboxModal'));
+            var elements = document.querySelectorAll('[data-lightbox]');
+
+            elements.forEach(function(element) {
+                element.addEventListener('click', function(event) {
+                    // Prevent default action if the element is a link
+                    event.preventDefault();
+
+                    var imagesPath = event.target; // Get the clicked element
+                    if (imagesPath.tagName === 'IMG') {
+                        imagesPath = imagesPath
+                            .parentNode; // Get the parent anchor if an image is clicked
+                    }
+
+                    var recipient = imagesPath.getAttribute(
+                        'data-lightbox'); // Retrieve the data-lightbox value
+                    if (recipient) {
+                        var image = document.querySelector(
+                            '.modal-image'); // Find the modal image element
+                        image.setAttribute('src', recipient); // Set the new image source
+                        lightboxModal.show(); // Show the modal
+                    }
+                });
+            });
+
+            function removeClassByPrefix(node, prefix) {
+                for (let i = 0; i < node.classList.length; i++) {
+                    let value = node.classList[i];
+                    if (value.startsWith(prefix)) {
+                        node.classList.remove(value);
+                    }
+                }
+            }
+        });
+    </script>
+
 
     <script>
         /******************** *************************** ****************/
@@ -626,18 +853,17 @@ use App\Models\Tasker;
                 const activeTab = document.querySelector('.nav-pills .nav-link.active');
                 const currentIndex = Array.from(tabs).indexOf(activeTab);
 
-                // Check if there is a previous tab to navigate to
                 if (currentIndex > 0) {
-                    // Deactivate the current tab
+
                     activeTab.classList.remove('active');
                     activeTab.setAttribute('aria-selected', 'false');
 
-                    // Activate the previous tab
+
                     const previousTab = tabs[currentIndex - 1];
                     previousTab.classList.add('active');
                     previousTab.setAttribute('aria-selected', 'true');
 
-                    // Activate the corresponding tab content
+
                     const tabContents = document.querySelectorAll('.tab-pane');
                     tabContents[currentIndex].classList.remove('active', 'show');
                     tabContents[currentIndex - 1].classList.add('active', 'show');
@@ -680,10 +906,10 @@ use App\Models\Tasker;
             const activeTab = document.querySelector('.nav-pills .nav-link.active');
             let currentIndex = Array.from(tabs).indexOf(activeTab);
 
-            // Calculate new index
+
             let newIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
 
-            // Ensure index is within bounds
+
             if (newIndex < 0 || newIndex >= tabs.length) return;
 
             if (direction === 'next') {
@@ -708,61 +934,66 @@ use App\Models\Tasker;
             const tabs = document.querySelectorAll('.nav-pills .nav-link');
             const activeTab = document.querySelector('.nav-pills .nav-link.active');
             const currentIndex = Array.from(tabs).indexOf(activeTab);
-
-            // Navigation buttons
             const prevButton = document.getElementById('prevButton');
             const nextButton = document.getElementById('nextButton');
             const nextStepButton = document.getElementById('nextStepButton');
-            const taskoption = document.getElementById('task-option');
-
-            // Enable/Disable "Previous" button
             prevButton.disabled = currentIndex === 0;
-
-            // Check if a radio button is selected
             const hourRadios = document.querySelectorAll('input[name="hour"]');
             const isHourSelected = Array.from(hourRadios).some(radio => radio.checked);
 
-            // Disable Next button if no radio button is selected
-            if (currentIndex === 2) {
-                nextButton.disabled = !isHourSelected; // Disable if no option is selected
-                nextButton.style.display = 'none'; // Hide "Next"
-                nextStepButton.style.display = ''; // Show "Next Step"
+            if (currentIndex === 1) {
+
+                nextButton.style.display = 'none';
+                nextButton.disabled = true;
+                nextStepButton.style.display = 'none';
+
+                if (isHourSelected) {
+                    nextButton.style.display = '';
+                    nextButton.disabled = false;
+                }
+            } else if (currentIndex === 2) {
+
+                nextButton.disabled = !isHourSelected;
+                nextButton.style.display = 'none';
+                nextStepButton.style.display = '';
             } else {
-                nextButton.disabled = false; // Enable Next button for other steps
+
+                nextButton.disabled = false;
                 if (currentIndex === 3) {
-                    nextButton.style.display = 'none'; // Hide "Next"
-                    nextStepButton.style.display = 'none'; // Show "Next Step"
+
+                    nextButton.style.display = 'none';
+                    nextStepButton.style.display = 'none';
                 } else {
                     nextButton.style.display = '';
                     nextStepButton.style.display = 'none';
                 }
             }
 
+
             updateProgressBar(currentIndex + 1, tabs.length);
         }
 
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Lock all tabs except the first one on page load
             const tabs = document.querySelectorAll('.nav-pills .nav-link');
             tabs.forEach((tab, index) => {
                 if (index !== 0) {
                     tab.classList.add('disabled');
-                    tab.removeAttribute('data-bs-toggle'); // Prevent tab switching
+                    tab.removeAttribute('data-bs-toggle');
                 }
             });
-
             updateButtons();
 
-            // Ensure tabs can't be clicked if disabled
+
             tabs.forEach(tab => {
                 tab.addEventListener('click', (e) => {
                     if (tab.classList.contains('disabled')) {
-                        e.preventDefault(); // Prevent navigation to disabled tabs
+                        e.preventDefault();
                     }
                 });
             });
         });
+
 
 
 
@@ -927,14 +1158,14 @@ use App\Models\Tasker;
 
                         <div class="row flex-sm-row  flex-column-reverse">
                             <div class="col-sm-12 col-md-3 col-lg-3">
-                                <div class="d-none d-md-block text-center mt-2 mb-2">
-                                    <a href="#" 
-                                        class="btn btn-link text-decoration-none primary p-1 view-profile-btn" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#taskerReviewModal-${tasker.taskerID}" >
-                                        View Profile & Review
-                                        </a>
-                                </div>
+                                <div class="d-flex justify-content-center mt-2 mb-2">
+                                <a href="#" 
+                                    class="btn btn-link text-decoration-none primary p-1 view-profile-btn" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#taskerReviewModal-${tasker.taskerID}">
+                                    View Profile & Review
+                                </a>
+                            </div>
                                 <div class="d-grid d-md-flex justify-content-md-center align-items-md-center ">
                                     <button type="button"
                                         class="btn btn-primary select-continue-btn"
@@ -1097,6 +1328,7 @@ use App\Models\Tasker;
             localStorage.setItem('selectedHour', selectedValue);
             const nextbutton = document.getElementById('nextButton');
             nextButton.disabled = false;
+            updateButtons();
 
 
         }

@@ -150,7 +150,7 @@ class RouteController extends Controller
 
     public function clientBooking($id)
     {
-        try {
+        // try {
 
             // Fetch taskers and calculate road distances
             $svtasker = DB::table('services as a')
@@ -169,10 +169,12 @@ class RouteController extends Controller
                     'b.servicetype_name',
                     'b.servicetype_status',
                     'c.tasker_firstname',
+                    'c.tasker_lastname',
                     'c.tasker_rating',
                     'c.tasker_photo',
                     'c.latitude as tasker_lat',
-                    'c.longitude as tasker_lng'
+                    'c.longitude as tasker_lng',
+                    'c.tasker_bio'
                 )
                 ->get();
 
@@ -186,16 +188,44 @@ class RouteController extends Controller
 
             $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
 
+            $review=DB::table('reviews as a')
+            ->join('bookings as b','a.booking_id','=','b.id')
+            ->join('services as c','b.service_id','=','c.id')
+            ->join('taskers as d','c.tasker_id','=','d.id')
+            ->join('service_types as e','c.service_type_id','=','e.id')
+            ->join('clients as f','b.client_id','=','f.id')
+            ->select(
+                'a.id as reviewID',
+                'c.id as serviceID',
+                'd.id as taskerID',
+                'd.tasker_photo',
+                'a.review_rating',
+                'a.review_description',
+                'a.review_imageOne',
+                'a.review_imageTwo',
+                'a.review_imageThree',
+                'a.review_imageFour',
+                'a.review_type',
+                'a.review_status',
+                'a.review_date_time',
+                'f.client_firstname',
+                'f.client_lastname',
+                'f.client_area',
+                'f.client_state'
+            )
+            ->get();
+
             return view('client.booking.index', [
                 'title' => 'Describe your task',
                 'tasker' => $svtasker,
                 'sv' => $sv,
                 'states' => $states,
-                'time' => $timeSlot
+                'time' => $timeSlot,
+                'review'=>$review
             ]);
-        } catch (Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
-        }
+        // } catch (Exception $e) {
+        //     return back()->withErrors(['error' => $e->getMessage()]);
+        // }
     }
 
     public function clientPaymentStatusNav(Request $request)
