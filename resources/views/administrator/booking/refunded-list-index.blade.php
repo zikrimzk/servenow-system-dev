@@ -5,6 +5,32 @@ use Carbon\Carbon;
 @extends('administrator.layouts.main')
 
 @section('content')
+    <style>
+        .dataTables_processing {
+            display: none !important;
+        }
+
+        .card-all {
+            border-left: 4px solid #10100f;
+        }
+
+        .card-unpaid {
+            border-left: 4px solid #ffc107;
+        }
+
+        .card-confirmed {
+            border-left: 4px solid #28a745;
+
+        }
+
+        .card-completed {
+            border-left: 4px solid #005013;
+        }
+
+        .card-cancelled {
+            border-left: 4px solid #dc3545;
+        }
+    </style>
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
@@ -57,16 +83,141 @@ use Carbon\Carbon;
                     </div>
                 @endif
             </div>
-
             <!-- End Alert -->
+
+            <!-- Analytics Start -->
+            <div class="row">
+                <div class="col-md-6 col-xl-3">
+                    <div class="card card-all">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-dark">Total Refunds</h6>
+                            <h4 class="mb-3">{{ $totalRefund }}</h4>
+                            <p class="mb-0 text-muted text-sm">booking refunds</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-3">
+                    <div class="card card-completed">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400" style="color: #005013">Approved Refunds</h6>
+                            <h4 class="mb-3">{{ $totalApprovedRefund }}</h4>
+                            <p class="mb-0 text-muted text-sm">refunds approved</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-3">
+                    <div class="card card-cancelled">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-danger">Rejected Refunds</h6>
+                            <h4 class="mb-3">{{ $totalRejectedRefund }}</h4>
+                            <p class="mb-0 text-muted text-sm">refunds rejected</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-3">
+                    <div class="card card-unpaid">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-warning">Pending Refunds</h6>
+                            <h4 class="mb-2">{{ $totalPendingRefund }}</h4>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <p class="mb-0 text-muted text-sm">refunds pending</p>
+                                <div class="d-flex align-items-center">
+                                    <a href="{{ route('admin-refund-request') }}" class="link link-primary text-sm">View
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-6">
+                    <div class="card card-cancelled">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-dark">Total Refunds Amount</h6>
+                            <h3 class="mb-3 text-danger">(-) RM {{ $totalApprovedAmount }}</h3>
+                            <p class="mb-0 text-muted text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-6">
+                    <div class="card card-confirmed">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-dark">Total Unrefunded Amount</h6>
+                            <h3 class="mb-3 text-success">(+) RM {{ $totalRejectedAmount }}</h3>
+                            <p class="mb-0 text-muted text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Analytics End -->
+
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card table-card">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col-sm-6 mb-3">
+                                    <label for="date_range" class="form-label">Date Range</label>
+                                    <div class="d-flex align-items-center">
+                                        <input type="date" id="startDate" name="startDate" class="form-control">
+                                        <span class="mx-2">to</span>
+                                        <input type="date" id="endDate" name="endDate" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 mb-3">
+                                    <label for="tasker_filter" class="form-label">Tasker</label>
+                                    <select id="tasker_filter" class="form-control">
+                                        <option value="">All Taskers</option>
+                                        @foreach ($books->unique('taskerID') as $b)
+                                            <option value="{{ $b->taskerID }}">
+                                                {{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) . ' (' . $b->tasker_code . ')' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-sm-9 mb-3">
+                                    <label for="rating_filter" class="form-label">Filter by</label>
+                                    <div class="d-block  d-md-flex justify-content-between align-items-center gap-2">
+
+
+                                        <select id="state_filter" class="form-control mb-3 mb-md-0" name="rating_filter">
+                                            <option value="">State</option>
+                                            @foreach ($states['states'] as $state)
+                                                <option value="{{ strtolower($state['name']) }}">{{ $state['name'] }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+
+                                        <select id="status_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Status</option>
+                                            <option value="2">Refunded</option>
+                                            <option value="3">Rejected</option>
+                                        </select>
+
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 mb-3">
+                                    <label for="endDate" class="form-label text-white">Action</label>
+                                    <div class="d-flex justify-content-start align-items-end">
+                                        <a href="" class="link-primary" id="clearAllBtn">Clear All</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="card-body">
                             <div class="dt-responsive table-responsive my-4 mx-0 mx-md-4">
                                 <table class="table data-table table-hover nowrap">
                                     <thead>
                                         <tr>
+                                            <th scope="col">#</th>
                                             <th scope="col">Booking ID</th>
                                             <th scope="col">Tasker</th>
                                             <th scope="col">Client</th>
@@ -85,19 +236,78 @@ use Carbon\Carbon;
 
 
             @foreach ($books as $b)
-                <!-- Modal View Booking Details Start Here-->
-                <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false" tabindex="-1"
-                    aria-hidden="true">
+                <!-- Modal View Refund Details Start Here-->
+                <div class="modal fade" id="viewRefundDetails-{{ $b->bookingID }}" data-bs-keyboard="false"
+                    tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="mb-0">Booking Details</h5>
+                                <h5 class="mb-0">Refund Details</h5>
                                 <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
                                     data-bs-dismiss="modal">
                                     <i class="ti ti-x f-20"></i>
                                 </a>
                             </div>
 
+                            <div class="modal-body">
+                                <div class="row">
+                                    <h5 class="mb-3">A. Refund Details</h5>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Refund Reason</label>
+                                            <textarea class="form-control" cols="20" rows="4" disabled>{{ $b->cr_reason }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Amount to be Refunded (RM) </label>
+                                            <input type="text" class="form-control" value="{{ $b->cr_amount }}"
+                                                disabled />
+                                        </div>
+                                    </div>
+
+                                    <h5 class="mb-3 mt-2">B. Payment Details</h5>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Bank</label>
+                                            <input type="text" class="form-control" value="{{ $b->cr_bank_name }}"
+                                                disabled />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Account Holder Name</label>
+                                            <input type="text" class="form-control" value="{{ $b->cr_account_name }}"
+                                                disabled />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Account Number</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $b->cr_account_number }}" disabled />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal View Refund Details End Here-->
+
+                <!-- Modal View Booking Details Start Here-->
+                <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false"
+                    tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="mb-0">Booking Details ({{ $b->booking_order_id }})</h5>
+                                <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
+                                    data-bs-dismiss="modal">
+                                    <i class="ti ti-x f-20"></i>
+                                </a>
+                            </div>
                             <div class="modal-body">
                                 <div class="row">
 
@@ -180,57 +390,24 @@ use Carbon\Carbon;
                                     </div>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
-                                            <label class="form-label">Total Amount Paid</label>
-                                            <input class="form-control" value="{{ $b->booking_rate }}" disabled>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
                                             <label class="form-label d-block mb-2">Booking Status</label>
-                                            @if ($b->booking_status == 7)
+                                            @if ($b->booking_status == 1)
+                                                <span class="badge bg-warning">To Pay</span>
+                                            @elseif($b->booking_status == 2)
+                                                <span class="badge bg-light-success">Paid</span>
+                                            @elseif($b->booking_status == 3)
+                                                <span class="badge bg-success">Confirmed</span>
+                                            @elseif($b->booking_status == 4)
+                                                <span class="badge bg-warning">Rescheduled</span>
+                                            @elseif($b->booking_status == 5)
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            @elseif($b->booking_status == 6)
+                                                <span class="badge bg-success">Completed</span>
+                                            @elseif($b->booking_status == 7)
                                                 <span class="badge bg-light-warning">Pending Refund</span>
                                             @elseif($b->booking_status == 8)
                                                 <span class="badge bg-light-success">Refunded</span>
                                             @endif
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-3 mt-2">D. Refund Details</h5>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Refund Reason</label>
-                                            <textarea class="form-control" cols="20" rows="4" disabled>{{ $b->cr_reason }}</textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Amount To be Refunded (RM) </label>
-                                            <input type="text" class="form-control" value="{{ $b->cr_amount }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-3 mt-2">E. Payment Details</h5>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Bank</label>
-                                            <input type="text" class="form-control" value="{{ $b->cr_bank_name }}"
-                                                disabled />
-
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Account Holder Name</label>
-                                            <input type="text" class="form-control" value="{{ $b->cr_account_name }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Account Number</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ $b->cr_account_number }}" disabled />
                                         </div>
                                     </div>
                                 </div>
@@ -238,7 +415,6 @@ use Carbon\Carbon;
                         </div>
                     </div>
                 </div>
-
                 <!-- Modal View Booking Details End Here-->
             @endforeach
 
@@ -259,19 +435,36 @@ use Carbon\Carbon;
                     processing: true,
                     serverSide: true,
                     responsive: true,
-                    ajax: "{{ route('admin-refunded-list') }}",
+                    ajax: {
+                        url: "{{ route('admin-refunded-list') }}",
+                        data: function(d) {
+                            d.startDate = $('#startDate').val();
+                            d.endDate = $('#endDate').val();
+                            d.tasker_filter = $('#tasker_filter').val();
+                            d.status_filter = $('#status_filter').val();
+                            d.state_filter = $('#state_filter').val();
+                        }
+                    },
                     columns: [
+                        {
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            searchable: false
+                        },
                         {
                             data: 'booking_order_id',
                             name: 'booking_order_id'
                         },
                         {
                             data: 'tasker',
-                            name: 'tasker'
+                            name: 'tasker',
+                            visible: false
                         },
                         {
                             data: 'client',
-                            name: 'client'
+                            name: 'client',
+                            visible: false
+
                         },
                         {
                             data: 'booking_date',
@@ -308,6 +501,37 @@ use Carbon\Carbon;
                         infoFiltered: "(filtered from _MAX_ total entries)"
                     }
 
+                });
+
+                $('#startDate, #endDate').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#tasker_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#status_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#state_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#clearAllBtn').on('click', function(e) {
+                    e.preventDefault();
+                    $('#startDate').val('');
+                    $('#endDate').val('');
+                    $('#tasker_filter').val('');
+                    $('#status_filter').val('');
+                    $('#state_filter').val('');
+                    table.ajax.reload();
+                    table.draw();
                 });
 
             });

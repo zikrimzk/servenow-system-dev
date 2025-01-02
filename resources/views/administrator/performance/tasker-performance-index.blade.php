@@ -441,13 +441,18 @@ use Illuminate\Support\Facades\DB;
                 });
 
                 $('#sendEmailBtn').on('click', function() {
+                    const $buttonSend = $(this);
                     let selectedTaskers = [];
 
                     $('.tasker-checkbox:checked').each(function() {
                         selectedTaskers.push($(this).val());
                     });
-            
+
                     if (selectedTaskers.length > 0) {
+                        // Disable the button and show loading text
+                        $buttonSend.prop('disabled', true).html(
+                            '<span class="spinner-border spinner-border-sm me-2"></span> Sending...'
+                        );
                         $.ajax({
                             url: "{{ route('admin-send-performance-report') }}",
                             type: "POST",
@@ -461,6 +466,10 @@ use Illuminate\Support\Facades\DB;
                             },
                             error: function(xhr) {
                                 console.error(xhr.responseText);
+                            },
+                            complete: function() {
+                                // Re-enable the button
+                                $buttonSend.prop('disabled', false).html('Send Report');
                             }
                         });
                     } else {

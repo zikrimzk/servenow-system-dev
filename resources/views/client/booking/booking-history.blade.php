@@ -1211,7 +1211,7 @@
                                                                                     value="Require Update" readonly />
                                                                             @elseif ($rf->cr_status == 1)
                                                                                 <input type="text" class="form-control"
-                                                                                    value="Pending Request" readonly />
+                                                                                    value="In Process" readonly />
                                                                             @elseif($rf->cr_status == 2)
                                                                                 <input type="text" class="form-control"
                                                                                     value="Approved" readonly />

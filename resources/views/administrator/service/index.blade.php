@@ -681,6 +681,7 @@
                 // Approve/Reject Action
                 $('#approveBtn').on('click', function() {
                     const $buttonOne = $(this);
+                    const $buttonReject = $('#rejectBtn');
                     const selectedPending = [];
                     $('.service-checkbox:checked').each(function() {
                         const row = $(this).closest('tr');
@@ -697,6 +698,7 @@
                         $buttonOne.prop('disabled', true).html(
                             '<span class="spinner-border spinner-border-sm me-2"></span> Approving...'
                         );
+                        $buttonReject.prop('disabled', true);
                         $.ajax({
                             url: "{{ route('admin-approve-multiple-service') }}",
                             type: "POST",
@@ -721,6 +723,7 @@
                 // Reject Action
                 $('#rejectBtn').on('click', function() {
                     const $buttonTwo = $(this);
+                    const $buttonApprove = $('#approveBtn');
                     const selectedPending = [];
                     $('.service-checkbox:checked').each(function() {
                         const row = $(this).closest('tr');
@@ -737,6 +740,7 @@
                         $buttonTwo.prop('disabled', true).html(
                             '<span class="spinner-border spinner-border-sm me-2"></span> Rejecting...'
                         );
+                        $buttonApprove.prop('disabled', true);
                         $.ajax({
                             url: "{{ route('admin-reject-multiple-service') }}",
                             type: "POST",

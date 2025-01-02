@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Spatie\Geocoder\Geocoder;
 use App\Models\TaskerTimeSlot;
+use App\Mail\AdminRefundApproval;
 use Illuminate\Support\Facades\DB;
 use App\Models\CancelRefundBooking;
 use Illuminate\Support\Facades\Log;
@@ -570,27 +571,7 @@ class BookingController extends Controller
         ]);
     }
 
-    public function adminUpdateBooking(Request $request, $id)
-    {
-        try {
-            $booking = Booking::findOrFail($id);
-            $booking->booking_status = $request->booking_status;
-            if ($booking->booking_address != $request->booking_address) {
-                $address = $request->booking_address;
-                $address = Str::headline($address);
-                $result = $this->geocoder->getCoordinatesForAddress($address);
-                $booking->booking_address = $address;
-                $booking->booking_latitude = $result['lat'];
-                $booking->booking_longitude = $result['lng'];
-            }
-            $booking->save();
-
-            return back()->with('success', 'Booking details has been updated successfully.');
-        } catch (Exception $e) {
-            return back()->with('error', 'Oops! Something went wrong. Please try again.');
-        }
-    }
-
+    // Done by Muhammad Zikri (2/1/2025)
     private function sendBookingStatusEmail($data, $userType)
     {
         // Booking Status
@@ -621,7 +602,7 @@ class BookingController extends Controller
             $name = $data->tasker_firstname . ' ' . $data->tasker_lastname;
         }
 
-        Mail::to('zikrimzk@gmail.com')->send(new TaskerClientBookingStatus([
+        Mail::to($data->email)->send(new TaskerClientBookingStatus([
             'users' => $userType,
             'name' => Str::headline($name),
             'service_name' => $data->servicetype_name,
@@ -637,11 +618,121 @@ class BookingController extends Controller
 
         ]));
     }
+
+    // Done by Muhammad Zikri (2/1/2025)
+    public function adminUpdateBooking(Request $request, $id)
+    {
+        try {
+
+            $booking = Booking::findOrFail($id);
+
+            $booking->booking_status = $request->booking_status;
+            if ($booking->booking_address != $request->booking_address) {
+                $address = $request->booking_address;
+                $address = Str::headline($address);
+                $result = $this->geocoder->getCoordinatesForAddress($address);
+                $booking->booking_address = $address;
+                $booking->booking_latitude = $result['lat'];
+                $booking->booking_longitude = $result['lng'];
+            }
+            $booking->save();
+
+
+            if ($booking->booking_status == 5) {
+
+                $tasker = DB::table('taskers as a')
+                    ->join('services as b', 'a.id', '=', 'b.tasker_id')
+                    ->join('bookings as c', 'b.id', '=', 'c.service_id')
+                    ->join('service_types as d', 'b.service_type_id', '=', 'd.id')
+                    ->where('c.id', $booking->id)
+                    ->select('a.id as tasker_id')
+                    ->first();
+
+                $oldDate = $booking->booking_date;
+                $oldStartTime = $booking->booking_time_start;
+                $oldEndTime = $booking->booking_time_end;
+
+                DB::table('tasker_time_slots as a')
+                    ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                    ->where('a.tasker_id', '=', $tasker->tasker_id)
+                    ->where('a.slot_date', '=', $oldDate)
+                    ->whereBetween('b.time', [
+                        $oldStartTime,
+                        date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))
+                    ])
+                    ->update(['a.slot_status' => 1]); // Mark slot as available
+
+            }
+
+            $datasTasker = DB::table('taskers as a')
+                ->join('services as b', 'a.id', '=', 'b.tasker_id')
+                ->join('bookings as c', 'b.id', '=', 'c.service_id')
+                ->join('service_types as d', 'b.service_type_id', '=', 'd.id')
+                ->where('c.id', $id)
+                ->get();
+
+            $datasClient = DB::table('clients as a')
+                ->join('bookings as b', 'a.id', '=', 'b.client_id')
+                ->join('services as c', 'b.service_id', '=', 'c.id')
+                ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
+                ->where('b.id', $id)
+                ->get();
+
+            foreach ($datasClient as $data) {
+                $this->sendBookingStatusEmail($data, 1);
+            }
+
+            foreach ($datasTasker as $data) {
+                $this->sendBookingStatusEmail($data, 2);
+            }
+
+            return back()->with('success', 'Booking details has been updated successfully.');
+        } catch (Exception $e) {
+            return back()->with('error', 'Oops! Something went wrong. Please try again.');
+        }
+    }
+
+    // Done by Muhammad Zikri (2/1/2025)
     public function adminChangeMultipleBookingStatus(Request $request)
     {
         try {
             $bookingIds = $request->input('selected_bookings');
-            Booking::whereIn('id', $bookingIds)->update(['booking_status' => $request->input('booking_status')]);
+            $updatedStatus = $request->input('booking_status');
+
+            // Fetch the bookings before updating them
+            $bookings = Booking::whereIn('id', $bookingIds)->get();
+
+            // Update the booking status
+            Booking::whereIn('id', $bookingIds)->update(['booking_status' => $updatedStatus]);
+
+            if ($updatedStatus == 5) { // Status 5 = Cancelled
+                foreach ($bookings as $booking) {
+                    $taskers = DB::table('taskers as a')
+                        ->join('services as b', 'a.id', '=', 'b.tasker_id')
+                        ->join('bookings as c', 'b.id', '=', 'c.service_id')
+                        ->join('service_types as d', 'b.service_type_id', '=', 'd.id')
+                        ->where('c.id', $booking->id)
+                        ->select('a.id as tasker_id')
+                        ->get();
+
+                    foreach ($taskers as $tasker) {
+                        $oldDate = $booking->booking_date;
+                        $oldStartTime = $booking->booking_time_start;
+                        $oldEndTime = $booking->booking_time_end;
+
+                        DB::table('tasker_time_slots as a')
+                            ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                            ->where('a.tasker_id', '=', $tasker->tasker_id)
+                            ->where('a.slot_date', '=', $oldDate)
+                            ->whereBetween('b.time', [
+                                $oldStartTime,
+                                date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))
+                            ])
+                            ->update(['a.slot_status' => 1]); // Mark slot as available
+                    }
+                }
+            }
+
 
             $datasTasker = DB::table('taskers as a')
                 ->join('services as b', 'a.id', '=', 'b.tasker_id')
@@ -669,6 +760,165 @@ class BookingController extends Controller
             return response()->json(['error' => 'Error : ' . $e->getMessage()]);
         }
     }
+    // Done by Muhammad Zikri (2/1/2025)
+
+    private function sendRefundStatusEmail($data, $userType)
+    {
+        // Booking Status
+        if ($data->cr_status == 0) {
+            $status = 'Require Update';
+        } elseif ($data->cr_status == 1) {
+            $status = 'Process';
+        } elseif ($data->cr_status == 2) {
+            $status = 'Approved';
+        } elseif ($data->cr_status == 3) {
+            $status = 'Rejected';
+        } else {
+            $status = 'Undefined Status';
+        }
+
+        // Booking Note
+        if ($data->booking_note != null) {
+            $note = $data->booking_note;
+        } else {
+            $note = '-';
+        }
+        // User Name
+        if ($userType == 1 || $userType == 3 || $userType == 5) {
+
+            $name = $data->client_firstname . ' ' . $data->client_lastname;
+        } elseif ($userType == 2 || $userType == 4) {
+
+            $name = $data->tasker_firstname . ' ' . $data->tasker_lastname;
+        }
+
+        Mail::to($data->email)->send(new AdminRefundApproval([
+            'users' => $userType,
+            'name' => Str::headline($name),
+            'service_name' => $data->servicetype_name,
+            'booking_order_id' => $data->booking_order_id,
+            'change_date' => Carbon::now()->format('d F Y g:i A'),
+            'booking_date' => $data->booking_date,
+            'booking_time_start' => Carbon::parse($data->booking_time_start)->format('g:i A'),
+            'booking_time_end' => Carbon::parse($data->booking_time_end)->format('g:i A'),
+            'booking_rate' => $data->booking_rate,
+            'booking_address' => $data->booking_address,
+            'booking_note' => $note,
+            'cr_status' => $status,
+            'cr_date' => $data->cr_date,
+            'cr_reason' => $data->cr_reason,
+            'cr_amount' => $data->cr_amount,
+            'cr_bank_name' => $data->cr_bank_name,
+            'cr_account_number' => $data->cr_account_number,
+        ]));
+    }
+    // Done by Muhammad Zikri (2/1/2025)
+
+    public function adminBookingRefundProcess($bookingid, $refundid, $option)
+    {
+        try {
+
+            if ($option == 1) {
+                Booking::where('id', $bookingid)->update(['booking_status' => 10]);
+                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 3]);
+
+                $dataTasker = DB::table('bookings as a')
+                    ->join('services as b', 'a.service_id', '=', 'b.id')
+                    ->join('cancel_refund_bookings as c', 'a.id', '=', 'c.booking_id')
+                    ->join('taskers as d', 'b.tasker_id', '=', 'd.id')
+                    ->join('service_types as e', 'b.service_type_id', '=', 'e.id')
+                    ->where('c.id', $refundid)
+                    ->get();
+
+                $dataClient = DB::table('bookings as a')
+                    ->join('services as b', 'a.service_id', '=', 'b.id')
+                    ->join('cancel_refund_bookings as c', 'a.id', '=', 'c.booking_id')
+                    ->join('clients as d', 'a.client_id', '=', 'd.id')
+                    ->join('service_types as e', 'b.service_type_id', '=', 'e.id')
+                    ->where('c.id', $refundid)
+                    ->get();
+
+                foreach ($dataTasker as $data) {
+                    $this->sendRefundStatusEmail($data, 2);
+                }
+
+                foreach ($dataClient as $data) {
+                    $this->sendRefundStatusEmail($data, 1);
+                }
+
+                $message = 'Refund Request Rejected';
+            } else if ($option == 2) {
+                Booking::where('id', $bookingid)->update(['booking_status' => 8]);
+                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 2]);
+                $dataTasker = DB::table('bookings as a')
+                    ->join('services as b', 'a.service_id', '=', 'b.id')
+                    ->join('cancel_refund_bookings as c', 'a.id', '=', 'c.booking_id')
+                    ->join('taskers as d', 'b.tasker_id', '=', 'd.id')
+                    ->join('service_types as e', 'b.service_type_id', '=', 'e.id')
+                    ->where('c.id', $refundid)
+                    ->get();
+
+                $dataClient = DB::table('bookings as a')
+                    ->join('services as b', 'a.service_id', '=', 'b.id')
+                    ->join('cancel_refund_bookings as c', 'a.id', '=', 'c.booking_id')
+                    ->join('clients as d', 'a.client_id', '=', 'd.id')
+                    ->join('service_types as e', 'b.service_type_id', '=', 'e.id')
+                    ->where('c.id', $refundid)
+                    ->get();
+
+                foreach ($dataTasker as $data) {
+                    $this->sendRefundStatusEmail($data, 2);
+                }
+
+                foreach ($dataClient as $data) {
+                    $this->sendRefundStatusEmail($data, 1);
+                }
+                $message = 'Refund Request Approved';
+            } else if ($option == 3) {
+                Booking::where('id', $bookingid)->update(['booking_status' => 8]);
+                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 2, 'cr_penalized' => 1]);
+                DB::table('bookings as a')
+                    ->join('services as b', 'a.service_id', '=', 'b.id')
+                    ->join('taskers as c', 'b.tasker_id', '=', 'c.id')
+                    ->where('a.id', '=', $bookingid)
+                    ->update(['c.tasker_selfrefund_count' => DB::raw('tasker_selfrefund_count + 1')]);
+
+                $dataTasker = DB::table('bookings as a')
+                    ->join('services as b', 'a.service_id', '=', 'b.id')
+                    ->join('cancel_refund_bookings as c', 'a.id', '=', 'c.booking_id')
+                    ->join('taskers as d', 'b.tasker_id', '=', 'd.id')
+                    ->join('service_types as e', 'b.service_type_id', '=', 'e.id')
+                    ->where('c.id', $refundid)
+                    ->get();
+
+                $dataClient = DB::table('bookings as a')
+                    ->join('services as b', 'a.service_id', '=', 'b.id')
+                    ->join('cancel_refund_bookings as c', 'a.id', '=', 'c.booking_id')
+                    ->join('clients as d', 'a.client_id', '=', 'd.id')
+                    ->join('service_types as e', 'b.service_type_id', '=', 'e.id')
+                    ->where('c.id', $refundid)
+                    ->get();
+
+                foreach ($dataTasker as $data) {
+                    $this->sendRefundStatusEmail($data, 4);
+                }
+
+                foreach ($dataClient as $data) {
+                    $this->sendRefundStatusEmail($data, 3);
+                }
+
+                $message = 'Refund Request Approved with Penalty';
+            } else {
+                return back()->with('error', 'Opps , invalid option. Please try again.');
+            }
+
+            return back()->with('success', $message);
+        } catch (Exception $e) {
+            return back()->with('error', 'Opps , there was an unexpected error to execute the operation. Please try again.');
+        }
+    }
+
+    // Done by Muhammad Zikri (2/1/2025)
 
     public function taskerChangeBookingStatus(Request $request)
     {
@@ -677,6 +927,17 @@ class BookingController extends Controller
             if ($request->option == 1) {
                 $booking->booking_status = 3;
                 $booking->save();
+
+                $datasClient = DB::table('clients as a')
+                    ->join('bookings as b', 'a.id', '=', 'b.client_id')
+                    ->join('services as c', 'b.service_id', '=', 'c.id')
+                    ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
+                    ->where('b.id', $request->id)
+                    ->get();
+
+                foreach ($datasClient as $data) {
+                    $this->sendBookingStatusEmail($data, 1);
+                }
 
                 return response()->json([
                     'status' => 'success',
@@ -713,10 +974,25 @@ class BookingController extends Controller
                 ];
                 CancelRefundBooking::create($validated);
 
+                $refund = CancelRefundBooking::where('booking_id', $request->id)->first();
+                $refundid = $refund->id;
+
+                $dataClient = DB::table('bookings as a')
+                    ->join('services as b', 'a.service_id', '=', 'b.id')
+                    ->join('cancel_refund_bookings as c', 'a.id', '=', 'c.booking_id')
+                    ->join('clients as d', 'a.client_id', '=', 'd.id')
+                    ->join('service_types as e', 'b.service_type_id', '=', 'e.id')
+                    ->where('c.id', $refundid)
+                    ->get();
+
+                foreach ($dataClient as $data) {
+                    $this->sendRefundStatusEmail($data, 5);
+                }
+
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Refund Request will be processed. Please inform the client to update their bank information in their booking history refund section.',
-                    'updated_booking' => $booking,
+                    'updated_booking' => $refundid,
                 ]);
             }
         } catch (Exception $e) {
@@ -897,38 +1173,5 @@ class BookingController extends Controller
         Booking::where('id', $refund->booking_id)->update(['booking_status' => 7]);
 
         return back()->with('success', 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account. ');
-    }
-
-
-    public function adminBookingRefundProcess($bookingid, $refundid, $option)
-    {
-        try {
-
-            if ($option == 1) {
-                Booking::where('id', $bookingid)->update(['booking_status' => 10]);
-                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 3]);
-                $message = 'Refund Request Rejected';
-            } else if ($option == 2) {
-                Booking::where('id', $bookingid)->update(['booking_status' => 8]);
-                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 2]);
-                $message = 'Refund Request Approved';
-            } else if ($option == 3) {
-                Booking::where('id', $bookingid)->update(['booking_status' => 8]);
-                CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 2, 'cr_penalized' => 1]);
-                DB::table('bookings as a')
-                    ->join('services as b', 'a.service_id', '=', 'b.id')
-                    ->join('taskers as c', 'b.tasker_id', '=', 'c.id')
-                    ->where('a.id', '=', $bookingid)
-                    ->update(['c.tasker_selfrefund_count' => DB::raw('tasker_selfrefund_count + 1')]);
-
-                $message = 'Refund Request Approved with Penalty';
-            } else {
-                return back()->with('error', 'Opps , invalid option. Please try again.');
-            }
-
-            return back()->with('success', $message);
-        } catch (Exception $e) {
-            return back()->with('error', 'Opps , there was an unexpected error to execute the operation. Please try again.');
-        }
     }
 }

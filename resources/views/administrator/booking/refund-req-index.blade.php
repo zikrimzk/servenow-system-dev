@@ -67,6 +67,7 @@ use Carbon\Carbon;
                                 <table class="table data-table table-hover nowrap">
                                     <thead>
                                         <tr>
+                                            <th scope="col">#</th>
                                             <th scope="col">Booking ID</th>
                                             <th scope="col">Tasker</th>
                                             <th scope="col">Client</th>
@@ -85,9 +86,79 @@ use Carbon\Carbon;
 
 
             @foreach ($books as $b)
-                <!-- Modal View Booking Details Start Here-->
-                <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false" tabindex="-1"
+                <!-- Modal View Refund Details Start Here-->
+                <div class="modal fade" id="viewRefundDetails-{{ $b->bookingID }}" data-bs-keyboard="false" tabindex="-1"
                     aria-hidden="true">
+                    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="mb-0">Refund Details ({{ $b->booking_order_id }})</h5>
+                                <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
+                                    data-bs-dismiss="modal">
+                                    <i class="ti ti-x f-20"></i>
+                                </a>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="row">
+                                    <h5 class="mb-3">A. Refund Details</h5>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Refund Reason</label>
+                                            <textarea class="form-control" cols="20" rows="4" disabled>{{ $b->cr_reason }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Amount To be Refunded (RM) </label>
+                                            <input type="text" class="form-control" value="{{ $b->cr_amount }}"
+                                                disabled />
+                                        </div>
+                                    </div>
+
+                                    <h5 class="mb-3 mt-2">B. Payment Details</h5>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Bank</label>
+                                            <input type="text" class="form-control" value="{{ $b->cr_bank_name }}"
+                                                disabled />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Account Holder Name</label>
+                                            <input type="text" class="form-control" value="{{ $b->cr_account_name }}"
+                                                disabled />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block mb-2">Account Number</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $b->cr_account_number }}" disabled />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @if ($b->booking_status == 7)
+                                <div class="modal-footer">
+                                    <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '1']) }}"
+                                        class="btn btn-danger">Reject Refund</a>
+                                    <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '3']) }}"
+                                        class="btn btn-primary">Approve + Penalty</a>
+                                    <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '2']) }}"
+                                        class="btn btn-primary">Approve Refund</a>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal View Refund Details End Here-->
+
+                 <!-- Modal View Booking Details Start Here-->
+                 <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false"
+                    tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -97,7 +168,6 @@ use Carbon\Carbon;
                                     <i class="ti ti-x f-20"></i>
                                 </a>
                             </div>
-
                             <div class="modal-body">
                                 <div class="row">
 
@@ -180,73 +250,28 @@ use Carbon\Carbon;
                                     </div>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
-                                            <label class="form-label">Total Amount Paid</label>
-                                            <input class="form-control" value="{{ $b->booking_rate }}" disabled>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
                                             <label class="form-label d-block mb-2">Booking Status</label>
-                                            @if ($b->booking_status == 7)
+                                            @if ($b->booking_status == 1)
+                                                <span class="badge bg-warning">To Pay</span>
+                                            @elseif($b->booking_status == 2)
+                                                <span class="badge bg-light-success">Paid</span>
+                                            @elseif($b->booking_status == 3)
+                                                <span class="badge bg-success">Confirmed</span>
+                                            @elseif($b->booking_status == 4)
+                                                <span class="badge bg-warning">Rescheduled</span>
+                                            @elseif($b->booking_status == 5)
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            @elseif($b->booking_status == 6)
+                                                <span class="badge bg-success">Completed</span>
+                                            @elseif($b->booking_status == 7)
                                                 <span class="badge bg-light-warning">Pending Refund</span>
                                             @elseif($b->booking_status == 8)
                                                 <span class="badge bg-light-success">Refunded</span>
-                                            @elseif($b->booking_status == 10)
-                                                <span class="badge bg-light-danger">Require Update</span>
                                             @endif
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-3 mt-2">D. Refund Details</h5>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Refund Reason</label>
-                                            <textarea class="form-control" cols="20" rows="4" disabled>{{ $b->cr_reason }}</textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Amount To be Refunded (RM) </label>
-                                            <input type="text" class="form-control" value="{{ $b->cr_amount }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-3 mt-2">E. Payment Details</h5>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Bank</label>
-                                            <input type="text" class="form-control" value="{{ $b->cr_bank_name }}"
-                                                disabled />
-
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Account Holder Name</label>
-                                            <input type="text" class="form-control" value="{{ $b->cr_account_name }}"
-                                                disabled />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block mb-2">Account Number</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ $b->cr_account_number }}" disabled />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            @if ($b->booking_status == 7)
-                                <div class="modal-footer">
-                                    <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '1']) }}"
-                                        class="btn btn-light">Cancel Refund</a>
-                                    <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '3']) }}"
-                                        class="btn btn-danger">Penalize Tasker</a>
-                                    <a href="{{ route('admin-change-refund-status', [$b->bookingID, $b->refundID, '2']) }}"
-                                        class="btn btn-primary">Approve Refund</a>
-                                </div>
-                            @endif
                         </div>
                     </div>
                 </div>
@@ -271,17 +296,25 @@ use Carbon\Carbon;
                     serverSide: true,
                     responsive: true,
                     ajax: "{{ route('admin-refund-request') }}",
-                    columns: [{
+                    columns: [
+                        {
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            searchable: false
+                        },
+                        {
                             data: 'booking_order_id',
                             name: 'booking_order_id'
                         },
                         {
                             data: 'tasker',
-                            name: 'tasker'
+                            name: 'tasker',
+                            visible: false
                         },
                         {
                             data: 'client',
-                            name: 'client'
+                            name: 'client',
+                            visible: false
                         },
                         {
                             data: 'booking_date',

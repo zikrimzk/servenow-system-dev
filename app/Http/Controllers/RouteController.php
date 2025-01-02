@@ -1762,7 +1762,7 @@ class RouteController extends Controller
 
 
     // Admin Booking Management
-    //Updated by: Zikri (31/12/2024)
+    //Updated by: Zikri (2/1/2025)
     public function adminBookingManagementNav(Request $request)
     {
         $data = DB::table('bookings as a')
@@ -1805,6 +1805,10 @@ class RouteController extends Controller
             if ($startDate && $endDate) {
                 $data->whereBetween('a.booking_date', [$request->startDate, $request->endDate]);
             }
+        }
+
+        if ($request->has('tasker_filter') && $request->input('tasker_filter') != '') {
+            $data->where('d.id', $request->input('tasker_filter'));
         }
 
         if ($request->has('status_filter') && $request->input('status_filter') != '') {
@@ -1915,6 +1919,18 @@ class RouteController extends Controller
         //calculate total booking Cancelled
         $totalCancelled = $data->where('booking_status', 5)->count();
 
+        //total completed booking amount 
+        $totalCompletedAmount = $data->where('booking_status', 6)->sum('booking_rate');
+        $totalCompletedAmount = number_format($totalCompletedAmount, 2);
+
+        //total cancelled booking amount
+        $totalCancelledAmount = $data->where('booking_status', 5)->sum('booking_rate');
+        $totalCancelledAmount = number_format($totalCancelledAmount, 2);
+
+        // total floating amount
+        $totalFloatingAmount = $data->whereIn('booking_status', [1, 2, 3, 4])->sum('booking_rate');
+        $totalFloatingAmount = number_format($totalFloatingAmount, 2);
+
         $bookings = DB::table('bookings')
             ->select('booking_address', 'booking_status')
             ->get();
@@ -1963,6 +1979,48 @@ class RouteController extends Controller
 
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
 
+        // Monthly Chart Data
+        $monthlyData = Booking::selectRaw("
+            YEAR(booking_date) as year,
+            MONTH(booking_date) as month,
+            SUM(CASE WHEN booking_status = 6 THEN booking_rate ELSE 0 END) as completedAmount,
+            SUM(CASE WHEN booking_status IN (1, 2, 3) THEN booking_rate ELSE 0 END) as floatingAmount,
+            SUM(CASE WHEN booking_status = 5 THEN booking_rate ELSE 0 END) as cancelledAmount
+        ")
+            ->groupBy('year', 'month')
+            ->get();
+
+        // Format monthly data for the chart
+        $monthlyChartData = [];
+        foreach ($monthlyData as $dataChartTwo) {
+            $monthYear = Carbon::create($dataChartTwo->year, $dataChartTwo->month)->format('F Y');
+            $monthlyChartData['labels'][] = $monthYear;
+            $monthlyChartData['completed'][] = $dataChartTwo->completedAmount;
+            $monthlyChartData['floating'][] = $dataChartTwo->floatingAmount;
+            $monthlyChartData['cancelled'][] = $dataChartTwo->cancelledAmount;
+        }
+
+
+        //Yearly Chart Data
+        $yearlyData = Booking::selectRaw("
+            YEAR(booking_date) as year,
+            SUM(CASE WHEN booking_status = 6 THEN booking_rate ELSE 0 END) as completedAmount,
+            SUM(CASE WHEN booking_status IN (1, 2, 3) THEN booking_rate ELSE 0 END) as floatingAmount,
+            SUM(CASE WHEN booking_status = 5 THEN booking_rate ELSE 0 END) as cancelledAmount
+        ")
+            ->groupBy('year')
+            ->orderBy('year', 'asc')
+            ->get();
+
+        $yearlyChartData = [
+            'labels' => $yearlyData->pluck('year')->toArray(),
+            'completed' => $yearlyData->pluck('completedAmount')->toArray(),
+            'floating' => $yearlyData->pluck('floatingAmount')->toArray(),
+            'cancelled' => $yearlyData->pluck('cancelledAmount')->toArray(),
+        ];
+
+        // dd($yearlyChartData);
+
 
         return view('administrator.booking.index', [
             'title' => 'Booking Management',
@@ -1975,12 +2033,16 @@ class RouteController extends Controller
             'stateCounts' => $stateCounts,
             'dataChart' => $dataChart,
             'states' => $states,
-
-
-
+            'totalCompletedAmount' => $totalCompletedAmount,
+            'totalCancelledAmount' => $totalCancelledAmount,
+            'totalFloatingAmount' => $totalFloatingAmount,
+            'monthlyChartData' => $monthlyChartData,
+            'yearlyChartData' => $yearlyChartData,
         ]);
     }
 
+    // Admin Booking Management
+    //Updated by: Zikri (2/1/2025)
     public function adminBookingRefundListNav(Request $request)
     {
         $data = DB::table('bookings as a')
@@ -2022,12 +2084,40 @@ class RouteController extends Controller
                 'f.cr_account_number'
             )
             ->whereIn('a.booking_status', [8, 10])
-            ->orderbyDesc('a.booking_date')
-            ->get();
+            ->orderbyDesc('a.booking_date');
+
+        if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
+            $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
+            $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
+
+            if ($startDate && $endDate) {
+                $data->whereBetween('f.cr_date', [$request->startDate, $request->endDate]);
+            }
+        }
+
+        if ($request->has('tasker_filter') && $request->input('tasker_filter') != '') {
+            $data->where('d.id', $request->input('tasker_filter'));
+        }
+
+        if ($request->has('status_filter') && $request->input('status_filter') != '') {
+            $data->where('f.cr_status', $request->input('status_filter'));
+        }
+
+        if ($request->has('state_filter') && $request->input('state_filter') != '') {
+            $stateFilter = $request->input('state_filter');
+            $data->whereRaw("TRIM(SUBSTRING_INDEX(a.booking_address, ' ', -1)) = ?", [$stateFilter]);
+        }
+
+        $data = $data->get();
 
         if ($request->ajax()) {
 
             $table = DataTables::of($data)->addIndexColumn();
+
+             $table->addColumn('booking_order_id', function ($row) {
+                $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
+                return $orderid;
+            });
 
             $table->addColumn('tasker', function ($row) {
                 $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
@@ -2056,9 +2146,9 @@ class RouteController extends Controller
             $table->addColumn('refund_amount', function ($row) {
 
                 if ($row->booking_status == 8) {
-                    $amount = '<span class="text-danger text-center"> ' . $row->cr_amount . '</span>';
+                    $amount = '<h6 class="text-danger text-start"> (-) ' . $row->cr_amount . '</h6>';
                 } else if ($row->booking_status == 10) {
-                    $amount = '<span class="text-success text-center"> ' . $row->cr_amount . '</span>';
+                    $amount = '<h6 class="text-success text-start"> (+) ' . $row->cr_amount . '</h6>';
                 }
                 return $amount;
             });
@@ -2079,7 +2169,7 @@ class RouteController extends Controller
                 $button =
                     '
                         <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
+                            data-bs-target="#viewRefundDetails-' . $row->bookingID . '">
                             <i class="ti ti-eye f-20"></i>
                         </a>
                     ';
@@ -2088,13 +2178,54 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time', 'refund_amount', 'booking_status', 'action']);
+            $table->rawColumns(['booking_order_id','tasker', 'client', 'booking_date', 'booking_time', 'refund_amount', 'booking_status', 'action']);
 
             return $table->make(true);
         }
+
+        // calculation of total refund data
+        $totalRefund = $data->count();
+
+        //calculation of total approved refund
+        $totalApprovedRefund = $data->where('cr_status', 2)->count();
+
+        //calculation of total rejected refund
+        $totalRejectedRefund = $data->where('cr_status', 3)->count();
+
+        $dataAll = DB::table('bookings as a')
+            ->join('cancel_refund_bookings as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->whereIn('a.booking_status', [7, 8, 9, 10])
+            ->orderbyDesc('a.booking_date')
+            ->get();
+        //calculation of total pending refund
+        $totalPendingRefund = $dataAll->whereIn('cr_status', [0, 1])->count();
+
+        //calculation of total approved amount
+        $totalApprovedAmount = $data->where('cr_status', 2)->sum('cr_amount');
+        $totalApprovedAmount = number_format($totalApprovedAmount, 2);
+
+        //calculation of total rejected amount
+        $totalRejectedAmount = $data->where('cr_status', 3)->sum('cr_amount');
+        $totalRejectedAmount = number_format($totalRejectedAmount, 2);
+
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+
+
+
         return view('administrator.booking.refunded-list-index', [
             'title' => 'Refund Booking List',
             'books' => $data,
+            'totalRefund' => $totalRefund,
+            'totalApprovedRefund' => $totalApprovedRefund,
+            'totalRejectedRefund' => $totalRejectedRefund,
+            'totalPendingRefund' => $totalPendingRefund,
+            'totalApprovedAmount' => $totalApprovedAmount,
+            'totalRejectedAmount' => $totalRejectedAmount,
+            'states' => $states
         ]);
     }
 
@@ -2146,6 +2277,11 @@ class RouteController extends Controller
 
             $table = DataTables::of($data)->addIndexColumn();
 
+            $table->addColumn('booking_order_id', function ($row) {
+                $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
+                return $orderid;
+            });
+
             $table->addColumn('tasker', function ($row) {
                 $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
                 return $tasker;
@@ -2186,7 +2322,7 @@ class RouteController extends Controller
                 $button =
                     '
                         <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
+                            data-bs-target="#viewRefundDetails-' . $row->bookingID . '">
                             <i class="ti ti-eye f-20"></i>
                         </a>
                     ';
@@ -2195,7 +2331,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
+            $table->rawColumns(['booking_order_id','tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
 
             return $table->make(true);
         }

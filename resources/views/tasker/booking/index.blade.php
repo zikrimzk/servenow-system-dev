@@ -590,11 +590,15 @@
         });
 
         $('#confirmBookingChange').on('click', function() {
-
+            const $buttonConfirm = $(this);
+            const $buttonReject = $('#rejectBookingChange');
             const bookingID = event.target.getAttribute('data-booking-id');
             const option = event.target.getAttribute('data-option');
 
-            console.log('Booking ID:', bookingID);
+            $buttonConfirm.prop('disabled', true).html(
+                '<span class="spinner-border spinner-border-sm me-2"></span> Confirming...'
+            );
+            $buttonReject.prop('disabled', true);
 
             fetch(`{{ route('confirmation-booking-tasker') }}`, {
                     method: 'POST',
@@ -619,6 +623,9 @@
                         if (calendarInstance) {
                             calendarInstance.refetchEvents();
                             $('#eventDetailsModal').modal('hide');
+                            $buttonConfirm.prop('disabled', false).html('Confirm Booking');
+                            $buttonReject.prop('disabled', false).html('Unable to Serve');
+
                         }
                     } else {
                         console.error('Failed to update event:', data.message);
@@ -630,11 +637,16 @@
         });
 
         $('#rejectBookingChange').on('click', function() {
-
+            const $buttonRejectTwo = $(this);
+            const $buttonConfirmTwo = $('#confirmBookingChange');
             const bookingID = event.target.getAttribute('data-booking-id');
             const option = event.target.getAttribute('data-option');
 
-            console.log('Booking ID:', bookingID);
+            $buttonRejectTwo.prop('disabled', true).html(
+                '<span class="spinner-border spinner-border-sm me-2"></span> Loading...'
+            );
+            $buttonConfirmTwo.prop('disabled', true);
+
 
             fetch(`{{ route('confirmation-booking-tasker') }}`, {
                     method: 'POST',
@@ -659,6 +671,8 @@
                         if (calendarInstance) {
                             calendarInstance.refetchEvents();
                             $('#eventDetailsModal').modal('hide');
+                            $buttonConfirmTwo.prop('disabled', false).html('Confirm Booking');
+                            $buttonRejectTwo.prop('disabled', false).html('Unable to Serve');
                         }
                     } else {
                         console.error('Failed to update event:', data.message);

@@ -26,6 +26,10 @@ use Carbon\Carbon;
         .card-completed {
             border-left: 4px solid #005013;
         }
+
+        .card-cancelled {
+            border-left: 4px solid #dc3545;
+        }
     </style>
     <!-- [ Main Content ] start -->
     <div class="pc-container">
@@ -84,7 +88,7 @@ use Carbon\Carbon;
 
             <!-- Analytics Start -->
             <div class="row">
-                <div class="col-md-6 col-xl-3">
+                <div class="col-md-6 col-xl-6">
                     <div class="card card-all">
                         <div class="card-body">
                             <h6 class="mb-2 f-w-400 text-dark">Total Bookings</h6>
@@ -93,31 +97,44 @@ use Carbon\Carbon;
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-xl-3">
-                    <div class="card card-unpaid">
+
+                <div class="col-md-6 col-xl-6">
+                    <div class="card card-completed">
                         <div class="card-body">
-                            <h6 class="mb-2 f-w-400 text-warning">Unpaid Services</h6>
-                            <h4 class="mb-3">{{ $totalUnpaid }}</h4>
-                            <p class="mb-0 text-muted text-sm">services unpaid</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-xl-3">
-                    <div class="card card-confirmed">
-                        <div class="card-body">
-                            <h6 class="mb-2 f-w-400 text-success">Confirmed Services</h6>
-                            <h4 class="mb-3">{{ $totalConfirmed }}</h4>
-                            <p class="mb-0 text-muted text-sm">services confirmed</p>
+                            <h6 class="mb-2 f-w-400" style="color: #005013">Completed Bookings</h6>
+                            <h4 class="mb-3">{{ $totalCompleted }}</h4>
+                            <p class="mb-0 text-muted text-sm">bookings completed</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6 col-xl-3">
-                    <div class="card card-completed">
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-unpaid">
                         <div class="card-body">
-                            <h6 class="mb-2 f-w-400" style="color: #005013">Completed Services</h6>
-                            <h4 class="mb-3">{{ $totalCompleted }}</h4>
-                            <p class="mb-0 text-muted text-sm">services completed</p>
+                            <h6 class="mb-2 f-w-400 text-warning">Unpaid Bookings</h6>
+                            <h4 class="mb-3">{{ $totalUnpaid }}</h4>
+                            <p class="mb-0 text-muted text-sm">bookings unpaid</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-confirmed">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-success">Confirmed Bookings</h6>
+                            <h4 class="mb-3">{{ $totalConfirmed }}</h4>
+                            <p class="mb-0 text-muted text-sm">bookings confirmed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-cancelled">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-danger">Cancelled Bookings</h6>
+                            <h4 class="mb-3">{{ $totalCancelled }}</h4>
+                            <p class="mb-0 text-muted text-sm">bookings cancelled</p>
                         </div>
                     </div>
                 </div>
@@ -130,6 +147,55 @@ use Carbon\Carbon;
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-confirmed">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-dark">Total Completed Booking Amount</h6>
+                            <h3 class="mb-3 text-success">(+) RM {{ $totalCompletedAmount }}</h3>
+                            <p class="mb-0 text-muted text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-unpaid">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-dark">Total Floating Amount</h6>
+                            <h3 class="mb-3 text-warning">(~) RM {{ $totalFloatingAmount }}</h3>
+                            <p class="mb-0 text-muted text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-cancelled">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-dark">Total Cancelled Amount</h6>
+                            <h3 class="mb-3 text-danger">(-) RM {{ $totalCancelledAmount }}</h3>
+                            <p class="mb-0 text-muted text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-3 f-w-400 text-dark">Monthly Revenue</h6>
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-3 f-w-400 text-dark">Yearly Revenue</h6>
+                            <canvas id="yearlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <!-- Analytics End -->
 
@@ -147,29 +213,35 @@ use Carbon\Carbon;
                                         <input type="date" id="endDate" name="endDate" class="form-control">
                                     </div>
                                 </div>
+
+                                <div class="col-sm-6 mb-3">
+                                    <label for="tasker_filter" class="form-label">Tasker</label>
+                                    <select id="tasker_filter" class="form-control">
+                                        <option value="">All Taskers</option>
+                                        @foreach ($books->unique('taskerID') as $b)
+                                            <option value="{{ $b->taskerID }}">
+                                                {{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) . ' (' . $b->tasker_code . ')' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                             <div class="row align-items-center">
                                 <div class="col-sm-9 mb-3">
                                     <label for="rating_filter" class="form-label">Filter by</label>
                                     <div class="d-block  d-md-flex justify-content-between align-items-center gap-2">
 
-                                        <select id="tasker_filter" class="form-control">
-                                            <option value="">All Taskers</option>
-                                            @foreach ($books->unique('taskerID') as $b)
-                                                <option value="{{ $b->taskerID }}">
-                                                    {{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) . ' (' . $b->tasker_code . ')' }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+
                                         <select id="state_filter" class="form-control mb-3 mb-md-0" name="rating_filter">
-                                            <option value="">All State</option>
+                                            <option value="">State</option>
                                             @foreach ($states['states'] as $state)
-                                                <option value="{{ strtolower($state['name']) }}">{{ $state['name'] }}</option>
+                                                <option value="{{ strtolower($state['name']) }}">{{ $state['name'] }}
+                                                </option>
                                             @endforeach
                                         </select>
 
                                         <select id="status_filter" class="form-select mb-3 mb-md-0">
-                                            <option value="">All Status</option>
+                                            <option value="">Status</option>
                                             <option value="1">To Pay</option>
                                             <option value="2">Paid</option>
                                             <option value="3">Confirmed</option>
@@ -408,22 +480,49 @@ use Carbon\Carbon;
                                             <div class="mb-3">
                                                 <label class="form-label d-block mb-2">Booking Status</label>
                                                 <select name="booking_status" class="form-control">
-                                                    <option value="1"
-                                                        @if ($b->booking_status == 1) selected @endif>To Pay</option>
-                                                    <option value="2"
-                                                        @if ($b->booking_status == 2) selected @endif>Paid</option>
-                                                    <option value="3"
-                                                        @if ($b->booking_status == 3) selected @endif>Confirmed
-                                                    </option>
-                                                    <option value="4"
-                                                        @if ($b->booking_status == 4) selected @endif>Rescheduled
-                                                    </option>
-                                                    <option value="5"
-                                                        @if ($b->booking_status == 5) selected @endif>Cancelled
-                                                    </option>
-                                                    <option value="6"
-                                                        @if ($b->booking_status == 6) selected @endif>Completed
-                                                    </option>
+                                                    @if ($b->booking_status == 1)
+                                                        <option value="1" selected>To Pay</option>
+                                                        <option value="2">Paid</option>
+                                                        <option value="3">Confirmed</option>
+                                                        <option value="4">Rescheduled</option>
+                                                        <option value="5">Cancelled</option>
+                                                        <option value="6">Completed</option>
+                                                    @elseif($b->booking_status == 2)
+                                                        <option value="1" disabled>To Pay</option>
+                                                        <option value="2" selected>Paid</option>
+                                                        <option value="3">Confirmed</option>
+                                                        <option value="4">Rescheduled</option>
+                                                        <option value="5">Cancelled</option>
+                                                        <option value="6">Completed</option>
+                                                    @elseif($b->booking_status == 3)
+                                                        <option value="1" disabled>To Pay</option>
+                                                        <option value="2" disabled>Paid</option>
+                                                        <option value="3" selected>Confirmed</option>
+                                                        <option value="4">Rescheduled</option>
+                                                        <option value="5">Cancelled</option>
+                                                        <option value="6">Completed</option>
+                                                    @elseif($b->booking_status == 4)
+                                                        <option value="1" disabled>To Pay</option>
+                                                        <option value="2" disabled>Paid</option>
+                                                        <option value="3" disabled>Confirmed</option>
+                                                        <option value="4" selected>Rescheduled</option>
+                                                        <option value="5">Cancelled</option>
+                                                        <option value="6">Completed</option>
+                                                    @elseif($b->booking_status == 5)
+                                                        <option value="1" disabled>To Pay</option>
+                                                        <option value="2" disabled>Paid</option>
+                                                        <option value="3" disabled>Confirmed</option>
+                                                        <option value="4" disabled>Rescheduled</option>
+                                                        <option value="5" selected>Cancelled</option>
+                                                        <option value="6" disabled>Completed</option>
+                                                    @elseif($b->booking_status == 6)
+                                                        <option value="1" disabled>To Pay</option>
+                                                        <option value="2" disabled>Paid</option>
+                                                        <option value="3" disabled>Confirmed</option>
+                                                        <option value="4" disabled>Rescheduled</option>
+                                                        <option value="5" disabled>Cancelled</option>
+                                                        <option value="6" selected>Completed</option>
+                                                    @endif
                                                 </select>
                                             </div>
                                         </div>
@@ -494,6 +593,121 @@ use Carbon\Carbon;
                 }
             }
         });
+
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        const monthlyChart = new Chart(monthlyCtx, {
+            type: 'line', // Change to line chart
+            data: {
+                labels: @json($monthlyChartData['labels']),
+                datasets: [{
+                        label: 'Completed (RM)',
+                        data: @json($monthlyChartData['completed']),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // Light fill for the area under the line
+                        fill: true, // Enable area fill
+                        tension: 0.4, // Smooth curves
+                    },
+                    {
+                        label: 'Floating (RM)',
+                        data: @json($monthlyChartData['floating']),
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                    },
+                    {
+                        label: 'Cancelled (RM)',
+                        data: @json($monthlyChartData['cancelled']),
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Monthly Booking Amounts by Status',
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month',
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Amount (RM)',
+                        },
+                    },
+                },
+            },
+        });
+
+
+        const yearlyCtx = document.getElementById('yearlyChart').getContext('2d');
+        const yearlyChart = new Chart(yearlyCtx, {
+            type: 'line', // Line chart
+            data: {
+                labels: @json($yearlyChartData['labels']), // Years
+                datasets: [{
+                        label: 'Completed (RM)',
+                        data: @json($yearlyChartData['completed']),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                    },
+                    {
+                        label: 'Floating (RM)',
+                        data: @json($yearlyChartData['floating']),
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                    },
+                    {
+                        label: 'Cancelled (RM)',
+                        data: @json($yearlyChartData['cancelled']),
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Yearly Booking Totals by Status',
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year',
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Amount (RM)',
+                        },
+                    },
+                },
+            },
+        });
     </script>
 
     <script type="text/javascript">
@@ -511,6 +725,7 @@ use Carbon\Carbon;
                         data: function(d) {
                             d.startDate = $('#startDate').val();
                             d.endDate = $('#endDate').val();
+                            d.tasker_filter = $('#tasker_filter').val();
                             d.status_filter = $('#status_filter').val();
                             d.state_filter = $('#state_filter').val();
                         }
@@ -585,12 +800,28 @@ use Carbon\Carbon;
                     table.draw();
                 });
 
+                $('#tasker_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
                 $('#status_filter').on('change', function() {
                     table.ajax.reload();
                     table.draw();
                 });
 
                 $('#state_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#clearAllBtn').on('click', function(e) {
+                    e.preventDefault();
+                    $('#startDate').val('');
+                    $('#endDate').val('');
+                    $('#tasker_filter').val('');
+                    $('#status_filter').val('');
+                    $('#state_filter').val('');
                     table.ajax.reload();
                     table.draw();
                 });

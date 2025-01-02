@@ -124,7 +124,7 @@
 
             @if ($data['users'] == 1)
                 {{-- Client --}}
-                <p>We’re reaching out to let you know that your booking status has been updated to
+                <p>We’re reaching out to let you know that your booking has been 
                     <strong>{{ $data['booking_status'] }}</strong>.
                 </p>
                 <p>This update was made on <strong>{{ $data['change_date'] }}</strong>. Here are the details of your
@@ -133,7 +133,7 @@
                 {{-- Tasker --}}
                 <p>Your client’s booking status has been updated to <strong>{{ $data['booking_status'] }}</strong>.</p>
                 <p>This update was made on <strong>{{ $data['change_date'] }}</strong>. Below are the details of the
-                    service:</p>
+                    booking:</p>
             @endif
 
             <div class="details">
@@ -158,7 +158,7 @@
                 <p>Thank you for choosing ServeNow. We value your trust in us and look forward to serving you again.</p>
             @elseif ($data['users'] == 2)
                 {{-- Tasker --}}
-                <p>Thank you for serving your client. We value your trust in us and look forward to serving you again.</p>
+                <p>Thank you for your dedication and service. We are committed to ensuring your clients are satisfied.</p>
             @endif
 
 
