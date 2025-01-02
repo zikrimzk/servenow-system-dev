@@ -79,6 +79,24 @@ use App\Models\Tasker;
         border: 1px solid #ccc;
         padding: 10px;
     }
+
+
+    .user-avatar {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        /* Menjadikan gambar bulat */
+        border: 2px solid #ccc;
+        /* Bingkai (pilihan) */
+    }
+
+    /* Container untuk gambar */
+    .image-container {
+        width: 150px;
+        height: 150px;
+        overflow: hidden;
+    }
 </style>
 
 
@@ -1119,10 +1137,11 @@ use App\Models\Tasker;
                         <div class="row mt-4">
                             <div class="col-sm-3 col-md-3 col-lg-3">
                                 <div class="d-flex justify-content-center align-items-center">
-                                    <img src="{{ asset('storage') }}/${tasker.tasker_photo}"
-                                        alt="Profile Photo" width="150"
-                                        height="150"
-                                        class="user-avtar rounded-circle">
+                                    <div class="image-container">
+                                        <img src="{{ asset('storage') }}/${tasker.tasker_photo}"
+                                            alt="Profile Photo" 
+                                            class="user-avatar rounded-circle">
+                                    </div>
                                 </div>
                             </div>
 
