@@ -1339,7 +1339,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['checkbox','admin_fullname', 'admin_status', 'action']);
+            $table->rawColumns(['checkbox', 'admin_fullname', 'admin_status', 'action']);
 
             return $table->make(true);
         }
@@ -1423,18 +1423,20 @@ class RouteController extends Controller
             $table->addColumn('action', function ($row) {
                 $button =
                     '
-                        <a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="avtar avtar-xs btn-light-primary"">
+                        <a href="#taskermodal" data-bs-toggle="modal" data-bs-target="#updateTaskerModal-' . $row->id . '" class="avtar avtar-xs btn-light-primary"">
                             <i class="ti ti-edit f-20"></i>
                         </a>
                     ';
                 return $button;
             });
 
-            $table->rawColumns(['tasker_fullname','checkbox', 'tasker_status', 'action']);
+            $table->rawColumns(['tasker_fullname', 'checkbox', 'tasker_status', 'action']);
             return $table->make(true);
         }
 
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+        $bank = json_decode(file_get_contents(public_path('assets/json/bank.json')), true);
+
         $alphabet = range('A', 'Z');
 
         //calculation of incomplete profile taskers
@@ -1459,6 +1461,7 @@ class RouteController extends Controller
             'title' => 'Tasker Management',
             'taskers' => Tasker::get(),
             'states' => $states,
+            'bank' => $bank,
             'alphabet' => $alphabet,
             'incompleteTaskers' => $incompleteTaskers,
             'unverifiedTaskers' => $unverifiedTaskers,
@@ -1562,7 +1565,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['checkbox','client_fullname', 'client_status', 'client_state', 'action']);
+            $table->rawColumns(['checkbox', 'client_fullname', 'client_status', 'client_state', 'action']);
             return $table->make(true);
         }
 

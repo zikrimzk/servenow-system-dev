@@ -171,11 +171,11 @@
                     <div class="card card-deactive">
                         <div class="card-body">
                             <div class="row align-items-center">
-                                <div class="col-8">
+                                <div class="col-9">
                                     <h3 class="mb-1">{{ $deactivatedClients }}</h3>
-                                    <p class="text-muted mb-0">Deactivate Clients</p>
+                                    <p class="text-muted mb-0">Deactivated Clients</p>
                                 </div>
-                                <div class="col-4 text-end">
+                                <div class="col-3 text-end">
                                     <i class="fas fa-user-lock f-36 text-danger"></i>
                                 </div>
                             </div>

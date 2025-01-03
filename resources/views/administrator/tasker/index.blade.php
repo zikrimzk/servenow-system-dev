@@ -116,6 +116,7 @@
             </div>
             <!-- End Alert -->
 
+            <!-- Analytics Start -->
             <div class="row">
                 <div class="col-lg-4 col-md-6">
                     <div class="card card-active">
@@ -213,8 +214,10 @@
                     </div>
                 </div>
             </div>
+            <!-- Analytics End -->
 
 
+            <!-- Datatable Start -->
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card table-card">
@@ -278,6 +281,8 @@
                     </div>
                 </div>
             </div>
+            <!-- Datatable End -->
+
 
             <!-- Modal Tasker Create Start Here -->
             <form action="{{ route('admin-tasker-create') }}" method="POST">
@@ -366,7 +371,8 @@
                                                 @error('tasker_phoneno')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
-                                                <div id="phone-error-message" class="text-danger text-sm" style="display: none;">
+                                                <div id="phone-error-message" class="text-danger text-sm"
+                                                    style="display: none;">
                                                     Phone number must be in a valid format (10 or 11 digits)!
                                                 </div>
                                             </div>
@@ -474,6 +480,404 @@
                 </div>
             </div>
             <!-- Modal Update Status client End Here-->
+
+            @foreach ($taskers as $tk)
+                <!-- Modal Tasker Create Start Here -->
+                <form action="{{ route('admin-tasker-create') }}" method="POST">
+                    @csrf
+                    <div class="modal fade" id="updateTaskerModal-{{ $tk->id }}" data-bs-keyboard="false"
+                        tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="mb-0">Tasker Update ({{ $tk->tasker_code }})</h5>
+                                    <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
+                                        data-bs-dismiss="modal">
+                                        <i class="ti ti-x f-20"></i>
+                                    </a>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="alert alert-primary" role="alert">
+                                        <h6 class="link-primary">Please note:</h6>
+                                        <ul class="mb-0">
+                                            <li>Fields marked with a red asterisk (<span class="text-danger">*</span>) are
+                                                mandatory.</li>
+                                            <li>Ensure the phone number includes the correct country code (e.g., +60 for
+                                                Malaysia).</li>
+                                            <li>The default password is pre-set. Please update the password later for
+                                                security
+                                                purposes.</li>
+                                            <li>Review all entered data before clicking 'Save.'</li>
+                                        </ul>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-center align-items-center mb-3">
+                                                    <img src="{{ asset('storage/' . $tk->tasker_photo) }}"
+                                                        alt="Profile Photo" width="150" height="150"
+                                                        class="user-avtar rounded-circle">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-8">
+                                            <div class="row">
+
+                                                <h5 class="mb-2">A. Personal Information</h5>
+
+                                                <!-- Tasker Code Field -->
+                                                <div class="col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Tasker Code</label>
+                                                        <input type="text" class="form-control" name="tasker_code"
+                                                            value="{{ $tk->tasker_code }}" readonly />
+                                                    </div>
+                                                </div>
+
+                                                <!-- First Name Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">
+                                                            First Name
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="text"
+                                                            class="form-control @error('tasker_firstname') is-invalid @enderror"
+                                                            placeholder="First Name" name="tasker_firstname"
+                                                            value="{{ $tk->tasker_firstname }}" />
+                                                        @error('tasker_firstname')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <!-- Last Name Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">
+                                                            Last Name
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="text"
+                                                            class="form-control @error('tasker_lastname') is-invalid @enderror"
+                                                            placeholder="Last Name" name="tasker_lastname"
+                                                            value="{{ $tk->tasker_lastname }}" />
+                                                        @error('tasker_lastname')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <!-- Phone Number Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">
+                                                            Phone Number
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">+60</span>
+                                                            <input type="text"
+                                                                class="form-control @error('tasker_phoneno') is-invalid @enderror"
+                                                                placeholder="Phone No." name="tasker_phoneno"
+                                                                id="tasker_phoneno" value="{{ $tk->tasker_phoneno }}"
+                                                                maxlength="13" />
+                                                            @error('tasker_phoneno')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                            <div id="phone-error-message" class="text-danger text-sm"
+                                                                style="display: none;">
+                                                                Phone number must be in a valid format (10 or 11 digits)!
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Email Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">
+                                                            Email
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="email"
+                                                            class="form-control @error('email') is-invalid @enderror"
+                                                            placeholder="Email" name="email"
+                                                            value="{{ $tk->email }}" />
+                                                        @error('email')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <h5 class="mb-2 mt-2">B. Tasker Address</h5>
+
+                                                <!-- Address Line 1 Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Address Line 1 <span
+                                                                class="text-danger">*</span></label>
+                                                        <input type="text"
+                                                            class="form-control @error('tasker_address_one') is-invalid @enderror"
+                                                            name="tasker_address_one"
+                                                            value="{{ $tk->tasker_address_one }}"
+                                                            placeholder="Address Line 1" />
+                                                        @error('tasker_address_one')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <!-- Address Line 2 Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Address Line 2 <span
+                                                                class="text-danger">*</span></label>
+                                                        <input type="text"
+                                                            class="form-control @error('tasker_address_two') is-invalid @enderror"
+                                                            name="tasker_address_two"
+                                                            value="{{ $tk->tasker_address_two }}"
+                                                            placeholder="Address Line 2" />
+                                                        @error('tasker_address_two')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <!-- Postal Code Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Postal Code <span
+                                                                class="text-danger">*</span></label>
+                                                        <input type="text"
+                                                            class="form-control @error('tasker_address_poscode') is-invalid @enderror"
+                                                            name="tasker_address_poscode"
+                                                            value="{{ $tk->tasker_address_poscode }}"
+                                                            placeholder="Postal Code" />
+                                                        @error('tasker_address_poscode')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <!-- State Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">State <span
+                                                                class="text-danger">*</span></label>
+                                                        <select name="tasker_address_state"
+                                                            class="form-control @error('tasker_address_state') is-invalid @enderror"
+                                                            id="addState">
+                                                            @if ($tk->tasker_address_state == '')
+                                                                <option value="" selected>Select State</option>
+                                                                @foreach ($states['states'] as $state)
+                                                                    <option value="{{ strtolower($state['name']) }}">
+                                                                        {{ $state['name'] }}</option>
+                                                                @endforeach
+                                                            @else
+                                                                @foreach ($states['states'] as $state)
+                                                                    @if ($tk->tasker_address_state == strtolower($state['name']))
+                                                                        <option value="{{ strtolower($state['name']) }}"
+                                                                            selected>
+                                                                            {{ $state['name'] }}</option>
+                                                                    @else
+                                                                        <option value="{{ strtolower($state['name']) }}">
+                                                                            {{ $state['name'] }}</option>
+                                                                    @endif
+                                                                @endforeach
+                                                            @endif
+                                                        </select>
+
+                                                        @error('tasker_address_state')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <!-- Area Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Area <span
+                                                                class="text-danger">*</span></label>
+                                                        <select name="tasker_address_area"
+                                                            class="form-control @error('tasker_address_area') is-invalid @enderror"
+                                                            id="addCity">
+                                                            @if ($tk->tasker_address_area == '')
+                                                                <option value="" selected>Select Area</option>
+                                                            @else
+                                                                <option value="{{ $tk->tasker_address_area }}" selected>
+                                                                    {{ $tk->tasker_address_area }}
+                                                                </option>
+                                                            @endif
+                                                        </select>
+                                                        @error('tasker_address_area')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <h5 class="mb-2">C. Working Area</h5>
+
+                                                <!-- Working Area State Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">State <span
+                                                                class="text-danger">*</span></label>
+                                                        <select name="tasker_workingloc_state"
+                                                            class="form-control @error('tasker_workingloc_state') is-invalid @enderror"
+                                                            id="workState">
+                                                            @if ($tk->tasker_workingloc_state == '')
+                                                                <option value="" selected>Select State</option>
+                                                                @foreach ($states['states'] as $state)
+                                                                    <option value="{{ strtolower($state['name']) }}">
+                                                                        {{ $state['name'] }}</option>
+                                                                @endforeach
+                                                            @else
+                                                                @foreach ($states['states'] as $state)
+                                                                    @if ($tk->tasker_workingloc_state == strtolower($state['name']))
+                                                                        <option value="{{ strtolower($state['name']) }}"
+                                                                            selected>
+                                                                            {{ $state['name'] }}</option>
+                                                                    @else
+                                                                        <option value="{{ strtolower($state['name']) }}">
+                                                                            {{ $state['name'] }}</option>
+                                                                    @endif
+                                                                @endforeach
+                                                            @endif
+                                                        </select>
+                                                        @error('tasker_workingloc_state')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <!-- Working Area Area Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Area <span
+                                                                class="text-danger">*</span></label>
+                                                        <select name="tasker_workingloc_area"
+                                                            class="form-control @error('tasker_workingloc_area') is-invalid @enderror"
+                                                            id="workCity">
+                                                            @if ($tk->tasker_workingloc_area == '')
+                                                                <option value="" selected>Select Area</option>
+                                                            @else
+                                                                <option value="{{ $tk->tasker_workingloc_area }}"
+                                                                    selected>
+                                                                    {{ $tk->tasker_workingloc_area }}</option>
+                                                            @endif
+                                                        </select>
+                                                        @error('tasker_workingloc_area')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <!-- Working Radius Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">
+                                                            Working Radius (KM)
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="number" min="1" max="200"
+                                                            class="form-control @error('working_radius') is-invalid @enderror"
+                                                            placeholder="Working Radius" name="working_radius"
+                                                            value="{{ $tk->working_radius }}" />
+                                                        @error('working_radius')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <h5 class="mb-2">D. Account Details</h5>
+                                                <!-- Account Status Field -->
+                                                <div class="col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Account Status</label>
+                                                        <select
+                                                            class="form-select @error('tasker_status') is-invalid @enderror"
+                                                            name="tasker_status">
+                                                            @if ($tk->tasker_status == 0)
+                                                                <option value ="0">Incomplete Profile</option>
+                                                            @elseif($tk->tasker_status == 1)
+                                                                <option value ="1" selected>Not Verified</option>
+                                                                <option value ="2">Active</option>
+                                                                <option value ="3">Inactive</option>
+                                                            @elseif($tk->tasker_status == 2)
+                                                                <option value ="2"selected>Active</option>
+                                                                <option value ="3">Inactive</option>
+                                                                <option value ="5">Banned</option>
+                                                            @elseif($tk->tasker_status == 3)
+                                                                <option value ="2">Active</option>
+                                                                <option value ="3"selected>Inactive</option>
+                                                                <option value ="5">Banned</option>
+                                                            @elseif($tk->tasker_status == 4)
+                                                                <option value ="4">Password Need Update</option>
+                                                            @elseif($tk->tasker_status == 5)
+                                                                <option value ="2">Active</option>
+                                                                <option value ="3">Inactive</option>
+                                                                <option value ="5"selected>Banned</option>
+                                                            @endif
+                                                        </select>
+                                                        @error('tasker_status')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <h5 class="mb-2">E. Bank Details</h5>
+                                                <div class="col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">
+                                                            Bank Name
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <select name="tasker_account_bank" id="tasker_account_bank"
+                                                            class="form-select">
+                                                            @if ($tk->tasker_account_bank == '')
+                                                                <option value="">Select Bank</option>
+                                                            @else
+                                                                <option value="{{ $tk->tasker_account_bank }}">
+                                                                    {{ $tk->tasker_account_bank }}</option>
+                                                            @endif
+                                                            @foreach ($bank as $banks)
+                                                                @if ($banks['bank'] != $tk->tasker_account_bank)
+                                                                    <option value="{{ $banks['bank'] }}">
+                                                                        {{ $banks['bank'] }}
+                                                                    </option>
+                                                                @endif
+                                                            @endforeach
+                                                        </select>
+
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+
+
+
+                                    </div>
+                                </div>
+                                <div class="modal-footer justify-content-end">
+                                    <div class="flex-grow-1 text-end">
+                                        <button type="reset" class="btn btn-link-danger btn-pc-default"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- Modal Tasker Create End  Here -->
+            @endforeach
 
 
         </div>
