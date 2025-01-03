@@ -83,6 +83,8 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/create-admin', [AdministratorController::class, 'createAdmin'])->name('admin-create');
     Route::post('/update-admin-{id}', [AdministratorController::class, 'updateAdmin'])->name('admin-update');
     Route::get('/delete-admin-{id}', [AdministratorController::class, 'deleteAdmin'])->name('admin-delete');
+    Route::post('/multiple-admin-status-update', [AdministratorController::class, 'updateMultipleAdminStatus'])->name('admin-status-update');
+
 
     // Admin - Service Type Management
     Route::get('/service-type-management', [RouteController::class, 'serviceTypeManagementNav'])->name('admin-service-type-management');
@@ -95,12 +97,16 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/create-tasker', [TaskerController::class, 'adminCreateTasker'])->name('admin-tasker-create');
     Route::get('/tasker-details-{id}', [RouteController::class, 'taskerUpdateNav'])->name('admin-tasker-update-form');
     Route::post('/update-tasker-{id}', [TaskerController::class, 'adminUpdateTasker'])->name('admin-tasker-update');
+    Route::post('/multiple-tasker-status-update', [TaskerController::class, 'updateMultipleTaskerStatus'])->name('admin-tasker-status-update');
 
-    // Admin - Tasker Management
+
+    // Admin - Client Management
     Route::get('/client-management', [RouteController::class, 'clientManagementNav'])->name('admin-client-management');
     Route::post('/create-client', [ClientController::class, 'adminCreateClient'])->name('admin-client-create');
     Route::post('/update-client-{id}', [ClientController::class, 'adminUpdateClient'])->name('admin-client-update');
     Route::get('/delete-client-{id}', [ClientController::class, 'adminDeleteClient'])->name('admin-client-delete');
+    Route::post('/multiple-client-status-update', [ClientController::class, 'updateMultipleClientStatus'])->name('admin-client-status-update');
+
 
 
     // Admin - Service Management

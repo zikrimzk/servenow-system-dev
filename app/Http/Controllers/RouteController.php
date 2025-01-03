@@ -152,48 +152,48 @@ class RouteController extends Controller
     {
         // try {
 
-            // Fetch taskers and calculate road distances
-            $svtasker = DB::table('services as a')
-                ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
-                ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
-                ->where('b.id', '=', $id)
-                ->where('a.service_status', '=', 1)
-                ->select(
-                    'a.id as svID',
-                    'b.id as typeID',
-                    'c.id as taskerID',
-                    'a.service_rate_type',
-                    'a.service_rate',
-                    'a.service_status',
-                    'a.service_desc',
-                    'b.servicetype_name',
-                    'b.servicetype_status',
-                    'c.tasker_firstname',
-                    'c.tasker_lastname',
-                    'c.tasker_rating',
-                    'c.tasker_photo',
-                    'c.latitude as tasker_lat',
-                    'c.longitude as tasker_lng',
-                    'c.tasker_bio'
-                )
-                ->get();
+        // Fetch taskers and calculate road distances
+        $svtasker = DB::table('services as a')
+            ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
+            ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
+            ->where('b.id', '=', $id)
+            ->where('a.service_status', '=', 1)
+            ->select(
+                'a.id as svID',
+                'b.id as typeID',
+                'c.id as taskerID',
+                'a.service_rate_type',
+                'a.service_rate',
+                'a.service_status',
+                'a.service_desc',
+                'b.servicetype_name',
+                'b.servicetype_status',
+                'c.tasker_firstname',
+                'c.tasker_lastname',
+                'c.tasker_rating',
+                'c.tasker_photo',
+                'c.latitude as tasker_lat',
+                'c.longitude as tasker_lng',
+                'c.tasker_bio'
+            )
+            ->get();
 
-            $sv = ServiceType::whereId($id)->first();
+        $sv = ServiceType::whereId($id)->first();
 
-            $timeSlot = DB::table('time_slots as a')
-                ->join('tasker_time_slots as b', 'a.id', '=', 'b.slot_id')
-                ->where('b.slot_status', '=', 1)
-                ->select('b.slot_id', 'a.time', 'b.tasker_id')
-                ->get();
+        $timeSlot = DB::table('time_slots as a')
+            ->join('tasker_time_slots as b', 'a.id', '=', 'b.slot_id')
+            ->where('b.slot_status', '=', 1)
+            ->select('b.slot_id', 'a.time', 'b.tasker_id')
+            ->get();
 
-            $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
 
-            $review=DB::table('reviews as a')
-            ->join('bookings as b','a.booking_id','=','b.id')
-            ->join('services as c','b.service_id','=','c.id')
-            ->join('taskers as d','c.tasker_id','=','d.id')
-            ->join('service_types as e','c.service_type_id','=','e.id')
-            ->join('clients as f','b.client_id','=','f.id')
+        $review = DB::table('reviews as a')
+            ->join('bookings as b', 'a.booking_id', '=', 'b.id')
+            ->join('services as c', 'b.service_id', '=', 'c.id')
+            ->join('taskers as d', 'c.tasker_id', '=', 'd.id')
+            ->join('service_types as e', 'c.service_type_id', '=', 'e.id')
+            ->join('clients as f', 'b.client_id', '=', 'f.id')
             ->select(
                 'a.id as reviewID',
                 'c.id as serviceID',
@@ -215,14 +215,14 @@ class RouteController extends Controller
             )
             ->get();
 
-            return view('client.booking.index', [
-                'title' => 'Describe your task',
-                'tasker' => $svtasker,
-                'sv' => $sv,
-                'states' => $states,
-                'time' => $timeSlot,
-                'review'=>$review
-            ]);
+        return view('client.booking.index', [
+            'title' => 'Describe your task',
+            'tasker' => $svtasker,
+            'sv' => $sv,
+            'states' => $states,
+            'time' => $timeSlot,
+            'review' => $review
+        ]);
         // } catch (Exception $e) {
         //     return back()->withErrors(['error' => $e->getMessage()]);
         // }
@@ -1272,11 +1272,33 @@ class RouteController extends Controller
     //Updated by: Zikri (5/12/2024)
     public function adminManagementNav(Request $request)
     {
+        $data = DB::table('administrators')
+            ->select('id', 'admin_firstname', 'admin_lastname', 'admin_phoneno', 'email', 'admin_status')
+            ->orderBy('created_at', 'desc');
+
+        if ($request->has('status_filter') && $request->input('status_filter') != '') {
+            $data->having('admin_status', '=', $request->status_filter);
+        }
+
+        // Filter by first letter of the name
+        if ($request->has('name_filter') && $request->input('name_filter') != '') {
+            $letter = $request->input('name_filter');
+            $data->where('admin_firstname', 'LIKE', "$letter%");
+        }
+
+        $data = $data->get();
+
         if ($request->ajax()) {
-            $data = DB::table('administrators')
-                ->select('id', 'admin_firstname', 'admin_lastname', 'admin_phoneno', 'email', 'admin_status')
-                ->get();
             $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('checkbox', function ($row) {
+                return '<input type="checkbox" class="user-checkbox form-check-input" value="' . $row->id . '">';
+            });
+
+            $table->addColumn('admin_fullname', function ($row) {
+                return Str::headline($row->admin_firstname . ' ' . $row->admin_lastname);
+            });
+
             $table->addColumn('admin_status', function ($row) {
 
                 if ($row->admin_status == 0) {
@@ -1317,13 +1339,33 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['admin_status', 'action']);
+            $table->rawColumns(['checkbox','admin_fullname', 'admin_status', 'action']);
 
             return $table->make(true);
         }
+        $alphabet = range('A', 'Z');
+
+        //calculation for admin not activated
+        $notActivated = Administrator::where('admin_status', 0)->count();
+
+        //calculation for admin activated
+        $activated = Administrator::where('admin_status', 1)->count();
+
+        //calculation for admin inactive
+        $inactive = Administrator::where('admin_status', 2)->count();
+
+        //calculation for admin deactivated
+        $deactivated = Administrator::where('admin_status', 3)->count();
+
+
         return view('administrator.admin.index', [
             'title' => 'Admin Management',
-            'admins' => Administrator::get()
+            'admins' => Administrator::get(),
+            'alphabet' => $alphabet,
+            'notActivated' => $notActivated,
+            'activated' => $activated,
+            'inactive' => $inactive,
+            'deactivated' => $deactivated
         ]);
     }
 
@@ -1331,13 +1373,34 @@ class RouteController extends Controller
     //Updated by: Zikri (5/12/2024)
     public function taskerManagementNav(Request $request)
     {
+        $data = DB::table('taskers')
+            ->select('id', 'tasker_code', 'tasker_firstname', 'tasker_lastname', 'email', 'tasker_status', 'tasker_phoneno')
+            ->orderBy('created_at', 'desc');
+
         if ($request->ajax()) {
 
-            $data = DB::table('taskers')
-                ->select('id', 'tasker_code', 'tasker_firstname', 'tasker_lastname', 'email', 'tasker_status', 'tasker_phoneno')
-                ->get();
+            // Filter by status
+            if ($request->has('status_filter') && $request->input('status_filter') != '') {
+                $data->having('tasker_status', '=', $request->status_filter);
+            }
+
+            // Filter by first letter of the name
+            if ($request->has('name_filter') && $request->input('name_filter') != '') {
+                $letter = $request->input('name_filter');
+                $data->where('tasker_firstname', 'LIKE', "$letter%");
+            }
+            $data = $data->get();
+
 
             $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('checkbox', function ($row) {
+                return '<input type="checkbox" class="user-checkbox form-check-input" value="' . $row->id . '">';
+            });
+
+            $table->addColumn('tasker_fullname', function ($row) {
+                return Str::headline($row->tasker_firstname . ' ' . $row->tasker_lastname);
+            });
 
             $table->addColumn('tasker_status', function ($row) {
                 if ($row->tasker_status == 0) {
@@ -1367,13 +1430,42 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['tasker_status', 'action']);
+            $table->rawColumns(['tasker_fullname','checkbox', 'tasker_status', 'action']);
             return $table->make(true);
         }
+
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+        $alphabet = range('A', 'Z');
+
+        //calculation of incomplete profile taskers
+        $incompleteTaskers = Tasker::where('tasker_status', 0)->count();
+
+        //calculation of unverified taskers
+        $unverifiedTaskers = Tasker::where('tasker_status', 1)->count();
+
+        //calculation of total active taskers
+        $activeTaskers = Tasker::where('tasker_status', 2)->count();
+
+        //calculation of total inactive taskers
+        $inactiveTaskers = Tasker::where('tasker_status', 3)->count();
+
+        //calculation of total password reset needed taskers
+        $resetTaskers = Tasker::where('tasker_status', 4)->count();
+
+        //calculation of total banned taskers
+        $bannedTaskers = Tasker::where('tasker_status', 5)->count();
 
         return view('administrator.tasker.index', [
             'title' => 'Tasker Management',
             'taskers' => Tasker::get(),
+            'states' => $states,
+            'alphabet' => $alphabet,
+            'incompleteTaskers' => $incompleteTaskers,
+            'unverifiedTaskers' => $unverifiedTaskers,
+            'activeTaskers' => $activeTaskers,
+            'inactiveTaskers' => $inactiveTaskers,
+            'resetTaskers' => $resetTaskers,
+            'bannedTaskers' => $bannedTaskers
         ]);
     }
 
@@ -1388,6 +1480,119 @@ class RouteController extends Controller
             'title' => $data->tasker_firstname . ' profile',
             'tasker' => $data,
             'states' => $states,
+        ]);
+    }
+
+    // Admin - Tasker Management Navigation
+    //Updated by: Zikri (5/12/2024)
+    public function clientManagementNav(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $data = DB::table('clients')
+                ->select('id', 'client_firstname', 'client_lastname', 'client_phoneno', 'email', 'client_status', 'client_state')
+                ->orderBy('created_at', 'desc');
+
+            // Filter by status
+            if ($request->has('status_filter') && $request->input('status_filter') != '') {
+                $data->having('client_status', '=', $request->status_filter);
+            }
+
+            // Filter by first letter of the name
+            if ($request->has('name_filter') && $request->input('name_filter') != '') {
+                $letter = $request->input('name_filter');
+                $data->where('client_firstname', 'LIKE', "$letter%");
+            }
+            $data = $data->get();
+
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('checkbox', function ($row) {
+                return '<input type="checkbox" class="user-checkbox form-check-input" value="' . $row->id . '">';
+            });
+
+            $table->addColumn('client_fullname', function ($row) {
+                return Str::headline($row->client_firstname . ' ' . $row->client_lastname);
+            });
+
+            $table->addColumn('client_status', function ($row) {
+                if ($row->client_status == 0) {
+                    $status = '<span class="badge bg-light-success">Newly Registered</span>';
+                } else if ($row->client_status == 1) {
+                    $status = '<span class="badge bg-light-danger">Admin Referal</span>';
+                } else if ($row->client_status == 2) {
+                    $status = '<span class="text-success"><i class="fas fa-circle f-10 m-r-10"></i> Active</span>';
+                } else if ($row->client_status == 3) {
+                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i> Inactive</span>';
+                } else if ($row->client_status == 4) {
+                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i> Deactivated</span>';
+                }
+                return $status;
+            });
+
+            $table->addColumn('client_state', function ($row) {
+                $state = Str::ucfirst($row->client_state);
+                return $state;
+            });
+
+            $table->addColumn('action', function ($row) {
+                if ($row->client_status == 4) {
+                    $button =
+                        '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#updateClientModal-' . $row->id . '">
+                            <i class="ti ti-edit f-20"></i>
+                        </a>
+                    ';
+                } else {
+                    $button =
+                        '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#updateClientModal-' . $row->id . '">
+                            <i class="ti ti-edit f-20"></i>
+                        </a>
+                        <a href="#" class="avtar avtar-xs  btn-light-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal-' . $row->id . '">
+                            <i class="ti ti-trash f-20"></i>
+                        </a>
+                    ';
+                }
+
+                return $button;
+            });
+
+            $table->rawColumns(['checkbox','client_fullname', 'client_status', 'client_state', 'action']);
+            return $table->make(true);
+        }
+
+        //calculation of total active clients
+        $activeClients = Client::where('client_status', 2)->count();
+
+        //calculation of total inactive clients
+        $inactiveClients = Client::where('client_status', 3)->count();
+
+        //calculation of total deactivated clients
+        $deactivatedClients = Client::where('client_status', 4)->count();
+
+        //calculation of total clients
+        $totalClients = Client::count();
+
+        //calculation of total newly registered clients
+        $nRegisterClients = Client::where('client_status', 0)->count();
+
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+        $alphabet = range('A', 'Z');
+        return view('administrator.client.index', [
+            'title' => 'Client Management',
+            'clients' => Client::get(),
+            'states' => $states,
+            'alphabet' => $alphabet,
+            'activeClients' => $activeClients,
+            'inactiveClients' => $inactiveClients,
+            'deactivatedClients' => $deactivatedClients,
+            'totalClients' => $totalClients,
+            'nRegisterClients' => $nRegisterClients
         ]);
     }
 
@@ -1612,7 +1817,6 @@ class RouteController extends Controller
         }
     }
 
-
     // Admin - Time Slot Setting
     //Updated by: Zikri (5/12/2024)
     public function adminTimeSlotNav(Request $request)
@@ -1668,78 +1872,6 @@ class RouteController extends Controller
         ]);
     }
 
-    // Admin - Tasker Management Navigation
-    //Updated by: Zikri (5/12/2024)
-    public function ClientManagementNav(Request $request)
-    {
-        if ($request->ajax()) {
-
-            $data = DB::table('clients')
-                ->select('id', 'client_firstname', 'client_lastname', 'client_phoneno', 'email', 'client_status', 'client_state')
-                ->get();
-
-            $table = DataTables::of($data)->addIndexColumn();
-
-            $table->addColumn('client_status', function ($row) {
-                if ($row->client_status == 0) {
-                    $status = '<span class="badge bg-light-success">Newly Registered</span>';
-                } else if ($row->client_status == 1) {
-                    $status = '<span class="badge bg-light-danger">Admin Referal</span>';
-                } else if ($row->client_status == 2) {
-                    $status = '<span class="text-success"><i class="fas fa-circle f-10 m-r-10"></i> Active</span>';
-                } else if ($row->client_status == 3) {
-                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i> Inactive</span>';
-                } else if ($row->client_status == 4) {
-                    $status = '<span class="text-danger"><i class="fas fa-circle f-10 m-r-10"></i> Deactivated</span>';
-                }
-
-                return $status;
-            });
-
-            $table->addColumn('client_state', function ($row) {
-                $state = Str::ucfirst($row->client_state);
-                return $state;
-            });
-
-            $table->addColumn('action', function ($row) {
-                if ($row->client_status == 4) {
-                    $button =
-                        '
-                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#updateClientModal-' . $row->id . '">
-                            <i class="ti ti-edit f-20"></i>
-                        </a>
-                    ';
-                } else {
-                    $button =
-                        '
-                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#updateClientModal-' . $row->id . '">
-                            <i class="ti ti-edit f-20"></i>
-                        </a>
-                        <a href="#" class="avtar avtar-xs  btn-light-danger" data-bs-toggle="modal"
-                            data-bs-target="#deleteModal-' . $row->id . '">
-                            <i class="ti ti-trash f-20"></i>
-                        </a>
-                    ';
-                }
-
-                return $button;
-            });
-
-            $table->rawColumns(['client_status', 'client_state', 'action']);
-            return $table->make(true);
-        }
-
-        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
-
-        return view('administrator.client.index', [
-            'title' => 'Client Management',
-            'clients' => Client::get(),
-            'states' => $states,
-        ]);
-    }
-
     // Admin - System Setting
     // Uncompleted
     public function adminSystemSettingNav()
@@ -1750,6 +1882,8 @@ class RouteController extends Controller
         ]);
     }
 
+    // Admin - Extract State from Address
+    //Updated by: Zikri (2/1/2025)
     private function extractState($address)
     {
         // Match the postal code (5 digits) followed by the state at the end
@@ -1759,7 +1893,6 @@ class RouteController extends Controller
         }
         return 'Unknown'; // Default if no match is found
     }
-
 
     // Admin Booking Management
     //Updated by: Zikri (2/1/2025)
@@ -2041,7 +2174,7 @@ class RouteController extends Controller
         ]);
     }
 
-    // Admin Booking Management
+    // Admin Refund Booking List 
     //Updated by: Zikri (2/1/2025)
     public function adminBookingRefundListNav(Request $request)
     {
@@ -2114,7 +2247,7 @@ class RouteController extends Controller
 
             $table = DataTables::of($data)->addIndexColumn();
 
-             $table->addColumn('booking_order_id', function ($row) {
+            $table->addColumn('booking_order_id', function ($row) {
                 $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
                 return $orderid;
             });
@@ -2178,7 +2311,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['booking_order_id','tasker', 'client', 'booking_date', 'booking_time', 'refund_amount', 'booking_status', 'action']);
+            $table->rawColumns(['booking_order_id', 'tasker', 'client', 'booking_date', 'booking_time', 'refund_amount', 'booking_status', 'action']);
 
             return $table->make(true);
         }
@@ -2229,6 +2362,8 @@ class RouteController extends Controller
         ]);
     }
 
+    // Admin Refund Booking Request
+    //Updated by: Zikri (3/1/2025)
     public function adminBookingRefundReqNav(Request $request)
     {
         $data = DB::table('bookings as a')
@@ -2331,7 +2466,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['booking_order_id','tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
+            $table->rawColumns(['booking_order_id', 'tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
 
             return $table->make(true);
         }

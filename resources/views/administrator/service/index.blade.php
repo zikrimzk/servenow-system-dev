@@ -435,6 +435,7 @@
     <!-- [ Main Content ] end -->
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         window.onload = function() {
             const serviceLabels = @json($popularServiceTypes->pluck('servicetype_name'));
@@ -516,7 +517,6 @@
             });
         };
     </script>
-
 
     <script type="text/javascript">
         $(document).ready(function() {

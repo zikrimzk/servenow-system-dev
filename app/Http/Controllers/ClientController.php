@@ -91,6 +91,25 @@ class ClientController extends Controller
         }
     }
 
+    public function updateMultipleClientStatus(Request $req)
+    {
+        try {
+            $clientIds = $req->input('selected_client');
+            $updatedStatus = $req->input('client_status');
+
+            Client::whereIn('id', $clientIds)->update(['client_status' => $updatedStatus]);
+
+            return response()->json([
+                'message' => 'All selected client status has been updated successfully !',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Oops! Something went wrong. Please try again later.',
+            ]);
+        }
+    }
+
+
     public function adminDeleteClient($id)
     {
         try {
@@ -254,8 +273,8 @@ class ClientController extends Controller
                 'client_postcode' => $validated['client_postcode'],
                 'client_state' => $validated['client_state'],
                 'client_area' => $validated['client_area'],
-                'latitude'=>$validated['latitude'],
-                'longitude'=>$validated['longitude']
+                'latitude' => $validated['latitude'],
+                'longitude' => $validated['longitude']
             ]);
 
             // Suceess Update Address

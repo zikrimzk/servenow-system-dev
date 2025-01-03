@@ -264,6 +264,25 @@ class TaskerController extends Controller
         }
     }
 
+    public function updateMultipleTaskerStatus(Request $req)
+    {
+        try {
+            $taskerIds = $req->input('selected_tasker');
+            $updatedStatus = $req->input('tasker_status');
+
+            Tasker::whereIn('id', $taskerIds)->update(['tasker_status' => $updatedStatus]);
+
+            return response()->json([
+                'message' => 'All selected tasker status has been updated successfully !',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Oops! Something went wrong. Please try again later.',
+            ]);
+        }
+    }
+
+
     public function taskerUpdateLocation(Request $req, $id)
     {
         $taskers = $req->validate(

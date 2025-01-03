@@ -546,6 +546,7 @@ use Carbon\Carbon;
     </div>
     <!-- [ Main Content ] end -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script>
         const dataChart = @json($dataChart);
 

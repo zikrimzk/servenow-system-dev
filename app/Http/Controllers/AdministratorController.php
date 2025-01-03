@@ -77,6 +77,24 @@ class AdministratorController extends Controller
         }
     }
 
+    public function updateMultipleAdminStatus(Request $req)
+    {
+        try {
+            $adminIds = $req->input('selected_admin');
+            $updatedStatus = $req->input('admin_status');
+
+            Administrator::whereIn('id', $adminIds)->update(['admin_status' => $updatedStatus]);
+
+            return response()->json([
+                'message' => 'All selected administrator status has been updated successfully !',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Oops! Something went wrong. Please try again later.',
+            ]);
+        }
+    }
+
     public function adminUpdateProfile(Request $req, $adminId)
     {
         if ($req->isUploadPhoto == 'true') {
@@ -138,35 +156,35 @@ class AdministratorController extends Controller
         return redirect(route('admin-profile'))->with('success', 'Administrator profile has been updated successfully !');
     }
 
-    public function adminUpdatePassword(Request $req,$id)
+    public function adminUpdatePassword(Request $req, $id)
     {
-        $validated = $req->validate([
-            'oldPass' => 'required | min:8',
-            'newPass' => 'required | min:8',
-            'renewPass' => 'required | same:newPass',
-        ],[],
-        [
-            'oldPass' => 'Old Password',
-            'newPass' => 'New Password',
-            'renewPass' => 'Comfirm Password',
+        $validated = $req->validate(
+            [
+                'oldPass' => 'required | min:8',
+                'newPass' => 'required | min:8',
+                'renewPass' => 'required | same:newPass',
+            ],
+            [],
+            [
+                'oldPass' => 'Old Password',
+                'newPass' => 'New Password',
+                'renewPass' => 'Comfirm Password',
 
-        ]);
+            ]
+        );
         $check = Hash::check($validated['oldPass'], Auth::user()->password, []);
-        if($check)
-        {
-            Administrator::where('id', $id)->update(['password'=> bcrypt($validated['renewPass'])]);
-            return back()->with('success','Password has been updated successfully !');
+        if ($check) {
+            Administrator::where('id', $id)->update(['password' => bcrypt($validated['renewPass'])]);
+            return back()->with('success', 'Password has been updated successfully !');
+        } else {
+            return back()->with('error', 'Please enter the correct password !');
         }
-        else{
-            return back()->with('error','Please enter the correct password !');
-        }
-
     }
 
-    public function deleteAdmin($adminId) 
+    public function deleteAdmin($adminId)
     {
         try {
-            Administrator::where('id', $adminId)->update(['admin_status'=> 3]);
+            Administrator::where('id', $adminId)->update(['admin_status' => 3]);
             return back()->with('success', 'Administrator account has been deactivated !');
         } catch (Exception $e) {
             return back()->with('error', 'Error : ' . $e->getMessage());
