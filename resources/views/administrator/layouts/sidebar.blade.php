@@ -148,9 +148,9 @@
                         <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                     </a>
                     <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="#">Card
+                        <li class="pc-item"><a class="pc-link" href="{{ route('card-verification-log') }}">Card
                                 Verification Log</a></li>
-                        <li class="pc-item"><a class="pc-link" href="#">Face
+                        <li class="pc-item"><a class="pc-link" href="{{ route('face-verification-log') }}">Face
                                 Verification Log</a></li>
                     </ul>
                 </li>

@@ -327,10 +327,11 @@ class TaskerController extends Controller
         return back()->with('success', 'Tasker location have been saved !');
     }
 
-    public function taskerCardVerification()
+    public function taskerCardVerification($data)
     {
         return view('ekyc.card-verification', [
-            'title' => 'Card Verification'
+            'title' => 'Card Verification',
+            'data' => $data
         ]);    
     }
 
@@ -341,11 +342,14 @@ class TaskerController extends Controller
         ]);
     }
 
-    public function verificationSuccess()
+    public function verificationSuccess(Request $request)
     {
         try {
-            Tasker::where('id', Auth::user()->id)->update(['tasker_status' => 2]);
-            return redirect(route('tasker-profile'))->with('success', 'Verification has been successfully completed. Please set up your task preferences at Task Preferences > Visibility & Location.');
+            // Tasker::where('id', Auth::user()->id)->update(['tasker_status' => 2]);
+            $idno = $request->query('idno');
+            $idno = str_replace('-', '', $idno);
+            $userData = Tasker::where('tasker_icno', $idno)->first();
+            return redirect(route('tasker-login'))->with('success', 'Verification has been successfully completed. Please set up your task preferences at Task Preferences > Visibility & Location.');
         } catch (Exception) {
             return back()->with('error', 'Something went wrong !');
         }

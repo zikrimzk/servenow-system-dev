@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Administrator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Http;
 
 class AdministratorController extends Controller
 {
@@ -189,5 +191,111 @@ class AdministratorController extends Controller
         } catch (Exception $e) {
             return back()->with('error', 'Error : ' . $e->getMessage());
         }
+    }
+
+    public function showCardLogs(Request $request)
+    {
+        $response = Http::withHeaders([
+            'Authorization' => env("EKYC_API_KEY"),
+        ])->withoutVerifying()
+        ->get(env('API_EKYC_URL') . '/card-logs');
+        $data = $response->json();
+
+
+        if ($response->successful()) {
+            $data = $response->json();
+
+            // dd($data);
+
+            if (isset($data['data']) && !empty($data['data'])) {
+                $logs = $data['data'];
+            } else {
+                $logs = [];
+            }
+        } else {
+            $logs = [];
+        }
+
+
+        if ($request->ajax()) {
+
+            return DataTables::of($logs)
+                ->addIndexColumn()
+                ->addColumn('status', function ($row) {
+                    if ($row['status'] == 'success') {
+                        return '<span class="badge bg-success p-2 fw-bold">SUCCESS</span>';
+                    } elseif ($row['status'] == 'failed') {
+                        return '<span class="badge bg-danger p-2 fw-bold">FAILED</span>';
+                    }
+                    return '<span class="badge bg-warning fw-bold">ERROR</span>';
+                })
+                ->addColumn('res', function ($row) {
+                    if ($row['status'] == 'success') {
+                        return '<span class="badge bg-light-success p-3 fw-bold " style="word-wrap: break-word; white-space: normal; text-align: left;">' . $row['response'] . '</span>';
+                    } elseif ($row['status'] == 'failed') {
+                        return '<span class="badge bg-light-danger p-3 fw-bold " style="word-wrap: break-word; white-space: normal; text-align: left;">' . $row['response'] . '</span>';
+                    
+                    }
+
+                    return '<span class="badge bg-danger">ERROR</span>';
+                })
+                ->rawColumns(['status', 'res'])
+                ->make(true);
+        }
+
+
+        return view('administrator.ekyc.card-log',[
+            'title' => 'e-KYC Card Log'
+        ]);
+    }
+
+    public function showFaceLogs(Request $request)
+    {
+        $response = Http::withHeaders([
+            'Authorization' => env("EKYC_API_KEY"),
+        ])->withoutVerifying()
+        ->get(env('API_EKYC_URL').'/face-logs');
+        $data = $response->json();
+ 
+        if ($response->successful()) {
+            $data = $response->json();
+            // dd($data);
+            if (isset($data['data']) && !empty($data['data'])) {
+                $logs = $data['data'];
+            } else {
+                $logs = [];
+            }
+        } else {
+            $logs = [];
+        }
+    
+
+        if ($request->ajax()) {
+            return DataTables::of($logs)
+                ->addIndexColumn()
+                ->addColumn('status', function ($row) {
+                    if ($row['status'] == 'SUCCESS') {
+                        return '<span class="badge bg-success p-2 fw-bold">SUCCESS</span>';
+                    } elseif ($row['status'] == 'FAILED') {
+                        return '<span class="badge bg-danger p-2 fw-bold">FAILED</span>';
+                    }
+                    return '<span class="badge bg-warning fw-bold">ERROR</span>';
+                })
+                ->addColumn('res', function ($row) {
+                    if ($row['status'] == 'SUCCESS') {
+                        return '<span class="badge bg-light-success p-3 fw-bold">'.$row['response'].'</span>';
+                    } elseif ($row['status'] == 'FAILED') {
+                        return '<span class="badge bg-light-danger p-3 fw-bold">'.$row['response'].'</span>';
+                    }
+                    return '<span class="badge bg-danger fw-bold">ERROR</span>';
+                })
+                ->rawColumns(['status','res'])
+                ->make(true);
+        }
+    
+        
+        return view('administrator.ekyc.face-log',[
+            'title' => 'e-KYC Face Log'
+        ]);
     }
 }

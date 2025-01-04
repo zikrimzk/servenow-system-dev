@@ -122,6 +122,12 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     // Admin - System Setting
     Route::get('/system-setting', [RouteController::class, 'adminSystemSettingNav'])->name('admin-system-setting');
 
+    // Admin - System Log e-KYC
+    Route::get('/card-verifiation-log', [RouteController::class, 'cardVerificationLog'])->name('card-verification-log');
+    Route::get('/face-verifiation-log', [RouteController::class, 'faceVerificationLog'])->name('face-verification-log');
+    Route::get('/card-logs', [AdministratorController::class, 'showCardLogs'])->name('show-card-logs');
+    Route::get('/face-logs', [AdministratorController::class, 'showFaceLogs'])->name('show-face-logs');
+
 
     // Admin - Time Slot Setting
     Route::get('/time-slot-setting', [RouteController::class, 'adminTimeSlotNav'])->name('admin-timeslot-setting');
@@ -157,12 +163,17 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
 /* Tasker Route Start */
 
+/*Tasker e-KYC*/
+Route::get('/card-verification/{data}', [TaskerController::class, 'taskerCardVerification'])->name('tasker-card-ver');
+Route::get('/face-verification', [TaskerController::class, 'taskerFaceVerification'])->name('tasker-face-ver');
+Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
+
+
 // Tasker - Registration Form [General]
 Route::get('/register-tasker', [RouteController::class, 'taskerRegisterFormNav'])->name('tasker-register-form');
 
 // Tasker - Registration Process
 Route::post('/tasker-registration', [TaskerController::class, 'createTasker'])->name('tasker-create');
-
 
 Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
@@ -178,9 +189,9 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::post('/update-password-{id}', [TaskerController::class, 'taskerUpdatePassword'])->name('tasker-update-password');
 
     // Tasker - Account Verification [e-KYC]
-    Route::get('/card-verification', [TaskerController::class, 'taskerCardVerification'])->name('tasker-card-ver');
-    Route::get('/face-verification', [TaskerController::class, 'taskerFaceVerification'])->name('tasker-face-ver');
-    Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
+    // Route::get('/card-verification/{data}', [TaskerController::class, 'taskerCardVerification'])->name('tasker-card-ver');
+    // Route::get('/face-verification', [TaskerController::class, 'taskerFaceVerification'])->name('tasker-face-ver');
+    // Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
 
     //Tasker - Service Management
     Route::get('/service-approval', [RouteController::class, 'taskerServiceManagementNav'])->name('tasker-service-management');

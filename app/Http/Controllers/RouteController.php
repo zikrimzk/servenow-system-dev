@@ -3011,10 +3011,9 @@ class RouteController extends Controller
                 DB::raw("LAST_DAY(bookings.booking_date) AS last_booking_date") // Last day of the month
             )
             ->whereNotNull('bookings.booking_date') // Only consider valid dates
-            ->groupBy(
-                'taskers.id',
-                'last_booking_date'
-            );
+
+            ->groupBy('taskers.id', 'taskers.tasker_code', 'last_booking_date');
+        // dd($taskers->get());
 
         $data = $taskers->get();
 
@@ -3090,5 +3089,20 @@ class RouteController extends Controller
         ]);
     }
 
-    /**** Administrator Route Function - End ****/
+
+
+    public function cardVerificationLog(Request $request) 
+    {
+        return view('administrator.ekyc.card-log',[
+            'title' => 'e-KYC Card Log'
+        ]);
+    }
+
+    public function faceVerificationLog(Request $request)
+    {
+        return view('administrator.ekyc.face-log',[
+            'title' => 'e-KYC Face Log'
+        ]);
+    }
+
 }
