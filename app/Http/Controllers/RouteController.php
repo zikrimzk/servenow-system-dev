@@ -2324,35 +2324,43 @@ class RouteController extends Controller
             return $table->make(true);
         }
 
-        // calculation of total refund data
-        $totalRefund = $data->count();
+        // Default values for calculations
+        $totalRefund = 0;
+        $totalApprovedRefund = 0;
+        $totalRejectedRefund = 0;
+        $totalPendingRefund = 0;
+        $totalApprovedAmount = '0.00';
+        $totalRejectedAmount = '0.00';
 
-        //calculation of total approved refund
-        $totalApprovedRefund = $data->where('cr_status', 2)->count();
+        // Check if $data is not empty
+        if ($data->isNotEmpty()) {
+            // Calculate totals
+            $totalRefund = $data->count();
+            $totalApprovedRefund = $data->where('cr_status', 2)->count();
+            $totalRejectedRefund = $data->where('cr_status', 3)->count();
 
-        //calculation of total rejected refund
-        $totalRejectedRefund = $data->where('cr_status', 3)->count();
+            // Calculate amounts
+            $totalApprovedAmount = number_format($data->where('cr_status', 2)->sum('cr_amount'), 2);
+            $totalRejectedAmount = number_format($data->where('cr_status', 3)->sum('cr_amount'), 2);
+        }
 
+        // Fetch all data with joins and ensure it's handled properly if empty
         $dataAll = DB::table('bookings as a')
-            ->join('cancel_refund_bookings as f', 'a.id', 'f.booking_id')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
-            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->join('cancel_refund_bookings as f', 'a.id', '=', 'f.booking_id')
+            ->join('services as b', 'a.service_id', '=', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', '=', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', '=', 'd.id')
+            ->join('clients as e', 'a.client_id', '=', 'e.id')
             ->whereIn('a.booking_status', [7, 8, 9, 10])
-            ->orderbyDesc('a.booking_date')
+            ->orderByDesc('a.booking_date')
             ->get();
-        //calculation of total pending refund
-        $totalPendingRefund = $dataAll->whereIn('cr_status', [0, 1])->count();
 
-        //calculation of total approved amount
-        $totalApprovedAmount = $data->where('cr_status', 2)->sum('cr_amount');
-        $totalApprovedAmount = number_format($totalApprovedAmount, 2);
+        if ($dataAll->isNotEmpty()) {
+            // Calculate total pending refunds if $dataAll is not empty
+            $totalPendingRefund = $dataAll->whereIn('cr_status', [0, 1])->count();
+        }
 
-        //calculation of total rejected amount
-        $totalRejectedAmount = $data->where('cr_status', 3)->sum('cr_amount');
-        $totalRejectedAmount = number_format($totalRejectedAmount, 2);
-
+        // Fetch state data
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
 
 
@@ -2666,79 +2674,77 @@ class RouteController extends Controller
         $currentYear = Carbon::now()->year;
         $totalreview = $data->count();
 
+        // Initialize variables with default values to handle empty data scenarios
+        $totalreviewsbymonth = 0;
+        $totalreviewsbyyear = 0;
+        $totalcompletedBooking = 0;
+        $totalunreview = 0;
+        $averageRating = 0.00;
+        $csat = 0.00;
+        $neutralrev = 0.00;
+        $negrev = 0.00;
+        $growthRate = 0.00;
+        $topService = null;
+        $reply = collect();
+
+        // Current month and year for filtering
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
 
         // Count total reviews by month
         $totalreviewsbymonth = DB::table('bookings as a')
-            ->join('reviews as f', 'a.id', 'f.booking_id')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('reviews as f', 'a.id', '=', 'f.booking_id')
             ->whereMonth('f.review_date_time', $currentMonth)
             ->whereYear('f.review_date_time', $currentYear)
             ->count();
 
         // Count total reviews by year
-
         $totalreviewsbyyear = DB::table('bookings as a')
-            ->join('reviews as f', 'a.id', 'f.booking_id')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('reviews as f', 'a.id', '=', 'f.booking_id')
             ->whereYear('f.review_date_time', $currentYear)
             ->count();
 
-        // Count total unreviewed bookings
-        $totalcompletedBooking = DB::table('bookings as a')
-            ->join('reviews as f', 'a.id', 'f.booking_id')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
-            ->where('a.booking_status', 6)
+        // Count total completed bookings
+        $totalcompletedBooking = DB::table('bookings')
+            ->where('booking_status', 6)
             ->count();
 
-        $totalunreview = $totalcompletedBooking - $totalreview;
+        // Calculate total unreviewed bookings
+        $totalunreview = max(0, $totalcompletedBooking - $totalreviewsbyyear);
 
-        // Count total average rating
-        $averageRating = DB::table('bookings as a')
-            ->join('reviews as f', 'a.id', 'f.booking_id')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
-            ->avg('f.review_rating');
+        // Calculate total average rating
+        $averageRating = DB::table('reviews')
+            ->avg('review_rating');
+        $averageRating = $averageRating ? number_format($averageRating, 2) : '0.00';
 
-        // Count Percentage of Positive and Negative Reviews and Nuetral Reviews
-        $csat =
-            $totalreview > 0
-            ? number_format(
-                ($data->where('review_rating', '>=', 4)->count() / $totalreview) * 100,
-                2,
-            )
-            : 0;
-        $neutralrev =
-            $totalreview > 0
-            ? number_format(
-                ($data->where('review_rating', '=', 3)->count() / $totalreview) * 100,
-                2,
-            )
-            : 0;
-        $negrev =
-            $totalreview > 0
-            ? number_format(
-                ($data->where('review_rating', '<', 3)->count() / $totalreview) * 100,
-                2,
-            )
-            : 0;
-        // Count Growth Rate by last month
+        // CSAT, Neutral, and Negative Review Percentages
+        $totalreview = DB::table('reviews')->count();
+
+        if ($totalreview > 0) {
+            $csat = number_format(
+                DB::table('reviews')->where('review_rating', '>=', 4)->count() / $totalreview * 100,
+                2
+            );
+            $neutralrev = number_format(
+                DB::table('reviews')->where('review_rating', '=', 3)->count() / $totalreview * 100,
+                2
+            );
+            $negrev = number_format(
+                DB::table('reviews')->where('review_rating', '<', 3)->count() / $totalreview * 100,
+                2
+            );
+        }
+
+        // Calculate Growth Rate by last month
         $currentMonthReviews = DB::table('reviews')
-            ->whereMonth('review_date_time', Carbon::now()->month)
+            ->whereMonth('review_date_time', $currentMonth)
             ->count();
         $lastMonthReviews = DB::table('reviews')
             ->whereMonth('review_date_time', Carbon::now()->subMonth()->month)
             ->count();
-        $growthRate =
-            $lastMonthReviews > 0
-            ? (($currentMonthReviews - $lastMonthReviews) / $lastMonthReviews) * 100
-            : 0;
+        $growthRate = $lastMonthReviews > 0
+            ? number_format((($currentMonthReviews - $lastMonthReviews) / $lastMonthReviews) * 100, 2)
+            : 0.00;
 
         // Get top service type with most reviews
         $topService = DB::table('reviews as a')
@@ -2752,10 +2758,7 @@ class RouteController extends Controller
 
         // Get reviews with replies
         $reply = DB::table('reviews as a')
-            ->join('bookings as b', 'a.booking_id', 'b.id')
-            ->join('services as c', 'b.service_id', 'c.id')
-            ->join('taskers as d', 'c.tasker_id', 'd.id')
-            ->join('review_replies as e', 'a.id', 'e.review_id')
+            ->join('review_replies as e', 'a.id', '=', 'e.review_id')
             ->whereNotNull('e.reply_message')
             ->get();
 
@@ -2788,26 +2791,32 @@ class RouteController extends Controller
                 DB::raw("CONCAT(taskers.tasker_firstname, ' ', taskers.tasker_lastname) AS tasker_name"),
                 DB::raw("AVG(reviews.review_rating) AS average_rating"),
                 DB::raw("
-                CASE 
-                    WHEN AVG(reviews.review_rating) >= 4 THEN '1'
-                    WHEN AVG(reviews.review_rating) >= 3 THEN '2'
-                    ELSE '3'
-                END AS satisfaction_reaction
-            "),
-                // 'taskers.tasker_selfrefund_count AS total_self_cancel_refunds',
+            CASE 
+                WHEN AVG(reviews.review_rating) >= 4 THEN '1'
+                WHEN AVG(reviews.review_rating) >= 3 THEN '2'
+                ELSE '3'
+            END AS satisfaction_reaction
+        "),
                 DB::raw("COUNT(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 END) AS total_self_cancel_refunds"),
                 DB::raw("COUNT(CASE WHEN bookings.booking_status = '6' THEN 1 END) AS total_completed_bookings"),
                 DB::raw("
-                    ROUND(
-                        (
-                            (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
-                            + (CASE WHEN AVG(reviews.review_rating) >= 4 THEN 15 ELSE 0 END) -- Satisfaction bonus (15%)
-                            - LEAST(taskers.tasker_selfrefund_count * 2.5, 25) -- Refund penalty capped at 25%
-                        ), 2
-                    ) AS performance_score_percentage
-                "),
+            ROUND(
+                (
+                    (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
+                    + (CASE WHEN AVG(reviews.review_rating) >= 4 THEN 15 ELSE 0 END) -- Satisfaction bonus (15%)
+                    - LEAST(taskers.tasker_selfrefund_count * 2.5, 25) -- Refund penalty capped at 25%
+                ), 2
+            ) AS performance_score_percentage
+        ")
             )
-            ->groupBy('taskers.id');
+            ->groupBy(
+                'taskers.id',
+                'taskers.tasker_code',
+                'taskers.tasker_firstname',
+                'taskers.tasker_lastname'
+            );
+
+
 
         if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
             $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
@@ -3056,11 +3065,5 @@ class RouteController extends Controller
 
         ]);
     }
-
-
-
-
-
-
     /**** Administrator Route Function - End ****/
 }
