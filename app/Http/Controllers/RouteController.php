@@ -2846,7 +2846,8 @@ class RouteController extends Controller
                 'taskers.id',
                 'taskers.tasker_code',
                 'taskers.tasker_firstname',
-                'taskers.tasker_lastname'
+                'taskers.tasker_lastname',
+                'taskers.tasker_selfrefund_count'
             );
 
 
