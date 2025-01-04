@@ -785,6 +785,7 @@ use App\Models\Tasker;
                                                                 <input type="hidden" name="service_id"
                                                                     class="serviceID">
                                                                 <input type="hidden" name="tasker_id" class="taskerID">
+                                                              
                                                             </div>
                                                             <div class="d-grid mt-4 mb-4">
                                                                 {{-- <button type="submit" class="btn btn-primary">Proceed to
@@ -1162,7 +1163,7 @@ use App\Models\Tasker;
 
                                     <div>
                                         <p class="mb-1">
-                                            <span class="fw-bold">★ 4.9</span> (394 reviews)
+                                            <span class="fw-bold"> ★ ${tasker.rating_count} </span> (${tasker.review_count} reviews)
                                         </p>                                       
                                         <p class="mb-1">N/A ${tasker.servicetype_name} tasks</p>
                                         <p class="mb-1"> 
@@ -1558,6 +1559,7 @@ use App\Models\Tasker;
                     $('.serviceID').val(svId);
                     $('.taskerID').val(taskerId);
                     $('.address-details').html($('.booking_address').val());
+                   
 
                     var dateBooking = $('.bookingDate').val();
                     var date = new Date(dateBooking);
