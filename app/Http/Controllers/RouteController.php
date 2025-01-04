@@ -2851,7 +2851,6 @@ class RouteController extends Controller
             );
 
 
-        // dd($taskers->get());
 
         if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
             $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
@@ -3034,7 +3033,9 @@ class RouteController extends Controller
                 DB::raw("LAST_DAY(bookings.booking_date) AS last_booking_date") // Last day of the month
             )
             ->whereNotNull('bookings.booking_date') // Only consider valid dates
-            ->groupBy('taskers.id', 'last_booking_date');
+            ->groupBy('taskers.id','taskers.tasker_code','last_booking_date');
+        // dd($taskers->get());
+        
 
         $data = $taskers->get();
 
