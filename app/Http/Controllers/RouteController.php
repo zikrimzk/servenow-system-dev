@@ -2846,10 +2846,11 @@ class RouteController extends Controller
                 'taskers.id',
                 'taskers.tasker_code',
                 'taskers.tasker_firstname',
-                'taskers.tasker_lastname'
+                'taskers.tasker_lastname',
+                'taskers.tasker_selfrefund_count',
             );
 
-        // dd($taskers->get());
+        dd($taskers->get());
 
         if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
             $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
