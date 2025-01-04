@@ -79,6 +79,8 @@ class SettingController extends Controller
     public function taskerCreateTimeSlot($date)
     {
         $isFull = Tasker::where('tasker_status', 2)->where('tasker_worktype', 1)->where('id', Auth::user()->id)->exists();
+        $isPart = Tasker::where('tasker_status', 2)->where('tasker_worktype', 2)->where('id', Auth::user()->id)->exists();
+
         if ($isFull) // Full-Time
         {
             $timeslotsFt = TimeSlot::where('slot_category', 1)->get();
@@ -98,7 +100,8 @@ class SettingController extends Controller
                     return back()->with('error', 'All slots for ' . $formattedDate . ' has been generated. No need to generate again.');
                 }
             }
-        } else // Part-Time
+        } 
+        elseif($isPart) // Part-Time
         {
             $timeslotsPt = TimeSlot::where('slot_category', 2)->get();
 
@@ -117,6 +120,10 @@ class SettingController extends Controller
                     return back()->with('error', 'All slots for ' . $formattedDate . ' has been generated. No need to generate again.');
                 }
             }
+        }
+        else
+        {
+            return back()->with('error', 'Please make sure you are verified in order to generate time slots. If you have any questions, please contact us.');
         }
 
         $datePrompt = Carbon::createFromFormat('Y-m-d', $date);

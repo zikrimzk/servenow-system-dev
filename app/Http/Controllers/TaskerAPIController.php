@@ -376,6 +376,8 @@ class TaskerAPIController extends Controller
     public function taskerCreateTimeSlotAPI($date)
     {
         $isFull = Tasker::where('tasker_status', 2)->where('tasker_worktype', 1)->where('id', Auth::user()->id)->exists();
+        $isPart = Tasker::where('tasker_status', 2)->where('tasker_worktype', 2)->where('id', Auth::user()->id)->exists();
+
         if ($isFull) // Full-Time
         {
             $timeslotsFt = TimeSlot::where('slot_category', 1)->get();
@@ -397,7 +399,8 @@ class TaskerAPIController extends Controller
                     ], 400);
                 }
             }
-        } else // Part-Time
+        } 
+        elseif($isPart) // Part-Time
         {
             $timeslotsPt = TimeSlot::where('slot_category', 2)->get();
 
@@ -418,6 +421,12 @@ class TaskerAPIController extends Controller
                     ], 400);
                 }
             }
+        }
+        else
+        {
+            return response()->json([
+                'error' => 'Please make sure you are verified in order to generate time slots. If you have any questions, please contact us.',
+            ], 400);
         }
 
         $datePrompt = Carbon::createFromFormat('Y-m-d', $date);
@@ -445,7 +454,33 @@ class TaskerAPIController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch your time. Please try again.'
-            ], 500); 
+            ], 500);
+        }
+    }
+
+    //  Task Preferences > Time Slot - Update Time Slot Availability
+    public function taskerUpdateTimeSlotAPI(Request $request, $id)
+    {
+        try {
+            $data = $request->validate(
+                [
+                    'slot_status' => 'required',
+                ],
+                [],
+                [
+                    'slot_status' => 'Status',
+                ]
+            );
+    
+            TaskerTimeSlot::whereId($id)->update($data);
+
+            return response()->json([
+                'data' => 'Slot availability has been updated successfully !'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch your time. Please try again.'
+            ], 500);
         }
     }
 
@@ -497,7 +532,7 @@ class TaskerAPIController extends Controller
                     'id' => $booking->bookingID,
                     'title' => $booking->client_firstname . ' (' . $booking->servicetype_name . ')',
                     'date' => $booking->booking_date,
-                    'startTime'=> $booking->booking_time_start,
+                    'startTime' => $booking->booking_time_start,
                     'endTime' => $booking->booking_time_end,
                     'address' => $booking->booking_address,
                     'status' => $booking->booking_status,
@@ -514,7 +549,6 @@ class TaskerAPIController extends Controller
             return response()->json([
                 'booking' => $events
             ], 200);
-
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -542,7 +576,7 @@ class TaskerAPIController extends Controller
                     'slot_id' => $slot->slotID,
                     'title' => 'Unavailable',
                     'date' => $slot->slot_date,
-                    'startTime'=>$slot->slot_time,
+                    'startTime' => $slot->slot_time,
                     'endTime' =>  date('H:i:s', strtotime('+1 hour', strtotime($slot->slot_time))),
                     'slot_status' => $slot->slot_status,
                     'editable' => false,
@@ -620,7 +654,7 @@ class TaskerAPIController extends Controller
                     'status' => 'success',
                     'message' => 'Booking Confirmed!',
                     'updated_booking' => $booking,
-                ],200);
+                ], 200);
             } else if ($request->option == 2) {
                 $booking->booking_status = 5;
                 $booking->save();
@@ -640,7 +674,7 @@ class TaskerAPIController extends Controller
                     'status' => 'success',
                     'message' => 'Booking Cancelled!',
                     'updated_booking' => $booking,
-                ],200);
+                ], 200);
             }
         } catch (Exception $e) {
             return response()->json([

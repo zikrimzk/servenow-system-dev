@@ -44,7 +44,7 @@ Route::middleware('auth:sanctum')->get('/get-tasker-details', [TaskerAPIControll
 Route::middleware('auth:sanctum')->post('/update-password-{id}', [TaskerAPIController::class, 'taskerUpdatePasswordAPI']);
 Route::middleware('auth:sanctum')->post('/update-profile-{id}', [TaskerAPIController::class, 'taskerUpdateProfileAPI']);
 
-// Tasket - Service Type Fetch
+// Tasker - Service Type Fetch
 Route::middleware('auth:sanctum')->get('/get-service-type', [TaskerAPIController::class, 'getAllServiceType']);
 
 // Tasker - Service Management API
@@ -62,6 +62,17 @@ Route::middleware('auth:sanctum')->get('/change-tasker-visibility', [TaskerAPICo
 Route::middleware('auth:sanctum')->post('/tasker-working-type-change', [TaskerAPIController::class, 'taskerTypeToggleAPI']);
 Route::middleware('auth:sanctum')->get('/create-time-slot-{date}', [TaskerAPIController::class, 'taskerCreateTimeSlotAPI'])->name('taskerTimeSlotCreateAPI');
 Route::middleware('auth:sanctum')->get('/get-tasker-time-slot-{date}', [TaskerAPIController::class, 'getTaskerTimeSlotAPI'])->name('getTaskerTimeSlot');
+Route::middleware('auth:sanctum')->post('/update-time-slot-{id}', [TaskerAPIController::class, 'taskerUpdateTimeSlotAPI'])->name('tasker-timeslot-update');
+/* 
+NOTE: URL /update-time-slot-{id} akan Post details :
+
+/update-time-slot-{id}?slot_status=1/2
+ex http://127.0.0.1:8000/api/update-time-slot-37?slot_status=0
+
+id - ID Slot
+slot_status - 1 - Available | 0 - Unavailable 
+
+*/
 
 // Tasker - Booking Management API
 Route::middleware('auth:sanctum')->get('/get-bookings-details', [TaskerAPIController::class, 'getBookingsDetailsAPI']);

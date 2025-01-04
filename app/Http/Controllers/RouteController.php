@@ -559,7 +559,7 @@ class RouteController extends Controller
     }
 
     // Admin - Time Slot Setting
-    public function taskerTimeSlotNav(Request $request)
+    public function taskerTimeSlotNav()
     {
         $data = DB::table('tasker_time_slots as a')
             ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
@@ -573,7 +573,7 @@ class RouteController extends Controller
         ]);
     }
 
-    public function taskerVisibleLocNav(Request $request)
+    public function taskerVisibleLocNav()
     {
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
 
@@ -1421,12 +1421,23 @@ class RouteController extends Controller
             });
 
             $table->addColumn('action', function ($row) {
-                $button =
-                    '
-                        <a href="#taskermodal" data-bs-toggle="modal" data-bs-target="#updateTaskerModal-' . $row->id . '" class="avtar avtar-xs btn-light-primary"">
+
+                if ($row->tasker_status == 0 || $row->tasker_status == 4) {
+                    $button =
+                        '
+                        <button class="btn avtar avtar-xs btn-light-primary" disabled>
+                            <i class="ti ti-edit f-20"></i>
+                        </button>
+                    ';
+                } else {
+                    $button =
+                        '
+                        <a href="#taskermodal" data-bs-toggle="modal" data-bs-target="#updateTaskerModal-' . $row->id . '" class="avtar avtar-xs btn-light-primary">
                             <i class="ti ti-edit f-20"></i>
                         </a>
                     ';
+                }
+
                 return $button;
             });
 
@@ -2780,39 +2791,6 @@ class RouteController extends Controller
 
     public function adminTaskerPerformanceNav(Request $request)
     {
-        // $taskers = DB::table('taskers')
-        //     ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
-        //     ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
-        //     ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
-        //     ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
-        //     ->select(
-        //         'taskers.tasker_code',
-        //         'taskers.id',
-        //         DB::raw("CONCAT(taskers.tasker_firstname, ' ', taskers.tasker_lastname) AS tasker_name"),
-        //         DB::raw("AVG(reviews.review_rating) AS average_rating"),
-        //         DB::raw("
-        //         CASE 
-        //             WHEN AVG(reviews.review_rating) >= 4 THEN '1'
-        //             WHEN AVG(reviews.review_rating) >= 3 THEN '2'
-        //             ELSE '3'
-        //         END AS satisfaction_reaction
-        //     "),
-        //         // 'taskers.tasker_selfrefund_count AS total_self_cancel_refunds',
-        //         DB::raw("COUNT(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 END) AS total_self_cancel_refunds"),
-        //         DB::raw("COUNT(CASE WHEN bookings.booking_status = '6' THEN 1 END) AS total_completed_bookings"),
-        //         DB::raw("
-        //             ROUND(
-        //                 (
-        //                     (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
-        //                     + (CASE WHEN AVG(reviews.review_rating) >= 4 THEN 15 ELSE 0 END) -- Satisfaction bonus (15%)
-        //                     - LEAST(taskers.tasker_selfrefund_count * 2.5, 25) -- Refund penalty capped at 25%
-        //                 ), 2
-        //             ) AS performance_score_percentage
-        //         "),
-        //     )
-        //     ->groupBy('taskers.id');
-
-
         $taskers = DB::table('taskers')
             ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
             ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
@@ -2830,25 +2808,20 @@ class RouteController extends Controller
                     ELSE '3'
                 END AS satisfaction_reaction
             "),
+                // 'taskers.tasker_selfrefund_count AS total_self_cancel_refunds',
                 DB::raw("COUNT(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 END) AS total_self_cancel_refunds"),
                 DB::raw("COUNT(CASE WHEN bookings.booking_status = '6' THEN 1 END) AS total_completed_bookings"),
                 DB::raw("
-                ROUND(
-                    (
-                        (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
-                        + (CASE WHEN AVG(reviews.review_rating) >= 4 THEN 15 ELSE 0 END) -- Satisfaction bonus (15%)
-                        - LEAST(taskers.tasker_selfrefund_count * 2.5, 25) -- Refund penalty capped at 25%
-                    ), 2
-                ) AS performance_score_percentage
-            ")
+                    ROUND(
+                        (
+                            (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
+                            + (CASE WHEN AVG(reviews.review_rating) >= 4 THEN 15 ELSE 0 END) -- Satisfaction bonus (15%)
+                            - LEAST(taskers.tasker_selfrefund_count * 2.5, 25) -- Refund penalty capped at 25%
+                        ), 2
+                    ) AS performance_score_percentage
+                "),
             )
-            ->groupBy(
-                'taskers.id',
-                'taskers.tasker_code',
-                'taskers.tasker_firstname',
-                'taskers.tasker_lastname',
-                'taskers.tasker_selfrefund_count'
-            );
+            ->groupBy('taskers.id');
 
 
 
@@ -2890,34 +2863,39 @@ class RouteController extends Controller
         $data = $taskers->get();
 
         // Overall performance
-        $overallPerformance = $data->avg('performance_score_percentage');
+        $overallPerformance = $data->isNotEmpty() ? $data->avg('performance_score_percentage') : 0;
 
-        //calculate highest penalized tasker
-        $highestPerformers = $data
+        // Handle highest performers
+        $highestPerformers = $data->isNotEmpty()
+            ? $data
             ->filter(function ($tasker) {
-                return $tasker->performance_score_percentage >= 60;
+                return $tasker->performance_score_percentage !== null && $tasker->performance_score_percentage >= 60;
             })
             ->sortByDesc('performance_score_percentage')
             ->values()
             ->map(function ($tasker, $index) {
                 return [
-                    'name' => $tasker->tasker_name,
-                    'score' => $tasker->performance_score_percentage,
+                    'name' => $tasker->tasker_name ?? 'N/A',
+                    'score' => $tasker->performance_score_percentage ?? 0,
                 ];
-            });
+            })
+            : collect([]); // Return empty collection if no data
 
-        $lowestPerformers = $data
+        // Handle lowest performers
+        $lowestPerformers = $data->isNotEmpty()
+            ? $data
             ->filter(function ($tasker) {
-                return $tasker->performance_score_percentage < 40;
+                return $tasker->performance_score_percentage !== null && $tasker->performance_score_percentage < 40;
             })
             ->sortBy('performance_score_percentage')
             ->values()
             ->map(function ($tasker, $index) {
                 return [
-                    'name' => $tasker->tasker_name,
-                    'score' => $tasker->performance_score_percentage,
+                    'name' => $tasker->tasker_name ?? 'N/A',
+                    'score' => $tasker->performance_score_percentage ?? 0,
                 ];
-            });
+            })
+            : collect([]); // Return empty collection if no data
 
         if ($request->ajax()) {
 
@@ -2928,7 +2906,7 @@ class RouteController extends Controller
             });
 
             $table->addColumn('tasker_code', function ($row) {
-                $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link link-primary">' . $row->tasker_code . '</a>';
+                $tasker = '<a href="#taskerDetailsModal" data-bs-toggle="modal" data-bs-target="#taskerDetailsModal-' . $row->tasker_code . '" class="btn btn-link">' . $row->tasker_code . '</a>';
                 return $tasker;
             });
 
@@ -3033,9 +3011,10 @@ class RouteController extends Controller
                 DB::raw("LAST_DAY(bookings.booking_date) AS last_booking_date") // Last day of the month
             )
             ->whereNotNull('bookings.booking_date') // Only consider valid dates
-            ->groupBy('taskers.id','taskers.tasker_code','last_booking_date');
-        // dd($taskers->get());
-        
+            ->groupBy(
+                'taskers.id',
+                'last_booking_date'
+            );
 
         $data = $taskers->get();
 
@@ -3046,21 +3025,27 @@ class RouteController extends Controller
 
         // Calculate monthly scores
         $monthlyScores = collect(range(1, 12))->map(function ($month) use ($data) {
-            return $data->filter(function ($item) use ($month) {
-                return Carbon::parse($item->last_booking_date)->month === $month;
-            })->avg('performance_score_percentage');
+            return $data->isNotEmpty()
+                ? $data->filter(function ($item) use ($month) {
+                    return $item->last_booking_date !== null && Carbon::parse($item->last_booking_date)->month === $month;
+                })->avg('performance_score_percentage') ?? 0
+                : 0; // Handle no data
         });
 
         // Group data by year and month
-        $groupedData = $data->groupBy(function ($item) {
-            return Carbon::parse($item->last_booking_date)->year; // Group by year
-        });
+        $groupedData = $data->isNotEmpty()
+            ? $data->groupBy(function ($item) {
+                return $item->last_booking_date !== null
+                    ? Carbon::parse($item->last_booking_date)->year
+                    : 'N/A'; // Handle null dates
+            })
+            : collect([]); // Return empty collection if no data
 
         // Prepare data for the chart
         $chartData = $groupedData->map(function ($items, $year) {
             $monthlyScores = collect(range(1, 12))->map(function ($month) use ($items) {
                 return $items->filter(function ($item) use ($month) {
-                    return Carbon::parse($item->last_booking_date)->month === $month;
+                    return $item->last_booking_date !== null && Carbon::parse($item->last_booking_date)->month === $month;
                 })->avg('performance_score_percentage') ?? 0;
             });
 
@@ -3070,15 +3055,16 @@ class RouteController extends Controller
             ];
         })->values();
 
-
-        $yearlyAverages = $chartData
+        // Calculate yearly averages
+        $yearlyAverages = $chartData->isNotEmpty()
+            ? $chartData
             ->sortByDesc('year')
             ->take(3)
             ->map(function ($data) {
                 $validScores = collect($data['scores'])->filter(function ($score) {
                     return $score > 0;
                 });
-                $average = $validScores->avg();
+                $average = $validScores->isNotEmpty() ? $validScores->avg() : 0;
 
                 return [
                     'year' => $data['year'],
@@ -3086,7 +3072,8 @@ class RouteController extends Controller
                 ];
             })
             ->sortBy('year')
-            ->values();
+            ->values()
+            : collect([]);
 
         return view('administrator.performance.tasker-performance-index', [
             'title' => 'Tasker Performance',
@@ -3097,9 +3084,11 @@ class RouteController extends Controller
             'monthlyScores' => $monthlyScores,
             'highestPerformers' => $highestPerformers,
             'lowestPerformers' => $lowestPerformers,
-            'yearlyAverages' => $yearlyAverages
+            'yearlyAverages' => $yearlyAverages,
+            'taskers' => Tasker::get()
 
         ]);
     }
+
     /**** Administrator Route Function - End ****/
 }
