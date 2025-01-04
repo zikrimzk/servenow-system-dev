@@ -348,7 +348,7 @@ class TaskerController extends Controller
             // Tasker::where('id', Auth::user()->id)->update(['tasker_status' => 2]);
             $idno = $request->query('idno');
             $idno = str_replace('-', '', $idno);
-            $userData = Tasker::where('tasker_icno', $idno)->first();
+            $userData = Tasker::where('tasker_icno', $idno)->update(['tasker_status' => 2]);
             return redirect(route('tasker-login'))->with('success', 'Verification has been successfully completed. Please set up your task preferences at Task Preferences > Visibility & Location.');
         } catch (Exception) {
             return back()->with('error', 'Something went wrong !');

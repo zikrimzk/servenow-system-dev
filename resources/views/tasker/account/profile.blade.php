@@ -192,7 +192,8 @@
                                                                 class="form-control @error('tasker_icno') is-invalid @enderror"
                                                                 name="tasker_icno" id="tasker_icno"
                                                                 placeholder="IC Number" maxlength="12" pattern="^\d{12}$"
-                                                                value="{{ Auth::user()->tasker_icno }}" @if(Auth::user()->tasker_status == 2) readonly @endif/>
+                                                                value="{{ Auth::user()->tasker_icno }}"
+                                                                @if (Auth::user()->tasker_status == 2) readonly @endif />
                                                             <div id="ic-error-message" class="text-danger"
                                                                 style="display: none;">IC Number must be exactly 12 digits!
                                                             </div>
@@ -250,7 +251,8 @@
                                                             <label class="form-label">Email</label>
                                                             <input type="text"
                                                                 class="form-control @error('email') is-invalid @enderror"
-                                                                name="email" value="{{ Auth::user()->email }}" readonly/>
+                                                                name="email" value="{{ Auth::user()->email }}"
+                                                                readonly />
                                                             @error('email')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
@@ -490,8 +492,11 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        @php
+                                            $data = Auth::check() ? Auth::user()->tasker_icno ?? '' : '';
+                                        @endphp
                                         <div class="d-flex justify-content-center align-items-center my-3">
-                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={{ route('tasker-card-ver', Auth::user()->tasker_icno) }}"
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={{ route('tasker-card-ver', $data) }}"
                                                 class="img-fluid" alt="qrcode">
                                         </div>
 
@@ -508,7 +513,7 @@
                                             </div>
                                         </div>
                                         <div class="d-grid my-3">
-                                            <a href="{{ route('tasker-card-ver', Auth::user()->tasker_icno) }}"
+                                            <a href="{{ route('tasker-card-ver', $data) }}"
                                                 class="btn btn-primary">Verify Account</a>
                                         </div>
                                     </div>
@@ -525,7 +530,6 @@
         </div>
     </div>
     <script>
-        
         document.getElementById('tasker_phoneno').addEventListener('input', function() {
             const input = this.value.replace(/\D/g, ''); // Remove non-numeric characters
             const errorMessage = document.getElementById('phone-error-message');
