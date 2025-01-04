@@ -567,6 +567,8 @@
                                                                     value="{{ $b->booking_date }}">
                                                                 <input type="hidden" name="booking_order_id"
                                                                     value="{{ $b->booking_order_id }}">
+                                                                <input type="hidden" name="booking_rate"
+                                                                    value="{{ $b->booking_rate}}">
                                                                 <button class="btn btn-light-warning">Proceed to
                                                                     Pay</button>
                                                                 <button class="btn btn-light-danger" type="button"

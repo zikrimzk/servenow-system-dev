@@ -78,6 +78,69 @@ class BookingController extends Controller
             $apiKey = env('GOOGLE_MAPS_GEOCODING_API_KEY', '');
 
             // Fetch taskers within a 30 km radius
+            // $svtasker = DB::table('services as a')
+            //     ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
+            //     ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
+            //     ->where('b.id', '=', $id)
+            //     ->where('a.service_status', '=', 1)
+            //     ->select(
+            //         'a.id as svID',
+            //         'b.id as typeID',
+            //         'c.id as taskerID',
+            //         'a.service_rate_type',
+            //         'a.service_rate',
+            //         'a.service_status',
+            //         'a.service_desc',
+            //         'b.servicetype_name',
+            //         'b.servicetype_status',
+            //         'c.tasker_firstname',
+            //         'c.tasker_rating',
+            //         'c.tasker_photo',
+            //         'c.latitude as tasker_lat',
+            //         'c.longitude as tasker_lng'
+
+            //     )
+            //     ->get();
+
+
+            // // Filter taskers within a specified distance
+            // $svtasker = $svtasker->map(function ($tasker) use ($clientLat, $clientLng, $apiKey) {
+            //     $taskerLat = $tasker->tasker_lat;
+            //     $taskerLng = $tasker->tasker_lng;
+
+            //     //Call Google Directions API
+            //     // $url = "https://maps.googleapis.com/maps/api/directions/json?origin=$clientLat,$clientLng&destination=$taskerLat,$taskerLng&key=$apiKey";
+            //     // $response = file_get_contents($url);
+            //     // $data = json_decode($response, true);
+
+            //     // Get road distance
+            //     if (!empty($data['routes']) && isset($data['routes'][0]['legs'][0]['distance']['value'])) {
+            //         $distanceInMeters = $data['routes'][0]['legs'][0]['distance']['value'];
+            //         $tasker->road_distance = $distanceInMeters / 1000; // Convert to kilometers
+            //     } else {
+            //         $tasker->road_distance = null; // If failed
+            //     }
+
+            //     return $tasker;
+            // });
+            // // ->filter(function ($tasker) {
+            // //     // Filter only taskers within 40 km
+            // //     return $tasker->road_distance !== null && $tasker->road_distance <= 4000;
+            // // })
+            // // ->sortBy('road_distance'); // Optional: Sort by nearest distance
+
+            // $reviewCount = DB::table('services as a')
+            //     ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
+            //     ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
+            //     ->join('bookings as d', 'a.id', '=', 'd.service_id')
+            //     ->join('reviews as e', 'd.id', '=', 'e.booking_id')
+            //     ->where('b.id', '=', 1)  // Optional: filter by a specific service type, can be removed if not needed
+            //     ->groupBy('c.id')  // Group by Tasker
+            //     ->select('c.id as tasker_id', DB::raw('count(e.id) as review_count'))  // Count reviews for each Tasker
+            //     ->get();  // This will return the results
+
+
+            // Step 1: Fetch Taskers Data
             $svtasker = DB::table('services as a')
                 ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
                 ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
@@ -100,12 +163,52 @@ class BookingController extends Controller
                     'c.longitude as tasker_lng'
                 )
                 ->get();
-            // Filter taskers within a specified distance
+
+            // Step 2: Fetch Review Count Data
+            $reviewCount = DB::table('services as a')
+                ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
+                ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
+                ->join('bookings as d', 'a.id', '=', 'd.service_id')
+                ->join('reviews as e', 'd.id', '=', 'e.booking_id')
+                ->where('b.id', '=', $id)  // Optional: filter by a specific service type, can be removed if not needed
+                ->groupBy('c.id')  // Group by Tasker
+                ->select('c.id as tasker_id', DB::raw('count(e.id) as review_count'))  // Count reviews for each Tasker
+                ->get();
+
+            $ratingCount = DB::table('services as a')
+                ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
+                ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
+                ->join('bookings as d', 'a.id', '=', 'd.service_id')
+                ->join('reviews as e', 'd.id', '=', 'e.booking_id')
+                ->where('b.id', '=', $id)  // Optional: filter by a specific service type, can be removed if not needed
+                ->groupBy('c.id')  // Group by Tasker
+                ->select('c.id as tasker_id', DB::raw('avg(e.review_rating) as rating_count'))  // Count reviews for each Tasker
+                ->get();
+
+            // Step 3: Convert review count data into a key-value pair (tasker_id => review_count)
+            $reviewCountMap = $reviewCount->pluck('review_count', 'tasker_id')->toArray();
+            $ratingCountMap = $ratingCount->pluck('rating_count', 'tasker_id')->toArray();
+
+
+            // Step 4: Merge review count into the tasker data
+            $svtasker = $svtasker->map(function ($tasker) use ($reviewCountMap) {
+                // Get review count or set to 0 if not available
+                $tasker->review_count = isset($reviewCountMap[$tasker->taskerID]) ? $reviewCountMap[$tasker->taskerID] : 0;
+                return $tasker;
+            });
+
+            $svtasker = $svtasker->map(function ($tasker) use ($ratingCountMap) {
+                // Get review count or set to 0 if not available
+                $tasker->rating_count = isset($ratingCountMap[$tasker->taskerID]) ? $ratingCountMap[$tasker->taskerID] : 0;
+                return $tasker;
+            });
+
+            // Step 5: Filter and calculate road distance as before
             $svtasker = $svtasker->map(function ($tasker) use ($clientLat, $clientLng, $apiKey) {
                 $taskerLat = $tasker->tasker_lat;
                 $taskerLng = $tasker->tasker_lng;
 
-                //Call Google Directions API
+                // Call Google Directions API (assuming you want to use it)
                 // $url = "https://maps.googleapis.com/maps/api/directions/json?origin=$clientLat,$clientLng&destination=$taskerLat,$taskerLng&key=$apiKey";
                 // $response = file_get_contents($url);
                 // $data = json_decode($response, true);
@@ -120,15 +223,16 @@ class BookingController extends Controller
 
                 return $tasker;
             });
-            // ->filter(function ($tasker) {
-            //     // Filter only taskers within 40 km
-            //     return $tasker->road_distance !== null && $tasker->road_distance <= 4000;
-            // })
-            // ->sortBy('road_distance'); // Optional: Sort by nearest distance
+
+            // Optional: You can filter taskers within a specific distance here
+            // $svtasker = $svtasker->filter(function ($tasker) {
+            //     return $tasker->road_distance !== null && $tasker->road_distance <= 40;  // Filter within 40 km
+            // });
 
             return response()->json([
                 'status' => 'success',
                 'taskers' => $svtasker,
+
             ]);
         } catch (Exception $e) {
             return response()->json([
@@ -188,8 +292,10 @@ class BookingController extends Controller
             $timestamp = time();
             $orderID = 'SRW-' . $now->format('d-m-Y') . '-' . $timestamp;
 
+            $billAmount = $request->input('booking_rate');
+            $billAmountCents = intval(floatval($billAmount) * 100);
 
-            // Prepare data for the API
+
             $some_data = [
                 'userSecretKey' => 'xmj59q1q-povy-vgdw-y5xd-ohqv7lrxlhts', // Ensure the key is correct
                 'categoryCode' => 'xzn4xeqb',
@@ -197,7 +303,7 @@ class BookingController extends Controller
                 'billDescription' => 'test',
                 'billPriceSetting' => 1,
                 'billPayorInfo' => 1,
-                'billAmount' => '100', // Ensure the amount is formatted as a string
+                'billAmount' => $billAmountCents, // Ensure the amount is formatted as a string
                 'billReturnUrl' => route('client-payment-status'), // Ensure this route exists
                 'billCallbackUrl' => route('client-callback'), // Ensure this callback URL is reachable
                 'billExternalReferenceNo' => $orderID,
@@ -300,6 +406,11 @@ class BookingController extends Controller
 
     public function clientToPayFunction(Request $request)
     {
+        $booking_price = $request->booking_rate;
+
+        $billAmount = $booking_price;
+        $billAmountCents = intval(floatval($billAmount) * 100);
+
         try {
             //PAYMENT GATEWAY CODE HERE
             $formattedDate = Carbon::parse($request->booking_date)
@@ -314,7 +425,7 @@ class BookingController extends Controller
                 'billDescription' => 'test',
                 'billPriceSetting' => 1,
                 'billPayorInfo' => 1,
-                'billAmount' => '100', // Ensure the amount is formatted as a string
+                'billAmount' =>  $billAmountCents, // Ensure the amount is formatted as a string
                 'billReturnUrl' => route('client-payment-status'), // Ensure this route exists
                 'billCallbackUrl' => route('client-callback'), // Ensure this callback URL is reachable
                 'billExternalReferenceNo' => $request->orderID,
