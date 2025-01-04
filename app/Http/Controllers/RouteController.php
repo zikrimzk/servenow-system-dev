@@ -2824,31 +2824,31 @@ class RouteController extends Controller
                 DB::raw("CONCAT(taskers.tasker_firstname, ' ', taskers.tasker_lastname) AS tasker_name"),
                 DB::raw("AVG(reviews.review_rating) AS average_rating"),
                 DB::raw("
-            CASE 
-                WHEN AVG(reviews.review_rating) >= 4 THEN '1'
-                WHEN AVG(reviews.review_rating) >= 3 THEN '2'
-                ELSE '3'
-            END AS satisfaction_reaction
-        "),
+                CASE 
+                    WHEN AVG(reviews.review_rating) >= 4 THEN '1'
+                    WHEN AVG(reviews.review_rating) >= 3 THEN '2'
+                    ELSE '3'
+                END AS satisfaction_reaction
+            "),
                 DB::raw("COUNT(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 END) AS total_self_cancel_refunds"),
                 DB::raw("COUNT(CASE WHEN bookings.booking_status = '6' THEN 1 END) AS total_completed_bookings"),
                 DB::raw("
-            ROUND(
-                (
-                    (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
-                    + (CASE WHEN AVG(reviews.review_rating) >= 4 THEN 15 ELSE 0 END) -- Satisfaction bonus (15%)
-                    - LEAST(taskers.tasker_selfrefund_count * 2.5, 25) -- Refund penalty capped at 25%
-                ), 2
-            ) AS performance_score_percentage
-        ")
+                ROUND(
+                    (
+                        (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
+                        + (CASE WHEN AVG(reviews.review_rating) >= 4 THEN 15 ELSE 0 END) -- Satisfaction bonus (15%)
+                        - LEAST(taskers.tasker_selfrefund_count * 2.5, 25) -- Refund penalty capped at 25%
+                    ), 2
+                ) AS performance_score_percentage
+            ")
             )
             ->groupBy(
                 'taskers.id',
                 'taskers.tasker_code',
                 'taskers.tasker_firstname',
-                'taskers.tasker_lastname',
-                'taskers.tasker_selfrefund_count',
+                'taskers.tasker_lastname'
             );
+
 
         dd($taskers->get());
 
