@@ -1685,7 +1685,7 @@ class RouteController extends Controller
 
                 $table->addColumn('tasker', function ($row) {
 
-                    $tasker = '<a href="' . route('admin-tasker-update-form', Crypt::encrypt($row->tasker_code)) . '" class="btn btn-link">' . $row->tasker_code . '</a>';
+                    $tasker = '<a href="#taskerDetailsModal" data-bs-toggle="modal" data-bs-target="#taskerDetailsModal-' . $row->tasker_code . '" class="btn btn-link">' . $row->tasker_code . '</a>';
                     return $tasker;
                 });
 
@@ -1812,8 +1812,8 @@ class RouteController extends Controller
                 'totalRejectedService' => $totalRejectedService,
                 'totalTerminatedService' => $totalTerminatedService,
                 'taskerServiceCounts' => $taskerServiceCounts,
-                'popularServiceTypes' => $popularServiceTypes
-
+                'popularServiceTypes' => $popularServiceTypes,
+                'taskers' => Tasker::get(),
             ]);
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -2040,67 +2040,66 @@ class RouteController extends Controller
             return $table->make(true);
         }
 
-        //calculate total booking
-        $totalBooking = $data->count();
-
-        //calculate total booking Unpaid
-        $totalUnpaid = $data->where('booking_status', 1)->count();
-
-        //calculate total booking Confirmed
-        $totalConfirmed = $data->where('booking_status', 3)->count();
-
-        //calculate total booking Completed
-        $totalCompleted = $data->where('booking_status', 6)->count();
-
-        //calculate total booking Cancelled
-        $totalCancelled = $data->where('booking_status', 5)->count();
-
-        //total completed booking amount 
-        $totalCompletedAmount = $data->where('booking_status', 6)->sum('booking_rate');
-        $totalCompletedAmount = number_format($totalCompletedAmount, 2);
-
-        //total cancelled booking amount
-        $totalCancelledAmount = $data->where('booking_status', 5)->sum('booking_rate');
-        $totalCancelledAmount = number_format($totalCancelledAmount, 2);
-
-        // total floating amount
-        $totalFloatingAmount = $data->whereIn('booking_status', [1, 2, 3, 4])->sum('booking_rate');
-        $totalFloatingAmount = number_format($totalFloatingAmount, 2);
-
-        $bookings = DB::table('bookings')
-            ->select('booking_address', 'booking_status')
-            ->get();
+        // Default values for calculations
+        $totalBooking = 0;
+        $totalUnpaid = 0;
+        $totalConfirmed = 0;
+        $totalCompleted = 0;
+        $totalCancelled = 0;
+        $totalCompletedAmount = '0.00';
+        $totalCancelledAmount = '0.00';
+        $totalFloatingAmount = '0.00';
 
         $stateCounts = [];
         $completedCounts = [];
         $unpaidCounts = [];
         $cancelledCounts = [];
 
-        // Initialize counts for each state and status
-        foreach ($bookings as $booking) {
-            $state = $this->extractState($booking->booking_address);
+        // Check if there is data
+        if ($data->isNotEmpty()) {
+            // Calculate totals
+            $totalBooking = $data->count();
+            $totalUnpaid = $data->where('booking_status', 1)->count();
+            $totalConfirmed = $data->where('booking_status', 3)->count();
+            $totalCompleted = $data->where('booking_status', 6)->count();
+            $totalCancelled = $data->where('booking_status', 5)->count();
 
-            if (!isset($stateCounts[$state])) {
-                $stateCounts[$state] = 0;
-                $completedCounts[$state] = 0;
-                $unpaidCounts[$state] = 0;
-                $cancelledCounts[$state] = 0;
-            }
+            $totalCompletedAmount = number_format($data->where('booking_status', 6)->sum('booking_rate'), 2);
+            $totalCancelledAmount = number_format($data->where('booking_status', 5)->sum('booking_rate'), 2);
+            $totalFloatingAmount = number_format($data->whereIn('booking_status', [1, 2, 3, 4])->sum('booking_rate'), 2);
+        }
 
-            // Increment total bookings for the state
-            $stateCounts[$state]++;
+        $bookings = DB::table('bookings')
+            ->select('booking_address', 'booking_status')
+            ->get();
 
-            // Increment based on booking status
-            switch ($booking->booking_status) {
-                case 6: // Completed
-                    $completedCounts[$state]++;
-                    break;
-                case 1: // Unpaid
-                    $unpaidCounts[$state]++;
-                    break;
-                case 5: // Cancelled
-                    $cancelledCounts[$state]++;
-                    break;
+        if ($bookings->isNotEmpty()) {
+            // Initialize counts for each state and status
+            foreach ($bookings as $booking) {
+                $state = $this->extractState($booking->booking_address);
+
+                if (!isset($stateCounts[$state])) {
+                    $stateCounts[$state] = 0;
+                    $completedCounts[$state] = 0;
+                    $unpaidCounts[$state] = 0;
+                    $cancelledCounts[$state] = 0;
+                }
+
+                // Increment total bookings for the state
+                $stateCounts[$state]++;
+
+                // Increment based on booking status
+                switch ($booking->booking_status) {
+                    case 6: // Completed
+                        $completedCounts[$state]++;
+                        break;
+                    case 1: // Unpaid
+                        $unpaidCounts[$state]++;
+                        break;
+                    case 5: // Cancelled
+                        $cancelledCounts[$state]++;
+                        break;
+                }
             }
         }
 
@@ -2126,8 +2125,14 @@ class RouteController extends Controller
             ->groupBy('year', 'month')
             ->get();
 
+        $monthlyChartData = [
+            'labels' => [],
+            'completed' => [],
+            'floating' => [],
+            'cancelled' => [],
+        ];
+
         // Format monthly data for the chart
-        $monthlyChartData = [];
         foreach ($monthlyData as $dataChartTwo) {
             $monthYear = Carbon::create($dataChartTwo->year, $dataChartTwo->month)->format('F Y');
             $monthlyChartData['labels'][] = $monthYear;
@@ -2136,8 +2141,7 @@ class RouteController extends Controller
             $monthlyChartData['cancelled'][] = $dataChartTwo->cancelledAmount;
         }
 
-
-        //Yearly Chart Data
+        // Yearly Chart Data
         $yearlyData = Booking::selectRaw("
             YEAR(booking_date) as year,
             SUM(CASE WHEN booking_status = 6 THEN booking_rate ELSE 0 END) as completedAmount,
@@ -2149,11 +2153,12 @@ class RouteController extends Controller
             ->get();
 
         $yearlyChartData = [
-            'labels' => $yearlyData->pluck('year')->toArray(),
-            'completed' => $yearlyData->pluck('completedAmount')->toArray(),
-            'floating' => $yearlyData->pluck('floatingAmount')->toArray(),
-            'cancelled' => $yearlyData->pluck('cancelledAmount')->toArray(),
+            'labels' => $yearlyData->pluck('year')->toArray() ?? [],
+            'completed' => $yearlyData->pluck('completedAmount')->toArray() ?? [],
+            'floating' => $yearlyData->pluck('floatingAmount')->toArray() ?? [],
+            'cancelled' => $yearlyData->pluck('cancelledAmount')->toArray() ?? [],
         ];
+
 
         // dd($yearlyChartData);
 

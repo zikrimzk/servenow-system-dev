@@ -325,9 +325,9 @@
                                             <div class="input-group">
                                                 <span class="input-group-text">+60</span>
                                                 <input type="text"
-                                                    class="form-control @error('admin_phoneno') is-invalid @enderror"
+                                                    class="form-control @error('admin_phoneno') is-invalid @enderror phoneno"
                                                     placeholder="Phone No." name="admin_phoneno"
-                                                    value="{{ old('admin_phoneno') }}" id="admin_phoneno"
+                                                    value="{{ old('admin_phoneno') }}"
                                                     maxlength="13" />
                                                 @error('admin_phoneno')
                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -522,7 +522,7 @@
                                                         </label>
                                                         <div class="input-group">
                                                             <span class="input-group-text">+60</span>
-                                                            <input type="text" class="form-control"
+                                                            <input type="text" class="form-control phoneno"
                                                                 placeholder="Phone No." name="admin_phoneno"
                                                                 value="{{ $admin->admin_phoneno }}" />
                                                         </div>
@@ -624,29 +624,6 @@
             @endif
         });
 
-        document.getElementById('admin_phoneno').addEventListener('input', function() {
-            const input = this.value.replace(/\D/g, ''); // Remove non-numeric characters
-            const errorMessage = document.getElementById('phone-error-message');
-
-            if (input.length <= 11) {
-                if (input.length === 10) {
-                    // Format for 10 digits: ### ### ####
-                    this.value = input.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
-                    errorMessage.style.display = 'none';
-                } else if (input.length === 11) {
-                    // Format for 11 digits: ### #### ####
-                    this.value = input.replace(/(\d{3})(\d{4})(\d{4})/, '$1 $2 $3');
-                    errorMessage.style.display = 'none';
-                } else {
-                    this.value = input; // Unformatted during input
-                    errorMessage.style.display = 'none';
-                }
-            } else {
-                // Show error if more than 11 digits
-                errorMessage.style.display = 'block';
-            }
-        });
-
         $(document).ready(function() {
 
             // DATATABLE : ADMINISTRATORS
@@ -725,6 +702,34 @@
 
                     // Reload table data
                     table.ajax.reload();
+                });
+
+                $(document).on('input', '.phoneno', function() {
+                    const $inputField = $(this);
+                    const input = $inputField.val().replace(/\D/g,
+                        ''); // Remove non-numeric characters
+                    const $modal = $inputField.closest(
+                        '.modal'); // Get the modal containing this input field
+                    const $errorMessage = $modal.find(
+                        '.phone-error-message'); // Find the error message within the same modal
+
+                    if (input.length <= 11) {
+                        if (input.length === 10) {
+                            // Format for 10 digits: ### ### ####
+                            $inputField.val(input.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3'));
+                            $errorMessage.hide();
+                        } else if (input.length === 11) {
+                            // Format for 11 digits: ### #### ####
+                            $inputField.val(input.replace(/(\d{3})(\d{4})(\d{4})/, '$1 $2 $3'));
+                            $errorMessage.hide();
+                        } else {
+                            $inputField.val(input); // Unformatted during input
+                            $errorMessage.hide();
+                        }
+                    } else {
+                        // Show error if more than 11 digits
+                        $errorMessage.show();
+                    }
                 });
 
                 let selectedUsers = {}; // Track selected rows

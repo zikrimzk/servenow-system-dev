@@ -38,8 +38,8 @@ return new class extends Migration
             $table->integer('tasker_worktype')->nullable(); // part-time (1) OR full-time(2)
             $table->string('tasker_account_bank')->nullable();
             $table->string('tasker_account_number')->nullable();
-            // $table->integer('tasker_rank')->nullable(); 
-            // $table->integer('tasker_rating')->nullable();
+            $table->integer('tasker_rank')->nullable(); 
+            $table->integer('tasker_rating')->nullable();
             $table->integer('tasker_selfrefund_count')->default(0);
             $table->rememberToken();
             $table->timestamps();

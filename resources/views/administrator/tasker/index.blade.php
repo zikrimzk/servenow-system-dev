@@ -365,8 +365,8 @@
                                             <div class="input-group">
                                                 <span class="input-group-text">+60</span>
                                                 <input type="text"
-                                                    class="form-control @error('tasker_phoneno') is-invalid @enderror"
-                                                    placeholder="Phone No." name="tasker_phoneno" id="tasker_phoneno"
+                                                    class="form-control @error('tasker_phoneno') is-invalid @enderror tasker-phoneno"
+                                                    placeholder="Phone No." name="tasker_phoneno"
                                                     value="{{ old('tasker_phoneno') }}" maxlength="13" />
                                                 @error('tasker_phoneno')
                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -482,8 +482,8 @@
             <!-- Modal Update Status client End Here-->
 
             @foreach ($taskers as $tk)
-                <!-- Modal Tasker Create Start Here -->
-                <form action="{{ route('admin-tasker-create') }}" method="POST">
+                <!-- Modal Tasker Update Start Here -->
+                <form action="{{ route('admin-tasker-update', $tk->id) }}" method="POST">
                     @csrf
                     <div class="modal fade" id="updateTaskerModal-{{ $tk->id }}" data-bs-keyboard="false"
                         tabindex="-1" aria-hidden="true">
@@ -497,19 +497,6 @@
                                     </a>
                                 </div>
                                 <div class="modal-body">
-                                    <div class="alert alert-primary" role="alert">
-                                        <h6 class="link-primary">Please note:</h6>
-                                        <ul class="mb-0">
-                                            <li>Fields marked with a red asterisk (<span class="text-danger">*</span>) are
-                                                mandatory.</li>
-                                            <li>Ensure the phone number includes the correct country code (e.g., +60 for
-                                                Malaysia).</li>
-                                            <li>The default password is pre-set. Please update the password later for
-                                                security
-                                                purposes.</li>
-                                            <li>Review all entered data before clicking 'Save.'</li>
-                                        </ul>
-                                    </div>
                                     <div class="row">
                                         <div class="col-sm-4">
                                             <div class="mb-3">
@@ -522,6 +509,18 @@
                                         </div>
 
                                         <div class="col-sm-8">
+                                            <div class="alert alert-primary" role="alert">
+                                                <h6 class="link-primary">Please note:</h6>
+                                                <ul class="mb-0">
+                                                    <li>Fields marked with a red asterisk (<span
+                                                            class="text-danger">*</span>) are
+                                                        mandatory.</li>
+                                                    <li>Ensure the phone number includes the correct country code (e.g., +60
+                                                        for
+                                                        Malaysia).</li>
+                                                    <li>Review all entered data before clicking 'Save Changes.'</li>
+                                                </ul>
+                                            </div>
                                             <div class="row">
 
                                                 <h5 class="mb-2">A. Personal Information</h5>
@@ -569,6 +568,47 @@
                                                     </div>
                                                 </div>
 
+                                                <!-- IC Number Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">
+                                                            IC Number
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="text"
+                                                            class="form-control @error('tasker_icno') is-invalid @enderror"
+                                                            placeholder="Enter IC number" name="tasker_icno"
+                                                            value="{{ $tk->tasker_icno }}" id="tasker_icno" maxlength="12" pattern="^\d{12}$" />
+                                                        @error('tasker_icno')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                        <div id="ic-error-message" class="text-danger"
+                                                            style="display: none;">IC Number must be exactly 12 digits!
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <!-- Date of Birth Field -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">
+                                                            Date of Birth
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="date"
+                                                            class="form-control @error('tasker_dob') is-invalid @enderror"
+                                                            name="tasker_dob" value="{{ $tk->tasker_dob }}"
+                                                            id="tasker_dob" />
+                                                        @error('tasker_dob')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                        <div id="dob-error-message" class="text-danger"
+                                                            style="display: none;">You must be 18 years and above!
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                                 <!-- Phone Number Field -->
                                                 <div class="col-sm-6">
                                                     <div class="mb-3">
@@ -579,10 +619,9 @@
                                                         <div class="input-group">
                                                             <span class="input-group-text">+60</span>
                                                             <input type="text"
-                                                                class="form-control @error('tasker_phoneno') is-invalid @enderror"
+                                                                class="form-control @error('tasker_phoneno') is-invalid @enderror tasker-phoneno"
                                                                 placeholder="Phone No." name="tasker_phoneno"
-                                                                id="tasker_phoneno" value="{{ $tk->tasker_phoneno }}"
-                                                                maxlength="13" />
+                                                                value="{{ $tk->tasker_phoneno }}" maxlength="13" />
                                                             @error('tasker_phoneno')
                                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                             @enderror
@@ -611,10 +650,10 @@
                                                     </div>
                                                 </div>
 
-                                                <h5 class="mb-2 mt-2">B. Tasker Address</h5>
+                                                <h5 class="mb-2 mt-2 mt-2">B. Tasker Address</h5>
 
                                                 <!-- Address Line 1 Field -->
-                                                <div class="col-sm-6">
+                                                <div class="col-sm-12">
                                                     <div class="mb-3">
                                                         <label class="form-label">Address Line 1 <span
                                                                 class="text-danger">*</span></label>
@@ -630,7 +669,7 @@
                                                 </div>
 
                                                 <!-- Address Line 2 Field -->
-                                                <div class="col-sm-6">
+                                                <div class="col-sm-12">
                                                     <div class="mb-3">
                                                         <label class="form-label">Address Line 2 <span
                                                                 class="text-danger">*</span></label>
@@ -667,8 +706,7 @@
                                                         <label class="form-label">State <span
                                                                 class="text-danger">*</span></label>
                                                         <select name="tasker_address_state"
-                                                            class="form-control @error('tasker_address_state') is-invalid @enderror"
-                                                            id="addState">
+                                                            class="form-control @error('tasker_address_state') is-invalid @enderror addStateT">
                                                             @if ($tk->tasker_address_state == '')
                                                                 <option value="" selected>Select State</option>
                                                                 @foreach ($states['states'] as $state)
@@ -701,8 +739,7 @@
                                                         <label class="form-label">Area <span
                                                                 class="text-danger">*</span></label>
                                                         <select name="tasker_address_area"
-                                                            class="form-control @error('tasker_address_area') is-invalid @enderror"
-                                                            id="addCity">
+                                                            class="form-control @error('tasker_address_area') is-invalid @enderror addCityT">
                                                             @if ($tk->tasker_address_area == '')
                                                                 <option value="" selected>Select Area</option>
                                                             @else
@@ -717,7 +754,7 @@
                                                     </div>
                                                 </div>
 
-                                                <h5 class="mb-2">C. Working Area</h5>
+                                                <h5 class="mb-2 mt-2">C. Working Area</h5>
 
                                                 <!-- Working Area State Field -->
                                                 <div class="col-sm-6">
@@ -725,7 +762,7 @@
                                                         <label class="form-label">State <span
                                                                 class="text-danger">*</span></label>
                                                         <select name="tasker_workingloc_state"
-                                                            class="form-control @error('tasker_workingloc_state') is-invalid @enderror"
+                                                            class="form-control @error('tasker_workingloc_state') is-invalid @enderror addState"
                                                             id="workState">
                                                             @if ($tk->tasker_workingloc_state == '')
                                                                 <option value="" selected>Select State</option>
@@ -758,7 +795,7 @@
                                                         <label class="form-label">Area <span
                                                                 class="text-danger">*</span></label>
                                                         <select name="tasker_workingloc_area"
-                                                            class="form-control @error('tasker_workingloc_area') is-invalid @enderror"
+                                                            class="form-control @error('tasker_workingloc_area') is-invalid @enderror addCity"
                                                             id="workCity">
                                                             @if ($tk->tasker_workingloc_area == '')
                                                                 <option value="" selected>Select Area</option>
@@ -791,7 +828,19 @@
                                                     </div>
                                                 </div>
 
-                                                <h5 class="mb-2">D. Account Details</h5>
+                                                <h5 class="mb-2 mt-2">D. Account Details</h5>
+                                                <!-- Bio Field -->
+                                                <div class="col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Bio</label>
+                                                        <textarea class="form-control @error('tasker_bio') is-invalid @enderror" rows="4" name="tasker_bio"
+                                                            placeholder="Enter your bio here...">{{ $tk->tasker_bio }}</textarea>
+                                                        @error('tasker_bio')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
                                                 <!-- Account Status Field -->
                                                 <div class="col-sm-12">
                                                     <div class="mb-3">
@@ -827,7 +876,38 @@
                                                     </div>
                                                 </div>
 
-                                                <h5 class="mb-2">E. Bank Details</h5>
+                                                <!--  Ratings Data -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label for="tasker_rating" class="form-label">Rating</label>
+                                                        <div class="d-flex align-items-center">
+                                                            @for ($i = 1; $i <= 5; $i++)
+                                                                @if ($tk->tasker_rating >= $i)
+                                                                    <i class="fas fa-star text-warning f-16"></i>
+                                                                @elseif ($tk->tasker_rating >= $i - 0.5)
+                                                                    <i class="fas fa-star-half-alt text-warning f-16"></i>
+                                                                @else
+                                                                    <i class="far fa-star text-warning f-16"></i>
+                                                                @endif
+                                                            @endfor
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!--  Penalty Data -->
+                                                <div class="col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label for="tasker_rating" class="form-label">Penalty
+                                                            Count</label>
+                                                        <div class="d-flex align-items-center">
+                                                            <p class="text-danger fw-bold f-24">
+                                                                {{ $tk->tasker_selfrefund_count }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <h5 class="mb-2 mt-2">E. Bank Details</h5>
+                                                <!-- Bank Name Field -->
                                                 <div class="col-sm-12">
                                                     <div class="mb-3">
                                                         <label class="form-label">
@@ -835,7 +915,7 @@
                                                             <span class="text-danger">*</span>
                                                         </label>
                                                         <select name="tasker_account_bank" id="tasker_account_bank"
-                                                            class="form-select">
+                                                            class="form-select @error('tasker_account_bank') is-invalid @enderror">
                                                             @if ($tk->tasker_account_bank == '')
                                                                 <option value="">Select Bank</option>
                                                             @else
@@ -850,10 +930,31 @@
                                                                 @endif
                                                             @endforeach
                                                         </select>
+                                                        @error('tasker_account_bank')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
 
                                                     </div>
                                                 </div>
 
+                                                <!-- Account Number Field -->
+                                                <div class="col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label for="tasker_account_number" class="form-label">Account
+                                                            Number</label>
+                                                        <input type="text"
+                                                            class="form-control @error('tasker_account_number') is-invalid @enderror"
+                                                            name="tasker_account_number"
+                                                            value="{{ $tk->tasker_account_number }}"
+                                                            placeholder="Account Number" />
+                                                        @error('tasker_account_number')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+
+
+
+                                                    </div>
+                                                </div>
 
                                             </div>
                                         </div>
@@ -876,7 +977,7 @@
                         </div>
                     </div>
                 </form>
-                <!-- Modal Tasker Create End  Here -->
+                <!-- Modal Tasker Update End  Here -->
             @endforeach
 
 
@@ -893,28 +994,51 @@
                 modal.show();
             @endif
         });
-        document.getElementById('tasker_phoneno').addEventListener('input', function() {
-            const input = this.value.replace(/\D/g, ''); // Remove non-numeric characters
-            const errorMessage = document.getElementById('phone-error-message');
 
-            if (input.length <= 11) {
-                if (input.length === 10) {
-                    // Format for 10 digits: ### ### ####
-                    this.value = input.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
-                    errorMessage.style.display = 'none';
-                } else if (input.length === 11) {
-                    // Format for 11 digits: ### #### ####
-                    this.value = input.replace(/(\d{3})(\d{4})(\d{4})/, '$1 $2 $3');
-                    errorMessage.style.display = 'none';
+        const icNoField = document.getElementById('tasker_icno');
+        const dobField = document.getElementById('tasker_dob');
+        const icErrorMessage = document.getElementById('ic-error-message');
+        const dobErrorMessage = document.getElementById('dob-error-message');
+
+        icNoField.addEventListener('input', function() {
+            // Remove non-numeric characters
+            this.value = this.value.replace(/\D/g, '');
+
+            const icNo = this.value.trim();
+            const currentYear = new Date().getFullYear();
+
+            // Validate IC Number (exactly 12 digits)
+            if (icNo.length === 12) {
+                const yearPrefix = parseInt(icNo.substring(0, 2), 10);
+                const month = icNo.substring(2, 4);
+                const day = icNo.substring(4, 6);
+
+                // Determine full year
+                let birthYear = yearPrefix <= (currentYear % 100) ? 2000 + yearPrefix : 1900 + yearPrefix;
+
+                // Validate date components and age
+                const birthDate = new Date(`${birthYear}-${month}-${day}`);
+                const age = currentYear - birthYear - (new Date().setFullYear(currentYear) < birthDate ? 1 : 0);
+
+                if (!isNaN(birthDate) && age >= 18) {
+                    dobField.value = birthDate.toISOString().split('T')[0];
+                    dobField.classList.remove('is-invalid');
+                    dobErrorMessage.style.display = 'none';
                 } else {
-                    this.value = input; // Unformatted during input
-                    errorMessage.style.display = 'none';
+                    dobField.value = '';
+                    dobField.classList.add('is-invalid');
+                    dobErrorMessage.style.display = 'block';
                 }
+
+                icErrorMessage.style.display = 'none'; // Hide IC Number error message
             } else {
-                // Show error if more than 11 digits
-                errorMessage.style.display = 'block';
+                dobField.value = '';
+                dobField.classList.add('is-invalid');
+                dobErrorMessage.style.display = 'block';
+                icErrorMessage.style.display = 'block'; // Show IC Number error message
             }
         });
+
         $(document).ready(function() {
 
             // DATATABLE : TASKERS
@@ -997,6 +1121,84 @@
 
                     // Reload table data
                     table.ajax.reload();
+                });
+
+                $(document).on('input', '.tasker-phoneno', function() {
+                    const $inputField = $(this);
+                    const input = $inputField.val().replace(/\D/g,
+                        ''); // Remove non-numeric characters
+                    const $modal = $inputField.closest(
+                        '.modal'); // Get the modal containing this input field
+                    const $errorMessage = $modal.find(
+                        '.phone-error-message'); // Find the error message within the same modal
+
+                    if (input.length <= 11) {
+                        if (input.length === 10) {
+                            // Format for 10 digits: ### ### ####
+                            $inputField.val(input.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3'));
+                            $errorMessage.hide();
+                        } else if (input.length === 11) {
+                            // Format for 11 digits: ### #### ####
+                            $inputField.val(input.replace(/(\d{3})(\d{4})(\d{4})/, '$1 $2 $3'));
+                            $errorMessage.hide();
+                        } else {
+                            $inputField.val(input); // Unformatted during input
+                            $errorMessage.hide();
+                        }
+                    } else {
+                        // Show error if more than 11 digits
+                        $errorMessage.show();
+                    }
+                });
+
+                function updateArea(modal, stateSelector, citySelector, urlSuffix = '') {
+                    const state = modal.find(stateSelector)
+                        .val(); // Find the state within the current modal
+                    const cityDropdown = modal.find(
+                        citySelector); // Find the city dropdown in the current modal
+
+                    if (state) {
+                        $.ajax({
+                            url: '/get-areas/' + state + urlSuffix, // Ensure this matches the route
+                            type: 'GET',
+                            success: function(data) {
+                                cityDropdown.empty().append(
+                                    '<option value="">Select Area</option>');
+                                $.each(data, function(index, area) {
+                                    cityDropdown.append('<option value="' + area +
+                                        '">' + area + '</option>');
+                                });
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("Error fetching areas: " +
+                                    error); // Debugging output
+                            }
+                        });
+                    } else {
+                        cityDropdown.empty().append('<option value="">Select Area</option>');
+                    }
+                }
+
+                // Modal shown logic
+                $(document).on('shown.bs.modal', '.modal-up', function() {
+                    const modal = $(this); // Current modal being triggered
+                    const stateT = modal.find('.addStateT').val();
+                    const state = modal.find('.addState').val();
+
+                    // Check and update if necessary
+                    if (!stateT) updateArea(modal, '.addStateT', '.addCityT');
+                    if (!state) updateArea(modal, '.addState', '.addCity');
+                });
+
+                // State change logic
+                $(document).on('change', '.addState', function() {
+                    const modal = $(this).closest('.modal');
+                    updateArea(modal, '.addState', '.addCity');
+                });
+
+                $(document).on('change', '.addStateT', function() {
+                    const modal = $(this).closest('.modal');
+                    updateArea(modal, '.addStateT', '.addCityT');
                 });
 
                 let selectedUsers = {}; // Track selected rows

@@ -95,15 +95,18 @@ class TaskerController extends Controller
                 'tasker_phoneno' => 'required|string|min:10',
                 'email' => 'required|email',
                 'tasker_bio' => '',
-                'tasker_icno' => 'required',
-                'tasker_dob' => 'required',
-                'tasker_address_one' => 'required',
-                'tasker_address_two' => 'required',
-                'tasker_address_poscode' => 'required',
-                'tasker_address_state' => 'required',
-                'tasker_address_area' => 'required',
-                'tasker_workingloc_state' => 'required',
-                'tasker_workingloc_area' => 'required',
+                'tasker_icno' => '',
+                'tasker_dob' => '',
+                'tasker_address_one' => '',
+                'tasker_address_two' => '',
+                'tasker_address_poscode' => '',
+                'tasker_address_state' => '',
+                'tasker_address_area' => '',
+                'tasker_workingloc_state' => '',
+                'tasker_workingloc_area' => '',
+                'working_radius' => '',
+                'tasker_account_bank' => '',
+                'tasker_account_number' => '',
                 'tasker_status' => '',
             ],
             [],
@@ -123,10 +126,23 @@ class TaskerController extends Controller
                 'tasker_address_area' => 'Area',
                 'tasker_workingloc_state' => 'Working State',
                 'tasker_workingloc_area' => 'Working Area',
+                'working_radius' => 'Working Radius',
+                'tasker_account_bank' => 'Account Bank',
+                'tasker_account_number' => 'Account Number',
                 'tasker_status' => 'Status',
 
             ]
         );
+
+        $ori = Tasker::whereId($id)->first();
+
+        if($ori->tasker_workingloc_state != $taskers['tasker_workingloc_state'] || $ori->tasker_workingloc_area != $taskers['tasker_workingloc_area']) {
+            $address=$taskers['tasker_workingloc_area'].','.$taskers['tasker_workingloc_state'];
+            $result = $this->geocoder->getCoordinatesForAddress($address);
+            $taskers['latitude'] = $result['lat'];
+            $taskers['longitude'] = $result['lng'];
+        }
+    
 
         Tasker::whereId($id)->update($taskers);
 

@@ -165,7 +165,7 @@
                     </div>
                 </div>
 
-                
+
 
                 <div class="col-lg-3 col-md-6">
                     <div class="card card-deactive">
@@ -318,9 +318,10 @@
                                             <div class="input-group">
                                                 <span class="input-group-text">+60</span>
                                                 <input type="text"
-                                                    class="form-control @error('client_phoneno') is-invalid @enderror"
+                                                    class="form-control @error('client_phoneno') is-invalid @enderror phoneno"
                                                     placeholder="Phone No." name="client_phoneno"
-                                                    value="{{ old('client_phoneno') }}" id="client_phoneno" maxlength="13" />
+                                                    value="{{ old('client_phoneno') }}" id="client_phoneno"
+                                                    maxlength="13" />
                                                 @error('client_phoneno')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -510,9 +511,9 @@
                                                         </label>
                                                         <div class="input-group">
                                                             <span class="input-group-text">+60</span>
-                                                            <input type="text" class="form-control"
+                                                            <input type="text" class="form-control phoneno"
                                                                 placeholder="Phone No." name="client_phoneno"
-                                                                value="{{ $client->client_phoneno }}" />
+                                                                value="{{ $client->client_phoneno }}"  maxlength="13" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -709,29 +710,6 @@
             @endif
         });
 
-        document.getElementById('client_phoneno').addEventListener('input', function() {
-            const input = this.value.replace(/\D/g, ''); // Remove non-numeric characters
-            const errorMessage = document.getElementById('phone-error-message');
-
-            if (input.length <= 11) {
-                if (input.length === 10) {
-                    // Format for 10 digits: ### ### ####
-                    this.value = input.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
-                    errorMessage.style.display = 'none';
-                } else if (input.length === 11) {
-                    // Format for 11 digits: ### #### ####
-                    this.value = input.replace(/(\d{3})(\d{4})(\d{4})/, '$1 $2 $3');
-                    errorMessage.style.display = 'none';
-                } else {
-                    this.value = input; // Unformatted during input
-                    errorMessage.style.display = 'none';
-                }
-            } else {
-                // Show error if more than 11 digits
-                errorMessage.style.display = 'block';
-            }
-        });
-
         function validatePostcode(input) {
             // Remove any non-numeric characters
             input.value = input.value.replace(/\D/g, '');
@@ -740,6 +718,7 @@
                 input.value = input.value.slice(0, 5);
             }
         }
+
         $(document).ready(function() {
 
             // DATATABLE : ClientS
@@ -820,6 +799,34 @@
                     table.ajax.reload();
                 });
 
+                $(document).on('input', '.phoneno', function() {
+                    const $inputField = $(this);
+                    const input = $inputField.val().replace(/\D/g,
+                        ''); // Remove non-numeric characters
+                    const $modal = $inputField.closest(
+                        '.modal'); // Get the modal containing this input field
+                    const $errorMessage = $modal.find(
+                        '.phone-error-message'); // Find the error message within the same modal
+
+                    if (input.length <= 11) {
+                        if (input.length === 10) {
+                            // Format for 10 digits: ### ### ####
+                            $inputField.val(input.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3'));
+                            $errorMessage.hide();
+                        } else if (input.length === 11) {
+                            // Format for 11 digits: ### #### ####
+                            $inputField.val(input.replace(/(\d{3})(\d{4})(\d{4})/, '$1 $2 $3'));
+                            $errorMessage.hide();
+                        } else {
+                            $inputField.val(input); // Unformatted during input
+                            $errorMessage.hide();
+                        }
+                    } else {
+                        // Show error if more than 11 digits
+                        $errorMessage.show();
+                    }
+                });
+
 
                 function updateArea(modal) {
                     var state = modal.find('.addState').val(); // Find the state within the current modal
@@ -856,6 +863,7 @@
                     if (isArea && isArea.trim() !== "") {
                         // Area is already selected, no need to update
                         console.log("Area already selected:", isArea);
+
                     } else {
                         // Area is empty, trigger update
                         console.log("No area selected. Updating areas...");
