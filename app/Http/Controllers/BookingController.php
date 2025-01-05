@@ -185,6 +185,8 @@ class BookingController extends Controller
                 ->select('c.id as tasker_id', DB::raw('avg(e.review_rating) as rating_count'))  // Count reviews for each Tasker
                 ->get();
 
+                
+
             // Step 3: Convert review count data into a key-value pair (tasker_id => review_count)
             $reviewCountMap = $reviewCount->pluck('review_count', 'tasker_id')->toArray();
             $ratingCountMap = $ratingCount->pluck('rating_count', 'tasker_id')->toArray();

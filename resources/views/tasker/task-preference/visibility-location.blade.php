@@ -13,7 +13,7 @@
                                 <li class="breadcrumb-item" aria-current="page">Visibility & Location</li>
                             </ul>
                         </div>
-                        <div class="col-md-12"> 
+                        <div class="col-md-12">
                             <div class="page-header-title">
                                 <h2 class="mb-4">Visibility & Location</h2>
                             </div>
@@ -63,7 +63,8 @@
                     <div class="d-flex align-items-center">
                         <i class="ti ti-info-circle h2 f-w-400 mb-0 text-primary"></i>
                         <div class="flex-grow-1 ms-3">
-                            <strong>Note :</strong> To enable the profile visibility features, you need to verify first your account !
+                            <strong>Note :</strong> To enable the profile visibility features, you need to verify first your
+                            account !
                         </div>
                     </div>
                 </div>
@@ -72,7 +73,8 @@
                     <div class="d-flex align-items-center">
                         <i class="ti ti-info-circle h2 f-w-400 mb-0 text-primary"></i>
                         <div class="flex-grow-1 ms-3">
-                            <strong>Tips : </strong> Please turn on tasker visibility in order to make your profile visible to client. Make sure to choose accessible location for you to make your task.
+                            <strong>Tips : </strong> Please turn on tasker visibility in order to make your profile visible
+                            to client. Make sure to choose accessible location for you to make your task.
                         </div>
                     </div>
                 </div>
@@ -119,7 +121,7 @@
                                     </h6>
                                     <div class="form-check form-switch mb-2">
                                         <input type="checkbox" class="form-check-input input-primary f-18"
-                                            id="showhideswitch" @if(Auth::user()->tasker_status != 2) disabled  @endif  />
+                                            id="showhideswitch" @if (Auth::user()->tasker_status != 2) disabled @endif />
                                         <input type="hidden" name="isChecked" id="isChecked"
                                             value="{{ Auth::user()->tasker_working_status }}">
                                     </div>
@@ -226,8 +228,11 @@
                                         </div>
                                     </div>
                                 </div>
+                                @php
+                                    $data = Auth::check() ? Auth::user()->tasker_icno ?? '' : '';
+                                @endphp
                                 <div class="d-flex justify-content-center align-items-center my-3">
-                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={{ route('tasker-card-ver') }}"
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={{ route('tasker-card-ver', $data) }}"
                                         class="img-fluid" alt="qrcode">
                                 </div>
 

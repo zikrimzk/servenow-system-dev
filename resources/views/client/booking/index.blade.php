@@ -530,12 +530,26 @@ use App\Models\Tasker;
                                                                         @foreach ($review->where('taskerID', $tk->taskerID) as $r)
                                                                             <div class="card mb-3">
                                                                                 <div class="card-body">
-                                                                                    @if ($r->review_type == 1)
-                                                                                        <h6>{{ Str::headline($r->client_firstname . ' ' . $r->client_lastname) }}
-                                                                                        </h6>
-                                                                                    @else
-                                                                                        <h6>Anonymous</h6>
-                                                                                    @endif
+                                                                                    <div
+                                                                                        class="d-flex justify-content-between align-items-center">
+                                                                                        @if ($r->review_type == 1)
+                                                                                            <h6>{{ Str::headline($r->client_firstname . ' ' . $r->client_lastname) }}
+                                                                                            </h6>
+                                                                                        @else
+                                                                                            <h6>Anonymous</h6>
+                                                                                        @endif
+                                                                                        <div class="text-end">
+                                                                                            @for ($i = 1; $i <= 5; $i++)
+                                                                                            @if ($r->review_rating >= $i)
+                                                                                                <i class="fas fa-star text-warning f-16"></i>
+                                                                                            @elseif ($r->review_rating >= $i - 0.5)
+                                                                                                <i class="fas fa-star-half-alt text-warning f-16"></i>
+                                                                                            @else
+                                                                                                <i class="far fa-star text-warning f-16"></i>
+                                                                                            @endif
+                                                                                        @endfor
+                                                                                        </div>
+                                                                                    </div>
                                                                                     <p>
                                                                                         {{ $r->review_description }}
                                                                                     </p>
@@ -555,46 +569,50 @@ use App\Models\Tasker;
 
                                                                                         @if ($hasImage)
                                                                                             @if ($r->review_imageOne)
-                                                                                                <div class="me-2">
+                                                                                                <div class="me-2"
+                                                                                                    style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0; overflow: hidden;">
                                                                                                     <a
                                                                                                         data-lightbox="{{ asset('storage/' . $r->review_imageOne) }}">
                                                                                                         <img src="{{ asset('storage/' . $r->review_imageOne) }}"
                                                                                                             alt="Image1"
                                                                                                             class="img-fluid"
-                                                                                                            style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0;">
+                                                                                                            style="width: 100%; height: 100%; object-fit: cover;">
                                                                                                     </a>
                                                                                                 </div>
                                                                                             @endif
                                                                                             @if ($r->review_imageTwo)
-                                                                                                <div class="me-2">
+                                                                                                <div class="me-2"
+                                                                                                    style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0; overflow: hidden;">
                                                                                                     <a
                                                                                                         data-lightbox="{{ asset('storage/' . $r->review_imageTwo) }}">
                                                                                                         <img src="{{ asset('storage/' . $r->review_imageTwo) }}"
                                                                                                             alt="Image2"
                                                                                                             class="img-fluid"
-                                                                                                            style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0;">
+                                                                                                            style="width: 100%; height: 100%; object-fit: cover;">
                                                                                                     </a>
                                                                                                 </div>
                                                                                             @endif
                                                                                             @if ($r->review_imageThree)
-                                                                                                <div class="me-2">
+                                                                                                <div class="me-2"
+                                                                                                    style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0; overflow: hidden;">
                                                                                                     <a
                                                                                                         data-lightbox="{{ asset('storage/' . $r->review_imageThree) }}">
                                                                                                         <img src="{{ asset('storage/' . $r->review_imageThree) }}"
                                                                                                             alt="Image3"
                                                                                                             class="img-fluid"
-                                                                                                            style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0;">
+                                                                                                            style="width: 100%; height: 100%; object-fit: cover;">
                                                                                                     </a>
                                                                                                 </div>
                                                                                             @endif
                                                                                             @if ($r->review_imageFour)
-                                                                                                <div class="me-2">
+                                                                                                <div class="me-2"
+                                                                                                    style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0; overflow: hidden;">
                                                                                                     <a
                                                                                                         data-lightbox="{{ asset('storage/' . $r->review_imageFour) }}">
                                                                                                         <img src="{{ asset('storage/' . $r->review_imageFour) }}"
                                                                                                             alt="Image4"
                                                                                                             class="img-fluid"
-                                                                                                            style="width: 70px; height: 70px; border: 1px solid #ccc; border-radius: 0;">
+                                                                                                            style="width: 100%; height: 100%; object-fit: cover;">
                                                                                                     </a>
                                                                                                 </div>
                                                                                             @endif
@@ -785,7 +803,7 @@ use App\Models\Tasker;
                                                                 <input type="hidden" name="service_id"
                                                                     class="serviceID">
                                                                 <input type="hidden" name="tasker_id" class="taskerID">
-                                                              
+
                                                             </div>
                                                             <div class="d-grid mt-4 mb-4">
                                                                 {{-- <button type="submit" class="btn btn-primary">Proceed to
@@ -820,6 +838,7 @@ use App\Models\Tasker;
         </div>
     </div>
 
+    
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var lightboxModal = new bootstrap.Modal(document.getElementById('lightboxModal'));
@@ -1143,22 +1162,26 @@ use App\Models\Tasker;
                                             alt="Profile Photo" 
                                             class="user-avatar rounded-circle">
                                     </div>
+                                    
                                 </div>
+                                <h4 class="mb-3 mt-2 d-lg-none text-center">
+                                        RM ${tasker.service_rate}/${tasker.service_rate_type}
+                                    </h4>
                             </div>
 
                             <div class="col-sm-9 col-md-9 col-lg-9">
                                 <div class="p-3">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <h5 class="mb-2 f-24">
+                                        <h6 class="mb-2 f-24">
                                             ${tasker.tasker_firstname.split(' ')[0]}.
-                                        </h5>
-                                        <h5 class="mb-2">
+                                        </h6>
+                                        <h5 class="mb-2 d-none d-lg-block">
                                             RM ${tasker.service_rate}/${tasker.service_rate_type}
                                         </h5>
                                     </div>
 
                                     <div class="d-flex align-items-center mb-2">
-                                        <span class="badge bg-success text-white me-2">GREAT VALUE</span>
+                                        <span class="badge bg-success text-white me-2"> GREAT VALUE</span>
                                     </div>
 
                                     <div>
@@ -1559,7 +1582,7 @@ use App\Models\Tasker;
                     $('.serviceID').val(svId);
                     $('.taskerID').val(taskerId);
                     $('.address-details').html($('.booking_address').val());
-                   
+
 
                     var dateBooking = $('.bookingDate').val();
                     var date = new Date(dateBooking);
