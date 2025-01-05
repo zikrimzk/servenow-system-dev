@@ -385,7 +385,6 @@
                     </div>
                 </div>
 
-
                 <!-- Card 2 -->
                 <div class="col-12 col-sm-6 col-md-4 mb-4">
                     <div class="card" style="width: 100%; border-radius: 15px; overflow: hidden;">
