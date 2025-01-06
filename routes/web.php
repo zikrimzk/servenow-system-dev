@@ -155,6 +155,9 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     // Admin - Performance > Tasker Performance
     Route::get('/tasker-performance', [RouteController::class, 'adminTaskerPerformanceNav'])->name('admin-tasker-performance');
     Route::post('/send-performance-report', [EmailController::class, 'adminSendPerformanceReport'])->name('admin-send-performance-report');
+
+    // Admin - e-Statement
+    Route::get('/e-statement', [RouteController::class, 'eStatementAdminNav'])->name('admin-e-statement');
 });
 
 /* Admin Route End */
@@ -232,6 +235,10 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
     // Tasker - Performance Analysis
     Route::get('/performance-analysis', [RouteController::class, 'taskerPerformanceAnalysisNav'])->name('tasker-performance-analysis');
+
+    // Tasker - e-Statement
+    Route::get('/e-statement', [RouteController::class, 'eStatementTaskerNav'])->name('tasker-e-statement');
+    Route::get('/e-statement-template', [RouteController::class, 'eStatementTemplateNav'])->name('e-statement-template');
 
 });
 

@@ -675,8 +675,6 @@ class RouteController extends Controller
                     $status = '<span class="badge bg-danger">Cancelled</span>';
                 } else if ($row->booking_status == 6) {
                     $status = '<span class="badge bg-success">Completed</span>';
-                } else if ($row->booking_status == 6) {
-                    $status = '<span class="badge bg-success">Completed</span>';
                 }
                 return $status;
             });
@@ -1225,6 +1223,38 @@ class RouteController extends Controller
             'taskerMonthlyRefunds' => $taskerMonthlyRefunds
         ]);
     }
+
+    public function eStatementTaskerNav(Request $request)
+    {
+        return view('tasker.eStatement.statement-index',[
+            'title' => 'e-Statement'
+        ]);
+    }
+
+    public function eStatementTemplateNav()
+    {
+        $dataTasker = Tasker::where('id', Auth::user()->id)->first();
+        $dataBooking = DB::table('taskers as a')
+        ->join('services as b', 'a.id', '=', 'b.tasker_id')
+        ->join('bookings as c', 'b.id', '=', 'c.service_id')
+        ->where('a.id', Auth::user()->id)
+        ->whereBetween('c.booking_date', ['2025-01-01','2025-01-31'])
+        ->get();
+
+        $totalCredit = $dataBooking->where('booking_status', 6)->sum('booking_rate');
+        $totalUnCredit = $dataBooking->whereIn('booking_status', [5,8])->sum('booking_rate');
+        $statement_dateMY = Carbon::parse('2025-01-01')->format('F Y');
+        
+        return view('tasker.eStatement.statement-template',[
+            'title' => 'Tasker Monthly Statement',
+            'tasker'=>$dataTasker,
+            'dataBooking'=>$dataBooking,
+            'totalCredit'=>$totalCredit,
+            'totalUnCredit'=>$totalUnCredit,
+            'statement_dateMY'=>$statement_dateMY
+        ]);
+    }
+
     /**** Tasker Route Function - End ****/
 
 
@@ -3092,6 +3122,13 @@ class RouteController extends Controller
         ]);
     }
 
+    public function eStatementAdminNav(Request $request)
+    {
+        return view('administrator.eStatement.statement-index',[
+            'title' => 'e-Statement'
+        ]);
+    }
+
 
 
     public function cardVerificationLog(Request $request) 
@@ -3107,5 +3144,8 @@ class RouteController extends Controller
             'title' => 'e-KYC Face Log'
         ]);
     }
+
+
+   
 
 }

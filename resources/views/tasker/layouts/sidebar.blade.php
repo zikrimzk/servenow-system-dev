@@ -117,6 +117,15 @@
                     </ul>
                 </li>
 
+                <li class="pc-item">
+                    <a href="{{ route('tasker-e-statement') }}" class="pc-link">
+                        <span class="pc-micon">
+                            <i class="fas fa-file-invoice-dollar pc-icon "></i>
+                        </span>
+                        <span class="pc-mtext">e-Statement</span>
+                    </a>
+                </li>
+
             </ul>
             <!-- SideBar Menu Item End -->
         </div>

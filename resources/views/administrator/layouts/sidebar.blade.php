@@ -127,7 +127,7 @@
                 </li>
 
                 <li class="pc-item">
-                    <a href="#" class="pc-link">
+                    <a href="{{ route('admin-e-statement') }}" class="pc-link">
                         <span class="pc-micon">
                             <i class="fas fa-file-invoice-dollar pc-icon "></i>
                         </span>
