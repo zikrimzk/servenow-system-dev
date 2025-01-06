@@ -14,6 +14,7 @@ class MonthlyStatement extends Model
         'end_date',
         'file_name',
         'statement_status',
+        'total_earnings',
         'tasker_id',
     ];
 }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('start_date');
             $table->string('end_date');
             $table->string('file_name')->nullable();
+            $table->decimal('total_earnings', 8, 2)->nullable(); 
             $table->string('statement_status')->default(0);
             $table->foreignId('tasker_id')->references('id')->on('taskers');
             $table->timestamps();
