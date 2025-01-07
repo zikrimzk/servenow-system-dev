@@ -99,8 +99,7 @@
         <nav class="navbar navbar-expand-md navbar-light default">
             <div class="container">
                 <a class="navbar-brand" href="{{ route('servenow-home') }}">
-                    <img src="../assets/images/logo-test.png" alt="img" class="img-fluid"
-                        style="max-width: 110px;" />
+                    <img src="../assets/images/logo-test.png" alt="img" class="img-fluid" style="max-width: 110px;" />
                 </a>
                 <button class="navbar-toggler rounded" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false"
@@ -121,19 +120,19 @@
             </div>
         </nav>
         <!-- [ Nav ] start -->
-
+    
         <div class="container mt-5">
             <div class="row justify-content-center">
-                <div class="col-md-10 text-center">
-                    <h1 class="wow fadeInUp" data-wow-delay="0.2s">
+                <!-- Left Column (Text and Buttons) -->
+                <div class="col-md-8 text-center">
+                    <h1 class="wow" data-wow-delay="0.2s">
                         Easy Solutions for
                     </h1>
-                    <h1 class="mb-4 wow fadeInUp" data-wow-delay="0.2s">
+                    <h1 class="mb-4 wow " data-wow-delay="0.2s">
                         Your
                         <span class="hero-text-gradient">Home Needs</span>
-
                     </h1>
-                    <div class="row justify-content-center wow fadeInUp" data-wow-delay="0.3s">
+                    <div class="row justify-content-center wow " data-wow-delay="0.3s">
                         <div class="col-md-8">
                             <p class="text-muted f-16 mb-0">
                                 Trusted Home Services at Your Fingertips.
@@ -142,13 +141,9 @@
                     </div>
                     <!-- [ Text] end -->
                     <!-- [ Search-Text] Start -->
-                    <div class="my-4 my-sm-5 wow fadeInUp" data-wow-delay="0.4s">
-                        <img src="../assets/images/servenowLogoIsk3.png" alt="img" class="img-fluid"
-                            style="max-width: 75px;" />
+                    <div class="my-4 my-sm-5 wow fade-in-right" data-wow-delay="0.4s">
+                        <img src="../assets/images/servenowLogoIsk3.png" alt="img" class="img-fluid" style="max-width: 75px;" />
                     </div>
-
-
-
                     <!-- [ Search-Text] End -->
                     <!-- [ Highlight Option] Start -->
                     <div class="container">
@@ -158,28 +153,32 @@
                                 <div class="my-2 my-sm-1 d-flex flex-wrap justify-content-center align-items-start gap-2 wow fadeInUp"
                                     data-wow-delay="0.4s">
                                     @foreach ($service as $sv)
-                                        <a href="{{ route('client-booking', $sv->id) }}"
-                                            class="btn btn-outline-primary">{{ $sv->servicetype_name }}</a>
+                                        <a href="{{ route('client-booking', $sv->id) }}" class="btn btn-outline-primary">{{ $sv->servicetype_name }}</a>
                                     @endforeach
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    <!-- [ Highlight Option] End -->
                 </div>
-                <!-- [ Highlight Option] End -->
+    
+                <!-- Right Column (Image) -->
+                <div class="col-md-4 d-flex justify-content-center align-items-center fade-in-right">
+                    <img src="../assets/images/landingPageIsk.png" alt="Home Image" class="img-fluid" style="max-width: 750px;" />
+                </div>
             </div>
         </div>
     </header>
+    
 
     <!-- [ Header ] End -->
 
     <body>
-        <div class="container title my-5">
-            <div class="row align-items-center">
+        <div class="container title my-5 ">
+            <div class="row align-items-center ">
                 <!-- Image Section -->
                 <div class="col-12 col-md-6 mb-4 mb-md-0"> <!-- Added margin bottom for spacing -->
-                    <img src="../assets/images/tasker_bg.jpg" alt="Tasker Background" class="img-fluid rounded"
+                    <img src="../assets/images/tasker_bg.png" alt="Tasker Background" class="img-fluid rounded "
                         style="border-radius: 15px;">
                 </div>
 
@@ -187,19 +186,19 @@
                 <div class="col-12 col-md-6 d-flex justify-content-center align-items-center">
                     <!-- Centering the steps -->
                     <div>
-                        <div class="d-flex align-items-center mb-3">
+                        <div class="d-flex align-items-center mb-3 fade-in-right">
                             <span class="me-3 fw-bold" style="font-size: 2rem; width:35px;color:red">1</span>
                             <p class="text-muted f-16 mb-0">
                                 Choose a Tasker by price, skills, and reviews.
                             </p>
                         </div>
-                        <div class="d-flex align-items-center mb-3">
+                        <div class="d-flex align-items-center mb-3 fade-in-right">
                             <span class="me-3 fw-bold" style="font-size: 2rem;width:35px;color:darkblue">2</span>
                             <p class="text-muted f-16 mb-0">
                                 Schedule a Tasker as early as today.
                             </p>
                         </div>
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center fade-in-right">
                             <span class="me-3 fw-bold" style="font-size: 2rem;width:35px; color:green">3</span>
                             <p class="text-muted f-16 mb-0">
                                 Chat, pay, tip, and review all in one place.
@@ -486,135 +485,147 @@
                 </div>
             </div>
         </div>
-
     </body>
 
 
     <!-- [ footer apps ] start -->
-    <footer class="footer" style="padding-top: 0; background-color:#e5e7eb">
-
-        <div class="footer-center">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6 wow fadeInUp" data-wow-delay="0.2s">
-                        <img src="../assets/images/logo-test.png" alt="img" class="img-fluid"
-                            style="max-width: 110px;" />
-                        <p class="mb-4">
-                            ServeNow has gained the trust of over 5.5K customers since 2024, thanks to our
-                            commitment to delivering high-quality
-                            products. Our experienced team players are responsible for managing ServeNow.
+    <footer class="footer" style="background-color:#16325b; padding: 40px 0;">
+        <div class="container" style="border-bottom: 2px solid #fff; padding-bottom: 20px;">
+            <div class="row d-flex align-items-center">
+                <!-- Left Column - About Section -->
+                <div class="col-md-6 mb-4">
+                    <div class="d-flex flex-column align-items-start">
+                        <img src="../assets/images/logo-test.png" alt="img" class="img-fluid mb-3"
+                            style="max-width: 110px; filter: brightness(0) invert(1);" />
+                        <p class="text-white fade-in-right" style="font-size: 16px; padding-right:30px">
+                            ServeNow has gained the trust of over 5.5K customers since 2024, thanks to our commitment to
+                            delivering high-quality products. Our experienced team players are responsible for managing
+                            ServeNow.
                         </p>
                     </div>
-                    <div class="col-md-6">
-                        <div class="row">
-                            <div class="col-sm-6 wow fadeInUp" data-wow-delay="0.8s">
-                                <h5 class="mb-4">Contact Us</h5>
-                                <ul class="list-unstyled footer-link">
-                                    <li>
-                                        <a href="" target="_blank">servenow@mail.com</a>
-                                    </li>
-                                    <li>
-                                        <a href="" target="_blank">6026429534</a>
-                                    </li>
+                </div>
 
-                                </ul>
-                            </div>
+                <!-- Right Column - Contact, Social Media, and App Links -->
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-sm-6 mb-4">
 
-                            <div class="col-sm-6 wow fadeInUp" data-wow-delay="0.6s">
-                                <h5 class="mb-4">Follow Us</h5>
-                                <ul class="list-unstyled footer-link">
-                                    <li>
-                                        <a href="https://www.instagram.com" target="_blank">
-                                            <i class="fab fa-instagram"
-                                                style="color: #E4405F; font-size: 20px; width: 15px"></i>
-                                            <span style="margin-left: 8px;">ofc_servenow</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="https://x.com" target="_blank">
-                                            <i class="fab fa-x"
-                                                style="color: #1DA1F2; font-size: 20px; width: 15px"></i>
-                                            <span style="margin-left: 8px;">serve_now</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="https://www.tiktok.com" target="_blank">
-                                            <i class="fab fa-tiktok"
-                                                style="color: #010101; font-size: 20px; width: 15px"></i>
-                                            <span style="margin-left: 8px;">serve_now_ofc</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="https://www.pinterest.com" target="_blank">
-                                            <i class="fab fa-pinterest"
-                                                style="color: #E60023; font-size: 20px; width: 15px"></i>
-                                            <span style="margin-left: 8px;">Serve Now</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                            <h5 class="text-white mb-3"
+                                style="font-size: 18px; border-left: 3px solid orange; padding-left: 10px;">Download
+                                App</h5>
+                            <ul class="list-unstyled fade-in-right">
+                                <li><a href="https://play.google.com" target="_blank"
+                                        class="d-flex align-items-center mb-3" style="color:white; font-size: 16px;">
+                                        <i class="fab fa-google-play" style="font-size: 25px; color:#a0a0a0"></i>
+                                        <span class="ms-2">Google Play</span>
+                                    </a></li>
+                                <li><a href="https://apps.apple.com" target="_blank"
+                                        class="d-flex align-items-center mt-3" style="color:white; font-size: 16px;">
+                                        <i class="fab fa-app-store" style="font-size: 25px; color:#a0a0a0"></i>
+                                        <span class="ms-2">App Store</span>
+                                    </a></li>
+                            </ul>
+                        </div>
 
-                            <div class="col-sm-6 wow fadeInUp" data-wow-delay="0.8s">
-                                <h5 class="mb-4">Download App</h5>
-                                <div class="d-flex flex-column">
-                                    <ul class="list-unstyled footer-link">
-                                        <li>
-                                            <a href="https://play.google.com" target="_blank"
-                                                class="d-flex align-items-center mb-3">
-                                                <i class="fab fa-google-play"
-                                                    style="font-size: 25px; color:#a0a0a0"></i>
-                                                <span class="ms-2">Google Play</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="https://apps.apple.com" target="_blank"
-                                                class="d-flex align-items-center mt-3">
-                                                <i class="fab fa-app-store"
-                                                    style="font-size: 25px; color:#a0a0a0"></i>
-                                                <span class="ms-2">App Store</span>
-                                            </a>
-                                        </li>
+                        <div class="col-sm-6 mb-4">
+                            <h5 class="text-white mb-3"
+                                style="font-size: 18px; border-left: 3px solid orange; padding-left: 10px;">Contact
+                                Info</h5>
+                            <ul class="list-unstyled text-white fade-in-right" style="font-size: 16px;">
+                                <li style="margin-bottom: 10px;">
+                                    <a href="mailto:servenow@mail.com" style="color:white;">servenow@mail.com</a>
+                                </li>
+                                <li>
+                                    <a href="tel:+6026429534" style="color:white;">6026429534</a>
+                                </li>
+                            </ul>
+                        </div>
 
-                                    </ul>
-                                </div>
-                            </div>
+
+                        <div class="col-sm-6 mb-4">
+                            <h5 class="text-white mb-3"
+                                style="font-size: 18px; border-left: 3px solid orange; padding-left: 10px;">Follow Us
+                            </h5>
+                            <ul class="list-unstyled fade-in-right">
+                                <li><a href="https://www.instagram.com" target="_blank"
+                                        class="d-flex align-items-center mt-3" style="color:white; font-size: 16px;">
+                                        <i class="fab fa-instagram"
+                                            style="font-size: 25px; color:#E4405F;width:25px"></i>
+                                        <span class="ms-2">servenowofc</span>
+                                    </a></li>
+                                <li><a href="https://x.com" target="_blank" class="d-flex align-items-center mt-3"
+                                        style="color:white; font-size: 16px;">
+                                        <i class="fab fa-x" style="font-size: 25px; color:blue;width:25px"></i>
+                                        <span class="ms-2">servenow_ofc</span>
+                                    </a></li>
+                                <li><a href="https://www.tiktok.com" target="_blank"
+                                        class="d-flex align-items-center mt-3" style="color:white; font-size: 16px;">
+                                        <i class="fab fa-tiktok" style="font-size: 25px; color:white;width:25px"></i>
+                                        <span class="ms-2">servenow</span>
+                                    </a></li>
+                                <li><a href="https://www.pinterest.com" target="_blank"
+                                        class="d-flex align-items-center mt-3" style="color:white; font-size: 16px;">
+                                        <i class="fab fa-pinterest"
+                                            style="font-size: 25px; color:#E60023;width:25px"></i>
+                                        <span class="ms-2">serve now</span>
+                                    </a></li>
+                            </ul>
 
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        {{-- <div class="container">
-            <div class="row align-items-center">
-                <div class="col my-1 wow fadeInUp" data-wow-delay="0.4s">
-                    <p class="mb-0">
-                        ServeNow Copyright © 2024 All rights reserved
-                    </p>
-                </div>
-                <div class="col-auto my-1">
-                    <ul class="list-inline footer-sos-link mb-0">
-                        <li class="list-inline-item wow fadeInUp" data-wow-delay="0.4s">
-                            <a href="https://fb.com/phoenixcoded">
-                                <svg class="pc-icon">
-                                    <use xlink:href="#custom-facebook"></use>
-                                </svg>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div> --}}
-        <div class="container">
+
+        <!-- Footer Bottom -->
+        <div class="container mt-4">
             <div class="row justify-content-center">
-                <div class="col-auto my-1 wow fadeInUp" data-wow-delay="0.4s">
-                    <p class="mb-0 text-center">
-                        ServeNow Copyright © 2024 All rights reserved
+                <div class="col-auto text-center">
+                    <p class="mb-0 text-white" style="font-size:18px;">ServeNow Copyright © 2024 All rights reserved
                     </p>
                 </div>
             </div>
         </div>
-
     </footer>
+
+    <style>
+        /* Initial state: elements are off-screen and transparent */
+        .fade-in-right {
+            opacity: 0;
+            transform: translateX(150px);
+            /* Move the element 100px to the right */
+            transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+        }
+
+        /* When the class is added (after scrolling into view), elements move to their normal position and become visible */
+        .fade-in-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+            /* Move to original position */
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fadeElements = document.querySelectorAll('.fade-in-right');
+
+            function checkVisibility() {
+                fadeElements.forEach(element => {
+                    const rect = element.getBoundingClientRect();
+                    if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+                        element.classList.add('visible');
+                    }
+                });
+            }
+
+            // Listen for scroll and resize events to check visibility
+            window.addEventListener('scroll', checkVisibility);
+            window.addEventListener('resize', checkVisibility);
+
+            // Initial check in case the page is loaded with the footer in view
+            checkVisibility();
+        });
+    </script>
 
     <!-- [ footer apps ] End -->
 
