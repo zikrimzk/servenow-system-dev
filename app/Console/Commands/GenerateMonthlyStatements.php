@@ -97,7 +97,7 @@ class GenerateMonthlyStatements extends Command
             $totalCredit = $dataBooking->where('booking_status', 6)->sum('booking_rate');
             $totalUnCredit = $dataBooking->whereIn('booking_status', [5, 8])->sum('booking_rate');
 
-            $statementDate = Carbon::now()->format('F Y');
+            $statementDate = Carbon::now()->format('F_Y');
 
             $html = view('tasker.eStatement.statement-template', [
                 'title' => 'Tasker Monthly Statement',
@@ -109,24 +109,45 @@ class GenerateMonthlyStatements extends Command
             ])->render();
 
             // File path
-            $fileName = "public/statements/{$tasker->tasker_code}_{$statementDate}.pdf";
-            $filePath = storage_path("app/{$fileName}");
+            // $fileName = "public/statements/{$tasker->tasker_code}_{$statementDate}.pdf";
+            // $filePath = storage_path("app/{$fileName}");
+            // $fileName = "{$tasker->tasker_code}_{$statementDate}.pdf";
+            // $filePath = "statements/{$fileName}";
+
+            // Define the directory and file path
+            $directory = 'statements';
+            $fileName = "{$tasker->tasker_code}_{$statementDate}.pdf";
+            $filePath = "{$directory}/{$fileName}";
+
+            // Ensure the directory exists
+            if (!Storage::exists($directory)) {
+                Storage::makeDirectory($directory);
+            }
 
             // Generate PDF using Browsershot
             Browsershot::html($html)
-                ->margins(10, 20, 10, 20) 
+                ->margins(10, 20, 10, 20)
                 ->format('A4')
-                ->save($filePath);
+                ->save(storage_path("app/public/{$filePath}"));
 
-
+            $check = MonthlyStatement::where('tasker_id', $tasker->id)->where('start_date', $startDate)->where('end_date', $endDate)->exists();
             // Save statement details to the database
-            MonthlyStatement::create([
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-                'file_name' => $fileName,
-                'statement_status' => 0,
-                'tasker_id' => $tasker->id,
-            ]);
+            if (!$check) {
+                MonthlyStatement::create([
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                    'file_name' => $filePath,
+                    'statement_status' => 0,
+                    'total_earnings' => $totalCredit,
+                    'tasker_id' => $tasker->id,
+                ]);
+            }
+            else{
+                MonthlyStatement::where('tasker_id', $tasker->id)->where('start_date', $startDate)->where('end_date', $endDate)->update([
+                    'file_name' => $filePath,
+                ]);
+            }
+
 
             $this->info("Monthly statement generated for Tasker ID: {$tasker->id}");
         }

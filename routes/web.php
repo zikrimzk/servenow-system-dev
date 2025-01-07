@@ -1,18 +1,20 @@
 <?php
 
+use App\Models\Booking;
 use App\Models\Service;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\TaskerController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SettingController;
-use App\Http\Controllers\AuthenticateController;
-use App\Http\Controllers\AdministratorController;
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\EmailController;
+use App\Http\Controllers\StatementController;
 use App\Http\Controllers\PerformanceController;
-use App\Models\Booking;
+use App\Http\Controllers\AuthenticateController;
+use NunoMaduro\Collision\Adapters\Phpunit\State;
+use App\Http\Controllers\AdministratorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -158,6 +160,9 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     // Admin - e-Statement
     Route::get('/e-statement', [RouteController::class, 'eStatementAdminNav'])->name('admin-e-statement');
+    Route::get('/release-amount-{id}',[StatementController::class, 'adminUpdateStatementStatus'])->name('admin-release-amount');
+    Route::get('/refresh-statement',[StatementController::class, 'triggerGenerateButton'])->name('admin-refresh-statement');
+
 });
 
 /* Admin Route End */

@@ -280,8 +280,8 @@ class RouteController extends Controller
     public function clientBookingHistoryNav()
     {
 
-       
-      
+
+
         $booking = DB::table('bookings as a')
             ->join('services as c', 'a.service_id', '=', 'c.id')
             ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
@@ -1226,8 +1226,77 @@ class RouteController extends Controller
 
     public function eStatementTaskerNav(Request $request)
     {
-        return view('tasker.eStatement.statement-index',[
-            'title' => 'e-Statement'
+        $data = DB::table('taskers as a')
+            ->join('monthly_statements as b', 'a.id', 'b.tasker_id')
+            ->select(
+                'a.id as taskerID',
+                'b.id as statementID',
+                'a.tasker_firstname',
+                'a.tasker_lastname',
+                'a.tasker_phoneno',
+                'a.email',
+                'a.tasker_code',
+                'b.start_date',
+                'b.end_date',
+                'b.file_name',
+                'b.statement_status',
+                'b.total_earnings'
+            )
+            ->where('a.id', Auth::user()->id)
+            ->get();
+        // dd($data);
+
+        if ($request->ajax()) {
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('start_date', function ($row) {
+
+                $startdate = Carbon::parse($row->start_date)->format('d/m/Y');
+                return $startdate;
+            });
+
+            $table->addColumn('end_date', function ($row) {
+
+                $enddate = Carbon::parse($row->end_date)->format('d/m/Y');
+                return $enddate;
+            });
+
+            $table->addColumn('total_earnings', function ($row) {
+
+                if ($row->statement_status == 0) {
+                    $amount = '<span class="text-danger"> ' . $row->total_earnings . '</span>';
+                } else if ($row->statement_status == 1) {
+                    $amount = '<span class="text-success"> ' . $row->total_earnings . '</span>';
+                }
+                return $amount;
+            });
+
+
+            $table->addColumn('statement_status', function ($row) {
+
+                if ($row->statement_status == 0) {
+                    $status = '<span class="badge bg-light-warning">Pending</span>';
+                } else if ($row->statement_status == 1) {
+                    $status = '<span class="badge bg-light-success">Released</span>';
+                }
+                return $status;
+            });
+
+            $table->addColumn('file_name', function ($row) {
+                $file = '<a href="' . asset('storage' . '/' . $row->file_name)  . '" target="_blank" class="btn btn-link"><i class="fas fa-file-pdf text-danger me-2"></i>Download Statement</a>';
+                return $file;
+            });
+
+            $table->rawColumns(['start_date', 'end_date', 'total_earnings', 'statement_status', 'file_name']);
+
+            return $table->make(true);
+        }
+
+        return view('tasker.eStatement.statement-index', [
+            'title' => 'e-Statement',
+            'data' => $data
+
         ]);
     }
 
@@ -1235,23 +1304,23 @@ class RouteController extends Controller
     {
         $dataTasker = Tasker::where('id', Auth::user()->id)->first();
         $dataBooking = DB::table('taskers as a')
-        ->join('services as b', 'a.id', '=', 'b.tasker_id')
-        ->join('bookings as c', 'b.id', '=', 'c.service_id')
-        ->where('a.id', Auth::user()->id)
-        ->whereBetween('c.booking_date', ['2025-01-01','2025-01-31'])
-        ->get();
+            ->join('services as b', 'a.id', '=', 'b.tasker_id')
+            ->join('bookings as c', 'b.id', '=', 'c.service_id')
+            ->where('a.id', Auth::user()->id)
+            ->whereBetween('c.booking_date', ['2025-01-01', '2025-01-31'])
+            ->get();
 
         $totalCredit = $dataBooking->where('booking_status', 6)->sum('booking_rate');
-        $totalUnCredit = $dataBooking->whereIn('booking_status', [5,8])->sum('booking_rate');
+        $totalUnCredit = $dataBooking->whereIn('booking_status', [5, 8])->sum('booking_rate');
         $statement_dateMY = Carbon::parse('2025-01-01')->format('F Y');
-        
-        return view('tasker.eStatement.statement-template',[
+
+        return view('tasker.eStatement.statement-template', [
             'title' => 'Tasker Monthly Statement',
-            'tasker'=>$dataTasker,
-            'dataBooking'=>$dataBooking,
-            'totalCredit'=>$totalCredit,
-            'totalUnCredit'=>$totalUnCredit,
-            'statement_dateMY'=>$statement_dateMY
+            'tasker' => $dataTasker,
+            'dataBooking' => $dataBooking,
+            'totalCredit' => $totalCredit,
+            'totalUnCredit' => $totalUnCredit,
+            'statement_dateMY' => $statement_dateMY
         ]);
     }
 
@@ -3124,28 +3193,120 @@ class RouteController extends Controller
 
     public function eStatementAdminNav(Request $request)
     {
-        return view('administrator.eStatement.statement-index',[
-            'title' => 'e-Statement'
+        $data = DB::table('taskers as a')
+            ->join('monthly_statements as b', 'a.id', 'b.tasker_id')
+            ->select(
+                'a.id as taskerID',
+                'b.id as statementID',
+                'a.tasker_firstname',
+                'a.tasker_lastname',
+                'a.tasker_phoneno',
+                'a.email',
+                'a.tasker_code',
+                'b.start_date',
+                'b.end_date',
+                'b.file_name',
+                'b.statement_status',
+                'b.total_earnings'
+            )
+            ->get();
+        // dd($data);
+
+        if ($request->ajax()) {
+
+            $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('tasker_code', function ($row) {
+                $tasker = '<a href="#taskerDetailsModal" data-bs-toggle="modal" data-bs-target="#taskerDetailsModal-' . $row->tasker_code . '" class="btn btn-link">' . $row->tasker_code . '</a>';
+                return $tasker;
+            });
+
+            $table->addColumn('start_date', function ($row) {
+
+                $startdate = Carbon::parse($row->start_date)->format('d/m/Y');
+                return $startdate;
+            });
+
+            $table->addColumn('end_date', function ($row) {
+
+                $enddate = Carbon::parse($row->end_date)->format('d/m/Y');
+                return $enddate;
+            });
+
+            $table->addColumn('total_earnings', function ($row) {
+
+                if ($row->statement_status == 0) {
+                    $amount = '<span class="text-danger"> ' . $row->total_earnings . '</span>';
+                } else if ($row->statement_status == 1) {
+                    $amount = '<span class="text-success"> ' . $row->total_earnings . '</span>';
+                }
+                return $amount;
+            });
+
+
+            $table->addColumn('statement_status', function ($row) {
+
+                if ($row->statement_status == 0) {
+                    $status = '<span class="badge bg-light-warning">Pending</span>';
+                } else if ($row->statement_status == 1) {
+                    $status = '<span class="badge bg-light-success">Released</span>';
+                }
+                return $status;
+            });
+
+            $table->addColumn('file_name', function ($row) {
+                $file = '<a href="' . asset('storage' . '/' . $row->file_name)  . '" target="_blank" class="btn btn-link"><i class="fas fa-file-pdf text-danger me-2"></i>' . $row->tasker_code . '_' . Carbon::parse($row->start_date)->format('F') . '.pdf' . '</a>';
+                return $file;
+            });
+
+            $table->addColumn('action', function ($row) {
+
+                if ($row->statement_status == 0) {
+
+                    $button =
+                        '
+                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#releaseModal-' . $row->statementID . '">
+                            <i class="fas fa-check"></i>
+                        </a>
+                    ';
+                } else if ($row->statement_status == 1) {
+
+                    $button =
+                        '
+                    ';
+                }
+
+
+
+
+                return $button;
+            });
+
+            $table->rawColumns(['tasker_code', 'start_date', 'end_date', 'total_earnings', 'statement_status', 'file_name', 'action']);
+
+            return $table->make(true);
+        }
+        return view('administrator.eStatement.statement-index', [
+            'title' => 'e-Statement',
+            'data' => $data,
+            'taskers' => Tasker::get()
         ]);
     }
 
 
 
-    public function cardVerificationLog(Request $request) 
+    public function cardVerificationLog(Request $request)
     {
-        return view('administrator.ekyc.card-log',[
+        return view('administrator.ekyc.card-log', [
             'title' => 'e-KYC Card Log'
         ]);
     }
 
     public function faceVerificationLog(Request $request)
     {
-        return view('administrator.ekyc.face-log',[
+        return view('administrator.ekyc.face-log', [
             'title' => 'e-KYC Face Log'
         ]);
     }
-
-
-   
-
 }
