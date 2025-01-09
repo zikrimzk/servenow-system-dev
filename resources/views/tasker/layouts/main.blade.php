@@ -323,7 +323,7 @@
 
     
     <script>
-        localStorage.setItem('layout', 'vertical');
+        localStorage.setItem('layout', 'color-header');
     </script>
 
     <script>

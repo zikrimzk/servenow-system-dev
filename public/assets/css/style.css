@@ -20347,12 +20347,12 @@ pre[class*=language-] > code {
   --pc-sidebar-background: #fff;
   --pc-sidebar-border: none;
   --pc-header-color: #fff;
-  --pc-layout-2-color: #4680ff;
+  --pc-layout-2-color:  linear-gradient(to right,#16325b, #005d88,#008a9d);
   background: var(--pc-layout-2-color);
   position: relative;
 }
 [data-pc-layout=color-header] a.preset.preset-1 {
-  background: #4680ff;
+  background: #16325b;
 }
 [data-pc-layout=color-header] a.preset.preset-gradient-1 {
   background: linear-gradient(to right, #4680ff 0%, #79a3ff 100%);

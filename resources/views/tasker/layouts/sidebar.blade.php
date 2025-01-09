@@ -1,9 +1,9 @@
 <nav class="pc-sidebar">
     <div class="navbar-wrapper">
-        <div class="m-header d-flex  align-items-center">
+        <div class="m-header d-flex  align-items-center justify-content-center">
             <a href="../dashboard/index.html" class="b-brand text-primary">
                 <!-- ========   Change your logo from here   ============ -->
-                <img src="../assets/images/logo-test.png" class="img-fluid" width="140" height="70" alt="logo" />
+                <img src="../assets/images/logo-test-whites.png" class="img-fluid" width="140" height="70" alt="logo" />
             </a>
         </div>
         <div class="navbar-content">
