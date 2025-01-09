@@ -28,6 +28,11 @@
         .card-cancelled {
             border-left: 4px solid #dc3545;
         }
+
+        .table td {
+            word-wrap: break-word;
+            white-space: normal;
+        }
     </style>
     <!-- [ Main Content ] start -->
     <div class="pc-container">
@@ -788,6 +793,16 @@
                     table.draw();
                 });
 
+                $('#clearAllBtn').on('click', function(e) {
+                    e.preventDefault();
+                    $('#startMonth').val('');
+                    $('#endMonth').val('');
+                    $('#tasker_filter').val('');
+                    $('#status_filter').val('');
+                    table.ajax.reload();
+                    table.draw();
+                });
+
 
                 // Approve/Reject Action
                 $('#refreshStatementBtn').on('click', function() {
@@ -806,15 +821,7 @@
                     );
                 });
 
-                $('#clearAllBtn').on('click', function(e) {
-                    e.preventDefault();
-                    $('#startMonth').val('');
-                    $('#endMonth').val('');
-                    $('#tasker_filter').val('');
-                    $('#status_filter').val('');
-                    table.ajax.reload();
-                    table.draw();
-                });
+               
 
 
 

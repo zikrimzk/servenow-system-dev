@@ -1243,9 +1243,22 @@ class RouteController extends Controller
                 'b.statement_status',
                 'b.total_earnings'
             )
-            ->where('a.id', Auth::user()->id)
-            ->get();
-        // dd($data);
+            ->where('a.id', Auth::user()->id);
+
+        if ($request->has('startMonth') && $request->has('endMonth') && $request->input('startMonth') != '' && $request->input('endMonth') != '') {
+            $startDate = Carbon::parse($request->input('startMonth'))->endOfMonth()->format('Y-m-d');
+            $endDate = Carbon::parse($request->input('endMonth'))->endOfMonth()->format('Y-m-d');
+
+            if ($startDate && $endDate) {
+                $data->whereBetween('b.end_date', [$startDate, $endDate]);
+            }
+        }
+
+        if ($request->has('status_filter') && $request->input('status_filter') != '') {
+            $data->where('b.statement_status', $request->input('status_filter'));
+        }
+
+        $data = $data->get();
 
         if ($request->ajax()) {
 
@@ -1285,7 +1298,7 @@ class RouteController extends Controller
             });
 
             $table->addColumn('file_name', function ($row) {
-                $file = '<a href="' . asset('storage' . '/' . $row->file_name)  . '" target="_blank" class="btn btn-link"><i class="fas fa-file-pdf text-danger me-2"></i>Download Statement</a>';
+                $file = '<a href="' . asset('storage' . '/' . $row->file_name)  . '" target="_blank" class="btn btn-link"><i class="fas fa-file-pdf text-danger me-2"></i>View e-Statement</a>';
                 return $file;
             });
 
@@ -1293,10 +1306,59 @@ class RouteController extends Controller
 
             return $table->make(true);
         }
+        $tobeReleased = MonthlyStatement::where('tasker_id', Auth::user()->id)->where('statement_status', 0)->sum('total_earnings');
+
+        //calculation of amount have been released
+        $currentYear = now()->year;
+
+        $releasedAll = MonthlyStatement::where('tasker_id', Auth::user()->id)->where('statement_status', 1)->sum('total_earnings');
+
+        $releasedthisyear = MonthlyStatement::where('tasker_id', Auth::user()->id)->where('statement_status', 1)->whereYear('end_date', $currentYear)->sum('total_earnings');
+
+        $monthlyLabels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+
+        $monthlyReleasedAmounts = MonthlyStatement::where('tasker_id', Auth::user()->id)->selectRaw('MONTH(end_date) as month, SUM(total_earnings) as total')
+            ->where('statement_status', 1)
+            ->whereYear('end_date', $currentYear) // Filter records for the current year
+            ->groupBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+
+        $monthlyReleasedAmounts = array_replace(array_fill(1, 12, 0), $monthlyReleasedAmounts);
+        $monthlyReleasedAmountsWithLabels = [];
+        foreach ($monthlyReleasedAmounts as $monthIndex => $amount) {
+            $monthlyReleasedAmountsWithLabels[$monthlyLabels[$monthIndex - 1]] = $amount; // $monthIndex is 1-based
+        }
+
+        // dd($monthlyReleasedAmountsWithLabels);
+
+        $yearlyLabels = MonthlyStatement::where('tasker_id', Auth::user()->id)->selectRaw('YEAR(end_date) as year')
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year')
+            ->toArray();
+
+        $yearlyReleasedAmounts = MonthlyStatement::where('tasker_id', Auth::user()->id)->selectRaw('YEAR(end_date) as year, SUM(total_earnings) as total')
+            ->where('statement_status', 1)
+            ->groupBy('year')
+            ->pluck('total', 'year')
+            ->toArray();
+
+        // dd($tobeReleased, $releasedAll, $releasedthisyear, $monthlyReleasedAmountsWithLabels, $yearlyLabels, $yearlyReleasedAmounts);
+
+
 
         return view('tasker.eStatement.statement-index', [
             'title' => 'e-Statement',
-            'data' => $data
+            'data' => $data,
+            'tobeReleased' => $tobeReleased,
+            'releasedthisyear' => $releasedthisyear,
+            'releasedAll' => $releasedAll,
+            'monthlyLabels' => $monthlyLabels,
+            'monthlyReleasedAmounts' => $monthlyReleasedAmountsWithLabels,
+            'yearlyLabels' => $yearlyLabels,
+            'yearlyReleasedAmounts' => $yearlyReleasedAmounts,
 
         ]);
     }
@@ -1307,13 +1369,22 @@ class RouteController extends Controller
         $dataBooking = DB::table('taskers as a')
             ->join('services as b', 'a.id', '=', 'b.tasker_id')
             ->join('bookings as c', 'b.id', '=', 'c.service_id')
+            ->join('clients as d', 'c.client_id', '=', 'd.id')
             ->where('a.id', Auth::user()->id)
             ->whereBetween('c.booking_date', ['2025-01-01', '2025-01-31'])
             ->get();
 
         $totalCredit = $dataBooking->where('booking_status', 6)->sum('booking_rate');
-        $totalUnCredit = $dataBooking->whereIn('booking_status', [5, 8])->sum('booking_rate');
+        $totalUnCredit = $dataBooking->whereIn('booking_status', [5, 7, 8])->sum('booking_rate');
+
         $statement_dateMY = Carbon::parse('2025-01-01')->format('F Y');
+        $todayDate = Carbon::now()->format('d/m/Y');
+        $system_charges_rate = 3;
+        $system_charges = $totalCredit * ($system_charges_rate / 100);
+        $totalToBeCredited = $totalCredit - $system_charges;
+
+        $totalTransaction = $dataBooking->whereIn('booking_status', [6, 7, 8])->count();
+
 
         return view('tasker.eStatement.statement-template', [
             'title' => 'Tasker Monthly Statement',
@@ -1321,7 +1392,13 @@ class RouteController extends Controller
             'dataBooking' => $dataBooking,
             'totalCredit' => $totalCredit,
             'totalUnCredit' => $totalUnCredit,
-            'statement_dateMY' => $statement_dateMY
+            'statement_dateMY' => $statement_dateMY,
+            'todayDate' => $todayDate,
+            'system_charges_rate' => $system_charges_rate,
+            'system_charges' => $system_charges,
+            'totalToBeCredited' => $totalToBeCredited,
+            'totalTransaction' => $totalTransaction
+
         ]);
     }
 
@@ -2607,6 +2684,8 @@ class RouteController extends Controller
         ]);
     }
 
+    // Admin Review Management
+    //Updated by: Zikri (3/1/2025)
     public function adminReviewManagementNav(Request $request)
     {
         $data = DB::table('bookings as a')
@@ -2892,6 +2971,8 @@ class RouteController extends Controller
         ]);
     }
 
+    // Admin Tasker Performance Management
+    //Updated by: Zikri (3/1/2025)
     public function adminTaskerPerformanceNav(Request $request)
     {
         $taskers = DB::table('taskers')
@@ -3192,6 +3273,8 @@ class RouteController extends Controller
         ]);
     }
 
+    // Admin eStatement Management
+    //Updated by: Zikri (9/1/2025)
     public function eStatementAdminNav(Request $request)
     {
         $data = DB::table('taskers as a')
@@ -3210,7 +3293,6 @@ class RouteController extends Controller
                 'b.statement_status',
                 'b.total_earnings'
             );
-        // dd($data);
 
         if ($request->has('startMonth') && $request->has('endMonth') && $request->input('startMonth') != '' && $request->input('endMonth') != '') {
             $startDate = Carbon::parse($request->input('startMonth'))->endOfMonth()->format('Y-m-d');
@@ -3362,8 +3444,6 @@ class RouteController extends Controller
             'yearlyReleasedAmounts' => $yearlyReleasedAmounts,
         ]);
     }
-
-
 
     public function cardVerificationLog(Request $request)
     {

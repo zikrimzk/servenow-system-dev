@@ -1,72 +1,6 @@
 @extends('administrator.layouts.main')
 
 @section('content')
-    <style>
-        .alphabet-filter-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
-            /* Responsive grid */
-            gap: 5px;
-            /* Spacing between items */
-            /* padding: 5px; */
-            /* background-color: #f8f9fa; */
-            /* Light background */
-            /* border: 1px solid #ddd; */
-            /* Subtle border */
-            border-radius: 5px;
-            /* Rounded corners */
-        }
-
-        .alphabet-link {
-            display: block;
-            text-align: center;
-            padding: 6px 9px;
-            font-size: 14px;
-            font-weight: 500;
-            text-decoration: none;
-            color: #000000;
-            /* Bootstrap primary color */
-            border: 1px solid #ddd;
-            /* Button-like border */
-            border-radius: 5px;
-            /* Rounded edges */
-            transition: all 0.2s ease-in-out;
-        }
-
-        .alphabet-link:hover,
-        .alphabet-link.active {
-            background-color: #091b2d;
-            color: #fff;
-            /* White text on active/hover */
-            border-color: #1e4167;
-            /* Darker border */
-        }
-
-        .card-all {
-            border-left: 4px solid #10100f;
-        }
-
-        .card-unactive {
-            border-left: 4px solid #ffc107;
-        }
-
-        .card-active {
-            border-left: 4px solid #28a745;
-        }
-
-        .card-deactive {
-            border-left: 4px solid #dc3545;
-        }
-
-        .card-inactive {
-            border-left: 4px solid #838592;
-        }
-
-        .wrap-text {
-            white-space: normal !important;
-            word-wrap: break-word;
-        }
-    </style>
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
@@ -76,7 +10,7 @@
                     <div class="row align-items-center">
                         <div class="col-md-12">
                             <ul class="breadcrumb">
-                                <li class="breadcrumb-item">Users</li>
+                                <li class="breadcrumb-item">e-KYC</li>
                                 <li class="breadcrumb-item" aria-current="page">e-KYC Face Verification Log</li>
 
                             </ul>
@@ -121,9 +55,6 @@
             <!-- End Alert -->
 
             <div class="card custom-card">
-                <div class="card-header">
-                    <div class="card-title">Servenow e-KYC Face Log</div>
-                </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table text-nowrap data-table">
@@ -144,107 +75,83 @@
                     </div>
                 </div>
 
+            </div>
         </div>
-    </div>
 
 
-    <!-- [ Main Content ] end -->
+        <!-- [ Main Content ] end -->
 
-    <script>
-        $(document).ready(function() {
-            var table = $('.data-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('show-face-logs') }}",
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        searchable: false
-                    },
-                    {
-                        data: 'requestId',
-                        name: 'requestId'
-                    },
-                    {
-                        data: 'requestedBy',
-                        name: 'requestedBy'
-                    },
-                    {
-                        data: 'res',
-                        name: 'res'
-                    },
-                    {
-                        data: 'compareWith',
-                        name: 'compareWith'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status'
-                    },
-                    {
-                        data: 'responseTime',
-                        name: 'responseTime'
-                    },
-                    {
-                        data: 'domain',
-                        name: 'domain'
-                    },
-                    {
-                        data: 'verifiedAt',
-                        name: 'verifiedAt'
-                    },
-                ],
-                dom: 'Bfrtip',
-                buttons: [{
-                        extend: 'copy',
-                        text: 'Copy Data',
-                        exportOptions: {
-                            columns: ':not(:last-child)'
-                        }
-                    },
-                    {
-                        extend: 'csv',
-                        text: 'Export CSV',
-                        exportOptions: {
-                            columns: ':not(:last-child)'
-                        }
-                    },
-                    {
-                        extend: 'excel',
-                        text: 'Export Excel',
-                        exportOptions: {
-                            columns: ':not(:last-child)'
-                        }
-                    },
-                    {
-                        extend: 'pdf',
-                        text: 'Export PDF',
-                        exportOptions: {
-                            columns: ':not(:last-child)'
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        text: 'Print Data',
-                        exportOptions: {
-                            columns: ':not(:last-child)'
-                        }
+        <script>
+            $(document).ready(function() {
+                var table = $('.data-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: "{{ route('show-face-logs') }}",
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            searchable: false
+                        },
+                        {
+                            data: 'requestId',
+                            name: 'requestId'
+                        },
+                        {
+                            data: 'requestedBy',
+                            name: 'requestedBy'
+                        },
+                        {
+                            data: 'res',
+                            name: 'res'
+                        },
+                        {
+                            data: 'compareWith',
+                            name: 'compareWith'
+                        },
+                        {
+                            data: 'status',
+                            name: 'status'
+                        },
+                        {
+                            data: 'responseTime',
+                            name: 'responseTime'
+                        },
+                        {
+                            data: 'domain',
+                            name: 'domain'
+                        },
+                        {
+                            data: 'verifiedAt',
+                            name: 'verifiedAt'
+                        },
+                    ],
+                    language: {
+                        emptyTable: "No data available in the table.",
+                        loadingRecords: "Loading...",
+                        processing: "Processing...",
+                        zeroRecords: "No matching records found.",
+                        paginate: {
+                            first: "First",
+                            last: "Last",
+                            next: "Next",
+                            previous: "Previous"
+                        },
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        infoEmpty: "Showing 0 to 0 of 0 entries",
+                        infoFiltered: "(filtered from _MAX_ total entries)"
                     }
-                ],
-                "language": {
-                    "emptyTable": "No records found"
-                }
+                });
             });
-        });
-    </script>
+        </script>
 
-    <style>
-        .table td {
-            word-wrap: break-word; /* Membenarkan teks untuk dibungkus pada baris baru */
-            white-space: normal; /* Menetapkan teks supaya tidak dipaksa ke satu baris */
-        }
-    </style>
+        <style>
+            .table td {
+                word-wrap: break-word;
+                /* Membenarkan teks untuk dibungkus pada baris baru */
+                white-space: normal;
+                /* Menetapkan teks supaya tidak dipaksa ke satu baris */
+            }
+        </style>
+    @endsection
 
-@endsection
-
-<!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
+    <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->

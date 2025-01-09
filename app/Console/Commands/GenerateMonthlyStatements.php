@@ -38,7 +38,7 @@ class GenerateMonthlyStatements extends Command
 
     public function handle()
     {
-        $taskers = Tasker::whereIn('tasker_status', [2,3])->get(); // Fetch all taskers
+        $taskers = Tasker::whereIn('tasker_status', [2, 3])->get(); // Fetch all taskers
         $startDate = Carbon::now()->startOfMonth()->toDateString();
         $endDate = Carbon::now()->endOfMonth()->toDateString();
         $todayDate = Carbon::now()->format('d/m/Y');
@@ -48,14 +48,21 @@ class GenerateMonthlyStatements extends Command
             $dataBooking = DB::table('taskers as a')
                 ->join('services as b', 'a.id', '=', 'b.tasker_id')
                 ->join('bookings as c', 'b.id', '=', 'c.service_id')
+                ->join('clients as d', 'c.client_id', '=', 'd.id')
                 ->where('a.id', $tasker->id)
                 ->whereBetween('c.booking_date', [$startDate, $endDate])
                 ->get();
 
             $totalCredit = $dataBooking->where('booking_status', 6)->sum('booking_rate');
-            $totalUnCredit = $dataBooking->whereIn('booking_status', [5, 8])->sum('booking_rate');
+            $totalUnCredit = $dataBooking->whereIn('booking_status', [5, 7, 8])->sum('booking_rate');
+            $statementFileDate = Carbon::now()->format('F_Y');
+            $statementDate = Carbon::now()->format('F Y');
+            $system_charges_rate = 3;
+            $system_charges = $totalCredit * ($system_charges_rate / 100);
+            $totalToBeCredited = $totalCredit - $system_charges;
 
-            $statementDate = Carbon::now()->format('F_Y');
+            $totalTransaction = $dataBooking->whereIn('booking_status', [6, 7, 8])->count();
+
 
             $html = view('tasker.eStatement.statement-template', [
                 'title' => 'Tasker Monthly Statement',
@@ -64,12 +71,16 @@ class GenerateMonthlyStatements extends Command
                 'totalCredit' => $totalCredit,
                 'totalUnCredit' => $totalUnCredit,
                 'statement_dateMY' => $statementDate,
-                'todayDate' => $todayDate
+                'todayDate' => $todayDate,
+                'system_charges_rate' => $system_charges_rate,
+                'system_charges' => $system_charges,
+                'totalToBeCredited' => $totalToBeCredited,
+                'totalTransaction' => $totalTransaction
             ])->render();
 
             // Define the directory and file path
             $directory = 'statements';
-            $fileName = "{$tasker->tasker_code}_{$statementDate}.pdf";
+            $fileName = "{$tasker->tasker_code}_{$statementFileDate}.pdf";
             $filePath = "{$directory}/{$fileName}";
 
             // Ensure the directory exists
@@ -79,7 +90,7 @@ class GenerateMonthlyStatements extends Command
 
             // Generate PDF using Browsershot
             Browsershot::html($html)
-                ->margins(10, 20, 10, 20)
+                ->margins(10, 10, 10, 10)
                 ->format('A4')
                 ->save(storage_path("app/public/{$filePath}"));
 
@@ -91,7 +102,7 @@ class GenerateMonthlyStatements extends Command
                     'end_date' => $endDate,
                     'file_name' => $filePath,
                     'statement_status' => 0,
-                    'total_earnings' => $totalCredit,
+                    'total_earnings' => $totalToBeCredited,
                     'tasker_id' => $tasker->id,
                 ]);
 
@@ -100,7 +111,7 @@ class GenerateMonthlyStatements extends Command
                     'statement_status' => 0,
                     'month_year' => Carbon::parse($startDate)->format('F Y'),
                     'date' => Carbon::now()->format('d F Y g:i A'),
-                    'total_earnings' => $totalCredit,
+                    'total_earnings' => $totalToBeCredited,
                 ]));
             }
 

@@ -40,6 +40,23 @@
             padding-top: 10px;
         }
 
+        .table-statement th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid #dee2e6;
+        }
+
+        .table-statement td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+        }
+
+        .table-statement .table-summary td {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
         /* Print styles */
         @media print {
             body {
@@ -67,7 +84,8 @@
         <!-- Company Header -->
         <div class="row align-items-center justify-content-between">
             <div class="col-6 text-start">
-                <img src="https://www.servenow.com.my/assets/images/logo-test.png" class="img-fluid" style="max-height: 100px;" alt="logo" />
+                <img src="https://www.servenow.com.my/assets/images/logo-test.png" class="img-fluid"
+                    style="max-height: 100px;" alt="logo" />
                 {{-- <h5 class="fw-bold">ServeNow Sdn Bhd</h5>
                 <p>Jalan Hang Tuah Jaya, 76100 Durian Tunggal, Melaka</p> --}}
             </div>
@@ -78,7 +96,7 @@
         <hr>
 
         <!-- Statement Details -->
-        <div class="row mb-5">
+        <div class="row mb-5 justify-content-between">
             <div class="col-6">
                 <p class="fw-bold mb-0">{{ Str::upper($tasker->tasker_firstname . ' ' . $tasker->tasker_lastname) }}</p>
                 <p class="mb-0">{{ Str::upper($tasker->tasker_address_one) }}</p>
@@ -88,8 +106,31 @@
                 <p class="mb-0">{{ Str::upper($tasker->tasker_address_state) }}</p>
             </div>
             <div class="col-6 text-end">
-                <p><strong>Statement Date:</strong> {{ $todayDate }}</p>
+                <table style="width:100%">
+                    <tr>
+                        <td><p class="mb-0">Statement Date</p></td>
+                        <td>:</td>
+                        <td><p class="mb-0">{{ $todayDate }}</p></td>
+
+                    </tr>
+                    <tr>
+                        <td><p class="mb-0">Total Credit Amount</p></td>
+                        <td>:</td>
+                        <td><p class="mb-0">RM {{ number_format($totalCredit,2) }}</p></td>
+                    </tr>
+                    <tr>
+                        <td><p class="mb-0">Total Debit Amount</p></td>
+                        <td>:</td>
+                        <td><p class="mb-0">RM {{ number_format($totalUnCredit,2) }}</p></td>
+                    </tr>
+                    <tr>
+                        <td><p class="mb-0">Number of Transactions</p></td>
+                        <td>:</td>
+                        <td><p class="mb-0">{{ $totalTransaction }}</p></td>
+                    </tr>
+                </table>
             </div>
+
         </div>
 
         <!-- Booking Summary Table -->
@@ -105,56 +146,62 @@
                 <p class="mb-0">{{ $tasker->tasker_account_number != '' ? $tasker->tasker_account_number : '-' }}</p>
             </div>
         </div>
-        <table class="table table-bordered">
+        <table class="table table-bordered table-statement">
             <thead class="table-light">
-                <tr>
-                    <th>Booking Date</th>
+                <tr class="text-center">
+                    <th>Date</th>
                     <th>Description</th>
                     <th> - </th>
-                    <th> +</th>
+                    <th> + </th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($dataBooking as $b)
                     <tr>
-                        <td>{{ $b->booking_date }}</td>
-                        <td>
-                            <p class="mb-1 mt-0 fw-bold">{{ $b->booking_order_id }}</p>
-                            <p class="mb-0 mt-0">{{ $b->booking_address }}</p>
+                        <td style="vertical-align: top; text-align: left;">
+                            {{ Carbon\Carbon::parse($b->booking_date)->format('d/m/Y') }}
+                        </td>
+                        <td style="vertical-align: top; text-align: left;">
+                            <p class="mb-0 fw-bold">{{ $b->booking_order_id }}</p>
+                            <p class="mb-0 fst-italic">
+                                {{ Str::headline($b->client_firstname . ' ' . $b->client_lastname) }}</p>
                             @if ($b->booking_status == 6)
-                                <p class="text-muted mb-0 mt-0">Completed</p>
+                                <p class="mb-0">Completed</p>
+                            @elseif ($b->booking_status == 7)
+                                <p class="mb-0">Refund in Progress</p>
                             @elseif($b->booking_status == 5)
-                                <p class="text-muted mb-0 mt-0">Cancelled</p>
+                                <p class="mb-0">Cancelled</p>
                             @elseif($b->booking_status == 8)
-                                <p class="text-muted mb-0 mt-0">Refunded</p>
+                                <p class="mb-0">Refunded</p>
                             @endif
                         </td>
-
-                        <td>
-                            @if ($b->booking_status == 5)
-                                {{ $b->booking_rate }}
-                            @elseif($b->booking_status == 8)
-                               {{ $b->booking_rate }}
+                        <td style="vertical-align: top; text-align: right;">
+                            @if ($b->booking_status == 5 || $b->booking_status == 7 || $b->booking_status == 8)
+                                {{ $minusNumber = number_format($b->booking_rate, 2) }}
                             @endif
                         </td>
-                        <td>
+                        <td style="vertical-align: top; text-align: right;">
                             @if ($b->booking_status == 6)
-                                {{ $b->booking_rate }}
+                                {{ $addnumber = number_format($b->booking_rate, 2) }}
                             @endif
                         </td>
                     </tr>
                 @endforeach
-                <tr class="table-summary">
-                    <td colspan="2" class="text-end">Total Uncredited Amount (RM)</td>
-                    <td class="text-danger">{{ $totalUnCredit }}</td>
-                    <td class="credit"></td>
-
+                <tr class="table-summary fw-bold">
+                    <td colspan="2" class="text-end">Total Amount (RM)</td>
+                    <td class="text-danger" style="text-align: right;">{{ number_format($totalUnCredit, 2) }}</td>
+                    <td class="text-success" style="text-align: right;">{{ number_format($totalCredit, 2) }}</td>
                 </tr>
-                <tr class="table-summary">
-                    <td colspan="2" class="text-end">Total Amount to Be Credited for {{ $statement_dateMY }} (RM)</td>
-                    <td class="credit"></td>
-
-                    <td class="text-success">{{ $totalCredit }}</td>
+                <tr class="table-summary fw-bold">
+                    <td colspan="2" class="text-end">System Charges ({{ $system_charges_rate }}%)</td>
+                    <td></td>
+                    <td class="text-danger" style="text-align: right;">(-) {{ number_format($system_charges, 2) }}</td>
+                </tr>
+                <tr class="table-summary fw-bold">
+                    <td colspan="2" class="text-end">Total Amount to be Credited for {{ $statement_dateMY }} (RM)
+                    </td>
+                    <td></td>
+                    <td class="text-dark" style="text-align: right;">{{ number_format($totalToBeCredited, 2) }}</td>
                 </tr>
             </tbody>
         </table>
