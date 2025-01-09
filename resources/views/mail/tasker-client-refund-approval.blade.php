@@ -168,7 +168,7 @@
 
             @if ($data['users'] == 1 || $data['users'] == 3 || $data['users'] == 5)
                 {{-- Client --}}
-                <p>Thank you for your continued trust in ServeNow. We are committed to ensuring your satisfaction and
+                <p>Thank you for your continued trust in ServeNow. We are committed to ensure your satisfaction and
                     look forward to serving you again in the future.</p>
             @elseif ($data['users'] == 2)
                 {{-- Tasker --}}

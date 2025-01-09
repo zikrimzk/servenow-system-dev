@@ -13,8 +13,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
-        $schedule->command('generate:monthly-statements')->monthlyOn(Carbon::now()->daysInMonth, '23:59');
+        //every end of month at 10:00 pm to generate monthly statements
+        $schedule->command('generate:monthly-statements')->monthlyOn(Carbon::now()->daysInMonth, '22:00');
     }
 
     /**

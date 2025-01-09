@@ -162,6 +162,8 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/e-statement', [RouteController::class, 'eStatementAdminNav'])->name('admin-e-statement');
     Route::get('/release-amount-{id}',[StatementController::class, 'adminUpdateStatementStatus'])->name('admin-release-amount');
     Route::get('/refresh-statement',[StatementController::class, 'triggerGenerateButton'])->name('admin-refresh-statement');
+    Route::post('/release-multiple-amount',[StatementController::class, 'adminUpdateMultipleStatementStatus'])->name('admin-release-multiple-amount');
+
 
 });
 

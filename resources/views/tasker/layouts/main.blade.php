@@ -29,21 +29,22 @@
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
     <link rel="stylesheet" href="../assets/css/style-preset.css" />
 
+    <!-- [DataTables Links & File] -->
     <link rel="stylesheet" href="../assets/css/plugins/dataTables.bootstrap5.min.css" />
     <link rel="stylesheet" href="../assets/css/plugins/responsive.bootstrap5.min.css" />
     <link href="../assets/css/plugins/animate.min.css" rel="stylesheet" type="text/css" /> 
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="../assets/js/plugins/dataTables.min.js"></script>
     <script src="../assets/js/plugins/dataTables.bootstrap5.min.js"></script>
     <script src="../assets/js/plugins/dataTables.responsive.min.js"></script>
     <script src="../assets/js/plugins/responsive.bootstrap5.min.js"></script>
     <script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
+    
+    <!-- [Flatpicker CSS File] -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
+    <!-- [FullCalandarJS File]* -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
 
 </head>
 
@@ -304,13 +305,6 @@
     <!-- Theme Setting end [To be Deleted] -->
 
 
-
-    <!-- [Page Specific JS] start -->
-    {{-- <script src="../assets/js/plugins/apexcharts.min.js"></script>
-    <script src="../assets/js/pages/dashboard-analytics.js"></script> --}}
-    <!-- [Page Specific JS] end -->
-
-
     <!-- Required Js -->
     <script src="../assets/js/plugins/popper.min.js"></script>
     <script src="../assets/js/plugins/simplebar.min.js"></script>
@@ -328,11 +322,6 @@
     <script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
 
     
-
-    {{-- <script src="../assets/js/plugins/index.global.min.js"></script>
-    <script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
-    <script src="../assets/js/pages/calendar.js"></script> --}}
-
     <script>
         localStorage.setItem('layout', 'vertical');
     </script>

@@ -4,11 +4,14 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use App\Models\Tasker;
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use App\Models\MonthlyStatement;
 use Illuminate\Support\Facades\DB;
 use Spatie\Browsershot\Browsershot;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\MonthlyStatementNotification;
 
 class GenerateMonthlyStatements extends Command
 {
@@ -32,58 +35,13 @@ class GenerateMonthlyStatements extends Command
 
     protected $signature = 'generate:monthly-statements';
     protected $description = 'Generate monthly statements for all taskers and save them in the database';
-    // public function handle()
-    // {
-    //     $taskers = Tasker::all();
-    //     $startDate = Carbon::now()->startOfMonth()->toDateString();
-    //     $endDate = Carbon::now()->endOfMonth()->toDateString();
-
-    //     foreach ($taskers as $tasker) {
-    //         // Fetch booking data for the tasker
-    //         $dataBooking = DB::table('taskers as a')
-    //             ->join('services as b', 'a.id', '=', 'b.tasker_id')
-    //             ->join('bookings as c', 'b.id', '=', 'c.service_id')
-    //             ->where('a.id', $tasker->id)
-    //             ->whereBetween('c.booking_date', [$startDate, $endDate])
-    //             ->get();
-
-    //         $totalCredit = $dataBooking->where('booking_status', 6)->sum('booking_rate');
-    //         $totalUnCredit = $dataBooking->whereIn('booking_status', [5, 8])->sum('booking_rate');
-
-    //         $statementDate = Carbon::now()->format('F Y');
-
-    //         // Generate PDF
-    //         $pdf = Pdf::loadView('tasker.eStatement.statement-template', [
-    //             'title' => 'Tasker Monthly Statement',
-    //             'tasker' => $tasker,
-    //             'dataBooking' => $dataBooking,
-    //             'totalCredit' => $totalCredit,
-    //             'totalUnCredit' => $totalUnCredit,
-    //             'statement_dateMY' => $statementDate,
-    //         ]);
-
-    //         $fileName = "statements/{$tasker->id}_{$statementDate}.pdf";
-    //         Storage::put($fileName, $pdf->output());
-
-    //         // Save statement details to database
-    //         MonthlyStatement::create([
-    //             'start_date' => $startDate,
-    //             'end_date' => $endDate,
-    //             'file_name' => $fileName,
-    //             'statement_status' => 0,
-    //             'tasker_id' => $tasker->id,
-    //         ]);
-
-    //         $this->info("Monthly statement generated for Tasker ID: {$tasker->id}");
-    //     }
-
-    // }
 
     public function handle()
     {
-        $taskers = Tasker::all(); // Fetch all taskers
+        $taskers = Tasker::whereIn('tasker_status', [2,3])->get(); // Fetch all taskers
         $startDate = Carbon::now()->startOfMonth()->toDateString();
         $endDate = Carbon::now()->endOfMonth()->toDateString();
+        $todayDate = Carbon::now()->format('d/m/Y');
 
         foreach ($taskers as $tasker) {
             // Fetch booking data for the tasker
@@ -106,13 +64,8 @@ class GenerateMonthlyStatements extends Command
                 'totalCredit' => $totalCredit,
                 'totalUnCredit' => $totalUnCredit,
                 'statement_dateMY' => $statementDate,
+                'todayDate' => $todayDate
             ])->render();
-
-            // File path
-            // $fileName = "public/statements/{$tasker->tasker_code}_{$statementDate}.pdf";
-            // $filePath = storage_path("app/{$fileName}");
-            // $fileName = "{$tasker->tasker_code}_{$statementDate}.pdf";
-            // $filePath = "statements/{$fileName}";
 
             // Define the directory and file path
             $directory = 'statements';
@@ -141,13 +94,15 @@ class GenerateMonthlyStatements extends Command
                     'total_earnings' => $totalCredit,
                     'tasker_id' => $tasker->id,
                 ]);
-            }
-            else{
-                MonthlyStatement::where('tasker_id', $tasker->id)->where('start_date', $startDate)->where('end_date', $endDate)->update([
-                    'file_name' => $filePath,
-                ]);
-            }
 
+                Mail::to($tasker->email)->send(new MonthlyStatementNotification([
+                    'name' => Str::headline($tasker->tasker_firstname . ' ' . $tasker->tasker_lastname),
+                    'statement_status' => 0,
+                    'month_year' => Carbon::parse($startDate)->format('F Y'),
+                    'date' => Carbon::now()->format('d F Y g:i A'),
+                    'total_earnings' => $totalCredit,
+                ]));
+            }
 
             $this->info("Monthly statement generated for Tasker ID: {$tasker->id}");
         }

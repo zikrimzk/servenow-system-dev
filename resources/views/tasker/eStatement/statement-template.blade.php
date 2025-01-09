@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monthly Tasker Statement</title>
+    <title>ServeNow - {{ $tasker->tasker_code }}_{{ $statement_dateMY }} </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
     <link rel="stylesheet" href="../assets/css/style-preset.css" />
@@ -88,7 +88,7 @@
                 <p class="mb-0">{{ Str::upper($tasker->tasker_address_state) }}</p>
             </div>
             <div class="col-6 text-end">
-                <p><strong>Statement Date:</strong> 10/10/2024</p>
+                <p><strong>Statement Date:</strong> {{ $todayDate }}</p>
             </div>
         </div>
 

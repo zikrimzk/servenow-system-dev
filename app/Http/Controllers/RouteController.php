@@ -16,6 +16,7 @@ use App\Models\Transaction;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
+use App\Models\MonthlyStatement;
 use Illuminate\Support\Facades\DB;
 use App\Models\CancelRefundBooking;
 use Illuminate\Support\Facades\Auth;
@@ -3208,13 +3209,35 @@ class RouteController extends Controller
                 'b.file_name',
                 'b.statement_status',
                 'b.total_earnings'
-            )
-            ->get();
+            );
         // dd($data);
+
+        if ($request->has('startMonth') && $request->has('endMonth') && $request->input('startMonth') != '' && $request->input('endMonth') != '') {
+            $startDate = Carbon::parse($request->input('startMonth'))->endOfMonth()->format('Y-m-d');
+            $endDate = Carbon::parse($request->input('endMonth'))->endOfMonth()->format('Y-m-d');
+
+            if ($startDate && $endDate) {
+                $data->whereBetween('b.end_date', [$startDate, $endDate]);
+            }
+        }
+
+        if ($request->has('tasker_filter') && $request->input('tasker_filter') != '') {
+            $data->where('a.id', $request->input('tasker_filter'));
+        }
+
+        if ($request->has('status_filter') && $request->input('status_filter') != '') {
+            $data->where('b.statement_status', $request->input('status_filter'));
+        }
+
+        $data = $data->get();
 
         if ($request->ajax()) {
 
             $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('checkbox', function ($row) {
+                return '<input type="checkbox" class="statement-checkbox form-check-input" value="' . $row->statementID . '">';
+            });
 
             $table->addColumn('tasker_code', function ($row) {
                 $tasker = '<a href="#taskerDetailsModal" data-bs-toggle="modal" data-bs-target="#taskerDetailsModal-' . $row->tasker_code . '" class="btn btn-link">' . $row->tasker_code . '</a>';
@@ -3276,21 +3299,67 @@ class RouteController extends Controller
                         '
                     ';
                 }
-
-
-
-
                 return $button;
             });
 
-            $table->rawColumns(['tasker_code', 'start_date', 'end_date', 'total_earnings', 'statement_status', 'file_name', 'action']);
+            $table->rawColumns(['checkbox', 'tasker_code', 'start_date', 'end_date', 'total_earnings', 'statement_status', 'file_name', 'action']);
 
             return $table->make(true);
         }
+
+        //calculation of amount to be released
+        $tobeReleased = MonthlyStatement::where('statement_status', 0)->sum('total_earnings');
+
+        //calculation of amount have been released
+        $currentYear = now()->year;
+
+        $releasedAll = MonthlyStatement::where('statement_status', 1)->sum('total_earnings');
+
+        $releasedthisyear = MonthlyStatement::where('statement_status', 1)->whereYear('end_date', $currentYear)->sum('total_earnings');
+
+        $monthlyLabels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+
+        $monthlyReleasedAmounts = MonthlyStatement::selectRaw('MONTH(end_date) as month, SUM(total_earnings) as total')
+            ->where('statement_status', 1)
+            ->whereYear('end_date', $currentYear) // Filter records for the current year
+            ->groupBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+
+        $monthlyReleasedAmounts = array_replace(array_fill(1, 12, 0), $monthlyReleasedAmounts);
+        $monthlyReleasedAmountsWithLabels = [];
+        foreach ($monthlyReleasedAmounts as $monthIndex => $amount) {
+            $monthlyReleasedAmountsWithLabels[$monthlyLabels[$monthIndex - 1]] = $amount; // $monthIndex is 1-based
+        }
+
+        // dd($monthlyReleasedAmountsWithLabels);
+
+        $yearlyLabels = MonthlyStatement::selectRaw('YEAR(end_date) as year')
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year')
+            ->toArray();
+
+        $yearlyReleasedAmounts = MonthlyStatement::selectRaw('YEAR(end_date) as year, SUM(total_earnings) as total')
+            ->where('statement_status', 1)
+            ->groupBy('year')
+            ->pluck('total', 'year')
+            ->toArray();
+
+
+
         return view('administrator.eStatement.statement-index', [
             'title' => 'e-Statement',
             'data' => $data,
-            'taskers' => Tasker::get()
+            'taskers' => Tasker::get(),
+            'tobeReleased' => $tobeReleased,
+            'releasedthisyear' => $releasedthisyear,
+            'releasedAll' => $releasedAll,
+            'monthlyLabels' => $monthlyLabels,
+            'monthlyReleasedAmounts' => $monthlyReleasedAmountsWithLabels,
+            'yearlyLabels' => $yearlyLabels,
+            'yearlyReleasedAmounts' => $yearlyReleasedAmounts,
         ]);
     }
 
