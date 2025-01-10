@@ -73,14 +73,12 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-header border border-0">
-                            <div class="d-sm-flex align-items-center justify-content-end">
-                                <div>
-                                    <a href="#" class="btn btn-primary d-inline-flex align-items-center gap-2"
-                                        data-bs-toggle="modal" data-bs-target="#addServiceModal">
-                                        <i class="ti ti-plus f-18"></i> Add Service
-                                    </a>
-                                </div>
+                        <div class="card-header border border-0 pb-0">
+                            <div class="d-flex align-items-center justify-content-end">
+                                <a href="#" class="btn btn-primary d-inline-flex align-items-center gap-2"
+                                    data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                                    <i class="ti ti-plus f-18"></i> Add Service
+                                </a>
                             </div>
                         </div>
                         <div class="card-body pt-3">
@@ -186,12 +184,18 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="modal-footer justify-content-end">
                                 <div class="flex-grow-1 text-end">
-                                    <button type="reset" class="btn btn-link-danger btn-pc-default"
-                                        data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary" id="addApplicationBtn">Add
-                                        Service</button>
+                                    <div class="col-sm-12">
+                                        <div class="d-flex justify-content-between gap-3 align-items-center">
+                                            <button type="button" class="btn btn-light btn-pc-default w-100"
+                                                data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary w-100"
+                                                id="addApplicationBtn">Add
+                                                Service</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -481,4 +485,3 @@
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
 <!--Updated By: Muhammad Zikri B. Kashim (10/01/2025)-->
-

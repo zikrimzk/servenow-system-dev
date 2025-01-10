@@ -203,13 +203,13 @@
                                     <svg viewBox="0 0 36 36" class="circular-chart">
                                         <path class="circle-bg"
                                             d="M18 2.0845
-                                                                                                       a 15.9155 15.9155 0 0 1 0 31.831
-                                                                                                       a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                                                                                           a 15.9155 15.9155 0 0 1 0 31.831
+                                                                                                                           a 15.9155 15.9155 0 0 1 0 -31.831" />
                                         <path class="circle"
                                             stroke-dasharray="{{ $taskers->performance_score_percentage }}, 100"
                                             d="M18 2.0845
-                                                                                                       a 15.9155 15.9155 0 0 1 0 31.831
-                                                                                                       a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                                                                                           a 15.9155 15.9155 0 0 1 0 31.831
+                                                                                                                           a 15.9155 15.9155 0 0 1 0 -31.831" />
                                     </svg>
                                     <div class="circle-text position-absolute">
                                         <h2 class="fw-bold text-primary mb-0">{{ $taskers->performance_score_percentage }}%
@@ -335,20 +335,23 @@
 
                             <!-- Monthly Analysis Table -->
                             @if ($taskerMonthlyRefunds->isNotEmpty())
-                                <table class="table table-bordered text-center">
+                                <table class="table table-bordered text-center" style="table-layout: fixed;">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>Month</th>
-                                            <th>Total Refunds</th>
-                                            <th>Penalized Refunds</th>
+                                            <th style="white-space: normal; word-wrap: break-word;">Month</th>
+                                            <th style="white-space: normal; word-wrap: break-word;">Total Refunds</th>
+                                            <th style="white-space: normal; word-wrap: break-word;">Penalized Refunds</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($taskerMonthlyRefunds as $refund)
                                             <tr>
-                                                <td>{{ Carbon\Carbon::parse($refund->month)->format('F Y') }}</td>
-                                                <td>{{ $refund->total_refunds }}</td>
-                                                <td>{{ $refund->penalized_refunds }}</td>
+                                                <td style="white-space: normal; word-wrap: break-word;">
+                                                    {{ Carbon\Carbon::parse($refund->month)->format('F Y') }}</td>
+                                                <td style="white-space: normal; word-wrap: break-word;">
+                                                    {{ $refund->total_refunds }}</td>
+                                                <td style="white-space: normal; word-wrap: break-word;">
+                                                    {{ $refund->penalized_refunds }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

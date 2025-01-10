@@ -437,6 +437,23 @@
 
         </div>
     </div>
+
+    <header>
+        <style>
+            @media (max-width: 768px) {
+                .nav-tabs.profile-tabs .nav-item {
+                    flex: 1 1 auto;
+                    text-align: center;
+                }
+
+                .nav-tabs.profile-tabs .nav-link {
+                    display: block;
+                    width: 100%;
+                }
+            }
+        </style>
+    </header>
+
     <script>
         function validatePostcode(input) {
             // Remove any non-numeric characters

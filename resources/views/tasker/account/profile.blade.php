@@ -29,7 +29,6 @@
                     <div class="card">
                         <div class="card-body py-0">
                             <ul class="nav nav-tabs profile-tabs" id="myTab" role="tablist">
-
                                 <li class="nav-item">
                                     <a class="nav-link active" id="profile-tab-2" data-bs-toggle="tab" href="#profile-2"
                                         role="tab" aria-selected="true">
@@ -45,6 +44,7 @@
                             </ul>
                         </div>
                     </div>
+
                     <div class="tab-content">
                         <div class="tab-pane show active" id="profile-2" role="tabpanel" aria-labelledby="profile-tab-2">
                             <form action="{{ route('tasker-update-profile', Auth::user()->id) }}" method="POST"
@@ -382,12 +382,16 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+
+
+                                            <div class="card-footer text-end btn-page">
+                                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                                            </div>
                                         </div>
 
                                     </div>
-                                    <div class="col-12 text-end btn-page">
-                                        <button type="submit" class="btn btn-primary">Update Profile</button>
-                                    </div>
+
                                 </div>
                             </form>
                         </div>
@@ -529,6 +533,22 @@
 
         </div>
     </div>
+
+    <header>
+        <style>
+            @media (max-width: 768px) {
+                .nav-tabs.profile-tabs .nav-item {
+                    flex: 1 1 auto;
+                    text-align: center;
+                }
+
+                .nav-tabs.profile-tabs .nav-link {
+                    display: block;
+                    width: 100%;
+                }
+            }
+        </style>
+    </header>
     <script>
         document.getElementById('tasker_phoneno').addEventListener('input', function() {
             const input = this.value.replace(/\D/g, ''); // Remove non-numeric characters

@@ -237,11 +237,11 @@ $currentYear = Carbon::now()->year;
                     <div class="card table-card">
                         <div class="card-header">
                             <div class="row align-items-center">
-                                <div class="col-sm-6 mb-3">
+                                <div class="col-sm-3 mb-3">
                                     <label for="score_filter" class="form-label">Date Range</label>
-                                    <div class="d-flex align-items-center">
+                                    <div class="d-flex flex-column align-items-start">
                                         <input type="date" id="startDate" name="startDate" class="form-control">
-                                        <span class="mx-2">to</span>
+                                        <span style="margin: 10px 15px">to</span>
                                         <input type="date" id="endDate" name="endDate" class="form-control">
                                     </div>
                                 </div>
@@ -249,20 +249,19 @@ $currentYear = Carbon::now()->year;
                             <div class="row align-items-center">
                                 <div class="col-sm-9 mb-3">
                                     <label for="rating_filter" class="form-label">Filter by</label>
-                                    <div class="d-block  d-md-flex justify-content-between align-items-center gap-2">
-                                        <select id="rating_filter" class="form-control mb-3 mb-md-0"
-                                            name="rating_filter">
+                                    <div class="d-block d-md-flex justify-content-between align-items-center gap-2">
+                                        <select id="rating_filter" class="form-control mb-3 mb-md-0" name="rating_filter">
                                             <option value="">Rating</option>
                                             <option value="1">Highest Rating</option>
                                             <option value="2">Lowest Rating</option>
                                         </select>
-
+                        
                                         <select id="status_filter" class="form-select mb-3 mb-md-0">
                                             <option value="">Status (All)</option>
                                             <option value="1">Show</option>
                                             <option value="2">Hide</option>
                                         </select>
-
+                        
                                         <select id="media_filter" class="form-select mb-3 mb-md-0">
                                             <option value="">Photo (All)</option>
                                             <option value="1">With Photo</option>
@@ -278,6 +277,7 @@ $currentYear = Carbon::now()->year;
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="card-body">
                             <div class="dt-responsive table-responsive my-4 mx-0 mx-md-4">
                                 <table class="table data-table table-hover nowrap">
