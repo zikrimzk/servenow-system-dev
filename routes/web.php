@@ -204,13 +204,13 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     // Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
 
     //Tasker - Service Management
-    Route::get('/service-approval', [RouteController::class, 'taskerServiceManagementNav'])->name('tasker-service-management');
+    Route::get('/service-enrollment', [RouteController::class, 'taskerServiceEnrollmentNav'])->name('tasker-service-enrollment');
     Route::post('/create-service', [ServiceController::class, 'createService'])->name('tasker-service-create');
     Route::post('/update-service-{id}', [ServiceController::class, 'updateService'])->name('tasker-service-update');
     Route::get('/delete-service-{id}', [ServiceController::class, 'deleteService'])->name('tasker-service-delete');
 
     // Tasker - Task Preference > Visibility & Location
-    Route::get('/visibility-location', [RouteController::class, 'taskerVisibleLocNav'])->name('tasker-visibleloc-setting');
+    Route::get('/preferences', [RouteController::class, 'taskerPreferencesNav'])->name('tasker-preferences');
     Route::get('/change-tasker-visibility', [SettingController::class, 'taskerVisibleToggle'])->name('tasker-visible-toggle');
     Route::post('/update-tasker-location-{id}', [TaskerController::class, 'taskerUpdateLocation'])->name('tasker-update-location');
 

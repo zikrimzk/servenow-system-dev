@@ -32,19 +32,31 @@
     <!-- [DataTables Links & File] -->
     <link rel="stylesheet" href="../assets/css/plugins/dataTables.bootstrap5.min.css" />
     <link rel="stylesheet" href="../assets/css/plugins/responsive.bootstrap5.min.css" />
-    <link href="../assets/css/plugins/animate.min.css" rel="stylesheet" type="text/css" /> 
+    <link href="../assets/css/plugins/animate.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="../assets/js/plugins/dataTables.min.js"></script>
     <script src="../assets/js/plugins/dataTables.bootstrap5.min.js"></script>
     <script src="../assets/js/plugins/dataTables.responsive.min.js"></script>
     <script src="../assets/js/plugins/responsive.bootstrap5.min.js"></script>
     <script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
-    
+
     <!-- [Flatpicker CSS File] -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <!-- [FullCalandarJS File]* -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+
+    <style>
+        body.modal-open {
+            padding-right: var(--bs-scrollbar-width) !important;
+            overflow: hidden;
+        }
+        .disabled-a {
+            pointer-events: none;
+            opacity: 0.6;
+            text-decoration: none;
+        }
+    </style>
 
 </head>
 
@@ -321,7 +333,7 @@
     <script src="../assets/js/plugins/responsive.bootstrap5.min.js"></script>
     <script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
 
-    
+
     <script>
         localStorage.setItem('layout', 'color-header');
     </script>

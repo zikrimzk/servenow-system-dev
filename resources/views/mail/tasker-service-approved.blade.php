@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Tasker Service Notification</title>
+    <title>Service Application</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -113,7 +113,7 @@
         <!-- Header -->
         <div class="header">
             <img src="https://servenow.com.my/assets/images/logo-test-white.png" alt="ServeNow Logo">
-            <h1>Service Status Update</h1>
+            <h1>Service Application Update</h1>
         </div>
 
         <!-- Content -->
@@ -127,7 +127,7 @@
                     details of your approved service:</p>
                 <div class="details">
                     <p><strong>Service Name:</strong> {{ $taskerDetails['service_name'] }}</p>
-                    <p><strong>Rate:</strong> {{ $taskerDetails['service_rate'] }} /
+                    <p><strong>Rate:</strong> RM {{ $taskerDetails['service_rate'] }} /
                         {{ $taskerDetails['service_rate_type'] }}</p>
                     <p><strong>Description:</strong> {{ $taskerDetails['service_desc'] }}</p>
                 </div>
@@ -141,7 +141,7 @@
                     details of your rejected service:</p>
                 <div class="details">
                     <p><strong>Service Name:</strong> {{ $taskerDetails['service_name'] }}</p>
-                    <p><strong>Rate:</strong> {{ $taskerDetails['service_rate'] }} /
+                    <p><strong>Rate:</strong> RM {{ $taskerDetails['service_rate'] }} /
                         {{ $taskerDetails['service_rate_type'] }}</p>
                     <p><strong>Description:</strong> {{ $taskerDetails['service_desc'] }}</p>
                     <p><strong>Reason:</strong> The rejection may be due to incomplete profile information or a proposed
@@ -156,7 +156,7 @@
                     the details of the terminated service:</p>
                 <div class="details">
                     <p><strong>Service Name:</strong> {{ $taskerDetails['service_name'] }}</p>
-                    <p><strong>Rate:</strong> {{ $taskerDetails['service_rate'] }} /
+                    <p><strong>Rate:</strong> RM {{ $taskerDetails['service_rate'] }} /
                         {{ $taskerDetails['service_rate_type'] }}</p>
                     <p><strong>Description:</strong> {{ $taskerDetails['service_desc'] }}</p>
                     <p><strong>Reason:</strong> Please contact our administration team for additional details.</p>

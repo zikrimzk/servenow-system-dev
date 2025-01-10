@@ -1,6 +1,118 @@
 @extends('tasker.layouts.main')
 
 @section('content')
+    <style>
+        /* General Calendar Styles */
+        .fc-toolbar {
+            background-color: #f8f9fa;
+            /* Light grey toolbar for a clean look */
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* Header Toolbar Buttons */
+        .fc-toolbar .fc-button {
+            background-color: #007bff;
+            /* Primary blue color for buttons */
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .fc-toolbar .fc-button:hover {
+            background-color: #0056b3;
+            /* Darker blue for hover effect */
+        }
+
+        /* Day and Time Slots */
+        .fc-timegrid-slot {
+            border-bottom: 1px solid #e9ecef;
+            /* Subtle lines for time slots */
+        }
+
+        .fc-day-today {
+            background-color: #e9f7ff;
+            /* Light blue for the current day */
+        }
+
+        /* Event Styles */
+        .fc-event {
+            border-radius: 10px;
+            /* Rounded corners for events */
+            font-size: 14px;
+            padding: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* Subtle shadow for depth */
+        }
+
+        .fc-event:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* Slightly enhanced shadow on hover */
+        }
+
+        /* Modal Design */
+        #eventDetailsModal .modal-header {
+            background-color: #007bff;
+            color: white;
+            border-bottom: none;
+        }
+
+        #eventDetailsModal .modal-footer {
+            border-top: none;
+        }
+
+        /* Unavailable Slot Styling */
+        .event-unavailable {
+            background-color: #d9534f !important;
+            /* Red for unavailable slots */
+            color: white !important;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        /* Smooth Hover Animation for Events */
+        .fc-event {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .fc-event:hover {
+            transform: scale(1.05);
+            /* Slight zoom on hover */
+        }
+
+        #eventDetailsModal {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #eventDetailsModal .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #eventDetailsModal input,
+        #eventDetailsModal textarea {
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            width: 100%;
+        }
+
+        .fc-toolbar .fc-button:hover {
+            background-color: #0056b3;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .fc-day-sun,
+        .fc-day-sat {
+            background-color: #f8f9fa;
+            /* Light grey for weekends */
+        }
+    </style>
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
@@ -18,7 +130,7 @@
                         </div>
                         <div class="col-md-12">
                             <div class="page-header-title">
-                                <h2 class="mb-4">My Booking</h2>
+                                <h2 class="mb-0">My Booking</h2>
                             </div>
                         </div>
                     </div>
@@ -201,6 +313,7 @@
             return `${day}-${month}-${year}, ${hours}:${minutes} ${ampm}`;
         }
 
+        //Unused function (but worked)
         function getValidRange() {
             const today = new Date();
             const sevenDaysFromToday = new Date();
@@ -222,34 +335,66 @@
             let currentLoadedDate = null;
             let allowedStartTimes = [];
 
+            // function fetchAvailability(date) {
+            //     return fetch(`{{ route('get-calander-range-tasker') }}?taskerid=${taskerId}&date=${date}`)
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             if (!data.start_time || !data.end_time) {
+            //                 console.log('No availability found for this tasker.');
+            //                 return {
+            //                     startTime: null,
+            //                     endTime: null,
+            //                     unavailableSlots: [],
+            //                     allowedTimes: [],
+            //                 };
+            //             }
+
+            //             allowedStartTimes = data.allowed_times || [];
+            //             console.log( allowedStartTimes);
+            //             return {
+            //                 startTime: data.start_time,
+            //                 endTime: data.end_time,
+            //                 unavailableSlots: Array.isArray(data.unavailable_slots) ? data.unavailable_slots :
+            //                 [],
+            //                 allowedTimes: allowedStartTimes,
+            //             };
+            //         })
+            //         .catch(error => {
+            //             console.error('Error fetching tasker availability:', error);
+            //             return {
+            //                 startTime: null,
+            //                 endTime: null,
+            //                 unavailableSlots: [],
+            //                 allowedTimes: [],
+            //             };
+            //         });
+            // }
             function fetchAvailability(date) {
                 return fetch(`{{ route('get-calander-range-tasker') }}?taskerid=${taskerId}&date=${date}`)
                     .then(response => response.json())
                     .then(data => {
                         if (!data.start_time || !data.end_time) {
-                            console.log('No availability found for this tasker.');
+                            console.log('No availability found for this tasker on this date.');
                             return {
-                                startTime: null,
-                                endTime: null,
+                                startTime: '07:00:00', // Default
+                                endTime: '20:00:00', // Default
                                 unavailableSlots: [],
                                 allowedTimes: [],
                             };
                         }
 
-                        allowedStartTimes = data.allowed_times || [];
                         return {
                             startTime: data.start_time,
                             endTime: data.end_time,
-                            unavailableSlots: Array.isArray(data.unavailable_slots) ? data.unavailable_slots :
-                            [],
-                            allowedTimes: allowedStartTimes,
+                            unavailableSlots: data.unavailable_slots || [],
+                            allowedTimes: data.allowed_times || [],
                         };
                     })
                     .catch(error => {
                         console.error('Error fetching tasker availability:', error);
                         return {
-                            startTime: null,
-                            endTime: null,
+                            startTime: '07:00:00', // Default fallback
+                            endTime: '20:00:00',
                             unavailableSlots: [],
                             allowedTimes: [],
                         };
@@ -277,16 +422,25 @@
                     eventStartEditable: true,
                     eventDurationEditable: true,
                     height: 'auto',
-                    validRange: validRange,
+                    // validRange: validRange,
                     slotMinTime: '07:00:00',
-                    slotMaxTime: '20:00:00',
+                    slotMaxTime: '21:00:00',
                     editable: true,
                     selectable: true,
-                    businessHours: [{
-                        daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
-                        startTime: startTime || '07:00:00',
-                        endTime: endTime || '20:00:00',
-                    }],
+                    businessHours: [],
+                    datesSet: function(info) {
+                        const currentDate = info.startStr.split('T')[
+                            0]; // Extract date in YYYY-MM-DD format
+                        fetchAvailability(currentDate).then(availability => {
+                            calendar.setOption('businessHours', [{
+                                daysOfWeek: [0, 1, 2, 3, 4, 5,
+                                    6
+                                ], // Apply to all days
+                                startTime: availability.startTime,
+                                endTime: availability.endTime,
+                            }, ]);
+                        });
+                    },
                     eventConstraint: 'businessHours',
                     eventSources: [{
                             events: function(fetchInfo, successCallback, failureCallback) {

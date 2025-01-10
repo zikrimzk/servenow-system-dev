@@ -76,93 +76,111 @@ class SettingController extends Controller
     }
 
     // Tasker - Create Time Slot Process
+    // Check by : Zikri (10/01/2025)
     public function taskerCreateTimeSlot($date)
     {
-        $isFull = Tasker::where('tasker_status', 2)->where('tasker_worktype', 1)->where('id', Auth::user()->id)->exists();
-        $isPart = Tasker::where('tasker_status', 2)->where('tasker_worktype', 2)->where('id', Auth::user()->id)->exists();
+        try {
+            $isFull = Tasker::where('tasker_status', 2)->where('tasker_worktype', 1)->where('id', Auth::user()->id)->exists();
+            $isPart = Tasker::where('tasker_status', 2)->where('tasker_worktype', 2)->where('id', Auth::user()->id)->exists();
 
-        if ($isFull) // Full-Time
-        {
-            $timeslotsFt = TimeSlot::where('slot_category', 1)->get();
+            if ($isFull) // Full-Time
+            {
+                $timeslotsFt = TimeSlot::where('slot_category', 1)->get();
 
-            foreach ($timeslotsFt as $ft) {
-                $check = TaskerTimeSlot::where('slot_id', $ft->id)->where('tasker_id', Auth::user()->id)->where('slot_date', $date)->exists();
-                if (!$check) {
-                    $data = new TaskerTimeSlot();
-                    $data->slot_id = $ft->id;
-                    $data->tasker_id = Auth::user()->id;
-                    $data->slot_date = $date;
-                    $data->slot_status = 1;
-                    $data->save();
-                } else {
-                    $datePrompt = Carbon::createFromFormat('Y-m-d', $date);
-                    $formattedDate = $datePrompt->format('l, d F Y');
-                    return back()->with('error', 'All slots for ' . $formattedDate . ' has been generated. No need to generate again.');
+                foreach ($timeslotsFt as $ft) {
+                    $check = TaskerTimeSlot::where('slot_id', $ft->id)->where('tasker_id', Auth::user()->id)->where('slot_date', $date)->exists();
+                    if (!$check) {
+                        $data = new TaskerTimeSlot();
+                        $data->slot_id = $ft->id;
+                        $data->tasker_id = Auth::user()->id;
+                        $data->slot_date = $date;
+                        $data->slot_status = 1;
+                        $data->save();
+                    } else {
+                        $datePrompt = Carbon::createFromFormat('Y-m-d', $date);
+                        $formattedDate = $datePrompt->format('l, d F Y');
+                        return back()->with('error', 'All slots for ' . $formattedDate . ' has been generated. No need to generate again.');
+                    }
                 }
-            }
-        } 
-        elseif($isPart) // Part-Time
-        {
-            $timeslotsPt = TimeSlot::where('slot_category', 2)->get();
+            } elseif ($isPart) // Part-Time
+            {
+                $timeslotsPt = TimeSlot::where('slot_category', 2)->get();
 
-            foreach ($timeslotsPt as $pt) {
-                $check = TaskerTimeSlot::where('slot_id', $pt->id)->where('tasker_id', Auth::user()->id)->where('slot_date', $date)->exists();
-                if (!$check) {
-                    $data = new TaskerTimeSlot();
-                    $data->slot_id = $pt->id;
-                    $data->tasker_id = Auth::user()->id;
-                    $data->slot_date = $date;
-                    $data->slot_status = 1;
-                    $data->save();
-                } else {
-                    $datePrompt = Carbon::createFromFormat('Y-m-d', $date);
-                    $formattedDate = $datePrompt->format('l, d F Y');
-                    return back()->with('error', 'All slots for ' . $formattedDate . ' has been generated. No need to generate again.');
+                foreach ($timeslotsPt as $pt) {
+                    $check = TaskerTimeSlot::where('slot_id', $pt->id)->where('tasker_id', Auth::user()->id)->where('slot_date', $date)->exists();
+                    if (!$check) {
+                        $data = new TaskerTimeSlot();
+                        $data->slot_id = $pt->id;
+                        $data->tasker_id = Auth::user()->id;
+                        $data->slot_date = $date;
+                        $data->slot_status = 1;
+                        $data->save();
+                    } else {
+                        $datePrompt = Carbon::createFromFormat('Y-m-d', $date);
+                        $formattedDate = $datePrompt->format('l, d F Y');
+                        return back()->with('error', 'All slots for ' . $formattedDate . ' has been generated. No need to generate again.');
+                    }
                 }
+            } else {
+                return back()->with('error', 'Please make sure you are verified in order to generate time slots. If you have any questions, please contact us.');
             }
-        }
-        else
-        {
-            return back()->with('error', 'Please make sure you are verified in order to generate time slots. If you have any questions, please contact us.');
-        }
 
-        $datePrompt = Carbon::createFromFormat('Y-m-d', $date);
-        $formattedDate = $datePrompt->format('l, d F Y');
-        return back()->with('success', 'Slot for ' . $formattedDate . ' has been generated successfully!');
+            $datePrompt = Carbon::createFromFormat('Y-m-d', $date);
+            $formattedDate = $datePrompt->format('l, d F Y');
+            return back()->with('success', 'Slot for ' . $formattedDate . ' has been generated successfully !');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     // Tasker - Update Time Slot Process
+    // Check by : Zikri (10/01/2025)
     public function taskerUpdateTimeSlot(Request $request, $id)
     {
-        $data = $request->validate(
-            [
-                'slot_status' => 'required',
-            ],
-            [],
-            [
-                'slot_status' => 'Status',
-            ]
-        );
+        try {
+            $data = $request->validate(
+                [
+                    'slot_status' => 'required',
+                ],
+                [],
+                [
+                    'slot_status' => 'Status',
+                ]
+            );
 
-        TaskerTimeSlot::whereId($id)->update($data);
-        return back()->with('success', 'Slot availability has been updated successfully !');
+            TaskerTimeSlot::whereId($id)->update($data);
+            return back()->with('success', 'Slot availability has been updated successfully !');
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     // Tasker - Visibility Change 
+    // Check by : Zikri (10/01/2025)
     public function taskerVisibleToggle()
     {
-        if (Auth::user()->tasker_working_status == 0) {
-            Tasker::whereId(Auth::user()->id)->update(['tasker_working_status' => 1]);
-            $message = 'You are now visible to clients !';
-        } else if (Auth::user()->tasker_working_status == 1) {
-            Tasker::whereId(Auth::user()->id)->update(['tasker_working_status' => 0]);
-            $message = 'You are now invisible to clients !';
-        }
+        try {
 
-        return response()->json(['message' => $message]);
+            if (Auth::user()->tasker_working_status == 0) {
+                Tasker::whereId(Auth::user()->id)->update(['tasker_working_status' => 1]);
+                $message = 'You are now visible to clients !';
+            } else if (Auth::user()->tasker_working_status == 1) {
+                Tasker::whereId(Auth::user()->id)->update(['tasker_working_status' => 0]);
+                $message = 'You are now invisible to clients !';
+            }
+
+            return response()->json([
+                'message' => $message
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update your working type. Please try again.'
+            ], 500); // Return a 500 status code for server error
+        }
     }
 
     // Tasker - Working Type Change 
+    // Check by : Zikri (10/01/2025)
     public function taskerTypeToggle(Request $req)
     {
         try {
@@ -170,16 +188,18 @@ class SettingController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Your working type has been successfully updated!'
+                'message' => 'Your working type has been successfully updated !'
             ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update your working type. Please try again.'
-            ], 500); // Return a 500 status code for server error
+            ], 500);
         }
     }
 
+    // Tasker - Get Time Slots
+    // Check by : Zikri (10/01/2025)
     public function getTaskerTimeSlot($date)
     {
         try {
@@ -192,9 +212,13 @@ class SettingController extends Controller
                 ->orderBy('b.time', 'asc')
                 ->get();
 
-            return response()->json(['data' => $data], 200);
+            return response()->json([
+                'data' => $data
+            ], 200);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Failed to fetch your time. Please try again.'], 500); // Return a 500 status code for server error
+            return response()->json([
+                'message' => 'Failed to fetch your time. Please try again.'
+            ], 500);
         }
     }
 }

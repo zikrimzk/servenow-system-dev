@@ -298,21 +298,23 @@ class TaskerController extends Controller
         }
     }
 
-
+    // Update Working Location
+    // Check by : Zikri (10/01/2025)
     public function taskerUpdateLocation(Request $req, $id)
     {
         $taskers = $req->validate(
             [
                 'tasker_workingloc_state' => 'required',
                 'tasker_workingloc_area' => 'required',
+                'working_radius' => 'required',
 
             ],
             [],
             [
                 'tasker_workingloc_state' => 'Working State',
                 'tasker_workingloc_area' => 'Working Area',
+                'working_radius' => 'Working Radius'
             ]
-
         );
 
 
@@ -320,10 +322,7 @@ class TaskerController extends Controller
         $result = $this->geocoder->getCoordinatesForAddress($address);
         $taskers['latitude'] = $result['lat'];
         $taskers['longitude'] = $result['lng'];
-        // dd($result);
         Tasker::whereId($id)->update($taskers);
-        
-
         return back()->with('success', 'Tasker location have been saved !');
     }
 

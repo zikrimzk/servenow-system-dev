@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('tasker_workingloc_area')->nullable();
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
-            $table->integer('working_radius')->nullable();
+            $table->integer('working_radius')->default(5);
             $table->integer('tasker_working_status')->default(0);
             $table->integer('tasker_worktype')->nullable(); // part-time (1) OR full-time(2)
             $table->string('tasker_account_bank')->nullable();

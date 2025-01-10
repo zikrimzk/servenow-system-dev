@@ -146,6 +146,7 @@ class BookingController extends Controller
                 ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
                 ->where('b.id', '=', $id)
                 ->where('a.service_status', '=', 1)
+                ->where('c.tasker_working_status', '=', 1)
                 ->select(
                     'a.id as svID',
                     'b.id as typeID',
@@ -185,7 +186,7 @@ class BookingController extends Controller
                 ->select('c.id as tasker_id', DB::raw('avg(e.review_rating) as rating_count'))  // Count reviews for each Tasker
                 ->get();
 
-                
+
 
             // Step 3: Convert review count data into a key-value pair (tasker_id => review_count)
             $reviewCountMap = $reviewCount->pluck('review_count', 'tasker_id')->toArray();
@@ -264,7 +265,6 @@ class BookingController extends Controller
     public function getTaskerDetail(Request $request)
     {
         try {
-            // $data = Tasker::where('id', $request->id)->get();
             $checkout = DB::table('taskers as a')
                 ->join('services as b', 'a.id', '=', 'b.tasker_id')
                 ->join('service_types as c', 'b.service_type_id', '=', 'c.id')
@@ -587,45 +587,33 @@ class BookingController extends Controller
     public function getRangeTimeSlotsForTaskerCalander(Request $request)
     {
         try {
-            // Fetch all slots with statuses
             $slots = DB::table('tasker_time_slots as a')
                 ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
                 ->where('a.tasker_id', $request->taskerid)
-                // ->where('a.slot_date', '=', $request->date)
+                ->where('a.slot_date', '=', $request->date) // Ensure it's specific to the date
                 ->select(
                     'a.slot_status',
                     'b.time as slot_time'
                 )
                 ->get();
 
-            // Extract the min/max times for available slots
             $availability = $slots->whereIn('slot_status', [1, 2]);
             $unavailability = $slots->where('slot_status', 0)->map(function ($slot) {
                 return ['slot_time' => $slot->slot_time];
             })->values();
 
-            $startTime = $availability->isNotEmpty() ? $availability->min('slot_time') : '07:00:00';
-            $endTime = $availability->isNotEmpty() ? $availability->max('slot_time') : '07:30:00';
-            $new_end_time = date('H:i:s', strtotime('+1 hour', strtotime($endTime)));
-            // dd($endTime,$new_end_time);
-            $allowedTimes = DB::table('tasker_time_slots as a')
-                ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
-                ->where('a.tasker_id', $request->taskerid)
-                ->where('a.slot_date', '=', $request->date)
-                ->where('a.slot_status', '!=', 0)
-                ->select(
-                    'b.time as slot_time'
-                )
-                ->orderBy('slot_time', 'asc')
-                ->get()
-                ->pluck('slot_time');
+            $startTime = $availability->isNotEmpty() ? $availability->min('slot_time') : null;
+            $endTime = $availability->isNotEmpty() ? $availability->max('slot_time') : null;
+            //adding an hour
+            $newEndTime = $endTime ? date('H:i:s', strtotime('+1 hour', strtotime($endTime))) : null;
 
+            $allowedTimes = $availability->pluck('slot_time');
 
             return response()->json([
-                'start_time' => $startTime,
-                'end_time' =>  $new_end_time,
+                'start_time' => $startTime,  // Start time for the specific date
+                'end_time' => $newEndTime,      // End time for the specific date
                 'unavailable_slots' => $unavailability,
-                'allowed_times' => $allowedTimes
+                'allowed_times' => $allowedTimes,
             ], 200);
         } catch (Exception $e) {
             return response()->json(['message' => 'Failed to fetch your time. Please try again.'], 500);
@@ -873,8 +861,8 @@ class BookingController extends Controller
             return response()->json(['error' => 'Error : ' . $e->getMessage()]);
         }
     }
-    // Done by Muhammad Zikri (2/1/2025)
 
+    // Done by Muhammad Zikri (2/1/2025)
     private function sendRefundStatusEmail($data, $userType)
     {
         // Booking Status

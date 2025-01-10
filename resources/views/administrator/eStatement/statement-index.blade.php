@@ -804,7 +804,7 @@
                 });
 
 
-                // Approve/Reject Action
+           
                 $('#refreshStatementBtn').on('click', function() {
                     const $buttonOne = $(this);
 

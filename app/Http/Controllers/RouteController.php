@@ -429,162 +429,143 @@ class RouteController extends Controller
         ]);
     }
 
-    // Tasker - Service Management Navigation
-    public function taskerServiceManagementNav(Request $request)
+
+    // Tasker >> Task Preferences >> Preferences
+    // Updated by: Zikri (10/01/2025)
+    public function taskerPreferencesNav()
     {
-        if ($request->ajax()) {
+        try {
+            $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+
+            return view('tasker.task-preference.visibility-location', [
+                'title' => 'Manage Visibility & Location',
+                'states' => $states
+            ]);
+        } catch (Exception $e) {
+            return view('tasker.task-preference.visibility-location', [
+                'title' => 'Manage Visibility & Location',
+                'states' => []
+            ]);
+        }
+    }
+
+    // Tasker >> Task Preferences >> Time Slot
+    // Updated by: Zikri (10/01/2025)
+    public function taskerTimeSlotNav()
+    {
+        try {
+
+            $data = DB::table('tasker_time_slots as a')
+                ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                ->select('a.id', 'a.slot_status', 'a.slot_date', 'a.slot_id', 'b.time', 'b.slot_category')
+                ->get();
+
+            return view('tasker.task-preference.time-slot-index', [
+                'title' => 'Manage Time Slot',
+                'slots' => TimeSlot::all(),
+                'data' => $data
+            ]);
+        } catch (Exception $e) {
+
+            return view('tasker.task-preference.time-slot-index', [
+                'title' => 'Manage Time Slot',
+                'slots' => TimeSlot::all(),
+                'data' => []
+            ]);
+        }
+    }
+
+    // Tasker - Service Management Navigation
+    public function taskerServiceEnrollmentNav(Request $request)
+    {
+        try {
 
             $data = DB::table('services as a')
                 ->join('service_types as b', 'a.service_type_id', 'b.id')
-                ->select('a.id', 'b.servicetype_name', 'a.service_rate', 'a.service_rate_type', 'a.service_status', 'a.tasker_id')
-                ->where('a.tasker_id', '=', Auth::user()->id)
-                ->get();
+                ->select('a.id', 'b.servicetype_name', 'a.service_rate', 'a.service_rate_type', 'a.service_status', 'a.tasker_id', 'a.created_at')
+                ->where('a.tasker_id', '=', Auth::user()->id);
 
-            $table = DataTables::of($data)->addIndexColumn();
+            if ($request->ajax()) {
 
-            $table->addColumn('service_rate', function ($row) {
-
-                $rate = $row->service_rate . ' / ' . $row->service_rate_type;
-                return $rate;
-            });
-
-            $table->addColumn('service_status', function ($row) {
-
-                if ($row->service_status == 0) {
-                    $status = ' <span class="badge text-bg-warning text-white">Pending</span>';
-                } else if ($row->service_status == 1) {
-                    $status = '<span class="badge text-bg-success text-white">Active</span>';
-                } else if ($row->service_status == 2) {
-                    $status = '<span class="badge text-bg-danger text-white">Inactive</span>';
-                } else if ($row->service_status == 3) {
-                    $status = '<span class="badge bg-danger">Rejected</span>';
-                } else if ($row->service_status == 4) {
-                    $status = '<span class="badge bg-light-danger">Terminated</span>';
+                // Filter by status
+                if ($request->has('status_filter') && $request->input('status_filter') != '') {
+                    $data->having('service_status', '=', $request->status_filter);
                 }
 
-                return $status;
-            });
+                $data = $data->get();
 
-            $table->addColumn('action', function ($row) {
+                $table = DataTables::of($data)->addIndexColumn();
 
-                if ($row->service_status == 0) {
-                    $button =
-                        '
-                          <a href="#" class="avtar avtar-xs  btn-light-danger deleteService-' . $row->id . '">
+                $table->addColumn('date', function ($row) {
+                    $date = Carbon::parse($row->created_at)->format('d F Y');
+                    return $date;
+                });
+
+                $table->addColumn('service_rate', function ($row) {
+
+                    $rate = '<strong>' . number_format($row->service_rate, 2) . ' / ' . $row->service_rate_type . '</strong>';
+                    return $rate;
+                });
+
+                $table->addColumn('service_status', function ($row) {
+
+                    if ($row->service_status == 0) {
+                        $status = ' <span class="badge text-bg-warning text-white">Pending</span>';
+                    } else if ($row->service_status == 1) {
+                        $status = '<span class="badge text-bg-success text-white">Active</span>';
+                    } else if ($row->service_status == 2) {
+                        $status = '<span class="badge text-bg-danger text-white">Inactive</span>';
+                    } else if ($row->service_status == 3) {
+                        $status = '<span class="badge bg-danger">Rejected</span>';
+                    } else if ($row->service_status == 4) {
+                        $status = '<span class="badge bg-light-danger">Terminated</span>';
+                    }
+
+                    return $status;
+                });
+
+                $table->addColumn('action', function ($row) {
+
+                    if ($row->service_status == 0) {
+                        $button =
+                            '
+                              <a href="#" class="avtar avtar-xs  btn-light-danger"  data-bs-toggle="modal" 
+                                data-bs-target="#deleteService-' . $row->id . '">
+                                <i class="ti ti-trash f-20"></i>
+                              </a>
+                            ';
+                    } else if ($row->service_status == 1 || $row->service_status == 2 || $row->service_status == 3) {
+                        $button =
+                            '
+                          <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
+                            data-bs-target="#updateServiceModal-' . $row->id . '">
+                            <i class="ti ti-edit f-20"></i>
+                          </a>
+                           <a href="#" class="avtar avtar-xs  btn-light-danger"  data-bs-toggle="modal" 
+                                data-bs-target="#deleteService-' . $row->id . '">
                             <i class="ti ti-trash f-20"></i>
                           </a>
-
-                        <script>
-                        document.querySelector(".deleteService-' . $row->id . '").addEventListener("click", function () {
-                            const swalWithBootstrapButtons = Swal.mixin({
-                            customClass: {
-                                confirmButton: "btn btn-success",
-                                cancelButton: "btn btn-danger"
-                            },
-                            buttonsStyling: false
-                            });
-                            swalWithBootstrapButtons
-                            .fire({
-                                title: "Are you sure?",
-                                text: "This action cannot be undone.",
-                                icon: "warning",
-                                showCancelButton: true,
-                                confirmButtonText: "Yes, delete it!",
-                                cancelButtonText: "No, cancel!",
-                                reverseButtons: true
-                            })
-                            .then((result) => {
-                                if (result.isConfirmed) {
-                                    setTimeout(function() {
-                                        location.href="' . route("tasker-service-delete", $row->id) . '";
-                                    }, 1000);
-                                } 
-                            });
-                        });
-                        </script>
                     ';
-                } else if ($row->service_status == 1 || $row->service_status == 2 || $row->service_status == 3) {
-                    $button =
-                        '
-                      <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                        data-bs-target="#updateServiceModal-' . $row->id . '">
-                        <i class="ti ti-edit f-20"></i>
-                      </a>
-                      <a href="#" class="avtar avtar-xs  btn-light-danger deleteService-' . $row->id . '">
-                        <i class="ti ti-trash f-20"></i>
-                      </a>
+                    } else if ($row->service_status == 4) {
+                        $button = 'Remarks : Make new application';
+                    }
 
-                    <script>
-                        document.querySelector(".deleteService-' . $row->id . '").addEventListener("click", function () {
-                            const swalWithBootstrapButtons = Swal.mixin({
-                            customClass: {
-                                confirmButton: "btn btn-success",
-                                cancelButton: "btn btn-danger"
-                            },
-                            buttonsStyling: false
-                            });
-                            swalWithBootstrapButtons
-                            .fire({
-                                title: "Are you sure?",
-                                text: "This action cannot be undone.",
-                                icon: "warning",
-                                showCancelButton: true,
-                                confirmButtonText: "Yes, delete it!",
-                                cancelButtonText: "No, cancel!",
-                                reverseButtons: true
-                            })
-                            .then((result) => {
-                                if (result.isConfirmed) {
-                                    setTimeout(function() {
-                                        location.href="' . route("tasker-service-delete", $row->id) . '";
-                                    }, 1000);
-                                } 
-                            });
-                        });
-                    </script>
-                ';
-                } else if ($row->service_status == 4) {
-                    $button = 'Remarks : Make new application';
-                }
+                    return $button;
+                });
 
-                return $button;
-            });
+                $table->rawColumns(['date', 'service_rate', 'service_status', 'action']);
 
-            $table->rawColumns(['service_rate', 'service_status', 'action']);
+                return $table->make(true);
+            }
 
-            return $table->make(true);
+            return view('tasker.service.index', [
+                'title' => 'Service Management',
+                'services' => Service::get(),
+                'types' => ServiceType::where('servicetype_status', 1)->get()
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'Oops, Something bad happen. Please try again !');
         }
-
-        return view('tasker.service.index', [
-            'title' => 'Service Management',
-            'services' => Service::get(),
-            'types' => ServiceType::where('servicetype_status', 1)->get()
-        ]);
-    }
-
-    // Admin - Time Slot Setting
-    public function taskerTimeSlotNav()
-    {
-        $data = DB::table('tasker_time_slots as a')
-            ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
-            ->select('a.id', 'a.slot_status', 'a.slot_date', 'a.slot_id', 'b.time', 'b.slot_category')
-            ->get();
-
-        return view('tasker.task-preference.time-slot-index', [
-            'title' => 'Manage Time Slot',
-            'slots' => TimeSlot::all(),
-            'data' => $data
-        ]);
-    }
-
-    public function taskerVisibleLocNav()
-    {
-        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
-
-        return view('tasker.task-preference.visibility-location', [
-            'title' => 'Manage Visibility & Location',
-            'states' => $states
-        ]);
     }
 
     public function taskerBookingManagementNav(Request $request)

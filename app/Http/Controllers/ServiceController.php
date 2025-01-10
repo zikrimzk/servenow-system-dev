@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ServiceApplicationNotification;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Service;
@@ -67,16 +68,18 @@ class ServiceController extends Controller
     // Admin - Service Type End
 
 
-    //Tasker - Service Management Start
-
+    //Tasker - Create Service
+    // Check by : Zikri (10/01/2025)
     public function createService(Request $req)
     {
-        try {
+        $servicetype = ServiceType::where('id', $req->service_type_id)->first();
+        $check = Service::where('tasker_id', Auth::user()->id)->where('service_type_id', $req->service_type_id)->where('service_status', '!=', 4)->exists();
+        if (!$check) {
             $data = $req->validate([
                 'service_rate' => 'required',
                 'service_rate_type' => 'required',
                 'service_type_id' => 'required',
-                'service_desc' => ''
+                'service_desc' => 'required'
 
             ], [], [
                 'service_rate' => 'Service Rate',
@@ -87,12 +90,27 @@ class ServiceController extends Controller
             $data['service_status'] = 0;
             $data['tasker_id'] = Auth::user()->id;
             Service::create($data);
-            return redirect(route('tasker-service-management'))->with('success', 'Your service has been successfully submitted! Please allow up to 3 business days for our administrators to review your application. We’ll notify you once it’s been processed.');
-        } catch (Exception $e) {
-            return redirect(route('tasker-service-management'))->with('error', 'Error : ' . $e->getMessage());
+
+            $servicetype = ServiceType::where('id', $req->service_type_id)->first();
+
+            Mail::to(Auth::user()->email)->send(new ServiceApplicationNotification([
+                'name' => Str::headline(Auth::user()->tasker_firstname . ' ' . Auth::user()->tasker_lastname),
+                'service_name' => $servicetype->servicetype_name,
+                'date' => Carbon::now()->format('d F Y g:i A'),
+                'service_rate' =>  $data['service_rate'],
+                'service_rate_type' => $data['service_rate_type'],
+                'service_desc' => $data['service_desc'],
+                'service_status' => $data['service_status']
+            ]));
+
+            return back()->with('success', 'Your service has been successfully submitted! Please allow up to 3 business days for our administrators to review your application. We’ll notify you once it’s been processed.');
+        } else {
+            return back()->with('error', 'You have already submitted the application for these services. Please submit a new application for different services.');
         }
     }
 
+    //Tasker - Update Service
+    // Check by : Zikri (10/01/2025)
     public function updateService(Request $req, $id)
     {
         try {
@@ -102,7 +120,7 @@ class ServiceController extends Controller
                 'service_rate_type' => 'required',
                 'service_type_id' => 'required',
                 'service_status' => 'required',
-                'service_desc' => ''
+                'service_desc' => 'required'
 
             ], [], [
                 'service_rate' => 'Service Rate',
@@ -116,24 +134,38 @@ class ServiceController extends Controller
             $message = null;
             if ($oridata->service_rate != $data['service_rate'] || $oridata->service_rate_type != $data['service_rate_type']) {
                 $data['service_status'] = 0;
+                $servicetype = ServiceType::where('id', $req->service_type_id)->first();
+
+                Mail::to(Auth::user()->email)->send(new ServiceApplicationNotification([
+                    'name' => Str::headline(Auth::user()->tasker_firstname . ' ' . Auth::user()->tasker_lastname),
+                    'service_name' => $servicetype->servicetype_name,
+                    'date' => Carbon::now()->format('d F Y g:i A'),
+                    'service_rate' =>  $data['service_rate'],
+                    'service_rate_type' => $data['service_rate_type'],
+                    'service_desc' => $data['service_desc'],
+                    'service_status' => $data['service_status']
+                ]));
+
                 $message = 'Your service has been successfully submitted! Please allow up to 3 business days for our administrators to review your updated application. We’ll notify you once it’s been processed.';
             } else {
                 $message = 'Service details has been successfully updated !';
             }
             Service::whereId($id)->update($data);
-            return redirect(route('tasker-service-management'))->with('success', $message);
+            return back()->with('success', $message);
         } catch (Exception $e) {
-            return redirect(route('tasker-service-management'))->with('error', 'Error : ' . $e->getMessage());
+            return back()->with('error', 'Error : ' . $e->getMessage());
         }
     }
 
+    //Tasker - Remove Service
+    // Check by : Zikri (10/01/2025)
     public function deleteService($id)
     {
         try {
             Service::where('id', $id)->delete();
-            return redirect(route('tasker-service-management'))->with('success', 'Service has been deleted successfully !');
+            return back()->with('success', 'Service has been deleted successfully !');
         } catch (Exception $e) {
-            return redirect(route('tasker-service-management'))->with('error', 'Error : ' . $e->getMessage());
+            return back()->with('error', 'The operation cannot be completed as it is restricted. You may only change the status to "Inactive".');
         }
     }
 
@@ -303,7 +335,7 @@ class ServiceController extends Controller
                 ->join('service_types as c', 'b.service_type_id', '=', 'c.id')
                 ->whereIn('b.id', $seviceIds)
                 ->get();
-                
+
             foreach ($datas as $data) {
                 Mail::to($data->email)->send(new TaskerServiceApproved([
                     'name' => Str::headline($data->tasker_firstname . ' ' . $data->tasker_lastname),
