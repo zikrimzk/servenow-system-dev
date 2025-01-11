@@ -164,7 +164,7 @@
 
             <div class="action-btn">
                 @if ($data['users'] == 1)
-                    <a href="{{ route('client-login') }}">Access Your Dashboard</a>
+                    <a href="{{ route('client-login') }}">Book Your Service at ServeNow !</a>
                 @elseif ($data['users'] == 2)
                     <a href="{{ route('tasker-login') }}">View Your Dashboard</a>
                 @endif

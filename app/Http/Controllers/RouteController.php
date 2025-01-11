@@ -476,6 +476,7 @@ class RouteController extends Controller
     }
 
     // Tasker - Service Management Navigation
+    // Updated by: Zikri (10/01/2025)
     public function taskerServiceEnrollmentNav(Request $request)
     {
         try {
@@ -568,6 +569,8 @@ class RouteController extends Controller
         }
     }
 
+    // Tasker - Booking Management Navigation
+    // Updated by: Zikri (11/01/2025)
     public function taskerBookingManagementNav(Request $request)
     {
         return view('tasker.booking.index', [

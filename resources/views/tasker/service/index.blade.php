@@ -102,10 +102,10 @@
             </div>
 
             <!-- Modal Service Create Start Here -->
-            <div class="modal fade" id="addServiceModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
-                    <form action="{{ route('tasker-service-create') }}" method="POST">
-                        @csrf
+            <form action="{{ route('tasker-service-create') }}" method="POST">
+                @csrf
+                <div class="modal fade" id="addServiceModal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="mb-0">Add Service</h5>
@@ -199,10 +199,9 @@
                                 </div>
                             </div>
                         </div>
-                    </form>
-
+                    </div>
                 </div>
-            </div>
+            </form>
             <!-- Modal Service Create End  Here -->
 
 

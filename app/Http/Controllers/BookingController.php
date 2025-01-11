@@ -620,58 +620,6 @@ class BookingController extends Controller
         }
     }
 
-    public function rescheduleBookingTimeFunction(Request $request)
-    {
-        // Find the booking by ID
-        $booking = Booking::find($request->id);
-
-        // Get the old time range
-        $oldDate = $booking->booking_date;
-        $oldStartTime = $booking->booking_time_start;
-        $oldEndTime = $booking->booking_time_end;
-
-        // Update the booking start and end times
-        $booking->booking_date = $request->date;
-        $booking->booking_status = 4;
-        $booking->booking_time_start = Carbon::parse($request->start)->format('H:i:s');
-        $booking->booking_time_end = Carbon::parse($request->end)->format('H:i:s');
-        $booking->save();
-
-        // Calculate new end time for slot adjustment (minus one hour)
-        $newEndTime = date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($request->end)->format('H:i:s'))));
-
-        // 1. Set old slots back to available (status = 1)
-        DB::table('tasker_time_slots as a')
-            ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
-            ->where('a.tasker_id', '=', Auth::user()->id)
-            ->where('a.slot_date', '=', $oldDate)
-            ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
-            ->update(['a.slot_status' => 1]);
-
-        // 2. Set new slots to booked (status = 2)
-        $newSlots = DB::table('tasker_time_slots as a')
-            ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
-            ->where('a.tasker_id', '=', Auth::user()->id)
-            ->where('a.slot_date', '=', $request->date)
-            ->whereBetween('b.time', [Carbon::parse($request->start)->format('H:i:s'), $newEndTime])
-            ->where('a.slot_status', '=', 1)
-            ->select('a.id as tasker_time_id', 'b.time')
-            ->get();
-
-        foreach ($newSlots as $slot) {
-            DB::table('tasker_time_slots')
-                ->where('id', '=', $slot->tasker_time_id)
-                ->update(['slot_status' => 2]);
-        }
-
-        // Return a response confirming the update
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Event rescheduled successfully',
-            'updated_booking' => $booking
-        ]);
-    }
-
     // Done by Muhammad Zikri (2/1/2025)
     private function sendBookingStatusEmail($data, $userType)
     {
@@ -680,6 +628,8 @@ class BookingController extends Controller
             $status = 'Paid';
         } elseif ($data->booking_status == 3) {
             $status = 'Confirmed';
+        } elseif ($data->booking_status == 4) {
+            $status = 'Rescheduled';
         } elseif ($data->booking_status == 5) {
             $status = 'Cancelled';
         } elseif ($data->booking_status == 6) {
@@ -694,6 +644,7 @@ class BookingController extends Controller
         } else {
             $note = '-';
         }
+
         // User Name
         if ($userType == 1) {
 
@@ -719,6 +670,81 @@ class BookingController extends Controller
 
         ]));
     }
+
+    public function rescheduleBookingTimeFunction(Request $request)
+    {
+        // Find the booking by ID
+        $booking = Booking::find($request->id);
+
+        // Get the old time range
+        $oldDate = $booking->booking_date;
+        $oldStartTime = $booking->booking_time_start;
+        $oldEndTime = $booking->booking_time_end;
+
+        $checkTimeSlot = TaskerTimeSlot::where('tasker_id', Auth::user()->id)->where('slot_date', $request->date)->exists();
+
+        if ($checkTimeSlot) {
+            // Update the booking start and end times
+            $booking->booking_date = $request->date;
+            $booking->booking_status = 4;
+            $booking->booking_time_start = Carbon::parse($request->start)->format('H:i:s');
+            $booking->booking_time_end = Carbon::parse($request->end)->format('H:i:s');
+            $booking->save();
+
+            // Calculate new end time for slot adjustment (minus one hour)
+            $newEndTime = date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($request->end)->format('H:i:s'))));
+
+            // 1. Set old slots back to available (status = 1)
+            DB::table('tasker_time_slots as a')
+                ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                ->where('a.tasker_id', '=', Auth::user()->id)
+                ->where('a.slot_date', '=', $oldDate)
+                ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
+                ->update(['a.slot_status' => 1]);
+
+            // 2. Set new slots to booked (status = 2)
+            $newSlots = DB::table('tasker_time_slots as a')
+                ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                ->where('a.tasker_id', '=', Auth::user()->id)
+                ->where('a.slot_date', '=', $request->date)
+                ->whereBetween('b.time', [Carbon::parse($request->start)->format('H:i:s'), $newEndTime])
+                ->where('a.slot_status', '=', 1)
+                ->select('a.id as tasker_time_id', 'b.time')
+                ->get();
+
+            foreach ($newSlots as $slot) {
+                DB::table('tasker_time_slots')
+                    ->where('id', '=', $slot->tasker_time_id)
+                    ->update(['slot_status' => 2]);
+            }
+
+            // 3. Send an email to client 
+            $datasClient = DB::table('clients as a')
+                ->join('bookings as b', 'a.id', '=', 'b.client_id')
+                ->join('services as c', 'b.service_id', '=', 'c.id')
+                ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
+                ->where('b.id', $booking->id)
+                ->get();
+
+            foreach ($datasClient as $data) {
+                $this->sendBookingStatusEmail($data, 1);
+            }
+
+            // Return a response confirming the update
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Event rescheduled successfully',
+                'updated_booking' => $booking
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Oops !, You cannot reschedule to this date because there is no time slots generated !',
+            ]);
+        }
+    }
+
+
 
     // Done by Muhammad Zikri (2/1/2025)
     public function adminUpdateBooking(Request $request, $id)

@@ -181,9 +181,6 @@ use Carbon\Carbon;
                     </div>
                 </div>
                 <!-- Modal View Booking Details End Here-->
-
-
-
             @endforeach
 
 
@@ -261,3 +258,4 @@ use Carbon\Carbon;
     </script>
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
+<!--Updated By: Muhammad Zikri B. Kashim (11/01/2025)-->

@@ -13,10 +13,10 @@
 
         /* Header Toolbar Buttons */
         .fc-toolbar .fc-button {
-            background-color: #007bff;
+            background-color: #142c4d !important;
             /* Primary blue color for buttons */
             border: none;
-            color: white;
+            color: rgb(255, 255, 255) !important;
             padding: 5px 10px;
             border-radius: 5px;
             transition: background-color 0.3s ease;
@@ -24,7 +24,6 @@
 
         .fc-toolbar .fc-button:hover {
             background-color: #0056b3;
-            /* Darker blue for hover effect */
         }
 
         /* Day and Time Slots */
@@ -34,7 +33,7 @@
         }
 
         .fc-day-today {
-            background-color: #e9f7ff;
+            background-color: #ffffff !important;
             /* Light blue for the current day */
         }
 
@@ -42,7 +41,7 @@
         .fc-event {
             border-radius: 10px;
             /* Rounded corners for events */
-            font-size: 14px;
+            font-size: 12px;
             padding: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             /* Subtle shadow for depth */
@@ -55,8 +54,6 @@
 
         /* Modal Design */
         #eventDetailsModal .modal-header {
-            background-color: #007bff;
-            color: white;
             border-bottom: none;
         }
 
@@ -67,7 +64,6 @@
         /* Unavailable Slot Styling */
         .event-unavailable {
             background-color: #d9534f !important;
-            /* Red for unavailable slots */
             color: white !important;
             opacity: 0.8;
             pointer-events: none;
@@ -75,22 +71,17 @@
 
         /* Smooth Hover Animation for Events */
         .fc-event {
+            background-color: #005d88 !important;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .fc-event:hover {
-            transform: scale(1.05);
-            /* Slight zoom on hover */
+            transform: scale(1.03);
         }
 
         #eventDetailsModal {
             border-radius: 10px;
             overflow: hidden;
-        }
-
-        #eventDetailsModal .modal-header {
-            font-size: 18px;
-            font-weight: bold;
         }
 
         #eventDetailsModal input,
@@ -102,15 +93,48 @@
         }
 
         .fc-toolbar .fc-button:hover {
-            background-color: #0056b3;
-            color: #fff;
-            transform: scale(1.05);
+            background-color: #142c4d !important;
+            color: #fff !important;
+            transform: scale(1.03);
         }
 
-        .fc-day-sun,
-        .fc-day-sat {
-            background-color: #f8f9fa;
-            /* Light grey for weekends */
+
+        /* List View Events */
+        .fc-list-event td {
+            color: white !important;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease !important;
+            padding: 10px 15px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .event-success td {
+            background-color: #1e8357 !important;
+            color: white !important;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease !important;
+            padding: 10px 15px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .fc-list .fc-list-event:hover td {
+            background-color: #142c4d !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15) !important;
+            color: white !important;
+            transform: scale(1.02) !important;
+
+
+        }
+
+        /* Adjust Event Title in List View */
+        .fc-list-event-title {
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        /* Adjust Time in List View */
+        .fc-list-event-time {
+            font-weight: 400;
+            font-size: 12px;
+            color: #ddd;
         }
     </style>
     <!-- [ Main Content ] start -->
@@ -288,9 +312,9 @@
     <!-- [ Main Content ] end -->
 
 
-
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
     <script>
+        // Format Date 
         function formatDateLocal(date) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -298,6 +322,7 @@
             return `${year}-${month}-${day}`;
         }
 
+        // Format Time
         function formatDateTime(date) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -313,7 +338,7 @@
             return `${day}-${month}-${year}, ${hours}:${minutes} ${ampm}`;
         }
 
-        //Unused function (but worked)
+        //Get Calendar range from today to next 7 days (notUsed)
         function getValidRange() {
             const today = new Date();
             const sevenDaysFromToday = new Date();
@@ -325,6 +350,7 @@
             };
         }
 
+        //Calander Code 
         let validRange = getValidRange();
         let calendarInstance = null;
 
@@ -335,40 +361,6 @@
             let currentLoadedDate = null;
             let allowedStartTimes = [];
 
-            // function fetchAvailability(date) {
-            //     return fetch(`{{ route('get-calander-range-tasker') }}?taskerid=${taskerId}&date=${date}`)
-            //         .then(response => response.json())
-            //         .then(data => {
-            //             if (!data.start_time || !data.end_time) {
-            //                 console.log('No availability found for this tasker.');
-            //                 return {
-            //                     startTime: null,
-            //                     endTime: null,
-            //                     unavailableSlots: [],
-            //                     allowedTimes: [],
-            //                 };
-            //             }
-
-            //             allowedStartTimes = data.allowed_times || [];
-            //             console.log( allowedStartTimes);
-            //             return {
-            //                 startTime: data.start_time,
-            //                 endTime: data.end_time,
-            //                 unavailableSlots: Array.isArray(data.unavailable_slots) ? data.unavailable_slots :
-            //                 [],
-            //                 allowedTimes: allowedStartTimes,
-            //             };
-            //         })
-            //         .catch(error => {
-            //             console.error('Error fetching tasker availability:', error);
-            //             return {
-            //                 startTime: null,
-            //                 endTime: null,
-            //                 unavailableSlots: [],
-            //                 allowedTimes: [],
-            //             };
-            //         });
-            // }
             function fetchAvailability(date) {
                 return fetch(`{{ route('get-calander-range-tasker') }}?taskerid=${taskerId}&date=${date}`)
                     .then(response => response.json())
@@ -376,13 +368,14 @@
                         if (!data.start_time || !data.end_time) {
                             console.log('No availability found for this tasker on this date.');
                             return {
-                                startTime: '07:00:00', // Default
-                                endTime: '20:00:00', // Default
+                                startTime: '07:00:00',
+                                endTime: '21:00:00',
                                 unavailableSlots: [],
                                 allowedTimes: [],
                             };
                         }
 
+                        allowedStartTimes = data.allowed_times || [];
                         return {
                             startTime: data.start_time,
                             endTime: data.end_time,
@@ -393,8 +386,8 @@
                     .catch(error => {
                         console.error('Error fetching tasker availability:', error);
                         return {
-                            startTime: '07:00:00', // Default fallback
-                            endTime: '20:00:00',
+                            startTime: null,
+                            endTime: null,
                             unavailableSlots: [],
                             allowedTimes: [],
                         };
@@ -427,21 +420,29 @@
                     slotMaxTime: '21:00:00',
                     editable: true,
                     selectable: true,
-                    businessHours: [],
+                    eventResize: function(info) {
+                        info.revert();
+                        alert('Resizing is disabled');
+                    },
                     datesSet: function(info) {
-                        const currentDate = info.startStr.split('T')[
-                            0]; // Extract date in YYYY-MM-DD format
+                        const currentDate = info.startStr.split('T')[0];
+                        console.log(currentDate);
                         fetchAvailability(currentDate).then(availability => {
-                            calendar.setOption('businessHours', [{
-                                daysOfWeek: [0, 1, 2, 3, 4, 5,
-                                    6
-                                ], // Apply to all days
-                                startTime: availability.startTime,
-                                endTime: availability.endTime,
-                            }, ]);
+                            if (!availability.startTime || !availability.endTime) {
+                                // Disable business hours and constraints for this day
+                            } else {
+                                // Enable business hours and constraints for this day
+                                calendar.setOption('businessHours', [{
+                                    daysOfWeek: [0, 1, 2, 3, 4, 5,
+                                        6
+                                    ], // Apply to all days
+                                    startTime: availability.startTime,
+                                    endTime: availability.endTime,
+                                }]);
+                                calendar.setOption('eventConstraint', 'businessHours');
+                            }
                         });
                     },
-                    eventConstraint: 'businessHours',
                     eventSources: [{
                             events: function(fetchInfo, successCallback, failureCallback) {
                                 // Fetch events dynamically for tasker bookings
@@ -574,7 +575,7 @@
 
                     },
                     eventDrop: eventDropHandler,
-                    eventResize: eventResizeHandler,
+                    // eventResize: eventResizeHandler,
                     dateClick: function(info) {
                         calendar.changeView('timeGridDay', info.dateStr);
                     },
@@ -588,56 +589,72 @@
             let eventToUpdate = null;
             let confirmClicked = false;
 
-            function isValidDropOrResize(date) {
-                if (allowedStartTimes.length === 0) {
-                    console.error('Allowed start times array is empty!');
-                    return false; // Prevent dragging
-                }
+            function isValidDropOrResize(date, taskerId) {
+                // Extract the date in 'YYYY-MM-DD' format
+                const draggedDate = date.toLocaleDateString('en-CA');
 
-                // Format dragged time
-                const draggedTime = date.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false,
-                }).padStart(5, '0');
+                // Fetch availability for the selected day
+                return fetchAvailability(draggedDate).then(availability => {
+                    // If no start or end time is available, prevent the drop or resize
+                    if (!availability.startTime || !availability.endTime) {
+                        console.error('No availability for the selected day!');
+                        return false;
+                    }
 
-                // Ensure allowedStartTimes values are strings and pad them
-                const formattedAllowedTimes = allowedStartTimes.map(time =>
-                    String(time).padStart(5, '0')
-                );
+                    // Get the dragged time in 'HH:mm' format
+                    const draggedTime = date.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false,
+                    }).padStart(5, '0');
 
-                // Check if the dragged time matches any allowed slot
-                return formattedAllowedTimes.some(time => time === draggedTime);
+                    // Fetch allowed start times from the availability data
+                    const allowedTimes = availability.allowedTimes.map(time =>
+                        String(time).padStart(5, '0')
+                    );
+
+                    // Validate if the dragged time is within the allowed times
+                    return allowedTimes.some(time => time === draggedTime);
+                }).catch(error => {
+                    console.error('Error fetching availability:', error);
+                    return false; // Prevent drop if error occurs while fetching availability
+                });
             }
 
             function eventDropHandler(info) {
-                if (!isValidDropOrResize(info.event.start)) {
-                    alert('Invalid drop time. Please follow the allowed time intervals.');
-                    info.revert(); // Revert changes if drop time is invalid
-                } else {
-                    // Store the event and show the confirmation modal
-                    eventToUpdate = info; // Ensure this line runs correctly
-                    console.log('Event to update (drop):', eventToUpdate); // Debugging
-                    document.getElementById('newStartTime').textContent = formatDateTime(info.event.start);
-                    document.getElementById('newEndTime').textContent = formatDateTime(info.event.end);
-                    new bootstrap.Modal(document.getElementById('confirmModal')).show();
-                }
+                const droppedDate = info.event.start; // Get the start date and time of the event
+
+                isValidDropOrResize(droppedDate).then(isValid => {
+                    if (!isValid) {
+                        alert('Invalid drop ! Please try another day and time.');
+                        info.revert();
+                    } else {
+                        // Proceed with the valid drop
+                        console.log(`Event dropped successfully at ${droppedDate}`);
+                        // Show modal for event confirmation
+                        eventToUpdate = info;
+                        document.getElementById('newStartTime').textContent = formatDateTime(info.event
+                            .start);
+                        document.getElementById('newEndTime').textContent = formatDateTime(info.event.end);
+                        new bootstrap.Modal(document.getElementById('confirmModal')).show();
+                    }
+                });
             }
 
-            function eventResizeHandler(info) {
-                if (!isValidDropOrResize(info.event.start) || !isValidDropOrResize(info.event.end)) {
-                    alert('Invalid resize time. Please follow the allowed time intervals.');
-                    info.revert(); // Revert changes if resize time is invalid
-                } else {
-                    // Store the event and show the confirmation modal
-                    eventToUpdate = info; // Ensure this line runs correctly
-                    console.log('Event to update (resize):', eventToUpdate); // Debugging
-                    document.getElementById('newStartTime').textContent = info.event.start.toLocaleString();
-                    document.getElementById('newEndTime').textContent = info.event.end.toLocaleString();
-                    new bootstrap.Modal(document.getElementById('confirmModal')).show();
-                }
-            }
+            // function eventResizeHandler(info) {
+            //     if (!isValidDropOrResize(info.event.start) || !isValidDropOrResize(info.event.end)) {
+            //         alert('Invalid resize time. Please follow the allowed time intervals.');
+            //         info.revert(); // Revert changes if resize time is invalid
+            //     } else {
+            //         // Store the event and show the confirmation modal
+            //         eventToUpdate = info; // Ensure this line runs correctly
+            //         console.log('Event to update (resize):', eventToUpdate); // Debugging
+            //         document.getElementById('newStartTime').textContent = info.event.start.toLocaleString();
+            //         document.getElementById('newEndTime').textContent = info.event.end.toLocaleString();
+            //         new bootstrap.Modal(document.getElementById('confirmModal')).show();
+            //     }
+            // }
 
             // Event listener for confirming the reschedule
             document.getElementById('confirmRescheduleBtn').addEventListener('click', function() {
@@ -724,7 +741,12 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'success') {
-                            console.log('Event updated successfully in the database:', data.updated_booking);
+                            // alert('Event rescheduled successfully !');
+                        } else if (data.status === 'error') {
+                            // alert(
+                            //     'Oops !, You cannot reschedule to this date because there is no time slots generated.'
+                            // );
+                            info.revert();
                         } else {
                             console.error('Failed to update event:', data.message);
                             info.revert(); // Revert changes if update fails
@@ -743,6 +765,7 @@
             });
         });
 
+        //AJAX: CONFIRM BOOKING
         $('#confirmBookingChange').on('click', function() {
             const $buttonConfirm = $(this);
             const $buttonReject = $('#rejectBookingChange');
@@ -790,6 +813,7 @@
                 });
         });
 
+        //AJAX: REJECT BOOKING
         $('#rejectBookingChange').on('click', function() {
             const $buttonRejectTwo = $(this);
             const $buttonConfirmTwo = $('#confirmBookingChange');
@@ -839,3 +863,4 @@
     </script>
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
+<!--Updated By: Muhammad Zikri B. Kashim (11/01/2025)-->
