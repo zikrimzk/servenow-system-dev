@@ -480,10 +480,184 @@ class BookingController extends Controller
         }
     }
 
+    public function clientChangeBookingStatus($id, $taskerid, $option)
+    {
+        try {
+
+            $booking = Booking::findOrFail($id);
+
+            if ($option == 1) {
+                $booking->booking_status = 5;
+                $booking->save();
+                $oldDate = $booking->booking_date;
+                $oldStartTime = $booking->booking_time_start;
+                $oldEndTime = $booking->booking_time_end;
+
+                DB::table('tasker_time_slots as a')
+                    ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                    ->where('a.tasker_id', '=', $taskerid)
+                    ->where('a.slot_date', '=', $oldDate)
+                    ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
+                    ->update(['a.slot_status' => 1]);
+                $message = 'Your booking cancellation request has been processed successfully !';
+            } else if ($option == 2) {
+                // refund process here
+                $booking->booking_status = 7;
+                $booking->save();
+                $message = 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account.';
+            } else if ($option == 3) {
+                // refund process here
+                $booking->booking_status = 6;
+                $booking->save();
+                $message = 'You have confirmed that you have received the service. Please leave a review for the tasker.';
+            }
+            return back()->with('success', $message);
+        } catch (Exception $e) {
+            // Catch errors and return a JSON response with a proper error message.
+            return back()->with('error', 'Opps , there was an unexpected error to execute the operation. Please try again.');
+        }
+    }
+
+    public function clientReviewBooking(Request $request)
+    {
+        try {
+
+            $validated = $request->validate([
+                'review_rating' => 'required|integer|min:1|max:5',
+                'review_description' => 'max:1000',
+                'photos' => 'nullable|array|max:4',
+                'photos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+                'review_type' => 'nullable',
+                'booking_id' => 'required|integer|exists:bookings,id',
+            ]);
+            if ($request->review_type == "on") {
+                $validated['review_type'] = 2;
+            } else {
+                $validated['review_type'] = 1;
+            }
+
+            $imagePaths = [null, null, null, null];
+
+            if ($request->hasFile('photos')) {
+                foreach ($request->file('photos') as $index => $photo) {
+                    if ($index < 4) {
+                        $imagePaths[$index] = $photo->store('uploads/review_images', 'public');
+                    }
+                }
+            }
+            $imagePaths = array_pad($imagePaths, 4, null);
+
+            Review::create([
+                'review_rating' => $validated['review_rating'],
+                'review_description' => $validated['review_description'],
+                'review_imageOne' => $imagePaths[0],
+                'review_imageTwo' => $imagePaths[1],
+                'review_imageThree' => $imagePaths[2],
+                'review_imageFour' => $imagePaths[3],
+                'review_type' => $validated['review_type'],
+                'review_date_time' => now(),
+                'booking_id' => $validated['booking_id']
+            ]);
+
+            $totalreviewcount = DB::table('reviews as a')
+                ->join('bookings as b', 'a.booking_id', '=', 'b.id')
+                ->join('services as c', 'b.service_id', '=', 'c.id')
+                ->where('c.tasker_id', '=', $request->tasker_id)
+                ->select('a.id')
+                ->count();
+            $totalRating =  DB::table('reviews as a')
+                ->join('bookings as b', 'a.booking_id', '=', 'b.id')
+                ->join('services as c', 'b.service_id', '=', 'c.id')
+                ->where('c.tasker_id', '=', $request->tasker_id)
+                ->select('a.review_rating')
+                ->sum('a.review_rating');
+
+            $finalRating =  number_format($totalRating / $totalreviewcount, 1);
+
+            Tasker::where('id', $request->tasker_id)->update(['tasker_rating' =>  $finalRating]);
+
+
+            return back()->with('success', 'Review submitted successfully!');
+        } catch (Exception $e) {
+
+            Log::error('Unexpected error:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return back()->with('error', 'An unexpected error occurred. Please try again.');
+        }
+    }
+
+    public function clientRefundRequest(Request $request, $id)
+    {
+        $formattedDate = Carbon::parse(Carbon::now())
+            ->format('Y-m-d');
+        $validated = $request->validate([
+            'cr_reason' => 'required',
+            'cr_amount' => 'required',
+            'cr_bank_name' => 'required',
+            'cr_account_name' => 'required',
+            'cr_account_number' => 'required',
+        ], [], [
+            'cr_reason' => 'Reason',
+            'cr_amount' => 'Amount',
+            'cr_bank_name' => 'Bank Name',
+            'cr_account_name' => 'Account Name',
+            'cr_account_number' => 'Account Number',
+        ]);
+        $validated['cr_date'] = $formattedDate;
+        $validated['cr_status'] = 1;
+        $validated['booking_id'] = $id;
+        CancelRefundBooking::create($validated);
+
+        $booking = Booking::findOrFail($id);
+        $booking->booking_status = 7;
+        $booking->save();
+
+        $tasker = DB::table('services as a')
+            ->join('taskers as b', 'a.tasker_id', '=', 'b.id')
+            ->join('bookings as c', 'a.id', '=', 'c.service_id')
+            ->where('c.id', '=', $booking->service_id)
+            ->select('b.id')
+            ->first();
+        // dd($tasker->id);
+
+        $oldDate = $booking->booking_date;
+        $oldStartTime = $booking->booking_time_start;
+        $oldEndTime = $booking->booking_time_end;
+
+        DB::table('tasker_time_slots as a')
+            ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+            ->where('a.tasker_id', '=', $tasker->id)
+            ->where('a.slot_date', '=', $oldDate)
+            ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
+            ->update(['a.slot_status' => 1]);
+
+        return back()->with('success', 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account. ');
+    }
+
+    public function clientUpdateRefundRequest(Request $request, $id)
+    {
+        $refund = CancelRefundBooking::findOrFail($id);
+        $validated = $request->validate([
+            'cr_bank_name' => 'required',
+            'cr_account_name' => 'required',
+            'cr_account_number' => 'required',
+        ]);
+        $validated['cr_status'] = 1;
+        CancelRefundBooking::where('id', $id)->update($validated);
+        Booking::where('id', $refund->booking_id)->update(['booking_status' => 7]);
+
+        return back()->with('success', 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account. ');
+    }
+
+    // Tasker >> My Booking - Get Booking details
+    // Check by : Zikri (11/01/2025)
     public function getBookingsDetails()
     {
         try {
-            // $bookings = Booking::all();
             $bookings = DB::table('bookings as a')
                 ->join('clients as b', 'a.client_id', '=', 'b.id')
                 ->join('services as c', 'a.service_id', '=', 'c.id')
@@ -512,7 +686,7 @@ class BookingController extends Controller
                     'b.longitude',
                 )
                 ->get();
-            // dd($bookings);
+
             $events = $bookings->map(function ($booking) {
                 $className = '';
                 $editable = true;
@@ -549,6 +723,8 @@ class BookingController extends Controller
         }
     }
 
+    // Tasker >> My Booking - Get Unavailable Time Slots
+    // Check by : Zikri (11/01/2025)
     public function getTaskerUnavailableSlot()
     {
         try {
@@ -584,6 +760,8 @@ class BookingController extends Controller
         }
     }
 
+    // Tasker >> My Booking - Get Business Hour for every day
+    // Check by : Zikri (11/01/2025)
     public function getRangeTimeSlotsForTaskerCalander(Request $request)
     {
         try {
@@ -620,7 +798,8 @@ class BookingController extends Controller
         }
     }
 
-    // Done by Muhammad Zikri (2/1/2025)
+    // Tasker | Admin - Send Email Notification for booking status update
+    // Check by : Zikri (11/01/2025)
     private function sendBookingStatusEmail($data, $userType)
     {
         // Booking Status
@@ -671,6 +850,8 @@ class BookingController extends Controller
         ]));
     }
 
+    // Tasker >> My Booking - Reshedule Booking 
+    // Check by : Zikri (11/01/2025)
     public function rescheduleBookingTimeFunction(Request $request)
     {
         // Find the booking by ID
@@ -744,6 +925,91 @@ class BookingController extends Controller
         }
     }
 
+
+    // Tasker >> My Booking - Confirm / Reject Booking 
+    // Check by : Zikri (11/01/2025)
+    public function taskerChangeBookingStatus(Request $request)
+    {
+        try {
+            $booking = Booking::findOrFail($request->id);
+            if ($request->option == 1) {
+                $booking->booking_status = 3;
+                $booking->save();
+
+                $datasClient = DB::table('clients as a')
+                    ->join('bookings as b', 'a.id', '=', 'b.client_id')
+                    ->join('services as c', 'b.service_id', '=', 'c.id')
+                    ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
+                    ->where('b.id', $request->id)
+                    ->get();
+
+                foreach ($datasClient as $data) {
+                    $this->sendBookingStatusEmail($data, 1);
+                }
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Booking Confirmed!',
+                    'updated_booking' => $booking,
+                ]);
+            } else if ($request->option == 2) {
+                $booking->booking_status = 9;
+                $booking->save();
+
+                $oldDate = $booking->booking_date;
+                $oldStartTime = $booking->booking_time_start;
+                $oldEndTime = $booking->booking_time_end;
+
+                DB::table('tasker_time_slots as a')
+                    ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
+                    ->where('a.tasker_id', '=', Auth::user()->id)
+                    ->where('a.slot_date', '=', $oldDate)
+                    ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
+                    ->update(['a.slot_status' => 1]);
+
+                $formattedDate = Carbon::parse(Carbon::now())
+                    ->format('Y-m-d');
+                $reason = 'Tasker: ' . Auth()->user()->tasker_firstname . ' ' . Auth()->user()->tasker_lastname . ' unable to serve the services. Full refund requested by tasker.';
+                $validated = [
+                    'cr_date' => $formattedDate,
+                    'cr_reason' => $reason,
+                    'cr_status' => 0,
+                    'cr_amount' => $booking->booking_rate,
+                    'cr_bank_name' => '-',
+                    'cr_account_name' => '-',
+                    'cr_account_number' => '-',
+                    'booking_id' => $request->id,
+                ];
+                CancelRefundBooking::create($validated);
+
+                $refund = CancelRefundBooking::where('booking_id', $request->id)->first();
+                $refundid = $refund->id;
+
+                $dataClient = DB::table('bookings as a')
+                    ->join('services as b', 'a.service_id', '=', 'b.id')
+                    ->join('cancel_refund_bookings as c', 'a.id', '=', 'c.booking_id')
+                    ->join('clients as d', 'a.client_id', '=', 'd.id')
+                    ->join('service_types as e', 'b.service_type_id', '=', 'e.id')
+                    ->where('c.id', $refundid)
+                    ->get();
+
+                foreach ($dataClient as $data) {
+                    $this->sendRefundStatusEmail($data, 5);
+                }
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Refund Request will be processed. Please inform the client to update their bank information in their booking history refund section.',
+                    'updated_booking' => $refundid,
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
 
     // Done by Muhammad Zikri (2/1/2025)
@@ -939,8 +1205,8 @@ class BookingController extends Controller
             'cr_account_number' => $data->cr_account_number,
         ]));
     }
+    
     // Done by Muhammad Zikri (2/1/2025)
-
     public function adminBookingRefundProcess($bookingid, $refundid, $option)
     {
         try {
@@ -1043,262 +1309,5 @@ class BookingController extends Controller
         } catch (Exception $e) {
             return back()->with('error', 'Opps , there was an unexpected error to execute the operation. Please try again.');
         }
-    }
-
-    // Done by Muhammad Zikri (2/1/2025)
-
-    public function taskerChangeBookingStatus(Request $request)
-    {
-        try {
-            $booking = Booking::findOrFail($request->id);
-            if ($request->option == 1) {
-                $booking->booking_status = 3;
-                $booking->save();
-
-                $datasClient = DB::table('clients as a')
-                    ->join('bookings as b', 'a.id', '=', 'b.client_id')
-                    ->join('services as c', 'b.service_id', '=', 'c.id')
-                    ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
-                    ->where('b.id', $request->id)
-                    ->get();
-
-                foreach ($datasClient as $data) {
-                    $this->sendBookingStatusEmail($data, 1);
-                }
-
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Booking Confirmed!',
-                    'updated_booking' => $booking,
-                ]);
-            } else if ($request->option == 2) {
-                $booking->booking_status = 9;
-                $booking->save();
-
-                $oldDate = $booking->booking_date;
-                $oldStartTime = $booking->booking_time_start;
-                $oldEndTime = $booking->booking_time_end;
-
-                DB::table('tasker_time_slots as a')
-                    ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
-                    ->where('a.tasker_id', '=', Auth::user()->id)
-                    ->where('a.slot_date', '=', $oldDate)
-                    ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
-                    ->update(['a.slot_status' => 1]);
-
-                $formattedDate = Carbon::parse(Carbon::now())
-                    ->format('Y-m-d');
-                $reason = 'Tasker: ' . Auth()->user()->tasker_firstname . ' ' . Auth()->user()->tasker_lastname . ' unable to serve the services. Full refund requested by tasker.';
-                $validated = [
-                    'cr_date' => $formattedDate,
-                    'cr_reason' => $reason,
-                    'cr_status' => 0,
-                    'cr_amount' => $booking->booking_rate,
-                    'cr_bank_name' => '-',
-                    'cr_account_name' => '-',
-                    'cr_account_number' => '-',
-                    'booking_id' => $request->id,
-                ];
-                CancelRefundBooking::create($validated);
-
-                $refund = CancelRefundBooking::where('booking_id', $request->id)->first();
-                $refundid = $refund->id;
-
-                $dataClient = DB::table('bookings as a')
-                    ->join('services as b', 'a.service_id', '=', 'b.id')
-                    ->join('cancel_refund_bookings as c', 'a.id', '=', 'c.booking_id')
-                    ->join('clients as d', 'a.client_id', '=', 'd.id')
-                    ->join('service_types as e', 'b.service_type_id', '=', 'e.id')
-                    ->where('c.id', $refundid)
-                    ->get();
-
-                foreach ($dataClient as $data) {
-                    $this->sendRefundStatusEmail($data, 5);
-                }
-
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Refund Request will be processed. Please inform the client to update their bank information in their booking history refund section.',
-                    'updated_booking' => $refundid,
-                ]);
-            }
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 500);
-        }
-    }
-    public function clientChangeBookingStatus($id, $taskerid, $option)
-    {
-        try {
-
-            $booking = Booking::findOrFail($id);
-
-            if ($option == 1) {
-                $booking->booking_status = 5;
-                $booking->save();
-                $oldDate = $booking->booking_date;
-                $oldStartTime = $booking->booking_time_start;
-                $oldEndTime = $booking->booking_time_end;
-
-                DB::table('tasker_time_slots as a')
-                    ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
-                    ->where('a.tasker_id', '=', $taskerid)
-                    ->where('a.slot_date', '=', $oldDate)
-                    ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
-                    ->update(['a.slot_status' => 1]);
-                $message = 'Your booking cancellation request has been processed successfully !';
-            } else if ($option == 2) {
-                // refund process here
-                $booking->booking_status = 7;
-                $booking->save();
-                $message = 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account.';
-            } else if ($option == 3) {
-                // refund process here
-                $booking->booking_status = 6;
-                $booking->save();
-                $message = 'You have confirmed that you have received the service. Please leave a review for the tasker.';
-            }
-            return back()->with('success', $message);
-        } catch (Exception $e) {
-            // Catch errors and return a JSON response with a proper error message.
-            return back()->with('error', 'Opps , there was an unexpected error to execute the operation. Please try again.');
-        }
-    }
-
-    public function clientReviewBooking(Request $request)
-    {
-        try {
-
-            $validated = $request->validate([
-                'review_rating' => 'required|integer|min:1|max:5',
-                'review_description' => 'max:1000',
-                'photos' => 'nullable|array|max:4',
-                'photos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
-                'review_type' => 'nullable',
-                'booking_id' => 'required|integer|exists:bookings,id',
-            ]);
-            if ($request->review_type == "on") {
-                $validated['review_type'] = 2;
-            } else {
-                $validated['review_type'] = 1;
-            }
-
-            $imagePaths = [null, null, null, null];
-
-            if ($request->hasFile('photos')) {
-                foreach ($request->file('photos') as $index => $photo) {
-                    if ($index < 4) {
-                        $imagePaths[$index] = $photo->store('uploads/review_images', 'public');
-                    }
-                }
-            }
-            $imagePaths = array_pad($imagePaths, 4, null);
-
-            Review::create([
-                'review_rating' => $validated['review_rating'],
-                'review_description' => $validated['review_description'],
-                'review_imageOne' => $imagePaths[0],
-                'review_imageTwo' => $imagePaths[1],
-                'review_imageThree' => $imagePaths[2],
-                'review_imageFour' => $imagePaths[3],
-                'review_type' => $validated['review_type'],
-                'review_date_time' => now(),
-                'booking_id' => $validated['booking_id']
-            ]);
-
-            $totalreviewcount = DB::table('reviews as a')
-                ->join('bookings as b', 'a.booking_id', '=', 'b.id')
-                ->join('services as c', 'b.service_id', '=', 'c.id')
-                ->where('c.tasker_id', '=', $request->tasker_id)
-                ->select('a.id')
-                ->count();
-            $totalRating =  DB::table('reviews as a')
-                ->join('bookings as b', 'a.booking_id', '=', 'b.id')
-                ->join('services as c', 'b.service_id', '=', 'c.id')
-                ->where('c.tasker_id', '=', $request->tasker_id)
-                ->select('a.review_rating')
-                ->sum('a.review_rating');
-
-            $finalRating =  number_format($totalRating / $totalreviewcount, 1);
-
-            Tasker::where('id', $request->tasker_id)->update(['tasker_rating' =>  $finalRating]);
-
-
-            return back()->with('success', 'Review submitted successfully!');
-        } catch (Exception $e) {
-
-            Log::error('Unexpected error:', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ]);
-
-            return back()->with('error', 'An unexpected error occurred. Please try again.');
-        }
-    }
-
-    public function clientRefundRequest(Request $request, $id)
-    {
-        $formattedDate = Carbon::parse(Carbon::now())
-            ->format('Y-m-d');
-        $validated = $request->validate([
-            'cr_reason' => 'required',
-            'cr_amount' => 'required',
-            'cr_bank_name' => 'required',
-            'cr_account_name' => 'required',
-            'cr_account_number' => 'required',
-        ], [], [
-            'cr_reason' => 'Reason',
-            'cr_amount' => 'Amount',
-            'cr_bank_name' => 'Bank Name',
-            'cr_account_name' => 'Account Name',
-            'cr_account_number' => 'Account Number',
-        ]);
-        $validated['cr_date'] = $formattedDate;
-        $validated['cr_status'] = 1;
-        $validated['booking_id'] = $id;
-        CancelRefundBooking::create($validated);
-
-        $booking = Booking::findOrFail($id);
-        $booking->booking_status = 7;
-        $booking->save();
-
-        $tasker = DB::table('services as a')
-            ->join('taskers as b', 'a.tasker_id', '=', 'b.id')
-            ->join('bookings as c', 'a.id', '=', 'c.service_id')
-            ->where('c.id', '=', $booking->service_id)
-            ->select('b.id')
-            ->first();
-        // dd($tasker->id);
-
-        $oldDate = $booking->booking_date;
-        $oldStartTime = $booking->booking_time_start;
-        $oldEndTime = $booking->booking_time_end;
-
-        DB::table('tasker_time_slots as a')
-            ->join('time_slots as b', 'a.slot_id', '=', 'b.id')
-            ->where('a.tasker_id', '=', $tasker->id)
-            ->where('a.slot_date', '=', $oldDate)
-            ->whereBetween('b.time', [$oldStartTime, date('H:i:s', strtotime('-1 hour', strtotime(Carbon::parse($oldEndTime)->format('H:i:s'))))])
-            ->update(['a.slot_status' => 1]);
-
-        return back()->with('success', 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account. ');
-    }
-
-    public function clientUpdateRefundRequest(Request $request, $id)
-    {
-        $refund = CancelRefundBooking::findOrFail($id);
-        $validated = $request->validate([
-            'cr_bank_name' => 'required',
-            'cr_account_name' => 'required',
-            'cr_account_number' => 'required',
-        ]);
-        $validated['cr_status'] = 1;
-        CancelRefundBooking::where('id', $id)->update($validated);
-        Booking::where('id', $refund->booking_id)->update(['booking_status' => 7]);
-
-        return back()->with('success', 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account. ');
     }
 }

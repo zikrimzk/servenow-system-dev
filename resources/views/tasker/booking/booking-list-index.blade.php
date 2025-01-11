@@ -62,6 +62,43 @@ use Carbon\Carbon;
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card table-card">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col-sm-6 mb-3">
+                                    <label for="date_range" class="form-label">Date Range</label>
+                                    <div class="d-flex align-items-center">
+                                        <input type="date" id="startDate" name="startDate" class="form-control">
+                                        <span class="mx-2">to</span>
+                                        <input type="date" id="endDate" name="endDate" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-sm-9 mb-3">
+                                    <label for="rating_filter" class="form-label">Filter by</label>
+                                    <div class="d-block  d-md-flex justify-content-between align-items-center gap-2">
+
+                                        <select id="status_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Status</option>
+                                            <option value="1">To Pay</option>
+                                            <option value="2">Paid</option>
+                                            <option value="3">Confirmed</option>
+                                            <option value="4">Rescheduled</option>
+                                            <option value="5">Cancelled</option>
+                                            <option value="6">Completed</option>
+                                        </select>
+
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 mb-3">
+                                    <label for="endDate" class="form-label text-white">Action</label>
+                                    <div class="d-flex justify-content-start align-items-end">
+                                        <a href="" class="link-primary" id="clearAllBtn">Clear All</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="card-body">
                             <div class="dt-responsive table-responsive my-4 mx-0 mx-md-4">
                                 <table class="table data-table table-hover nowrap">
@@ -73,7 +110,6 @@ use Carbon\Carbon;
                                             <th scope="col">Booking Time</th>
                                             <th scope="col">Booking Status</th>
                                             <th scope="col">Amount (RM)</th>
-                                            <th scope="col">Action</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -149,8 +185,7 @@ use Carbon\Carbon;
                                         <div class="mb-3">
                                             <label class="form-label">Booking Amount (RM)</label>
                                             <input type="text" class="form-control"
-                                                value="{{ number_format($b->booking_rate, 2) }}"
-                                                disabled />
+                                                value="{{ number_format($b->booking_rate, 2) }}" disabled />
                                         </div>
                                     </div>
                                     <div class="col-sm-12">
@@ -197,15 +232,21 @@ use Carbon\Carbon;
             $(function() {
 
                 var table = $('.data-table').DataTable({
-                    processing: true,
+                    // processing: true,
                     serverSide: true,
                     responsive: true,
-                    ajax: "{{ route('tasker-booking-list') }}",
-                    columns: [
-                        {
+                    ajax: {
+                        url: "{{ route('tasker-booking-list') }}",
+                        data: function(d) {
+                            d.startDate = $('#startDate').val();
+                            d.endDate = $('#endDate').val();
+                            d.status_filter = $('#status_filter').val();
+                            // d.state_filter = $('#state_filter').val();
+                        }
+                    },
+                    columns: [{
                             data: 'booking_order_id',
                             name: 'booking_order_id'
-                         
                         },
                         {
                             data: 'client',
@@ -227,12 +268,6 @@ use Carbon\Carbon;
                             data: 'booking_amount',
                             name: 'booking_amount'
                         },
-                        {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false
-                        }
                     ],
                     language: {
                         emptyTable: "No data available in the table.", // Custom message when there's no data
@@ -250,6 +285,22 @@ use Carbon\Carbon;
                         infoFiltered: "(filtered from _MAX_ total entries)"
                     }
 
+                });
+
+                // Refresh the table every 5 seconds
+                // setInterval(function() {
+                //     table.ajax.reload(null, false); // Reloads without resetting pagination
+                //     $('.dataTables_processing').hide();
+                // }, 5000);
+
+                $('#startDate, #endDate').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#status_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
                 });
 
             });

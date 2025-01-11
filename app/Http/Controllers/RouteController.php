@@ -476,7 +476,7 @@ class RouteController extends Controller
     }
 
     // Tasker - Service Management Navigation
-    // Updated by: Zikri (10/01/2025)
+    // Updated by: Zikri (11/01/2025)
     public function taskerServiceEnrollmentNav(Request $request)
     {
         try {
@@ -578,8 +578,7 @@ class RouteController extends Controller
         ]);
     }
 
-    // Admin - Booking List
-
+    // Tasker - Booking List
     public function taskerBookingListNav(Request $request)
     {
         $data = DB::table('bookings as a')
@@ -611,21 +610,29 @@ class RouteController extends Controller
             ->where('b.tasker_id', Auth::user()->id)
             ->orderbyDesc('a.booking_date');
 
-        // if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
-        //     $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
-        //     $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
+        if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
+            $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
+            $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
 
-        //     if ($startDate && $endDate) {
-        //         $data->whereBetween('a.booking_date', [$request->startDate, $request->endDate]);
-        //     }
-        // }
-        // $data->whereBetween('a.booking_date', ['2024-12-30', '2024-12-31']);
+            if ($startDate && $endDate) {
+                $data->whereBetween('a.booking_date', [$request->startDate, $request->endDate]);
+            }
+        }
+
+        if ($request->has('status_filter') && $request->input('status_filter') != '') {
+            $data->where('a.booking_status', $request->input('status_filter'));
+        }
+
         $data = $data->get();
-        // dd($data);
 
         if ($request->ajax()) {
 
             $table = DataTables::of($data)->addIndexColumn();
+
+            $table->addColumn('booking_order_id', function ($row) {
+                $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
+                return $orderid;
+            });
 
             $table->addColumn('client', function ($row) {
                 $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
@@ -665,46 +672,11 @@ class RouteController extends Controller
             });
 
             $table->addColumn('booking_amount', function ($row) {
-
-                if ($row->booking_status == 1) {
-                    $amount = '<span class="text-warning"> ' . $row->booking_rate . '</span>';
-                } else if ($row->booking_status == 2 || $row->booking_status == 3 || $row->booking_status == 4 || $row->booking_status == 6) {
-                    $amount = '<span class="text-success"> ' . $row->booking_rate . '</span>';
-                } else if ($row->booking_status == 5) {
-                    $amount = '<span class="text-danger"> ' . $row->booking_rate . '</span>';
-                }
+                $amount = '<span class="fw-normal"> ' . $row->booking_rate . '</span>';
                 return $amount;
             });
 
-            $table->addColumn('action', function ($row) {
-
-                if ($row->booking_status == 1 || $row->booking_status == 2 || $row->booking_status == 3 || $row->booking_status == 4) {
-                    $button =
-                        '
-                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
-                            <i class="ti ti-eye f-20"></i>
-                        </a>
-                       
-                    ';
-                    // ' <a href="#" class="avtar avtar-xs btn-light-secondary" data-bs-toggle="modal" 
-                    //         data-bs-target="#updatebooking-' . $row->bookingID . '">
-                    //         <i class="ti ti-edit f-20"></i>
-                    //     </a>'
-                } else if ($row->booking_status == 5 || $row->booking_status == 6) {
-                    $button =
-                        '
-                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
-                            <i class="ti ti-eye f-20"></i>
-                        </a>
-                    ';
-                }
-
-                return $button;
-            });
-
-            $table->rawColumns(['client', 'booking_date', 'booking_time', 'booking_status', 'booking_amount', 'action']);
+            $table->rawColumns(['booking_order_id','client', 'booking_date', 'booking_time', 'booking_status', 'booking_amount']);
 
             return $table->make(true);
         }
