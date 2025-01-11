@@ -51,6 +51,7 @@ class GenerateMonthlyStatements extends Command
                 ->join('clients as d', 'c.client_id', '=', 'd.id')
                 ->where('a.id', $tasker->id)
                 ->whereBetween('c.booking_date', [$startDate, $endDate])
+                ->whereIn('c.booking_status',[5,6,7,8])
                 ->get();
 
             $totalCredit = $dataBooking->where('booking_status', 6)->sum('booking_rate');

@@ -57,8 +57,8 @@ use Carbon\Carbon;
                     </div>
                 @endif
             </div>
-
             <!-- End Alert -->
+            
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card table-card">
@@ -68,10 +68,10 @@ use Carbon\Carbon;
                                     <thead>
                                         <tr>
                                             <th scope="col">#</th>
+                                            <th scope="col">Refund Date</th>
                                             <th scope="col">Booking ID</th>
                                             <th scope="col">Tasker</th>
                                             <th scope="col">Client</th>
-                                            <th scope="col">Booking Date</th>
                                             <th scope="col">Refund Amount (RM)</th>
                                             <th scope="col">Booking Status</th>
                                             <th scope="col">Action</th>
@@ -278,7 +278,6 @@ use Carbon\Carbon;
                 <!-- Modal View Booking Details End Here-->
             @endforeach
 
-
         </div>
 
     </div>
@@ -303,6 +302,10 @@ use Carbon\Carbon;
                             searchable: false
                         },
                         {
+                            data: 'cr_date',
+                            name: 'cr_date'
+                        },
+                        {
                             data: 'booking_order_id',
                             name: 'booking_order_id'
                         },
@@ -315,10 +318,6 @@ use Carbon\Carbon;
                             data: 'client',
                             name: 'client',
                             visible: false
-                        },
-                        {
-                            data: 'booking_date',
-                            name: 'booking_date'
                         },
                         {
                             data: 'cr_amount',

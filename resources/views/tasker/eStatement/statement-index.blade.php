@@ -116,9 +116,9 @@
                             <div class="row align-items-center">
                                 <div class="col-sm-6 mb-3">
                                     <label for="month_range" class="form-label">Month Range</label>
-                                    <div class="d-flex align-items-center">
+                                    <div class="d-flex flex-column flex-md-row align-items-start">
                                         <input type="month" id="startMonth" name="startMonth" class="form-control">
-                                        <span class="mx-2">to</span>
+                                        <span style="margin: 10px 15px">to</span>
                                         <input type="month" id="endMonth" name="endMonth" class="form-control">
                                     </div>
                                 </div>
@@ -323,3 +323,4 @@
         });
     </script>
 @endsection
+<!--Updated By: Muhammad Zikri B. Kashim (11/01/2025)-->

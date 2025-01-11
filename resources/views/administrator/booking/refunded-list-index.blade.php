@@ -6,10 +6,6 @@ use Carbon\Carbon;
 
 @section('content')
     <style>
-        .dataTables_processing {
-            display: none !important;
-        }
-
         .card-all {
             border-left: 4px solid #10100f;
         }
@@ -31,6 +27,7 @@ use Carbon\Carbon;
             border-left: 4px solid #dc3545;
         }
     </style>
+
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
@@ -133,7 +130,7 @@ use Carbon\Carbon;
                     </div>
                 </div>
 
-                <div class="col-md-6 col-xl-6">
+                <div class="col-md-6 col-xl-4">
                     <div class="card card-cancelled">
                         <div class="card-body">
                             <h6 class="mb-2 f-w-400 text-dark">Total Refunds Amount</h6>
@@ -143,7 +140,17 @@ use Carbon\Carbon;
                     </div>
                 </div>
 
-                <div class="col-md-6 col-xl-6">
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-unpaid">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 ">Total Pending Amount</h6>
+                            <h3 class="mb-3 text-warning">(~) RM {{ $totalPendingAmount }}</h3>
+                            <p class="mb-0 text-muted text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
                     <div class="card card-confirmed">
                         <div class="card-body">
                             <h6 class="mb-2 f-w-400 text-dark">Total Unrefunded Amount</h6>
@@ -201,6 +208,12 @@ use Carbon\Carbon;
                                             <option value="3">Rejected</option>
                                         </select>
 
+                                        <select id="type_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Refund Type</option>
+                                            <option value="1">Tasker Refund</option>
+                                            <option value="0">Client Refund</option>
+                                        </select>
+
 
                                     </div>
                                 </div>
@@ -218,10 +231,10 @@ use Carbon\Carbon;
                                     <thead>
                                         <tr>
                                             <th scope="col">#</th>
+                                            <th scope="col">Refund Date</th>
                                             <th scope="col">Booking ID</th>
                                             <th scope="col">Tasker</th>
                                             <th scope="col">Client</th>
-                                            <th scope="col">Booking Date</th>
                                             <th scope="col">Refund Amount (RM)</th>
                                             <th scope="col">Booking Status</th>
                                             <th scope="col">Action</th>
@@ -233,7 +246,6 @@ use Carbon\Carbon;
                     </div>
                 </div>
             </div>
-
 
             @foreach ($books as $b)
                 <!-- Modal View Refund Details Start Here-->
@@ -443,6 +455,7 @@ use Carbon\Carbon;
                             d.tasker_filter = $('#tasker_filter').val();
                             d.status_filter = $('#status_filter').val();
                             d.state_filter = $('#state_filter').val();
+                            d.type_filter = $('#type_filter').val();
                         }
                     },
                     columns: [
@@ -450,6 +463,10 @@ use Carbon\Carbon;
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
                             searchable: false
+                        },
+                        {
+                            data: 'cr_date',
+                            name: 'cr_date'
                         },
                         {
                             data: 'booking_order_id',
@@ -465,10 +482,6 @@ use Carbon\Carbon;
                             name: 'client',
                             visible: false
 
-                        },
-                        {
-                            data: 'booking_date',
-                            name: 'booking_date'
                         },
                         {
                             data: 'refund_amount',
@@ -523,6 +536,11 @@ use Carbon\Carbon;
                     table.draw();
                 });
 
+                $('#type_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
                 $('#clearAllBtn').on('click', function(e) {
                     e.preventDefault();
                     $('#startDate').val('');
@@ -530,6 +548,7 @@ use Carbon\Carbon;
                     $('#tasker_filter').val('');
                     $('#status_filter').val('');
                     $('#state_filter').val('');
+                    $('#type_filter').val('');
                     table.ajax.reload();
                     table.draw();
                 });
@@ -540,3 +559,5 @@ use Carbon\Carbon;
     </script>
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
+<!--Updated By: Muhammad Zikri B. Kashim (11/01/2025)-->
+

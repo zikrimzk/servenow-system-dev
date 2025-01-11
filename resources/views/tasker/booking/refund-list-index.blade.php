@@ -5,6 +5,28 @@ use Carbon\Carbon;
 @extends('tasker.layouts.main')
 
 @section('content')
+    <style>
+        .card-all {
+            border-left: 4px solid #10100f;
+        }
+
+        .card-unpaid {
+            border-left: 4px solid #ffc107;
+        }
+
+        .card-confirmed {
+            border-left: 4px solid #28a745;
+
+        }
+
+        .card-completed {
+            border-left: 4px solid #005013;
+        }
+
+        .card-cancelled {
+            border-left: 4px solid #dc3545;
+        }
+    </style>
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
@@ -57,22 +79,122 @@ use Carbon\Carbon;
                     </div>
                 @endif
             </div>
-
             <!-- End Alert -->
+
+            <!-- Analytics Start -->
+            <div class="row">
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-all">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-dark">Total Refunds</h6>
+                            <h4 class="mb-3">{{ $totalRefund }}</h4>
+                            <p class="mb-0 text-muted text-sm">booking refunds</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-unpaid ">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-warning">Pending Refunds</h6>
+                            <h4 class="mb-3">{{ $totalPendingRefund }}</h4>
+                            <p class="mb-0 text-muted text-sm">refunds approved</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-cancelled">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-danger">Self-Refunds</h6>
+                            <h4 class="mb-3">{{ $totalSelfRefund }}</h4>
+                            <p class="mb-0 text-muted text-sm">booking refunded</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-cancelled">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-dark">Total Refunds Amount</h6>
+                            <h3 class="mb-3 text-danger">(-) RM {{ $totalApprovedAmount }}</h3>
+                            <p class="mb-0 text-muted text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-unpaid">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 ">Total Pending Amount</h6>
+                            <h3 class="mb-3 text-warning">(~) RM {{ $totalPendingAmount }}</h3>
+                            <p class="mb-0 text-muted text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-cancelled">
+                        <div class="card-body">
+                            <h6 class="mb-2 f-w-400 text-dark">Total Self-Refunded Amount</h6>
+                            <h3 class="mb-3 text-danger">(-) RM {{ $totalPenalizedAmount }}</h3>
+                            <p class="mb-0 text-muted text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Analytics End -->
+
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card table-card">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col-sm-6 mb-3">
+                                    <label for="date_range" class="form-label">Date Range</label>
+                                    <div class="d-flex flex-column flex-md-row align-items-start">
+                                        <input type="date" id="startDate" name="startDate" class="form-control">
+                                        <span style="margin: 10px 15px">to</span>
+                                        <input type="date" id="endDate" name="endDate" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-sm-9 mb-3">
+                                    <label for="filter" class="form-label">Filter by</label>
+                                    <div class="d-block  d-md-flex justify-content-between align-items-center gap-2">
+                                        <select id="status_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Status</option>
+                                            <option value="1">Pending</option>
+                                            <option value="2">Refunded</option>
+                                        </select>
+
+                                        <select id="type_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Refund Type</option>
+                                            <option value="1">Self-Refund</option>
+                                            <option value="0">Client Refund</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 mb-3">
+                                    <label for="endDate" class="form-label text-white">Action</label>
+                                    <div class="d-flex justify-content-start align-items-end">
+                                        <a href="" class="link-primary" id="clearAllBtn">Clear All</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="card-body">
                             <div class="dt-responsive table-responsive my-4 mx-0 mx-md-4">
                                 <table class="table data-table table-hover nowrap">
                                     <thead>
                                         <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Refund Date</th>
                                             <th scope="col">Booking ID</th>
                                             <th scope="col">Client</th>
-                                            <th scope="col">Booking Date</th>
-                                            <th scope="col">Refund Amount (RM)</th>
                                             <th scope="col">Booking Status</th>
-                                            <th scope="col">Action</th>
+                                            <th scope="col">Refund Amount (RM)</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -82,11 +204,10 @@ use Carbon\Carbon;
                 </div>
             </div>
 
-
             @foreach ($books as $b)
                 <!-- Modal View Booking Details Start Here-->
-                <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false" tabindex="-1"
-                    aria-hidden="true">
+                <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false"
+                    tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -181,13 +302,10 @@ use Carbon\Carbon;
                         </div>
                     </div>
                 </div>
-
                 <!-- Modal View Booking Details End Here-->
             @endforeach
 
-
         </div>
-
     </div>
     <!-- [ Main Content ] end -->
 
@@ -195,7 +313,7 @@ use Carbon\Carbon;
     <script type="text/javascript">
         $(document).ready(function() {
 
-            // DATATABLE : BOOKINGS
+            // DATATABLE : REFUNDS
             $(function() {
 
                 var table = $('.data-table').DataTable({
@@ -203,7 +321,25 @@ use Carbon\Carbon;
                     serverSide: true,
                     responsive: true,
                     ajax: "{{ route('tasker-refund-booking-list') }}",
+                    ajax: {
+                        url: "{{ route('tasker-refund-booking-list') }}",
+                        data: function(d) {
+                            d.startDate = $('#startDate').val();
+                            d.endDate = $('#endDate').val();
+                            d.type_filter = $('#type_filter').val();
+                            d.status_filter = $('#status_filter').val();
+                        }
+                    },
                     columns: [
+                        {
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            searchable: false
+                        },
+                        {
+                            data: 'cr_date',
+                            name: 'cr_date'
+                        },
                         {
                             data: 'booking_order_id',
                             name: 'booking_order_id'
@@ -213,23 +349,13 @@ use Carbon\Carbon;
                             name: 'client'
                         },
                         {
-                            data: 'booking_date',
-                            name: 'booking_date'
+                            data: 'booking_status',
+                            name: 'booking_status'
                         },
                         {
                             data: 'refund_amount',
                             name: 'refund_amount'
                         },
-                        {
-                            data: 'booking_status',
-                            name: 'booking_status'
-                        },
-                        {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false
-                        }
                     ],
                     language: {
                         emptyTable: "No data available in the table.", // Custom message when there's no data
@@ -249,9 +375,35 @@ use Carbon\Carbon;
 
                 });
 
+                $('#startDate, #endDate').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#type_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#status_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#clearAllBtn').on('click', function(e) {
+                    e.preventDefault();
+                    $('#startDate').val('');
+                    $('#endDate').val('');
+                    $('#type_filter').val('');
+                    $('#status_filter').val('');
+                    table.ajax.reload();
+                    table.draw();
+                });
+
             });
 
         });
     </script>
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
+<!--Updated By: Muhammad Zikri B. Kashim (11/01/2025)-->

@@ -63,6 +63,7 @@ $currentYear = Carbon::now()->year;
             </div>
 
             <!-- End Alert -->
+
             <div class="row">
                 <div class="col-md-6 col-xl-3">
                     <div class="card">
@@ -237,9 +238,9 @@ $currentYear = Carbon::now()->year;
                     <div class="card table-card">
                         <div class="card-header">
                             <div class="row align-items-center">
-                                <div class="col-sm-3 mb-3">
+                                <div class="col-sm-6 mb-3">
                                     <label for="score_filter" class="form-label">Date Range</label>
-                                    <div class="d-flex flex-column align-items-start">
+                                    <div class="d-flex flex-column flex-md-row align-items-start">
                                         <input type="date" id="startDate" name="startDate" class="form-control">
                                         <span style="margin: 10px 15px">to</span>
                                         <input type="date" id="endDate" name="endDate" class="form-control">
@@ -605,9 +606,7 @@ $currentYear = Carbon::now()->year;
                 </div>
             </div>
 
-
         </div>
-
     </div>
     <!-- [ Main Content ] end -->
     <script>
@@ -647,8 +646,6 @@ $currentYear = Carbon::now()->year;
             }
         });
     </script>
-
-
 
     <script type="text/javascript">
         $(document).ready(function() {
@@ -760,3 +757,4 @@ $currentYear = Carbon::now()->year;
     </script>
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
+<!--Updated By: Muhammad Zikri B. Kashim (11/01/2025)-->

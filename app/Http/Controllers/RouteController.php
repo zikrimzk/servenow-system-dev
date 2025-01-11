@@ -579,380 +579,554 @@ class RouteController extends Controller
     }
 
     // Tasker - Booking List
+    // Updated by: Zikri (11/01/2025)
     public function taskerBookingListNav(Request $request)
     {
-        $data = DB::table('bookings as a')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
-            ->join('clients as e', 'a.client_Id', 'e.id')
-            ->select(
-                'a.id as bookingID',
-                'b.id as serviceID',
-                'c.id as typeID',
-                'd.id as taskerID',
-                'a.booking_date',
-                'a.booking_address',
-                'a.booking_time_start',
-                'a.booking_time_end',
-                'a.booking_status',
-                'a.booking_note',
-                'a.booking_rate',
-                'a.booking_order_id',
-                'c.servicetype_name',
-                'e.client_firstname',
-                'e.client_lastname',
-                'e.client_phoneno',
-                'e.email as client_email',
+        try {
+            $data = DB::table('bookings as a')
+                ->join('services as b', 'a.service_id', 'b.id')
+                ->join('service_types as c', 'b.service_type_id', 'c.id')
+                ->join('taskers as d', 'b.tasker_id', 'd.id')
+                ->join('clients as e', 'a.client_Id', 'e.id')
+                ->select(
+                    'a.id as bookingID',
+                    'b.id as serviceID',
+                    'c.id as typeID',
+                    'd.id as taskerID',
+                    'a.booking_date',
+                    'a.booking_address',
+                    'a.booking_time_start',
+                    'a.booking_time_end',
+                    'a.booking_status',
+                    'a.booking_note',
+                    'a.booking_rate',
+                    'a.booking_order_id',
+                    'c.servicetype_name',
+                    'e.client_firstname',
+                    'e.client_lastname',
+                    'e.client_phoneno',
+                    'e.email as client_email',
+                )
+                ->whereNotIn('a.booking_status', [7, 8, 9, 10])
+                ->where('b.tasker_id', Auth::user()->id)
+                ->orderbyDesc('a.booking_date');
 
-            )
-            ->whereNotIn('a.booking_status', [7, 8, 9, 10])
-            ->where('b.tasker_id', Auth::user()->id)
-            ->orderbyDesc('a.booking_date');
+            if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
+                $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
+                $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
 
-        if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
-            $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
-            $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
-
-            if ($startDate && $endDate) {
-                $data->whereBetween('a.booking_date', [$request->startDate, $request->endDate]);
-            }
-        }
-
-        if ($request->has('status_filter') && $request->input('status_filter') != '') {
-            $data->where('a.booking_status', $request->input('status_filter'));
-        }
-
-        $data = $data->get();
-
-        if ($request->ajax()) {
-
-            $table = DataTables::of($data)->addIndexColumn();
-
-            $table->addColumn('booking_order_id', function ($row) {
-                $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
-                return $orderid;
-            });
-
-            $table->addColumn('client', function ($row) {
-                $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
-                return $client;
-            });
-
-            $table->addColumn('booking_date', function ($row) {
-
-                $date = Carbon::parse($row->booking_date)->format('d F Y');
-                return $date;
-            });
-
-            $table->addColumn('booking_time', function ($row) {
-
-                $startTime = Carbon::parse($row->booking_time_start)->format('g:i A');
-                $endTime = Carbon::parse($row->booking_time_end)->format('g:i A');
-                $time = $startTime . ' - ' . $endTime;
-                return $time;
-            });
-
-            $table->addColumn('booking_status', function ($row) {
-
-                if ($row->booking_status == 1) {
-                    $status = '<span class="badge bg-warning">To Pay</span>';
-                } else if ($row->booking_status == 2) {
-                    $status = '<span class="badge bg-light-success">Paid</span>';
-                } else if ($row->booking_status == 3) {
-                    $status = '<span class="badge bg-success">Confirmed</span>';
-                } else if ($row->booking_status == 4) {
-                    $status = '<span class="badge bg-warning">Rescheduled</span>';
-                } else if ($row->booking_status == 5) {
-                    $status = '<span class="badge bg-danger">Cancelled</span>';
-                } else if ($row->booking_status == 6) {
-                    $status = '<span class="badge bg-success">Completed</span>';
+                if ($startDate && $endDate) {
+                    $data->whereBetween('a.booking_date', [$startDate, $endDate]);
                 }
-                return $status;
-            });
+            }
 
-            $table->addColumn('booking_amount', function ($row) {
-                $amount = '<span class="fw-normal"> ' . $row->booking_rate . '</span>';
-                return $amount;
-            });
+            if ($request->has('status_filter') && $request->input('status_filter') != '') {
+                $data->where('a.booking_status', $request->input('status_filter'));
+            }
 
-            $table->rawColumns(['booking_order_id','client', 'booking_date', 'booking_time', 'booking_status', 'booking_amount']);
+            $data = $data->get();
 
-            return $table->make(true);
+            if ($request->ajax()) {
+                $table = DataTables::of($data)->addIndexColumn();
+
+                $table->addColumn('booking_order_id', function ($row) {
+                    $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
+                    return $orderid;
+                });
+
+                $table->addColumn('client', function ($row) {
+                    $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
+                    return $client;
+                });
+
+                $table->addColumn('booking_date', function ($row) {
+                    $date = Carbon::parse($row->booking_date)->format('d F Y');
+                    return $date;
+                });
+
+                $table->addColumn('booking_time', function ($row) {
+                    $startTime = Carbon::parse($row->booking_time_start)->format('g:i A');
+                    $endTime = Carbon::parse($row->booking_time_end)->format('g:i A');
+                    $time = $startTime . ' - ' . $endTime;
+                    return $time;
+                });
+
+                $table->addColumn('booking_status', function ($row) {
+                    $statusLabels = [
+                        1 => '<span class="badge bg-warning">To Pay</span>',
+                        2 => '<span class="badge bg-light-success">Paid</span>',
+                        3 => '<span class="badge bg-light-success">Confirmed</span>',
+                        4 => '<span class="badge bg-warning">Rescheduled</span>',
+                        5 => '<span class="badge bg-danger">Cancelled</span>',
+                        6 => '<span class="badge bg-success">Completed</span>',
+                    ];
+                    return $statusLabels[$row->booking_status] ?? '<span class="badge bg-secondary">Unknown</span>';
+                });
+
+                $table->addColumn('booking_amount', function ($row) {
+                    $amount = '<span class="fw-normal"> ' . $row->booking_rate . '</span>';
+                    return $amount;
+                });
+
+                $table->rawColumns(['booking_order_id', 'client', 'booking_date', 'booking_time', 'booking_status', 'booking_amount']);
+
+                return $table->make(true);
+            }
+
+            // Default values for calculations
+            $totalBooking = 0;
+            $totalUnpaid = 0;
+            $totalConfirmed = 0;
+            $totalCompleted = 0;
+            $totalCancelled = 0;
+            $totalCompletedAmount = '0.00';
+            $totalCompletedAmountThisMonth = '0.00';
+            $totalCancelledAmount = '0.00';
+            $totalFloatingAmount = '0.00';
+            $currentMonth = Carbon::now()->format('m');
+
+            // Check if there is data
+            if ($data->isNotEmpty()) {
+                $totalBooking = $data->count();
+                $totalUnpaid = $data->where('booking_status', 1)->count();
+                $totalConfirmed = $data->where('booking_status', 3)->count();
+                $totalCompleted = $data->where('booking_status', 6)->count();
+                $totalCancelled = $data->where('booking_status', 5)->count();
+
+                $totalCompletedAmount = number_format($data->where('booking_status', 6)->sum('booking_rate'), 2);
+                $totalCancelledAmount = number_format($data->where('booking_status', 5)->sum('booking_rate'), 2);
+                $totalFloatingAmount = number_format($data->whereIn('booking_status', [1, 2, 3, 4])->sum('booking_rate'), 2);
+            }
+
+            // Monthly Chart Data
+            $monthlyData = Booking::selectRaw("
+                YEAR(booking_date) as year,
+                MONTH(booking_date) as month,
+                SUM(CASE WHEN booking_status = 6 THEN booking_rate ELSE 0 END) as completedAmount,
+                SUM(CASE WHEN booking_status IN (1, 2, 3, 4) THEN booking_rate ELSE 0 END) as floatingAmount,
+                SUM(CASE WHEN booking_status = 5 THEN booking_rate ELSE 0 END) as cancelledAmount
+            ")
+                ->join('services as b', 'bookings.service_id', '=', 'b.id')
+                ->where('b.tasker_id', Auth::user()->id)
+                ->groupBy('year', 'month')
+                ->get();
+
+            $monthlyChartData = [
+                'labels' => [],
+                'completed' => [],
+                'floating' => [],
+                'cancelled' => [],
+            ];
+
+            // Format monthly data for the chart
+            foreach ($monthlyData as $dataChartTwo) {
+                $monthYear = Carbon::create($dataChartTwo->year, $dataChartTwo->month)->format('F Y');
+                $monthlyChartData['labels'][] = $monthYear;
+                $monthlyChartData['completed'][] = $dataChartTwo->completedAmount;
+                $monthlyChartData['floating'][] = $dataChartTwo->floatingAmount;
+                $monthlyChartData['cancelled'][] = $dataChartTwo->cancelledAmount;
+            }
+
+            // Yearly Chart Data
+            $yearlyData = Booking::selectRaw("
+                YEAR(booking_date) as year,
+                SUM(CASE WHEN booking_status = 6 THEN booking_rate ELSE 0 END) as completedAmount,
+                SUM(CASE WHEN booking_status IN (1, 2, 3, 4) THEN booking_rate ELSE 0 END) as floatingAmount,
+                SUM(CASE WHEN booking_status = 5 THEN booking_rate ELSE 0 END) as cancelledAmount
+            ")
+                ->join('services as b', 'bookings.service_id', '=', 'b.id')
+                ->where('b.tasker_id', Auth::user()->id)
+                ->groupBy('year')
+                ->orderBy('year', 'asc')
+                ->get();
+
+            $yearlyChartData = [
+                'labels' => $yearlyData->pluck('year')->toArray() ?? [],
+                'completed' => $yearlyData->pluck('completedAmount')->toArray() ?? [],
+                'floating' => $yearlyData->pluck('floatingAmount')->toArray() ?? [],
+                'cancelled' => $yearlyData->pluck('cancelledAmount')->toArray() ?? [],
+            ];
+
+            return view('tasker.booking.booking-list-index', [
+                'title' => 'All Booking List',
+                'books' => $data,
+                'totalBooking' => $totalBooking,
+                'totalUnpaid' => $totalUnpaid,
+                'totalConfirmed' => $totalConfirmed,
+                'totalCompleted' => $totalCompleted,
+                'totalCancelled' => $totalCancelled,
+                'totalCompletedAmount' => $totalCompletedAmount,
+                'totalCancelledAmount' => $totalCancelledAmount,
+                'totalFloatingAmount' => $totalFloatingAmount,
+                'totalCompletedAmountThisMonth' => $totalCompletedAmountThisMonth,
+                'monthlyChartData' => $monthlyChartData,
+                'yearlyChartData' => $yearlyChartData,
+
+            ]);
+        } catch (Exception $e) {
+            return view('tasker.booking.booking-list-index', [
+
+                'title' => 'All Booking List',
+                'books' => [],
+                'totalBooking' => 0,
+                'totalUnpaid' => 0,
+                'totalConfirmed' => 0,
+                'totalCompleted' => 0,
+                'totalCancelled' => 0,
+                'totalCompletedAmount' => 0,
+                'totalCancelledAmount' => 0,
+                'totalFloatingAmount' => 0,
+                'totalCompletedAmountThisMonth' => 0,
+                'monthlyChartData' => [],
+                'yearlyChartData' => [],
+
+            ]);
         }
-        return view('tasker.booking.booking-list-index', [
-            'title' => 'All Booking List',
-            'books' => $data,
-        ]);
     }
 
+    // Tasker - Refund List
+    // Updated by: Zikri (11/01/2025)
     public function taskerRefundBookingListNav(Request $request)
     {
-        $data = DB::table('bookings as a')
-            ->join('cancel_refund_bookings as f', 'a.id', 'f.booking_id')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
-            ->join('clients as e', 'a.client_Id', 'e.id')
-            ->select(
-                'a.id as bookingID',
-                'b.id as serviceID',
-                'c.id as typeID',
-                'd.id as taskerID',
-                'f.id as refundID',
-                'a.booking_date',
-                'a.booking_address',
-                'a.booking_time_start',
-                'a.booking_time_end',
-                'a.booking_status',
-                'a.booking_note',
-                'a.booking_rate',
-                'a.booking_order_id',
-                'c.servicetype_name',
-                'd.tasker_firstname',
-                'd.tasker_lastname',
-                'd.tasker_phoneno',
-                'd.email as tasker_email',
-                'd.tasker_code',
-                'e.client_firstname',
-                'e.client_lastname',
-                'e.client_phoneno',
-                'e.email as client_email',
-                'f.cr_reason',
-                'f.cr_status',
-                'f.cr_date',
-                'f.cr_amount',
-                'f.cr_bank_name',
-                'f.cr_account_name',
-                'f.cr_account_number'
-            )
-            ->whereIn('a.booking_status', [7, 8])
-            ->where('b.tasker_id', Auth::user()->id)
-            ->orderbyDesc('a.booking_date')
-            ->get();
+        try {
+            $data = DB::table('bookings as a')
+                ->join('cancel_refund_bookings as f', 'a.id', 'f.booking_id')
+                ->join('services as b', 'a.service_id', 'b.id')
+                ->join('service_types as c', 'b.service_type_id', 'c.id')
+                ->join('taskers as d', 'b.tasker_id', 'd.id')
+                ->join('clients as e', 'a.client_Id', 'e.id')
+                ->select(
+                    'a.id as bookingID',
+                    'b.id as serviceID',
+                    'c.id as typeID',
+                    'd.id as taskerID',
+                    'f.id as refundID',
+                    'a.booking_date',
+                    'a.booking_address',
+                    'a.booking_time_start',
+                    'a.booking_time_end',
+                    'a.booking_status',
+                    'a.booking_note',
+                    'a.booking_rate',
+                    'a.booking_order_id',
+                    'c.servicetype_name',
+                    'd.tasker_firstname',
+                    'd.tasker_lastname',
+                    'd.tasker_phoneno',
+                    'd.email as tasker_email',
+                    'd.tasker_code',
+                    'e.client_firstname',
+                    'e.client_lastname',
+                    'e.client_phoneno',
+                    'e.email as client_email',
+                    'f.cr_reason',
+                    'f.cr_status',
+                    'f.cr_date',
+                    'f.cr_amount',
+                    'f.cr_penalized',
+                    'f.cr_bank_name',
+                    'f.cr_account_name',
+                    'f.cr_account_number'
+                )
+                ->whereIn('a.booking_status', [7, 8, 9])
+                ->where('b.tasker_id', Auth::user()->id)
+                ->orderbyDesc('a.booking_date');
 
-        if ($request->ajax()) {
+            if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
+                $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
+                $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
 
-            $table = DataTables::of($data)->addIndexColumn();
-
-            $table->addColumn('client', function ($row) {
-                $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
-                return $client;
-            });
-
-            $table->addColumn('booking_date', function ($row) {
-
-                $date = Carbon::parse($row->booking_date)->format('d F Y');
-                return $date;
-            });
-
-            $table->addColumn('booking_time', function ($row) {
-
-                $startTime = Carbon::parse($row->booking_time_start)->format('g:i A');
-                $endTime = Carbon::parse($row->booking_time_end)->format('g:i A');
-                $time = $startTime . ' - ' . $endTime;
-                return $time;
-            });
-
-            $table->addColumn('refund_amount', function ($row) {
-
-                if ($row->booking_status == 7) {
-                    $amount = '<span class="text-warning text-center"> ' . $row->cr_amount . '</span>';
-                } else if ($row->booking_status == 8) {
-                    $amount = '<span class="text-danger text-center"> ' . $row->cr_amount . '</span>';
+                if ($startDate && $endDate) {
+                    $data->whereBetween('f.cr_date', [$request->startDate, $request->endDate]);
                 }
-                return $amount;
-            });
+            }
+
+            if ($request->has('type_filter') && $request->input('type_filter') != '') {
+                $data->where('f.cr_penalized', $request->input('type_filter'));
+            }
+
+            if ($request->has('status_filter') && $request->input('status_filter') != '') {
+                $data->where('f.cr_status', $request->input('status_filter'));
+            }
+
+            $data = $data->get();
+
+            if ($request->ajax()) {
+
+                $table = DataTables::of($data)->addIndexColumn();
+
+                $table->addColumn('booking_order_id', function ($row) {
+                    $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
+                    return $orderid;
+                });
 
 
-            $table->addColumn('booking_status', function ($row) {
+                $table->addColumn('client', function ($row) {
+                    $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
+                    return $client;
+                });
 
-                if ($row->booking_status == 7) {
-                    $status = '<span class="badge bg-light-warning">Pending Refund</span>';
-                } else if ($row->booking_status == 8) {
-                    $status = '<span class="badge bg-light-success">Refunded</span>';
-                }
-                return $status;
-            });
+                $table->addColumn('cr_date', function ($row) {
 
-            $table->addColumn('action', function ($row) {
+                    $date = Carbon::parse($row->cr_date)->format('d F Y');
+                    return $date;
+                });
 
-                $button =
-                    '
-                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
-                            <i class="ti ti-eye f-20"></i>
-                        </a>
-                    ';
+                $table->addColumn('booking_time', function ($row) {
+
+                    $startTime = Carbon::parse($row->booking_time_start)->format('g:i A');
+                    $endTime = Carbon::parse($row->booking_time_end)->format('g:i A');
+                    $time = $startTime . ' - ' . $endTime;
+                    return $time;
+                });
+
+                $table->addColumn('refund_amount', function ($row) {
+                    if ($row->booking_status == 7) {
+                        $amount = '<h6 class="text-warning text-start"> (~) ' . $row->cr_amount . '</h6>';
+                    } else if ($row->booking_status == 8 || $row->booking_status == 9) {
+                        $amount = '<h6 class="text-danger text-start"> (-) ' . $row->cr_amount . '</h6>';
+                    }
+                    return $amount;
+                });
 
 
-                return $button;
-            });
+                $table->addColumn('booking_status', function ($row) {
 
-            $table->rawColumns(['client', 'booking_date', 'booking_time', 'refund_amount', 'booking_status', 'action']);
+                    if ($row->booking_status == 7) {
+                        $status = '<span class="badge bg-light-warning">Pending Refund</span>';
+                    } else if ($row->booking_status == 8) {
+                        $status = '<span class="badge bg-light-success">Refunded</span>';
+                    } else if ($row->booking_status == 9) {
+                        $status = '<span class="badge bg-light-danger">Require Update</span>';
+                    }
+                    return $status;
+                });
 
-            return $table->make(true);
+                $table->rawColumns(['booking_order_id', 'client', 'cr_date', 'booking_time', 'refund_amount', 'booking_status']);
+
+                return $table->make(true);
+            }
+
+            // Default values for calculations
+            $totalRefund = 0;
+            $totalPendingRefund = 0;
+            $totalSelfRefund = 0;
+            $totalApprovedAmount = '0.00';
+            $totalPenalizedAmount = '0.00';
+            $totalPendingAmount = '0.00';
+
+            // Check if $data is not empty
+            if ($data->isNotEmpty()) {
+                // Calculate totals
+                $totalRefund = $data->count();
+                $totalSelfRefund = $data->where('cr_penalized', 1)->count();
+
+                // Calculate amounts
+                $totalApprovedAmount = number_format($data->where('cr_status', 2)->sum('cr_amount'), 2);
+                $totalPenalizedAmount = number_format($data->where('cr_penalized', 1)->sum('cr_amount'), 2);
+            }
+
+
+            // Fetch all data with joins and ensure it's handled properly if empty
+            $dataAll = DB::table('bookings as a')
+                ->join('cancel_refund_bookings as f', 'a.id', '=', 'f.booking_id')
+                ->join('services as b', 'a.service_id', '=', 'b.id')
+                ->join('service_types as c', 'b.service_type_id', '=', 'c.id')
+                ->join('taskers as d', 'b.tasker_id', '=', 'd.id')
+                ->join('clients as e', 'a.client_id', '=', 'e.id')
+                ->whereIn('a.booking_status', [7, 8, 9, 10])
+                ->where('b.tasker_id', Auth::user()->id)
+                ->orderByDesc('a.booking_date')
+                ->get();
+
+            if ($dataAll->isNotEmpty()) {
+                // Calculate total pending refunds if $dataAll is not empty
+                $totalPendingRefund = $dataAll->whereIn('cr_status', [0, 1])->count();
+                $totalPendingAmount = number_format($dataAll->whereIn('cr_status', [0, 1])->sum('cr_amount'), 2);
+            }
+
+            return view('tasker.booking.refund-list-index', [
+                'title' => 'Refund Booking List',
+                'books' => $data,
+                'totalRefund' => $totalRefund,
+                'totalPendingRefund' => $totalPendingRefund,
+                'totalSelfRefund' => $totalSelfRefund,
+                'totalApprovedAmount' => $totalApprovedAmount,
+                'totalPenalizedAmount' => $totalPenalizedAmount,
+                'totalPendingAmount' => $totalPendingAmount
+            ]);
+        } catch (Exception $e) {
+            return view('tasker.booking.refund-list-index', [
+                'title' => 'Refund Booking List',
+                'books' => [],
+                'totalRefund' => 0,
+                'totalPendingRefund' => 0,
+                'totalSelfRefund' => 0,
+                'totalApprovedAmount' => 0,
+                'totalPenalizedAmount' => 0,
+                'totalPendingAmount' => 0
+            ]);
         }
-        return view('tasker.booking.refund-list-index', [
-            'title' => 'Refund Booking List',
-            'books' => $data,
-        ]);
     }
+
+    // Tasker - Review Management
+    // Updated by: Zikri (11/01/2025)
     public function taskerReviewManagementNav(Request $request)
     {
-        $data = DB::table('bookings as a')
-            ->join('reviews as f', 'a.id', 'f.booking_id')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
-            ->join('clients as e', 'a.client_Id', 'e.id')
-            ->select(
-                'a.id as bookingID',
-                'b.id as serviceID',
-                'c.id as typeID',
-                'd.id as taskerID',
-                'f.id as reviewID',
-                'a.booking_date',
-                'a.booking_address',
-                'a.booking_time_start',
-                'a.booking_time_end',
-                'a.booking_status',
-                'a.booking_note',
-                'a.booking_rate',
-                'a.booking_order_id',
-                'c.servicetype_name',
-                'd.tasker_firstname',
-                'd.tasker_lastname',
-                'd.tasker_phoneno',
-                'd.email as tasker_email',
-                'd.tasker_code',
-                'e.client_firstname',
-                'e.client_lastname',
-                'e.client_phoneno',
-                'e.email as client_email',
-                'f.review_status',
-                'f.review_rating',
-                'f.review_description',
-                'f.review_date_time',
-                'f.review_imageOne',
-                'f.review_imageTwo',
-                'f.review_imageThree',
-                'f.review_imageFour',
-                'f.review_type',
-            )
-            ->where('d.id', Auth::user()->id);
+        try {
+            $data = DB::table('bookings as a')
+                ->join('reviews as f', 'a.id', 'f.booking_id')
+                ->join('services as b', 'a.service_id', 'b.id')
+                ->join('service_types as c', 'b.service_type_id', 'c.id')
+                ->join('taskers as d', 'b.tasker_id', 'd.id')
+                ->join('clients as e', 'a.client_Id', 'e.id')
+                ->select(
+                    'a.id as bookingID',
+                    'b.id as serviceID',
+                    'c.id as typeID',
+                    'd.id as taskerID',
+                    'f.id as reviewID',
+                    'a.booking_date',
+                    'a.booking_address',
+                    'a.booking_time_start',
+                    'a.booking_time_end',
+                    'a.booking_status',
+                    'a.booking_note',
+                    'a.booking_rate',
+                    'a.booking_order_id',
+                    'c.servicetype_name',
+                    'd.tasker_firstname',
+                    'd.tasker_lastname',
+                    'd.tasker_phoneno',
+                    'd.email as tasker_email',
+                    'd.tasker_code',
+                    'e.client_firstname',
+                    'e.client_lastname',
+                    'e.client_phoneno',
+                    'e.email as client_email',
+                    'f.review_status',
+                    'f.review_rating',
+                    'f.review_description',
+                    'f.review_date_time',
+                    'f.review_imageOne',
+                    'f.review_imageTwo',
+                    'f.review_imageThree',
+                    'f.review_imageFour',
+                    'f.review_type',
+                )
+                ->where('d.id', Auth::user()->id);
 
-        // Apply date range filter before calling get()
-        if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
-            $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
-            $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
+            // Apply date range filter before calling get()
+            if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
+                $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
+                $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
 
-            if ($startDate && $endDate) {
-                $data->whereBetween(DB::raw("DATE(f.review_date_time)"), [$startDate, $endDate]);
-            }
-        }
-
-        if ($request->has('status_filter') && $request->input('status_filter') != '') {
-            $data->where('f.review_status', $request->input('status_filter'));
-        }
-
-        if ($request->has('media_filter') && $request->input('media_filter') != '') {
-            if ($request->input('media_filter') == '1') {
-                // Filter for reviews that have at least one image
-                $data->where(function ($query) {
-                    $query->whereNotNull('f.review_imageOne')
-                        ->orWhereNotNull('f.review_imageTwo')
-                        ->orWhereNotNull('f.review_imageThree')
-                        ->orWhereNotNull('f.review_imageFour');
-                });
-            } elseif ($request->input('media_filter') == '2') {
-                // Filter for reviews that have no images
-                $data->where(function ($query) {
-                    $query->whereNull('f.review_imageOne')
-                        ->whereNull('f.review_imageTwo')
-                        ->whereNull('f.review_imageThree')
-                        ->whereNull('f.review_imageFour');
-                });
-            }
-        }
-
-        if ($request->has('rating_filter') && $request->input('rating_filter') != '') {
-            $ratingFilter = $request->input('rating_filter');
-            if ($ratingFilter == '1') {
-                $data->orderByDesc('f.review_rating'); // Highest rating first
-            } elseif ($ratingFilter == '2') {
-                $data->orderBy('f.review_rating'); // Lowest rating first
-            }
-        } else {
-            $data->orderByDesc('f.review_date_time');
-        }
-
-        $data = $data->get();
-
-        if ($request->ajax()) {
-
-            $table = DataTables::of($data)->addIndexColumn();
-
-            $table->addColumn('booking_order_id', function ($row) {
-                $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
-                return $orderid;
-            });
-
-            $table->addColumn('client', function ($row) {
-                $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
-                return $client;
-            });
-
-            $table->addColumn('review_rating', function ($row) {
-
-                $rating = '';
-                for ($i = 1; $i <= $row->review_rating; $i++) {
-                    $rating .= '<i class="fas fa-star text-warning"></i>';
+                if ($startDate && $endDate) {
+                    $data->whereBetween(DB::raw("DATE(f.review_date_time)"), [$startDate, $endDate]);
                 }
-                return $rating;
-            });
+            }
 
+            if ($request->has('status_filter') && $request->input('status_filter') != '') {
+                $data->where('f.review_status', $request->input('status_filter'));
+            }
 
-            $table->addColumn('review_date_time', function ($row) {
-
-                $datetime = Carbon::parse($row->review_date_time)->setTimezone('Asia/Kuala_Lumpur')->format('d F Y g:i A');
-                return $datetime;
-            });
-
-            $table->addColumn('review_description', function ($row) {
-                // Define maximum rows and columns
-                $maxRows = 3;
-                $maxCols = 18;
-
-                // Calculate the maximum number of characters that can fit
-                $maxCharsPerRow = $maxCols;
-                $maxTotalChars = $maxRows * $maxCharsPerRow;
-
-                // Truncate the description to fit within the maximum allowed size
-                $description = strlen($row->review_description) > $maxTotalChars
-                    ? substr($row->review_description, 0, $maxTotalChars) . '...'
-                    : $row->review_description;
-
-                // Create the textarea element
-                return '<textarea class="form-control" rows="' . $maxRows . '" cols="' . $maxCols . '" readonly style="resize: none;">'
-                    . htmlspecialchars($description)
-                    . '</textarea>';
-            });
-
-            $table->addColumn('review_status', function ($row) {
-
-                if ($row->review_status == 1) {
-                    $status = '<span class="badge bg-success">Show</span>';
-                } else if ($row->review_status == 2) {
-                    $status = '<span class="badge bg-danger">Hide</span>';
+            if ($request->has('media_filter') && $request->input('media_filter') != '') {
+                if ($request->input('media_filter') == '1') {
+                    // Filter for reviews that have at least one image
+                    $data->where(function ($query) {
+                        $query->whereNotNull('f.review_imageOne')
+                            ->orWhereNotNull('f.review_imageTwo')
+                            ->orWhereNotNull('f.review_imageThree')
+                            ->orWhereNotNull('f.review_imageFour');
+                    });
+                } elseif ($request->input('media_filter') == '2') {
+                    // Filter for reviews that have no images
+                    $data->where(function ($query) {
+                        $query->whereNull('f.review_imageOne')
+                            ->whereNull('f.review_imageTwo')
+                            ->whereNull('f.review_imageThree')
+                            ->whereNull('f.review_imageFour');
+                    });
                 }
+            }
 
-                return $status;
-            });
+            if ($request->has('rating_filter') && $request->input('rating_filter') != '') {
+                $ratingFilter = $request->input('rating_filter');
+                if ($ratingFilter == '1') {
+                    $data->orderByDesc('f.review_rating'); // Highest rating first
+                } elseif ($ratingFilter == '2') {
+                    $data->orderBy('f.review_rating'); // Lowest rating first
+                }
+            } else {
+                $data->orderByDesc('f.review_date_time');
+            }
 
-            $table->addColumn('action', function ($row) {
-                $button =
-                    '
+            $data = $data->get();
+
+            if ($request->ajax()) {
+
+                $table = DataTables::of($data)->addIndexColumn();
+
+                $table->addColumn('booking_order_id', function ($row) {
+                    $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
+                    return $orderid;
+                });
+
+                $table->addColumn('client', function ($row) {
+                    $client = Str::headline($row->client_firstname . ' ' . $row->client_lastname);
+                    return $client;
+                });
+
+                $table->addColumn('review_rating', function ($row) {
+
+                    $rating = '';
+                    for ($i = 1; $i <= $row->review_rating; $i++) {
+                        $rating .= '<i class="fas fa-star text-warning"></i>';
+                    }
+                    return $rating;
+                });
+
+
+                $table->addColumn('review_date_time', function ($row) {
+
+                    $datetime = Carbon::parse($row->review_date_time)->setTimezone('Asia/Kuala_Lumpur')->format('d F Y g:i A');
+                    return $datetime;
+                });
+
+                $table->addColumn('review_description', function ($row) {
+                    // Define maximum rows and columns
+                    $maxRows = 3;
+                    $maxCols = 18;
+
+                    // Calculate the maximum number of characters that can fit
+                    $maxCharsPerRow = $maxCols;
+                    $maxTotalChars = $maxRows * $maxCharsPerRow;
+
+                    // Truncate the description to fit within the maximum allowed size
+                    $description = strlen($row->review_description) > $maxTotalChars
+                        ? substr($row->review_description, 0, $maxTotalChars) . '...'
+                        : $row->review_description;
+
+                    // Create the textarea element
+                    return '<textarea class="form-control" rows="' . $maxRows . '" cols="' . $maxCols . '" readonly style="resize: none;">'
+                        . htmlspecialchars($description)
+                        . '</textarea>';
+                });
+
+                $table->addColumn('review_status', function ($row) {
+
+                    if ($row->review_status == 1) {
+                        $status = '<span class="badge bg-success">Show</span>';
+                    } else if ($row->review_status == 2) {
+                        $status = '<span class="badge bg-danger">Hide</span>';
+                    }
+
+                    return $status;
+                });
+
+                $table->addColumn('action', function ($row) {
+                    $button =
+                        '
                         <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
                             data-bs-target="#viewReviewDetails-' . $row->reviewID . '">
                             <i class="ti ti-eye f-20"></i>
@@ -962,162 +1136,166 @@ class RouteController extends Controller
                             <i class="ti ti-repeat f-20"></i>
                         </a>
                     ';
-                return $button;
-            });
+                    return $button;
+                });
 
-            $table->rawColumns(['booking_order_id', 'client', 'review_rating', 'review_date_time', 'review_description', 'review_status', 'action']);
+                $table->rawColumns(['booking_order_id', 'client', 'review_rating', 'review_date_time', 'review_description', 'review_status', 'action']);
 
-            return $table->make(true);
+                return $table->make(true);
+            }
+
+            $currentMonth = Carbon::now()->month;
+            $currentYear = Carbon::now()->year;
+            $totalreview = $data->count();
+
+
+            // Count total reviews by month
+            $totalreviewsbymonth = DB::table('bookings as a')
+                ->join('reviews as f', 'a.id', 'f.booking_id')
+                ->join('services as b', 'a.service_id', 'b.id')
+                ->join('service_types as c', 'b.service_type_id', 'c.id')
+                ->join('taskers as d', 'b.tasker_id', 'd.id')
+                ->whereMonth('f.review_date_time', $currentMonth)
+                ->whereYear('f.review_date_time', $currentYear)
+                ->where('d.id', auth()->user()->id)
+                ->count();
+
+            // Count total reviews by year
+
+            $totalreviewsbyyear = DB::table('bookings as a')
+                ->join('reviews as f', 'a.id', 'f.booking_id')
+                ->join('services as b', 'a.service_id', 'b.id')
+                ->join('service_types as c', 'b.service_type_id', 'c.id')
+                ->join('taskers as d', 'b.tasker_id', 'd.id')
+                ->whereYear('f.review_date_time', $currentYear)
+                ->where('d.id', auth()->user()->id)
+                ->count();
+
+            // Count total unreviewed bookings
+            $totalcompletedBooking = DB::table('bookings as a')
+                ->join('services as b', 'a.service_id', 'b.id')
+                ->join('service_types as c', 'b.service_type_id', 'c.id')
+                ->join('taskers as d', 'b.tasker_id', 'd.id')
+                ->where('a.booking_status', 6)
+                ->where('d.id', auth()->user()->id)
+                ->count();
+
+            $totalunreview = $totalcompletedBooking - $totalreview;
+
+            // Count total average rating
+            $averageRating = DB::table('bookings as a')
+                ->join('reviews as f', 'a.id', 'f.booking_id')
+                ->join('services as b', 'a.service_id', 'b.id')
+                ->join('service_types as c', 'b.service_type_id', 'c.id')
+                ->join('taskers as d', 'b.tasker_id', 'd.id')
+                ->where('d.id', auth()->user()->id)
+                ->avg('f.review_rating');
+
+            // Count Percentage of Positive and Negative Reviews and Nuetral Reviews
+            $csat =
+                $totalreview > 0
+                ? number_format(
+                    ($data->where('review_rating', '>=', 4)->count() / $totalreview) * 100,
+                    2,
+                )
+                : 0;
+            $neutralrev =
+                $totalreview > 0
+                ? number_format(
+                    ($data->where('review_rating', '=', 3)->count() / $totalreview) * 100,
+                    2,
+                )
+                : 0;
+            $negrev =
+                $totalreview > 0
+                ? number_format(
+                    ($data->where('review_rating', '<', 3)->count() / $totalreview) * 100,
+                    2,
+                )
+                : 0;
+
+            $reply = DB::table('reviews as a')
+                ->join('bookings as b', 'a.booking_id', 'b.id')
+                ->join('services as c', 'b.service_id', 'c.id')
+                ->join('taskers as d', 'c.tasker_id', 'd.id')
+                ->join('review_replies as e', 'a.id', 'e.review_id')
+                ->whereNotNull('e.reply_message')
+                ->get();
+
+            return view('tasker.performance.review-index', [
+                'title' => 'Review Management',
+                'data' => $data,
+                'totalreviewsbymonth' => $totalreviewsbymonth,
+                'totalreviewsbyyear' => $totalreviewsbyyear,
+                'totalunreview' => $totalunreview,
+                'averageRating' => $averageRating,
+                'csat' => $csat,
+                'negrev' => $negrev,
+                'neutralrev' => $neutralrev,
+                'reply' => $reply
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'Oops, Something bad happen. Please try again !');
         }
-
-        $currentMonth = Carbon::now()->month;
-        $currentYear = Carbon::now()->year;
-        $totalreview = $data->count();
-
-
-        // Count total reviews by month
-        $totalreviewsbymonth = DB::table('bookings as a')
-            ->join('reviews as f', 'a.id', 'f.booking_id')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
-            ->whereMonth('f.review_date_time', $currentMonth)
-            ->whereYear('f.review_date_time', $currentYear)
-            ->where('d.id', auth()->user()->id)
-            ->count();
-
-        // Count total reviews by year
-
-        $totalreviewsbyyear = DB::table('bookings as a')
-            ->join('reviews as f', 'a.id', 'f.booking_id')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
-            ->whereYear('f.review_date_time', $currentYear)
-            ->where('d.id', auth()->user()->id)
-            ->count();
-
-        // Count total unreviewed bookings
-        $totalcompletedBooking = DB::table('bookings as a')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
-            ->where('a.booking_status', 6)
-            ->where('d.id', auth()->user()->id)
-            ->count();
-
-        $totalunreview = $totalcompletedBooking - $totalreview;
-
-        // Count total average rating
-        $averageRating = DB::table('bookings as a')
-            ->join('reviews as f', 'a.id', 'f.booking_id')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->join('service_types as c', 'b.service_type_id', 'c.id')
-            ->join('taskers as d', 'b.tasker_id', 'd.id')
-            ->where('d.id', auth()->user()->id)
-            ->avg('f.review_rating');
-
-        // Count Percentage of Positive and Negative Reviews and Nuetral Reviews
-        $csat =
-            $totalreview > 0
-            ? number_format(
-                ($data->where('review_rating', '>=', 4)->count() / $totalreview) * 100,
-                2,
-            )
-            : 0;
-        $neutralrev =
-            $totalreview > 0
-            ? number_format(
-                ($data->where('review_rating', '=', 3)->count() / $totalreview) * 100,
-                2,
-            )
-            : 0;
-        $negrev =
-            $totalreview > 0
-            ? number_format(
-                ($data->where('review_rating', '<', 3)->count() / $totalreview) * 100,
-                2,
-            )
-            : 0;
-
-        $reply = DB::table('reviews as a')
-            ->join('bookings as b', 'a.booking_id', 'b.id')
-            ->join('services as c', 'b.service_id', 'c.id')
-            ->join('taskers as d', 'c.tasker_id', 'd.id')
-            ->join('review_replies as e', 'a.id', 'e.review_id')
-            ->whereNotNull('e.reply_message')
-            ->get();
-
-        // dd($reply);
-
-        return view('tasker.performance.review-index', [
-            'title' => 'Review Management',
-            'data' => $data,
-            'totalreviewsbymonth' => $totalreviewsbymonth,
-            'totalreviewsbyyear' => $totalreviewsbyyear,
-            'totalunreview' => $totalunreview,
-            'averageRating' => $averageRating,
-            'csat' => $csat,
-            'negrev' => $negrev,
-            'neutralrev' => $neutralrev,
-            'reply' => $reply
-        ]);
     }
 
+    // Tasker - Perfomance Analysis
+    // Updated by: Zikri (11/01/2025)
     public function taskerPerformanceAnalysisNav()
     {
-        $bookings = DB::table('bookings as a')
-            ->join('services as b', 'a.service_id', 'b.id')
-            ->where('b.tasker_id', auth()->user()->id)
-            ->get();
+        try {
+            $bookings = DB::table('bookings as a')
+                ->join('services as b', 'a.service_id', 'b.id')
+                ->where('b.tasker_id', auth()->user()->id)
+                ->get();
 
-        $completedBookings = $bookings->where('booking_status', 6)->count();
-        // $completedBookings = 201;
+            $completedBookings = $bookings->where('booking_status', 6)->count();
 
-        // Calculate progress
-        if ($completedBookings <= 20) {
-            $progress = ($completedBookings / 20) * 100;
-        } elseif ($completedBookings <= 80) {
-            $progress = (($completedBookings - 20) / 60) * 100;
-        } else {
-            $progress = 100; // Max progress for Experienced Tasker
-        }
 
-        $taskerId = auth()->user()->id;
+            // Calculate progress
+            if ($completedBookings <= 20) {
+                $progress = ($completedBookings / 20) * 100;
+            } elseif ($completedBookings <= 80) {
+                $progress = (($completedBookings - 20) / 60) * 100;
+            } else {
+                $progress = 100;
+            }
 
-        // Get the current date and calculate the two previous months' ranges
-        $twoMonthsAgo = now()->subMonths(2)->startOfMonth();
-        $lastMonth = now()->subMonth()->startOfMonth();
-        $endLastMonth = now()->subMonth()->endOfMonth();
+            $taskerId = auth()->user()->id;
 
-        // label for the chart
-        $dateLabel = [
-            'currentDate' => now()->format('d F Y'),
-            'lastMonth' => $lastMonth->format('F Y'),
-            'twoMonthsAgo' => $twoMonthsAgo->format('F Y'),
-        ];
+            // Get the current date and calculate the two previous months' ranges
+            $twoMonthsAgo = now()->subMonths(2)->startOfMonth();
+            $lastMonth = now()->subMonth()->startOfMonth();
+            $endLastMonth = now()->subMonth()->endOfMonth();
 
-        $taskers = DB::table('taskers')
-            ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
-            ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
-            ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
-            ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
-            ->select(
-                'taskers.tasker_code',
-                'taskers.id',
-                DB::raw("CONCAT(taskers.tasker_firstname, ' ', taskers.tasker_lastname) AS tasker_name"),
-                DB::raw("AVG(reviews.review_rating) AS average_rating"),
-                DB::raw("
+            // label for the chart
+            $dateLabel = [
+                'currentDate' => now()->format('d F Y'),
+                'lastMonth' => $lastMonth->format('F Y'),
+                'twoMonthsAgo' => $twoMonthsAgo->format('F Y'),
+            ];
+
+            $taskers = DB::table('taskers')
+                ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
+                ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
+                ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
+                ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
+                ->select(
+                    'taskers.tasker_code',
+                    'taskers.id',
+                    DB::raw("CONCAT(taskers.tasker_firstname, ' ', taskers.tasker_lastname) AS tasker_name"),
+                    DB::raw("AVG(reviews.review_rating) AS average_rating"),
+                    DB::raw("
                 CASE 
                     WHEN AVG(reviews.review_rating) >= 4 THEN '1'
                     WHEN AVG(reviews.review_rating) >= 3 THEN '2'
                     ELSE '3'
                 END AS satisfaction_reaction
             "),
-                // 'taskers.tasker_selfrefund_count AS total_self_cancel_refunds',
-                DB::raw("COUNT(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 END) AS total_self_cancel_refunds"),
-                DB::raw("COUNT(CASE WHEN bookings.booking_status = '6' THEN 1 END) AS total_completed_bookings"),
-                DB::raw("
+                    // 'taskers.tasker_selfrefund_count AS total_self_cancel_refunds',
+                    DB::raw("COUNT(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 END) AS total_self_cancel_refunds"),
+                    DB::raw("COUNT(CASE WHEN bookings.booking_status = '6' THEN 1 END) AS total_completed_bookings"),
+                    DB::raw("
                     ROUND(
                         (
                             (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
@@ -1126,19 +1304,19 @@ class RouteController extends Controller
                         ), 2
                     ) AS performance_score_percentage
                 "),
-            )
-            ->groupBy('taskers.id')
-            ->where('taskers.id', $taskerId);
+                )
+                ->groupBy('taskers.id')
+                ->where('taskers.id', $taskerId);
 
-        $pastPerformance = DB::table('taskers')
-            ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
-            ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
-            ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
-            ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
-            ->select(
-                DB::raw("DATE_FORMAT(bookings.booking_date, '%Y-%m') AS month"),
-                DB::raw("AVG(reviews.review_rating) AS average_rating"),
-                DB::raw("
+            $pastPerformance = DB::table('taskers')
+                ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
+                ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
+                ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
+                ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
+                ->select(
+                    DB::raw("DATE_FORMAT(bookings.booking_date, '%Y-%m') AS month"),
+                    DB::raw("AVG(reviews.review_rating) AS average_rating"),
+                    DB::raw("
                     ROUND(
                         (
                             (AVG(reviews.review_rating) / 5 * 60) -- Ratings contribute 60%
@@ -1147,178 +1325,185 @@ class RouteController extends Controller
                         ), 2
                     ) AS performance_score_percentage
                 ")
-            )
-            ->where('taskers.id', $taskerId)
-            ->whereBetween('bookings.booking_date', [$twoMonthsAgo, $endLastMonth])
-            ->groupBy(DB::raw("DATE_FORMAT(bookings.booking_date, '%Y-%m')"))
-            ->get();
+                )
+                ->where('taskers.id', $taskerId)
+                ->whereBetween('bookings.booking_date', [$twoMonthsAgo, $endLastMonth])
+                ->groupBy(DB::raw("DATE_FORMAT(bookings.booking_date, '%Y-%m')"))
+                ->get();
 
-        $taskers = $taskers->first();
+            $taskers = $taskers->first();
 
-        $taskerMonthlyRefunds = DB::table('taskers')
-            ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
-            ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
-            ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
-            ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
-            ->select(
-                DB::raw("DATE_FORMAT(bookings.booking_date, '%Y-%m') AS month"), // Extract year and month
-                DB::raw("COUNT(cancel_refund_bookings.id) AS total_refunds"),   // Total refunds
-                DB::raw("SUM(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 ELSE 0 END) AS penalized_refunds"), // Penalized refunds
-            )
-            ->where('taskers.id', $taskerId)
-            ->groupBy('month')
-            ->orderBy('month', 'desc')
-            ->get();
+            $taskerMonthlyRefunds = DB::table('taskers')
+                ->leftJoin('services', 'taskers.id', '=', 'services.tasker_id')
+                ->leftJoin('bookings', 'services.id', '=', 'bookings.service_id')
+                ->leftJoin('reviews', 'bookings.id', '=', 'reviews.booking_id')
+                ->leftJoin('cancel_refund_bookings', 'bookings.id', '=', 'cancel_refund_bookings.booking_id')
+                ->select(
+                    DB::raw("DATE_FORMAT(bookings.booking_date, '%Y-%m') AS month"), // Extract year and month
+                    DB::raw("COUNT(cancel_refund_bookings.id) AS total_refunds"),   // Total refunds
+                    DB::raw("SUM(CASE WHEN cancel_refund_bookings.cr_penalized = '1' THEN 1 ELSE 0 END) AS penalized_refunds"), // Penalized refunds
+                )
+                ->where('taskers.id', $taskerId)
+                ->groupBy('month')
+                ->orderBy('month', 'desc')
+                ->get();
 
-        return view('tasker.performance.performance-analysis-index', [
-            'title' => 'Performance Analysis',
-            'completedBookings' => $completedBookings,
-            'progress' => $progress,
-            'taskers' => $taskers,
-            'pastPerformance' => $pastPerformance,
-            'date' => $dateLabel,
-            'taskerMonthlyRefunds' => $taskerMonthlyRefunds
-        ]);
+            return view('tasker.performance.performance-analysis-index', [
+                'title' => 'Performance Analysis',
+                'completedBookings' => $completedBookings,
+                'progress' => $progress,
+                'taskers' => $taskers,
+                'pastPerformance' => $pastPerformance,
+                'date' => $dateLabel,
+                'taskerMonthlyRefunds' => $taskerMonthlyRefunds
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'Oops, Something bad happen. Please try again !');
+        }
     }
 
+    // Tasker - eStatement
+    // Updated by: Zikri (11/01/2025)
     public function eStatementTaskerNav(Request $request)
     {
-        $data = DB::table('taskers as a')
-            ->join('monthly_statements as b', 'a.id', 'b.tasker_id')
-            ->select(
-                'a.id as taskerID',
-                'b.id as statementID',
-                'a.tasker_firstname',
-                'a.tasker_lastname',
-                'a.tasker_phoneno',
-                'a.email',
-                'a.tasker_code',
-                'b.start_date',
-                'b.end_date',
-                'b.file_name',
-                'b.statement_status',
-                'b.total_earnings'
-            )
-            ->where('a.id', Auth::user()->id);
+        try {
+            $data = DB::table('taskers as a')
+                ->join('monthly_statements as b', 'a.id', 'b.tasker_id')
+                ->select(
+                    'a.id as taskerID',
+                    'b.id as statementID',
+                    'a.tasker_firstname',
+                    'a.tasker_lastname',
+                    'a.tasker_phoneno',
+                    'a.email',
+                    'a.tasker_code',
+                    'b.start_date',
+                    'b.end_date',
+                    'b.file_name',
+                    'b.statement_status',
+                    'b.total_earnings'
+                )
+                ->where('a.id', Auth::user()->id);
 
-        if ($request->has('startMonth') && $request->has('endMonth') && $request->input('startMonth') != '' && $request->input('endMonth') != '') {
-            $startDate = Carbon::parse($request->input('startMonth'))->endOfMonth()->format('Y-m-d');
-            $endDate = Carbon::parse($request->input('endMonth'))->endOfMonth()->format('Y-m-d');
+            if ($request->has('startMonth') && $request->has('endMonth') && $request->input('startMonth') != '' && $request->input('endMonth') != '') {
+                $startDate = Carbon::parse($request->input('startMonth'))->endOfMonth()->format('Y-m-d');
+                $endDate = Carbon::parse($request->input('endMonth'))->endOfMonth()->format('Y-m-d');
 
-            if ($startDate && $endDate) {
-                $data->whereBetween('b.end_date', [$startDate, $endDate]);
+                if ($startDate && $endDate) {
+                    $data->whereBetween('b.end_date', [$startDate, $endDate]);
+                }
             }
+
+            if ($request->has('status_filter') && $request->input('status_filter') != '') {
+                $data->where('b.statement_status', $request->input('status_filter'));
+            }
+
+            $data = $data->get();
+
+            if ($request->ajax()) {
+
+                $table = DataTables::of($data)->addIndexColumn();
+
+                $table->addColumn('start_date', function ($row) {
+
+                    $startdate = Carbon::parse($row->start_date)->format('d/m/Y');
+                    return $startdate;
+                });
+
+                $table->addColumn('end_date', function ($row) {
+
+                    $enddate = Carbon::parse($row->end_date)->format('d/m/Y');
+                    return $enddate;
+                });
+
+                $table->addColumn('total_earnings', function ($row) {
+
+                    if ($row->statement_status == 0) {
+                        $amount = '<span class="text-danger"> ' . $row->total_earnings . '</span>';
+                    } else if ($row->statement_status == 1) {
+                        $amount = '<span class="text-success"> ' . $row->total_earnings . '</span>';
+                    }
+                    return $amount;
+                });
+
+
+                $table->addColumn('statement_status', function ($row) {
+
+                    if ($row->statement_status == 0) {
+                        $status = '<span class="badge bg-light-warning">Pending</span>';
+                    } else if ($row->statement_status == 1) {
+                        $status = '<span class="badge bg-light-success">Released</span>';
+                    }
+                    return $status;
+                });
+
+                $table->addColumn('file_name', function ($row) {
+                    $file = '<a href="' . asset('storage' . '/' . $row->file_name)  . '" target="_blank" class="btn btn-link"><i class="fas fa-file-pdf text-danger me-2"></i>View e-Statement</a>';
+                    return $file;
+                });
+
+                $table->rawColumns(['start_date', 'end_date', 'total_earnings', 'statement_status', 'file_name']);
+
+                return $table->make(true);
+            }
+            $tobeReleased = MonthlyStatement::where('tasker_id', Auth::user()->id)->where('statement_status', 0)->sum('total_earnings');
+
+            //calculation of amount have been released
+            $currentYear = now()->year;
+
+            $releasedAll = MonthlyStatement::where('tasker_id', Auth::user()->id)->where('statement_status', 1)->sum('total_earnings');
+
+            $releasedthisyear = MonthlyStatement::where('tasker_id', Auth::user()->id)->where('statement_status', 1)->whereYear('end_date', $currentYear)->sum('total_earnings');
+
+            $monthlyLabels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+
+            $monthlyReleasedAmounts = MonthlyStatement::where('tasker_id', Auth::user()->id)->selectRaw('MONTH(end_date) as month, SUM(total_earnings) as total')
+                ->where('statement_status', 1)
+                ->whereYear('end_date', $currentYear) // Filter records for the current year
+                ->groupBy('month')
+                ->pluck('total', 'month')
+                ->toArray();
+
+            $monthlyReleasedAmounts = array_replace(array_fill(1, 12, 0), $monthlyReleasedAmounts);
+            $monthlyReleasedAmountsWithLabels = [];
+            foreach ($monthlyReleasedAmounts as $monthIndex => $amount) {
+                $monthlyReleasedAmountsWithLabels[$monthlyLabels[$monthIndex - 1]] = $amount; // $monthIndex is 1-based
+            }
+
+            // dd($monthlyReleasedAmountsWithLabels);
+
+            $yearlyLabels = MonthlyStatement::where('tasker_id', Auth::user()->id)->selectRaw('YEAR(end_date) as year')
+                ->distinct()
+                ->orderBy('year')
+                ->pluck('year')
+                ->toArray();
+
+            $yearlyReleasedAmounts = MonthlyStatement::where('tasker_id', Auth::user()->id)->selectRaw('YEAR(end_date) as year, SUM(total_earnings) as total')
+                ->where('statement_status', 1)
+                ->groupBy('year')
+                ->pluck('total', 'year')
+                ->toArray();
+
+            return view('tasker.eStatement.statement-index', [
+                'title' => 'e-Statement',
+                'data' => $data,
+                'tobeReleased' => $tobeReleased,
+                'releasedthisyear' => $releasedthisyear,
+                'releasedAll' => $releasedAll,
+                'monthlyLabels' => $monthlyLabels,
+                'monthlyReleasedAmounts' => $monthlyReleasedAmountsWithLabels,
+                'yearlyLabels' => $yearlyLabels,
+                'yearlyReleasedAmounts' => $yearlyReleasedAmounts,
+
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'Oops, Something bad happen. Please try again !');
         }
-
-        if ($request->has('status_filter') && $request->input('status_filter') != '') {
-            $data->where('b.statement_status', $request->input('status_filter'));
-        }
-
-        $data = $data->get();
-
-        if ($request->ajax()) {
-
-            $table = DataTables::of($data)->addIndexColumn();
-
-            $table->addColumn('start_date', function ($row) {
-
-                $startdate = Carbon::parse($row->start_date)->format('d/m/Y');
-                return $startdate;
-            });
-
-            $table->addColumn('end_date', function ($row) {
-
-                $enddate = Carbon::parse($row->end_date)->format('d/m/Y');
-                return $enddate;
-            });
-
-            $table->addColumn('total_earnings', function ($row) {
-
-                if ($row->statement_status == 0) {
-                    $amount = '<span class="text-danger"> ' . $row->total_earnings . '</span>';
-                } else if ($row->statement_status == 1) {
-                    $amount = '<span class="text-success"> ' . $row->total_earnings . '</span>';
-                }
-                return $amount;
-            });
-
-
-            $table->addColumn('statement_status', function ($row) {
-
-                if ($row->statement_status == 0) {
-                    $status = '<span class="badge bg-light-warning">Pending</span>';
-                } else if ($row->statement_status == 1) {
-                    $status = '<span class="badge bg-light-success">Released</span>';
-                }
-                return $status;
-            });
-
-            $table->addColumn('file_name', function ($row) {
-                $file = '<a href="' . asset('storage' . '/' . $row->file_name)  . '" target="_blank" class="btn btn-link"><i class="fas fa-file-pdf text-danger me-2"></i>View e-Statement</a>';
-                return $file;
-            });
-
-            $table->rawColumns(['start_date', 'end_date', 'total_earnings', 'statement_status', 'file_name']);
-
-            return $table->make(true);
-        }
-        $tobeReleased = MonthlyStatement::where('tasker_id', Auth::user()->id)->where('statement_status', 0)->sum('total_earnings');
-
-        //calculation of amount have been released
-        $currentYear = now()->year;
-
-        $releasedAll = MonthlyStatement::where('tasker_id', Auth::user()->id)->where('statement_status', 1)->sum('total_earnings');
-
-        $releasedthisyear = MonthlyStatement::where('tasker_id', Auth::user()->id)->where('statement_status', 1)->whereYear('end_date', $currentYear)->sum('total_earnings');
-
-        $monthlyLabels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-
-        $monthlyReleasedAmounts = MonthlyStatement::where('tasker_id', Auth::user()->id)->selectRaw('MONTH(end_date) as month, SUM(total_earnings) as total')
-            ->where('statement_status', 1)
-            ->whereYear('end_date', $currentYear) // Filter records for the current year
-            ->groupBy('month')
-            ->pluck('total', 'month')
-            ->toArray();
-
-        $monthlyReleasedAmounts = array_replace(array_fill(1, 12, 0), $monthlyReleasedAmounts);
-        $monthlyReleasedAmountsWithLabels = [];
-        foreach ($monthlyReleasedAmounts as $monthIndex => $amount) {
-            $monthlyReleasedAmountsWithLabels[$monthlyLabels[$monthIndex - 1]] = $amount; // $monthIndex is 1-based
-        }
-
-        // dd($monthlyReleasedAmountsWithLabels);
-
-        $yearlyLabels = MonthlyStatement::where('tasker_id', Auth::user()->id)->selectRaw('YEAR(end_date) as year')
-            ->distinct()
-            ->orderBy('year')
-            ->pluck('year')
-            ->toArray();
-
-        $yearlyReleasedAmounts = MonthlyStatement::where('tasker_id', Auth::user()->id)->selectRaw('YEAR(end_date) as year, SUM(total_earnings) as total')
-            ->where('statement_status', 1)
-            ->groupBy('year')
-            ->pluck('total', 'year')
-            ->toArray();
-
-        // dd($tobeReleased, $releasedAll, $releasedthisyear, $monthlyReleasedAmountsWithLabels, $yearlyLabels, $yearlyReleasedAmounts);
-
-
-
-        return view('tasker.eStatement.statement-index', [
-            'title' => 'e-Statement',
-            'data' => $data,
-            'tobeReleased' => $tobeReleased,
-            'releasedthisyear' => $releasedthisyear,
-            'releasedAll' => $releasedAll,
-            'monthlyLabels' => $monthlyLabels,
-            'monthlyReleasedAmounts' => $monthlyReleasedAmountsWithLabels,
-            'yearlyLabels' => $yearlyLabels,
-            'yearlyReleasedAmounts' => $yearlyReleasedAmounts,
-
-        ]);
     }
 
+    // Tasker - eStatement Template
+    // Updated by: Zikri (11/01/2025)
     public function eStatementTemplateNav()
     {
         $dataTasker = Tasker::where('id', Auth::user()->id)->first();
@@ -2266,7 +2451,7 @@ class RouteController extends Controller
             YEAR(booking_date) as year,
             MONTH(booking_date) as month,
             SUM(CASE WHEN booking_status = 6 THEN booking_rate ELSE 0 END) as completedAmount,
-            SUM(CASE WHEN booking_status IN (1, 2, 3) THEN booking_rate ELSE 0 END) as floatingAmount,
+            SUM(CASE WHEN booking_status IN (1, 2, 3, 4) THEN booking_rate ELSE 0 END) as floatingAmount,
             SUM(CASE WHEN booking_status = 5 THEN booking_rate ELSE 0 END) as cancelledAmount
         ")
             ->groupBy('year', 'month')
@@ -2292,7 +2477,7 @@ class RouteController extends Controller
         $yearlyData = Booking::selectRaw("
             YEAR(booking_date) as year,
             SUM(CASE WHEN booking_status = 6 THEN booking_rate ELSE 0 END) as completedAmount,
-            SUM(CASE WHEN booking_status IN (1, 2, 3) THEN booking_rate ELSE 0 END) as floatingAmount,
+            SUM(CASE WHEN booking_status IN (1, 2, 3, 4) THEN booking_rate ELSE 0 END) as floatingAmount,
             SUM(CASE WHEN booking_status = 5 THEN booking_rate ELSE 0 END) as cancelledAmount
         ")
             ->groupBy('year')
@@ -2367,6 +2552,7 @@ class RouteController extends Controller
                 'f.cr_status',
                 'f.cr_date',
                 'f.cr_amount',
+                'f.cr_penalized',
                 'f.cr_bank_name',
                 'f.cr_account_name',
                 'f.cr_account_number'
@@ -2396,6 +2582,11 @@ class RouteController extends Controller
             $data->whereRaw("TRIM(SUBSTRING_INDEX(a.booking_address, ' ', -1)) = ?", [$stateFilter]);
         }
 
+
+        if ($request->has('type_filter') && $request->input('type_filter') != '') {
+            $data->where('f.cr_penalized', $request->input('type_filter'));
+        }
+
         $data = $data->get();
 
         if ($request->ajax()) {
@@ -2417,9 +2608,9 @@ class RouteController extends Controller
                 return $client;
             });
 
-            $table->addColumn('booking_date', function ($row) {
+            $table->addColumn('cr_date', function ($row) {
 
-                $date = Carbon::parse($row->booking_date)->format('d F Y');
+                $date = Carbon::parse($row->cr_date)->format('d F Y');
                 return $date;
             });
 
@@ -2453,7 +2644,6 @@ class RouteController extends Controller
             });
 
             $table->addColumn('action', function ($row) {
-
                 $button =
                     '
                         <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
@@ -2461,12 +2651,10 @@ class RouteController extends Controller
                             <i class="ti ti-eye f-20"></i>
                         </a>
                     ';
-
-
                 return $button;
             });
 
-            $table->rawColumns(['booking_order_id', 'tasker', 'client', 'booking_date', 'booking_time', 'refund_amount', 'booking_status', 'action']);
+            $table->rawColumns(['booking_order_id', 'tasker', 'client', 'cr_date', 'booking_time', 'refund_amount', 'booking_status', 'action']);
 
             return $table->make(true);
         }
@@ -2478,6 +2666,7 @@ class RouteController extends Controller
         $totalPendingRefund = 0;
         $totalApprovedAmount = '0.00';
         $totalRejectedAmount = '0.00';
+        $totalPendingAmount = '0.00';
 
         // Check if $data is not empty
         if ($data->isNotEmpty()) {
@@ -2505,7 +2694,9 @@ class RouteController extends Controller
         if ($dataAll->isNotEmpty()) {
             // Calculate total pending refunds if $dataAll is not empty
             $totalPendingRefund = $dataAll->whereIn('cr_status', [0, 1])->count();
+            $totalPendingAmount = number_format($dataAll->whereIn('cr_status', [0, 1])->sum('cr_amount'), 2);
         }
+
 
         // Fetch state data
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
@@ -2521,6 +2712,7 @@ class RouteController extends Controller
             'totalPendingRefund' => $totalPendingRefund,
             'totalApprovedAmount' => $totalApprovedAmount,
             'totalRejectedAmount' => $totalRejectedAmount,
+            'totalPendingAmount' => $totalPendingAmount,
             'states' => $states
         ]);
     }
@@ -2590,9 +2782,9 @@ class RouteController extends Controller
                 return $client;
             });
 
-            $table->addColumn('booking_date', function ($row) {
+            $table->addColumn('cr_date', function ($row) {
 
-                $date = Carbon::parse($row->booking_date)->format('d F Y');
+                $date = Carbon::parse($row->cr_date)->format('d F Y');
                 return $date;
             });
 
@@ -2629,7 +2821,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['booking_order_id', 'tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
+            $table->rawColumns(['booking_order_id', 'tasker', 'client', 'cr_date', 'booking_time', 'booking_status', 'action']);
 
             return $table->make(true);
         }

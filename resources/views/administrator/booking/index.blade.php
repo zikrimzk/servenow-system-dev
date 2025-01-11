@@ -6,10 +6,6 @@ use Carbon\Carbon;
 
 @section('content')
     <style>
-        .dataTables_processing {
-            display: none !important;
-        }
-
         .card-all {
             border-left: 4px solid #10100f;
         }
@@ -107,7 +103,6 @@ use Carbon\Carbon;
                         </div>
                     </div>
                 </div>
-
 
                 <div class="col-md-6 col-xl-4">
                     <div class="card card-unpaid">
@@ -207,9 +202,9 @@ use Carbon\Carbon;
                             <div class="row align-items-center">
                                 <div class="col-sm-6 mb-3">
                                     <label for="date_range" class="form-label">Date Range</label>
-                                    <div class="d-flex align-items-center">
+                                    <div class="d-flex flex-column flex-md-row align-items-start">
                                         <input type="date" id="startDate" name="startDate" class="form-control">
-                                        <span class="mx-2">to</span>
+                                        <span style="margin: 10px 15px">to</span>
                                         <input type="date" id="endDate" name="endDate" class="form-control">
                                     </div>
                                 </div>
@@ -451,8 +446,6 @@ use Carbon\Carbon;
                     </div>
                 </div>
                 <!-- Modal View Booking Details End Here-->
-
-
 
                 <!-- Modal Update Booking Details Start Here-->
                 <form action="{{ route('admin-booking-update', $b->bookingID) }}" method="POST">
