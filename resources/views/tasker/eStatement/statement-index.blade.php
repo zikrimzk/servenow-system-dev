@@ -131,8 +131,9 @@
                                         <option value="1">Released</option>
                                     </select>
                                 </div>
+                                
                                 <div class="col-sm-3 mb-3">
-                                    <label for="endDate" class="form-label text-white">Action</label>
+                                    <label class="form-label text-white">Action</label>
                                     <div class="d-flex justify-content-start align-items-end">
                                         <a href="" class="link-primary" id="clearAllBtn">Clear All</a>
                                     </div>

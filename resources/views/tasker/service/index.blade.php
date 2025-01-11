@@ -59,7 +59,7 @@
                 <div class="col-sm-12">
                     <div class="card table-card">
                         <div class="card-header">
-                            <div class="row">
+                            <div class="row align-items-center">
                                 <div class="col-sm-6 col-xl-3">
                                     <label for="status_filter" class="form-label">Filter by</label>
                                     <select id="status_filter" class="form-select mb-3 mb-md-0">
@@ -70,6 +70,12 @@
                                         <option value="3">Rejected</option>
                                         <option value="4">Terminated</option>
                                     </select>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="form-label text-white">Action</label>
+                                    <div class="d-flex justify-content-start align-items-end">
+                                        <a href="" class="link-primary" id="clearAllBtn">Clear All</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -431,6 +437,13 @@
                     table.draw();
                 });
 
+                $('#clearAllBtn').on('click', function(e) {
+                    e.preventDefault();
+                    $('#status_filter').val('');
+                    table.ajax.reload();
+                    table.draw();
+                });
+
                 $('#addApplicationBtn').on('click', function() {
                     const $buttonOne = $(this);
 
@@ -483,4 +496,4 @@
     </script>
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
-<!--Updated By: Muhammad Zikri B. Kashim (10/01/2025)-->
+<!--Updated By: Muhammad Zikri B. Kashim (11/01/2025)-->

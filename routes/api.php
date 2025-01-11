@@ -56,6 +56,11 @@ Route::middleware('auth:sanctum')->get('/delete-service-{id}', [TaskerAPIControl
 
 // Tasker - Visibility & Location API
 Route::middleware('auth:sanctum')->post('/update-tasker-location', [TaskerAPIController::class, 'taskerUpdateLocationAPI']);
+/* 
+NOTE: URL /update-tasker-location akan Post details :
+ex http://127.0.0.1:8000/api/update-tasker-location?tasker_workingloc_state=melaka&tasker_workingloc_area=Melaka Tengah&working_radius=20
+*/
+
 Route::middleware('auth:sanctum')->get('/change-tasker-visibility', [TaskerAPIController::class, 'taskerVisibleToggleAPI']);
 
 // Tasker - Time Slot Setting API
@@ -78,6 +83,7 @@ slot_status - 1 - Available | 0 - Unavailable
 Route::middleware('auth:sanctum')->get('/get-bookings-details', [TaskerAPIController::class, 'getBookingsDetailsAPI']);
 Route::middleware('auth:sanctum')->get('/get-unavailable-time', [TaskerAPIController::class, 'getTaskerUnavailableSlotAPI']);
 Route::middleware('auth:sanctum')->post('/booking-reschedule', [TaskerAPIController::class, 'rescheduleBookingTimeFunctionAPI']);
+
 /* 
 NOTE: URL /booking-reschedule akan Post details :
 
@@ -103,6 +109,49 @@ option - 1 = Confirmed booking
          2 = Cancel booking
 
 */
+
+Route::middleware('auth:sanctum')->get('/get-booking-list', [TaskerAPIController::class, 'getBookingListAPI']);
+Route::middleware('auth:sanctum')->get('/get-refund-list', [TaskerAPIController::class, 'getRefundListAPI']);
+Route::middleware('auth:sanctum')->get('/get-review-list', [TaskerAPIController::class, 'getReviewListAPI']);
+
+Route::middleware('auth:sanctum')->post('/update-review-{id}', [TaskerAPIController::class, 'taskerReviewUpdateStatusAPI']);
+/* 
+NOTE: URL /update-review akan Post details :
+
+/update-review-1?review_status=1/2
+ex http://127.0.0.1:8000/api/update-review-1?review_status=1
+
+id - ID REVIEW
+review_status - 1 = Active
+                2 = Hide
+
+*/
+
+Route::middleware('auth:sanctum')->post('/tasker-reply-review/{id}', [TaskerAPIController::class, 'taskerReplyReviewAPI']);
+/* 
+NOTE: URL /tasker-reply-review akan Post details :
+
+/update-review-1?review_status=1/2
+/tasker-reply-review/1?reply_message=AnyMessageHere
+ex http://127.0.0.1:8000/api/tasker-reply-review/1?reply_message=AnyMessageHere
+
+id - ID REVIEW
+reply_message - Apa apa mesej nak reply
+
+*/
+
+Route::middleware('auth:sanctum')->get('/get-performance-analysis', [TaskerAPIController::class, 'getPerformanceAnalysisAPI']);
+
+Route::middleware('auth:sanctum')->get('/get-e-statement', [TaskerAPIController::class, 'geteStatementAPI']);
+
+
+
+
+
+
+
+
+
 
 
 

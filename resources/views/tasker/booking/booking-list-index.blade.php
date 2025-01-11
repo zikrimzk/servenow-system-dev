@@ -186,6 +186,7 @@ use Carbon\Carbon;
 
             </div>
             <!-- Analytics End -->
+
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card table-card">
@@ -212,7 +213,7 @@ use Carbon\Carbon;
                                     </select>
                                 </div>
                                 <div class="col-sm-3 mb-3">
-                                    <label for="endDate" class="form-label text-white">Action</label>
+                                    <label class="form-label text-white">Action</label>
                                     <div class="d-flex justify-content-start align-items-end">
                                         <a href="" class="link-primary" id="clearAllBtn">Clear All</a>
                                     </div>
@@ -465,7 +466,7 @@ use Carbon\Carbon;
             $(function() {
 
                 var table = $('.data-table').DataTable({
-                    // processing: true,
+                    processing: true,
                     serverSide: true,
                     responsive: true,
                     ajax: {
@@ -474,7 +475,6 @@ use Carbon\Carbon;
                             d.startDate = $('#startDate').val();
                             d.endDate = $('#endDate').val();
                             d.status_filter = $('#status_filter').val();
-                            // d.state_filter = $('#state_filter').val();
                         }
                     },
                     columns: [{
@@ -520,18 +520,21 @@ use Carbon\Carbon;
 
                 });
 
-                // Refresh the table every 5 seconds
-                // setInterval(function() {
-                //     table.ajax.reload(null, false); // Reloads without resetting pagination
-                //     $('.dataTables_processing').hide();
-                // }, 5000);
-
                 $('#startDate, #endDate').on('change', function() {
                     table.ajax.reload();
                     table.draw();
                 });
 
                 $('#status_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#clearAllBtn').on('click', function(e) {
+                    e.preventDefault();
+                    $('#startDate').val('');
+                    $('#endDate').val('');
+                    $('#status_filter').val('');
                     table.ajax.reload();
                     table.draw();
                 });

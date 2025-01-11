@@ -17,7 +17,7 @@ class PerformanceController extends Controller
             $review->save();
             return back()->with('success', 'Review status updated successfully');
         }catch(Exception $e){
-            return back()->with('error', 'Opps, something went wrong. Please try again.');
+            return back()->with('error', 'Opps, something went wrong. Please try again !');
         }
     }
 
@@ -33,7 +33,7 @@ class PerformanceController extends Controller
             ReviewReply::create($data);
             return back()->with('success', 'Review reply sent successfully');
         }catch(Exception $e){
-            return back()->with('error', 'Opps, something went wrong. Please try again.');
+            return back()->with('error', 'Opps, something went wrong. Please try again !');
         }
     }
 
@@ -43,11 +43,12 @@ class PerformanceController extends Controller
             $review = Review::find($id);
             $review->review_status = $request->review_status;
             $review->save();
-            return back()->with('success', 'Review status updated successfully');
+            return back()->with('success', 'Review status updated successfully !');
         }catch(Exception $e){
-            return back()->with('error', 'Opps, something went wrong. Please try again.');
+            return back()->with('error', 'Opps, something went wrong. Please try again !');
         }
     }
+
 
     public function taskerReplyReview(Request $request, $id)
     {
@@ -59,9 +60,9 @@ class PerformanceController extends Controller
                 'review_id' => $id,
             ];
             ReviewReply::create($data);
-            return back()->with('success', 'Review reply sent successfully');
+            return back()->with('success', 'Review reply sent successfully !');
         }catch(Exception $e){
-            return back()->with('error', 'Opps, something went wrong. Please try again.');
+            return back()->with('error', 'Opps, something went wrong. Please try again !');
         }
     }
 

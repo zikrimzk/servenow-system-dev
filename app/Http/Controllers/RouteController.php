@@ -1251,16 +1251,6 @@ class RouteController extends Controller
 
             $completedBookings = $bookings->where('booking_status', 6)->count();
 
-
-            // Calculate progress
-            if ($completedBookings <= 20) {
-                $progress = ($completedBookings / 20) * 100;
-            } elseif ($completedBookings <= 80) {
-                $progress = (($completedBookings - 20) / 60) * 100;
-            } else {
-                $progress = 100;
-            }
-
             $taskerId = auth()->user()->id;
 
             // Get the current date and calculate the two previous months' ranges
@@ -1351,7 +1341,6 @@ class RouteController extends Controller
             return view('tasker.performance.performance-analysis-index', [
                 'title' => 'Performance Analysis',
                 'completedBookings' => $completedBookings,
-                'progress' => $progress,
                 'taskers' => $taskers,
                 'pastPerformance' => $pastPerformance,
                 'date' => $dateLabel,
@@ -1446,6 +1435,7 @@ class RouteController extends Controller
 
                 return $table->make(true);
             }
+            
             $tobeReleased = MonthlyStatement::where('tasker_id', Auth::user()->id)->where('statement_status', 0)->sum('total_earnings');
 
             //calculation of amount have been released
