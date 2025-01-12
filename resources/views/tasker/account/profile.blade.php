@@ -13,6 +13,7 @@
                 width: 100%;
             }
         }
+
     </style>
 
     <!-- [ Main Content ] start -->
@@ -44,26 +45,26 @@
                         <div class="card-body py-0">
                             <ul class="nav nav-tabs profile-tabs" id="myTab" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="profile-tab-1" data-bs-toggle="tab" href="#profile-1"
-                                        role="tab" aria-selected="true">
+                                    <a class="nav-link {{ session('active_tab', 'profile-1') == 'profile-1' ? 'active' : '' }}"
+                                        id="profile-tab-1" data-bs-toggle="tab" href="#profile-1" role="tab">
                                         <i class="ti ti-file-text me-2"></i>Personal Details
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="profile-tab-2" data-bs-toggle="tab" href="#profile-2"
-                                        role="tab" aria-selected="false">
+                                    <a class="nav-link {{ session('active_tab') == 'profile-2' ? 'active' : '' }}"
+                                        id="profile-tab-2" data-bs-toggle="tab" href="#profile-2" role="tab">
                                         <i class="ti ti-map-pin me-2"></i>Tasker Address
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="profile-tab-3" data-bs-toggle="tab" href="#profile-3"
-                                        role="tab" aria-selected="false">
+                                    <a class="nav-link {{ session('active_tab') == 'profile-3' ? 'active' : '' }}"
+                                        id="profile-tab-3" data-bs-toggle="tab" href="#profile-3" role="tab">
                                         <i class="ti ti-building-bank me-2"></i>Bank Details
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="profile-tab-4" data-bs-toggle="tab" href="#profile-4"
-                                        role="tab" aria-selected="false">
+                                    <a class="nav-link {{ session('active_tab') == 'profile-4' ? 'active' : '' }}"
+                                        id="profile-tab-4" data-bs-toggle="tab" href="#profile-4" role="tab">
                                         <i class="ti ti-lock me-2"></i>Change Password
                                     </a>
                                 </li>
@@ -104,7 +105,8 @@
 
                     <div class="tab-content">
                         <!-- Personal Details Tab Start -->
-                        <div class="tab-pane show active" id="profile-1" role="tabpanel" aria-labelledby="profile-tab-1">
+                        <div class="tab-pane fade {{ session('active_tab', 'profile-1') == 'profile-1' ? 'show active' : '' }} "
+                            id="profile-1" role="tabpanel" aria-labelledby="profile-tab-1">
                             <form action="{{ route('tasker-update-profile-personal') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
@@ -153,7 +155,7 @@
                                                 @endif
                                             </div>
                                             <div class="card-body">
-                                                <div class="row justify-content-center mb-4">
+                                                <div class="row mb-4">
                                                     <!-- Profile Picture Section Start -->
                                                     <div class="col-md-4 text-center">
                                                         <div class="user-upload">
@@ -172,7 +174,11 @@
                                                             @enderror
                                                         </div>
                                                         <input type="hidden" name="isUploadPhoto" id="isUploadPhoto"
-                                                            value="false">
+                                                        value="false">
+                                                        <div class="col-md-12 mb-3">
+                                                            <label for="profilephoto" class="fw-semibold"
+                                                                style="cursor:pointer; color:#16325b">Edit Profile Photo</label>
+                                                        </div>
                                                     </div>
                                                     <!-- Profile Picture Section End -->
 
@@ -296,7 +302,8 @@
                         <!-- Personal Details Tab End -->
 
                         <!-- Tasker Address Tab Start -->
-                        <div class="tab-pane" id="profile-2" role="tabpanel" aria-labelledby="profile-tab-2">
+                        <div class="tab-pane fade {{ session('active_tab') == 'profile-2' ? 'show active' : '' }}"
+                            id="profile-2" role="tabpanel" aria-labelledby="profile-tab-2">
                             <form action="{{ route('tasker-update-profile-address') }}" method="POST">
                                 @csrf
                                 <div class="card">
@@ -408,7 +415,8 @@
                         <!-- Tasker Address Tab End -->
 
                         <!-- Bank Details Tab Start -->
-                        <div class="tab-pane" id="profile-3" role="tabpanel" aria-labelledby="profile-tab-3">
+                        <div class="tab-pane fade {{ session('active_tab') == 'profile-3' ? 'show active' : '' }}"
+                            id="profile-3" role="tabpanel" aria-labelledby="profile-tab-3">
                             <form action="{{ route('tasker-update-profile-bank') }}" method="POST">
                                 @csrf
                                 <div class="card">
@@ -466,9 +474,9 @@
                         </div>
                         <!-- Bank Details Tab End -->
 
-
                         <!-- Update Password Tab Start -->
-                        <div class="tab-pane" id="profile-4" role="tabpanel" aria-labelledby="profile-tab-4">
+                        <div class="tab-pane fade {{ session('active_tab') == 'profile-4' ? 'show active' : '' }}"
+                            id="profile-4" role="tabpanel" aria-labelledby="profile-tab-4">
                             <form action="{{ route('tasker-update-password', Auth::user()->id) }}" method="POST">
                                 @csrf
                                 <div class="card">
@@ -601,7 +609,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -780,6 +787,10 @@
         showpassword('show-password-confirm', 'cpassword', 'toggle-icon-confirm-password');
 
         $(document).ready(function() {
+
+            var activeTab = "{{ session('active_tab', 'profile-1') }}";
+            $('.nav-link[href="#' + activeTab + '"]').tab('show');
+
             $('#profilephoto').on('change', function() {
                 const file = event.target.files[0];
                 if (file) {
@@ -837,3 +848,4 @@
     </script>
     <!-- [ Main Content ] end -->
 @endsection
+<!--Updated By: Muhammad Zikri B. Kashim (12/01/2025)-->

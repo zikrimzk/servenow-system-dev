@@ -149,8 +149,66 @@ class TaskerController extends Controller
         return redirect(route('admin-tasker-management'))->with('success', 'The Tasker details has been successfully updated !');
     }
 
+
+    public function updateMultipleTaskerStatus(Request $req)
+    {
+        try {
+            $taskerIds = $req->input('selected_tasker');
+            $updatedStatus = $req->input('tasker_status');
+
+            Tasker::whereIn('id', $taskerIds)->update(['tasker_status' => $updatedStatus]);
+
+            return response()->json([
+                'message' => 'All selected tasker status has been updated successfully !',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Oops! Something went wrong. Please try again later.',
+            ]);
+        }
+    }
+
+    // Tasker e-KYC Process 1
+    // Check by : Zikri (12/01/2025)
+    public function taskerCardVerification($data)
+    {
+        return view('ekyc.card-verification', [
+            'title' => 'Card Verification',
+            'data' => $data
+        ]);
+    }
+
+    // Tasker e-KYC Process 2
+    // Check by : Zikri (12/01/2025)
+    public function taskerFaceVerification()
+    {
+        return view('ekyc.face-verification', [
+            'title' => 'Face Verification'
+        ]);
+    }
+
+    // Tasker e-KYC Process 3
+    // Check by : Zikri (12/01/2025)
+    public function verificationSuccess(Request $request)
+    {
+        try {
+            $idno = $request->query('idno');
+            $idno = str_replace('-', '', $idno);
+            $userData = Tasker::where('tasker_icno', $idno)->update(['tasker_status' => 2]);
+            return redirect(route('tasker-profile'))->with('success', 'Verification has been successfully completed. Please set up your task preferences at Task Preferences > Preferences.');
+        } catch (Exception) {
+            return back()->with('error', 'Something went wrong !');
+        }
+    }
+
+    // Tasker Update Profile [Personal Details]
+    // Check by : Zikri (12/01/2025)
     public function taskerUpdateProfilePersonal(Request $req)
     {
+        // Set the active tab to Bank Details (profile-3) in the session
+        session()->flash('active_tab', 'profile-1');
+
+        // Validate the request
         if ($req->isUploadPhoto == 'true') {
             $taskers = $req->validate(
                 [
@@ -246,8 +304,14 @@ class TaskerController extends Controller
         return back()->with('success', $message);
     }
 
+    // Tasker Update Profile [Address]
+    // Check by : Zikri (12/01/2025)
     public function taskerUpdateProfileAddress(Request $req)
     {
+        // Set the active tab to Bank Details (profile-3) in the session
+        session()->flash('active_tab', 'profile-2');
+
+        // Validate the request
         $taskers = $req->validate(
             [
                 'tasker_address_one' => 'required',
@@ -288,6 +352,8 @@ class TaskerController extends Controller
             $taskers['tasker_status'] = 1;
             $message = 'Tasker profile has been successfully updated. Please proceed to account verification to start earning.';
             Tasker::whereId(Auth::user()->id)->update($taskers);
+            // Set the active tab to Bank Details (profile-3) in the session
+            session()->flash('active_tab', 'profile-1');
         } else {
             $message = 'Tasker address has been successfully updated !';
         }
@@ -295,12 +361,18 @@ class TaskerController extends Controller
         return back()->with('success', $message);
     }
 
+    // Tasker Update Profile [Bank Details]
+    // Check by : Zikri (12/01/2025)
     public function taskerUpdateProfileBank(Request $req)
     {
+        // Set the active tab to Bank Details (profile-3) in the session
+        session()->flash('active_tab', 'profile-3');
+
+        // Validate the request
         $taskers = $req->validate(
             [
                 'tasker_account_bank' => 'required',
-                'tasker_account_number' => 'required',
+                'tasker_account_number' => 'required|numeric',
             ],
             [],
             [
@@ -308,10 +380,12 @@ class TaskerController extends Controller
                 'tasker_account_number' => 'Account Number',
             ]
         );
+
         Tasker::whereId(Auth::user()->id)->update($taskers);
 
         $ori = Tasker::whereId(Auth::user()->id)->first();
 
+        // Check if all fields are filled and update status
         if (
             $ori->tasker_firstname != null &&
             $ori->tasker_lastname != null &&
@@ -331,17 +405,24 @@ class TaskerController extends Controller
             $taskers['tasker_status'] = 1;
             $message = 'Tasker profile has been successfully updated. Please proceed to account verification to start earning.';
             Tasker::whereId(Auth::user()->id)->update($taskers);
+            // Set the active tab to Bank Details (profile-3) in the session
+            session()->flash('active_tab', 'profile-1');
         } else {
-            $message = 'Tasker bank details has been successfully updated !';
+            $message = 'Tasker bank details have been successfully updated!';
         }
 
-        Tasker::whereId(Auth::user()->id)->update($taskers);
-
+        // Return back with success message
         return back()->with('success', $message);
     }
 
+    // Tasker Update Password
+    // Check by : Zikri (12/01/2025)
     public function taskerUpdatePassword(Request $req, $id)
     {
+        // Set the active tab to Bank Details (profile-3) in the session
+        session()->flash('active_tab', 'profile-4');
+
+        // Validate the request
         $validated = $req->validate(
             [
                 'oldPass' => 'required | min:8',
@@ -365,25 +446,7 @@ class TaskerController extends Controller
         }
     }
 
-    public function updateMultipleTaskerStatus(Request $req)
-    {
-        try {
-            $taskerIds = $req->input('selected_tasker');
-            $updatedStatus = $req->input('tasker_status');
-
-            Tasker::whereIn('id', $taskerIds)->update(['tasker_status' => $updatedStatus]);
-
-            return response()->json([
-                'message' => 'All selected tasker status has been updated successfully !',
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Oops! Something went wrong. Please try again later.',
-            ]);
-        }
-    }
-
-    // Update Working Location
+    // Tasker Update Working Location
     // Check by : Zikri (10/01/2025)
     public function taskerUpdateLocation(Request $req, $id)
     {
@@ -409,33 +472,5 @@ class TaskerController extends Controller
         $taskers['longitude'] = $result['lng'];
         Tasker::whereId($id)->update($taskers);
         return back()->with('success', 'Tasker location have been saved !');
-    }
-
-    public function taskerCardVerification($data)
-    {
-        return view('ekyc.card-verification', [
-            'title' => 'Card Verification',
-            'data' => $data
-        ]);
-    }
-
-    public function taskerFaceVerification()
-    {
-        return view('ekyc.face-verification', [
-            'title' => 'Face Verification'
-        ]);
-    }
-
-    public function verificationSuccess(Request $request)
-    {
-        try {
-            // Tasker::where('id', Auth::user()->id)->update(['tasker_status' => 2]);
-            $idno = $request->query('idno');
-            $idno = str_replace('-', '', $idno);
-            $userData = Tasker::where('tasker_icno', $idno)->update(['tasker_status' => 2]);
-            return redirect(route('tasker-login'))->with('success', 'Verification has been successfully completed. Please set up your task preferences at Task Preferences > Visibility & Location.');
-        } catch (Exception) {
-            return back()->with('error', 'Something went wrong !');
-        }
     }
 }

@@ -160,11 +160,9 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     // Admin - e-Statement
     Route::get('/e-statement', [RouteController::class, 'eStatementAdminNav'])->name('admin-e-statement');
-    Route::get('/release-amount-{id}',[StatementController::class, 'adminUpdateStatementStatus'])->name('admin-release-amount');
-    Route::get('/refresh-statement',[StatementController::class, 'triggerGenerateButton'])->name('admin-refresh-statement');
-    Route::post('/release-multiple-amount',[StatementController::class, 'adminUpdateMultipleStatementStatus'])->name('admin-release-multiple-amount');
-
-
+    Route::get('/release-amount-{id}', [StatementController::class, 'adminUpdateStatementStatus'])->name('admin-release-amount');
+    Route::get('/refresh-statement', [StatementController::class, 'triggerGenerateButton'])->name('admin-refresh-statement');
+    Route::post('/release-multiple-amount', [StatementController::class, 'adminUpdateMultipleStatementStatus'])->name('admin-release-multiple-amount');
 });
 
 /* Admin Route End */
@@ -173,17 +171,16 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
 /* Tasker Route Start */
 
-/*Tasker e-KYC*/
-Route::get('/card-verification/{data}', [TaskerController::class, 'taskerCardVerification'])->name('tasker-card-ver');
-Route::get('/face-verification', [TaskerController::class, 'taskerFaceVerification'])->name('tasker-face-ver');
-Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
-
-
 // Tasker - Registration Form [General]
 Route::get('/register-tasker', [RouteController::class, 'taskerRegisterFormNav'])->name('tasker-register-form');
 
 // Tasker - Registration Process
 Route::post('/tasker-registration', [TaskerController::class, 'createTasker'])->name('tasker-create');
+
+// Tasker - Account Verification [e-KYC]
+Route::get('/card-verification/{data}', [TaskerController::class, 'taskerCardVerification'])->name('tasker-card-ver');
+Route::get('/face-verification', [TaskerController::class, 'taskerFaceVerification'])->name('tasker-face-ver');
+Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
 
 Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
@@ -200,23 +197,18 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     Route::post('/update-bank-details', [TaskerController::class, 'taskerUpdateProfileBank'])->name('tasker-update-profile-bank');
     Route::post('/update-password-{id}', [TaskerController::class, 'taskerUpdatePassword'])->name('tasker-update-password');
 
-    // Tasker - Account Verification [e-KYC]
-    // Route::get('/card-verification/{data}', [TaskerController::class, 'taskerCardVerification'])->name('tasker-card-ver');
-    // Route::get('/face-verification', [TaskerController::class, 'taskerFaceVerification'])->name('tasker-face-ver');
-    // Route::get('/verification-success', [TaskerController::class, 'verificationSuccess'])->name('tasker-ver-success');
-
     //Tasker - Service Management
     Route::get('/service-enrollment', [RouteController::class, 'taskerServiceEnrollmentNav'])->name('tasker-service-enrollment');
     Route::post('/create-service', [ServiceController::class, 'createService'])->name('tasker-service-create');
     Route::post('/update-service-{id}', [ServiceController::class, 'updateService'])->name('tasker-service-update');
     Route::get('/delete-service-{id}', [ServiceController::class, 'deleteService'])->name('tasker-service-delete');
 
-    // Tasker - Task Preference > Visibility & Location
+    // Tasker - Task Preference > Prefreneces
     Route::get('/preferences', [RouteController::class, 'taskerPreferencesNav'])->name('tasker-preferences');
     Route::get('/change-tasker-visibility', [SettingController::class, 'taskerVisibleToggle'])->name('tasker-visible-toggle');
     Route::post('/update-tasker-location-{id}', [TaskerController::class, 'taskerUpdateLocation'])->name('tasker-update-location');
 
-    // Tasker - Time Slot Setting
+    // Tasker - Task Preference > Time Slot Setting
     Route::post('/tasker-working-type-change', [SettingController::class, 'taskerTypeToggle'])->name('tasker-type-change');
     Route::get('/time-slot-setting', [RouteController::class, 'taskerTimeSlotNav'])->name('tasker-timeslot-setting');
     Route::get('/create-time-slot-{date}', [SettingController::class, 'taskerCreateTimeSlot'])->name('tasker-timeslot-create');
@@ -248,13 +240,11 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
     // Tasker - e-Statement
     Route::get('/e-statement', [RouteController::class, 'eStatementTaskerNav'])->name('tasker-e-statement');
     Route::get('/e-statement-template', [RouteController::class, 'eStatementTemplateNav'])->name('e-statement-template');
-
 });
 
 /* Tasker Route End */
 
 
-Route::post('/return-payment-callback', [RouteController::class, 'clientPaymentCallbackNav'])->name('client-callback');
 
 
 
@@ -264,6 +254,9 @@ Route::get('/', [RouteController::class, 'gotoIndex'])->name('servenow-home');
 Route::get('/register-client', [RouteController::class, 'clientRegisterFormNav'])->name('client-register-form');
 
 Route::post('/create-client', [ClientController::class, 'createClient'])->name('client-create');
+
+Route::post('/return-payment-callback', [RouteController::class, 'clientPaymentCallbackNav'])->name('client-callback');
+
 
 Route::prefix('client')->middleware('auth:client')->group(function () {
 
