@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Spatie\Geocoder\Geocoder;
 use App\Models\TaskerTimeSlot;
 use App\Models\MonthlyStatement;
+use App\Mail\AdminRefundApproval;
 use Illuminate\Support\Facades\DB;
 use App\Models\CancelRefundBooking;
 use Illuminate\Support\Facades\Auth;
@@ -710,6 +711,60 @@ class TaskerAPIController extends Controller
             'booking_status' => $status,
             'booking_note' => $note,
 
+        ]));
+    }
+
+    // Tasker | Admin - Send Email Notification for Refund booking status update
+    // Done by Muhammad Zikri (12/01/2025)
+    private function sendRefundStatusEmail($data, $userType)
+    {
+        // Booking Status
+        if ($data->cr_status == 0) {
+            $status = 'Require Update';
+        } elseif ($data->cr_status == 1) {
+            $status = 'Process';
+        } elseif ($data->cr_status == 2) {
+            $status = 'Approved';
+        } elseif ($data->cr_status == 3) {
+            $status = 'Rejected';
+        } else {
+            $status = 'Undefined Status';
+        }
+
+        // Booking Note
+        if ($data->booking_note != null) {
+            $note = $data->booking_note;
+        } else {
+            $note = '-';
+        }
+        // User Name
+        if ($userType == 1 || $userType == 3 || $userType == 5) {
+
+            $name = $data->client_firstname . ' ' . $data->client_lastname;
+
+        } elseif ($userType == 2 || $userType == 4) {
+
+            $name = $data->tasker_firstname . ' ' . $data->tasker_lastname;
+        }
+
+        Mail::to($data->email)->send(new AdminRefundApproval([
+            'users' => $userType,
+            'name' => Str::headline($name),
+            'service_name' => $data->servicetype_name,
+            'booking_order_id' => $data->booking_order_id,
+            'change_date' => Carbon::now()->format('d F Y g:i A'),
+            'booking_date' => $data->booking_date,
+            'booking_time_start' => Carbon::parse($data->booking_time_start)->format('g:i A'),
+            'booking_time_end' => Carbon::parse($data->booking_time_end)->format('g:i A'),
+            'booking_rate' => $data->booking_rate,
+            'booking_address' => $data->booking_address,
+            'booking_note' => $note,
+            'cr_status' => $status,
+            'cr_date' => $data->cr_date,
+            'cr_reason' => $data->cr_reason,
+            'cr_amount' => $data->cr_amount,
+            'cr_bank_name' => $data->cr_bank_name,
+            'cr_account_number' => $data->cr_account_number,
         ]));
     }
 
