@@ -280,9 +280,9 @@ class RouteController extends Controller
 
     public function clientBookingHistoryNav()
     {
-        
-        
-        
+
+
+
         $booking = DB::table('bookings as a')
             ->join('services as c', 'a.service_id', '=', 'c.id')
             ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
@@ -399,7 +399,8 @@ class RouteController extends Controller
         ]);
     }
 
-    // Tasker - Login Form Navigation
+    // Tasker - Login Navigation
+    // Updated by: Zikri (12/01/2025)
     public function taskerLoginNav()
     {
         if (!Auth::guard('tasker')->check()) {
@@ -420,15 +421,25 @@ class RouteController extends Controller
     }
 
     // Tasker - Profile Navigation
+    // Updated by: Zikri (12/01/2025)
     public function taskerprofileNav()
     {
-        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
-        $bank = json_decode(file_get_contents(public_path('assets/json/bank.json')), true);
-        return view('tasker.account.profile', [
-            'title' => 'Tasker Profile',
-            'states' => $states,
-            'bank'=> $bank
-        ]);
+        try {
+
+            $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+            $bank = json_decode(file_get_contents(public_path('assets/json/bank.json')), true);
+            return view('tasker.account.profile', [
+                'title' => 'Tasker Profile',
+                'states' => $states,
+                'bank' => $bank
+            ]);
+        } catch (Exception $e) {
+            return view('tasker.account.profile', [
+                'title' => 'Tasker Profile',
+                'states' => [],
+                'bank' => []
+            ]);
+        }
     }
 
 
@@ -581,7 +592,7 @@ class RouteController extends Controller
     }
 
     // Tasker - Booking List
-    // Updated by: Zikri (11/01/2025)
+    // Updated by: Zikri (12/01/2025)
     public function taskerBookingListNav(Request $request)
     {
         try {
@@ -624,6 +635,10 @@ class RouteController extends Controller
 
             if ($request->has('status_filter') && $request->input('status_filter') != '') {
                 $data->where('a.booking_status', $request->input('status_filter'));
+            }
+
+            if ($request->has('service_filter') && $request->input('service_filter') != '') {
+                $data->where('c.id', $request->input('service_filter'));
             }
 
             $data = $data->get();
@@ -787,7 +802,7 @@ class RouteController extends Controller
     }
 
     // Tasker - Refund List
-    // Updated by: Zikri (11/01/2025)
+    // Updated by: Zikri (12/01/2025)
     public function taskerRefundBookingListNav(Request $request)
     {
         try {
@@ -849,6 +864,10 @@ class RouteController extends Controller
 
             if ($request->has('status_filter') && $request->input('status_filter') != '') {
                 $data->where('f.cr_status', $request->input('status_filter'));
+            }
+
+            if ($request->has('service_filter') && $request->input('service_filter') != '') {
+                $data->where('c.id', $request->input('service_filter'));
             }
 
             $data = $data->get();
@@ -972,7 +991,7 @@ class RouteController extends Controller
     }
 
     // Tasker - Review Management
-    // Updated by: Zikri (11/01/2025)
+    // Updated by: Zikri (12/01/2025)
     public function taskerReviewManagementNav(Request $request)
     {
         try {
@@ -1437,7 +1456,7 @@ class RouteController extends Controller
 
                 return $table->make(true);
             }
-            
+
             $tobeReleased = MonthlyStatement::where('tasker_id', Auth::user()->id)->where('statement_status', 0)->sum('total_earnings');
 
             //calculation of amount have been released
@@ -2218,11 +2237,11 @@ class RouteController extends Controller
         if (preg_match($pattern, $address, $matches)) {
             return trim($matches[1]); // Return the state
         }
-        return 'Unknown'; // Default if no match is found
+        return 'Others'; // Default if no match is found
     }
 
     // Admin Booking Management
-    //Updated by: Zikri (2/1/2025)
+    //Updated by: Zikri (12/1/2025)
     public function adminBookingManagementNav(Request $request)
     {
         $data = DB::table('bookings as a')
@@ -2280,6 +2299,10 @@ class RouteController extends Controller
             $data->whereRaw("TRIM(SUBSTRING_INDEX(a.booking_address, ' ', -1)) = ?", [$stateFilter]);
         }
 
+        if ($request->has('service_filter') && $request->input('service_filter') != '') {
+            $data->where('c.id', $request->input('service_filter'));
+        }
+
         $data = $data->get();
 
         if ($request->ajax()) {
@@ -2288,6 +2311,11 @@ class RouteController extends Controller
 
             $table->addColumn('checkbox', function ($row) {
                 return '<input type="checkbox" class="booking-checkbox form-check-input" value="' . $row->bookingID . '">';
+            });
+
+            $table->addColumn('booking_order_id', function ($row) {
+                $orderid = '<button class="btn btn-link link-primary" data-bs-toggle="modal" data-bs-target="#viewBookingDetails-' . $row->bookingID . '">' . $row->booking_order_id . '</button>';
+                return $orderid;
             });
 
             $table->addColumn('tasker', function ($row) {
@@ -2337,10 +2365,6 @@ class RouteController extends Controller
                 if ($row->booking_status == 1 || $row->booking_status == 2 || $row->booking_status == 3 || $row->booking_status == 4) {
                     $button =
                         '
-                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
-                            <i class="ti ti-eye f-20"></i>
-                        </a>
                         <a href="#" class="avtar avtar-xs btn-light-secondary" data-bs-toggle="modal" 
                             data-bs-target="#updatebooking-' . $row->bookingID . '">
                             <i class="ti ti-edit f-20"></i>
@@ -2349,9 +2373,9 @@ class RouteController extends Controller
                 } else if ($row->booking_status == 5 || $row->booking_status == 6) {
                     $button =
                         '
-                        <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
-                            data-bs-target="#viewBookingDetails-' . $row->bookingID . '">
-                            <i class="ti ti-eye f-20"></i>
+                        <a href="#" class="avtar avtar-xs btn-light-secondary disabled-a" data-bs-toggle="modal" 
+                            data-bs-target="#updatebooking-' . $row->bookingID . '">
+                            <i class="ti ti-edit f-20"></i>
                         </a>
                     ';
                 }
@@ -2359,7 +2383,7 @@ class RouteController extends Controller
                 return $button;
             });
 
-            $table->rawColumns(['checkbox', 'tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
+            $table->rawColumns(['checkbox', 'booking_order_id', 'tasker', 'client', 'booking_date', 'booking_time', 'booking_status', 'action']);
 
             return $table->make(true);
         }
@@ -2507,7 +2531,7 @@ class RouteController extends Controller
     }
 
     // Admin Refund Booking List 
-    //Updated by: Zikri (2/1/2025)
+    //Updated by: Zikri (12/1/2025)
     public function adminBookingRefundListNav(Request $request)
     {
         $data = DB::table('bookings as a')
@@ -2577,6 +2601,10 @@ class RouteController extends Controller
 
         if ($request->has('type_filter') && $request->input('type_filter') != '') {
             $data->where('f.cr_penalized', $request->input('type_filter'));
+        }
+
+        if ($request->has('service_filter') && $request->input('service_filter') != '') {
+            $data->where('c.id', $request->input('service_filter'));
         }
 
         $data = $data->get();
@@ -2710,7 +2738,7 @@ class RouteController extends Controller
     }
 
     // Admin Refund Booking Request
-    //Updated by: Zikri (3/1/2025)
+    //Updated by: Zikri (12/1/2025)
     public function adminBookingRefundReqNav(Request $request)
     {
         $data = DB::table('bookings as a')
@@ -2752,8 +2780,39 @@ class RouteController extends Controller
                 'f.cr_account_number'
             )
             ->whereIn('a.booking_status', [7, 9])
-            ->orderbyDesc('a.booking_date')
-            ->get();
+            ->orderbyDesc('a.booking_date');
+        if ($request->has('startDate') && $request->has('endDate') && $request->input('startDate') != '' && $request->input('endDate') != '') {
+            $startDate = Carbon::parse($request->input('startDate'))->format('Y-m-d');
+            $endDate = Carbon::parse($request->input('endDate'))->format('Y-m-d');
+
+            if ($startDate && $endDate) {
+                $data->whereBetween('f.cr_date', [$request->startDate, $request->endDate]);
+            }
+        }
+
+        if ($request->has('tasker_filter') && $request->input('tasker_filter') != '') {
+            $data->where('d.id', $request->input('tasker_filter'));
+        }
+
+        if ($request->has('status_filter') && $request->input('status_filter') != '') {
+            $data->where('f.cr_status', $request->input('status_filter'));
+        }
+
+        if ($request->has('state_filter') && $request->input('state_filter') != '') {
+            $stateFilter = $request->input('state_filter');
+            $data->whereRaw("TRIM(SUBSTRING_INDEX(a.booking_address, ' ', -1)) = ?", [$stateFilter]);
+        }
+
+
+        if ($request->has('type_filter') && $request->input('type_filter') != '') {
+            $data->where('f.cr_penalized', $request->input('type_filter'));
+        }
+
+        if ($request->has('service_filter') && $request->input('service_filter') != '') {
+            $data->where('c.id', $request->input('service_filter'));
+        }
+
+        $data = $data->get();
 
         if ($request->ajax()) {
 
@@ -2818,14 +2877,18 @@ class RouteController extends Controller
             return $table->make(true);
         }
 
+        // Fetch state data
+        $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+
         return view('administrator.booking.refund-req-index', [
             'title' => 'Refund Request',
-            'books' => $data
+            'books' => $data,
+            'states' => $states
         ]);
     }
 
     // Admin Review Management
-    //Updated by: Zikri (3/1/2025)
+    //Updated by: Zikri (12/1/2025)
     public function adminReviewManagementNav(Request $request)
     {
         $data = DB::table('bookings as a')
@@ -2920,6 +2983,56 @@ class RouteController extends Controller
             $data->orderByDesc('f.review_date_time');
         }
 
+
+        if ($request->has('service_filter') && $request->input('service_filter') != '') {
+            $data->where('c.id', $request->input('service_filter'));
+        }
+
+        if ($request->has('unreview_filter') && $request->input('unreview_filter') == 'T') {
+
+            $data = DB::table('bookings as a')
+                ->leftJoin('reviews as f', 'a.id', '=', 'f.booking_id') // Left join to include bookings without reviews
+                ->join('services as b', 'a.service_id', '=', 'b.id')
+                ->join('service_types as c', 'b.service_type_id', '=', 'c.id')
+                ->join('taskers as d', 'b.tasker_id', '=', 'd.id')
+                ->join('clients as e', 'a.client_Id', '=', 'e.id')
+                ->select(
+                    'a.id as bookingID',
+                    'b.id as serviceID',
+                    'c.id as typeID',
+                    'd.id as taskerID',
+                    'a.booking_date',
+                    'a.booking_address',
+                    'a.booking_time_start',
+                    'a.booking_time_end',
+                    'a.booking_status',
+                    'a.booking_note',
+                    'a.booking_rate',
+                    'a.booking_order_id',
+                    'c.servicetype_name',
+                    'd.tasker_firstname',
+                    'd.tasker_lastname',
+                    'd.tasker_phoneno',
+                    'd.email as tasker_email',
+                    'd.tasker_code',
+                    'e.client_firstname',
+                    'e.client_lastname',
+                    'e.client_phoneno',
+                    'e.email as client_email',
+                    'f.review_status',
+                    'f.review_rating',
+                    'f.review_description',
+                    'f.review_date_time',
+                    'f.review_imageOne',
+                    'f.review_imageTwo',
+                    'f.review_imageThree',
+                    'f.review_imageFour',
+                    'f.review_type',
+                )
+                ->whereNull('f.booking_id')
+                ->where('a.booking_status', '=', 6);
+        }
+
         $data = $data->get();
 
         if ($request->ajax()) {
@@ -2978,14 +3091,18 @@ class RouteController extends Controller
                     $status = '<span class="badge bg-success">Show</span>';
                 } else if ($row->review_status == 2) {
                     $status = '<span class="badge bg-danger">Hide</span>';
+                } else {
+                    $status = '<span class="badge bg-warning">Pending Review</span>';
                 }
 
                 return $status;
             });
 
             $table->addColumn('action', function ($row) {
-                $button =
-                    '
+
+                if ($row->review_status != null) {
+                    $button =
+                        '
                         <a href="#" class="avtar avtar-xs btn-light-primary" data-bs-toggle="modal"
                             data-bs-target="#viewReviewDetails-' . $row->reviewID . '">
                             <i class="ti ti-eye f-20"></i>
@@ -2995,6 +3112,10 @@ class RouteController extends Controller
                             <i class="ti ti-repeat f-20"></i>
                         </a>
                     ';
+                }else{
+                    $button ='';
+                }
+
                 return $button;
             });
 

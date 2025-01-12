@@ -205,7 +205,7 @@ class TaskerController extends Controller
     // Check by : Zikri (12/01/2025)
     public function taskerUpdateProfilePersonal(Request $req)
     {
-        // Set the active tab to Bank Details (profile-3) in the session
+        // Set the active tab to Bank Details (profile-1) in the session
         session()->flash('active_tab', 'profile-1');
 
         // Validate the request
@@ -308,7 +308,7 @@ class TaskerController extends Controller
     // Check by : Zikri (12/01/2025)
     public function taskerUpdateProfileAddress(Request $req)
     {
-        // Set the active tab to Bank Details (profile-3) in the session
+        // Set the active tab to Bank Details (profile-1) in the session
         session()->flash('active_tab', 'profile-2');
 
         // Validate the request
@@ -419,7 +419,7 @@ class TaskerController extends Controller
     // Check by : Zikri (12/01/2025)
     public function taskerUpdatePassword(Request $req, $id)
     {
-        // Set the active tab to Bank Details (profile-3) in the session
+        // Set the active tab to Bank Details (profile-4) in the session
         session()->flash('active_tab', 'profile-4');
 
         // Validate the request

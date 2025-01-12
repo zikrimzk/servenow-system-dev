@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Http;
 class AdministratorController extends Controller
 {
 
+    // Admin - Register Admin
+    // Check by : Zikri (12/01/2025)
     public function createAdmin(Request $req)
     {
 
@@ -45,9 +47,11 @@ class AdministratorController extends Controller
         $data['password'] = bcrypt($data['password']);
         Administrator::create($data);
 
-        return redirect(route('admin-management'))->with('success', 'Administrator has been registered successfully !');
+        return back()->with('success', 'Administrator has been registered successfully !');
     }
 
+    // Admin - Update Admin
+    // Check by : Zikri (12/01/2025)
     public function updateAdmin(Request $req, $adminId)
     {
         try {
@@ -73,12 +77,14 @@ class AdministratorController extends Controller
 
             Administrator::where('id', $adminId)->update($data);
 
-            return redirect(route('admin-management'))->with('success', 'Administrator details has been updated successfully !');
+            return back()->with('success', 'Administrator details has been updated successfully !');
         } catch (Exception $e) {
-            return redirect(route('admin-management'))->with('error', 'Error : ' . $e->getMessage());
+            return back()->with('error', 'Error : ' . $e->getMessage());
         }
     }
 
+    // Admin - Update Multiple Admin
+    // Check by : Zikri (12/01/2025)
     public function updateMultipleAdminStatus(Request $req)
     {
         try {
@@ -97,6 +103,20 @@ class AdministratorController extends Controller
         }
     }
 
+    // Admin - Soft Delete Admin
+    // Check by : Zikri (12/01/2025)
+    public function deleteAdmin($adminId)
+    {
+        try {
+            Administrator::where('id', $adminId)->update(['admin_status' => 3]);
+            return back()->with('success', 'Administrator account has been deactivated !');
+        } catch (Exception $e) {
+            return back()->with('error', 'Error : ' . $e->getMessage());
+        }
+    }
+
+    // Admin - Update Profile
+    // Check by : Zikri (12/01/2025)
     public function adminUpdateProfile(Request $req, $adminId)
     {
         if ($req->isUploadPhoto == 'true') {
@@ -125,7 +145,7 @@ class AdministratorController extends Controller
 
             // Generate a custom name for the file
             $file = $req->file('admin_photo');
-            $filename = $user->admin_code . '_profile' . '.' . $file->getClientOriginalExtension();
+            $filename = time() . '_' . $user->admin_code . '_profile' . '.' . $file->getClientOriginalExtension();
 
             // Store the file with the custom filename
             $path = $file->storeAs('profile_photos/admins', $filename, 'public');
@@ -155,9 +175,14 @@ class AdministratorController extends Controller
 
         Administrator::where('id', $adminId)->update($data);
 
-        return redirect(route('admin-profile'))->with('success', 'Administrator profile has been updated successfully !');
+        // Set the active tab to Bank Details (profile-1) in the session
+        session()->flash('active_tab', 'profile-1');
+
+        return back()->with('success', 'Administrator profile has been updated successfully !');
     }
 
+    // Admin - Update Password
+    // Check by : Zikri (12/01/2025)
     public function adminUpdatePassword(Request $req, $id)
     {
         $validated = $req->validate(
@@ -174,6 +199,9 @@ class AdministratorController extends Controller
 
             ]
         );
+        // Set the active tab to Bank Details (profile-2) in the session
+        session()->flash('active_tab', 'profile-2');
+
         $check = Hash::check($validated['oldPass'], Auth::user()->password, []);
         if ($check) {
             Administrator::where('id', $id)->update(['password' => bcrypt($validated['renewPass'])]);
@@ -183,22 +211,12 @@ class AdministratorController extends Controller
         }
     }
 
-    public function deleteAdmin($adminId)
-    {
-        try {
-            Administrator::where('id', $adminId)->update(['admin_status' => 3]);
-            return back()->with('success', 'Administrator account has been deactivated !');
-        } catch (Exception $e) {
-            return back()->with('error', 'Error : ' . $e->getMessage());
-        }
-    }
-
     public function showCardLogs(Request $request)
     {
         $response = Http::withHeaders([
             'Authorization' => env("EKYC_API_KEY"),
         ])->withoutVerifying()
-        ->get(env('API_EKYC_URL') . '/card-logs');
+            ->get(env('API_EKYC_URL') . '/card-logs');
         $data = $response->json();
 
 
@@ -234,7 +252,6 @@ class AdministratorController extends Controller
                         return '<span class="badge bg-light-success p-3 fw-bold " style="word-wrap: break-word; white-space: normal; text-align: left;">' . $row['response'] . '</span>';
                     } elseif ($row['status'] == 'failed') {
                         return '<span class="badge bg-light-danger p-3 fw-bold " style="word-wrap: break-word; white-space: normal; text-align: left;">' . $row['response'] . '</span>';
-                    
                     }
 
                     return '<span class="badge bg-danger">ERROR</span>';
@@ -244,7 +261,7 @@ class AdministratorController extends Controller
         }
 
 
-        return view('administrator.ekyc.card-log',[
+        return view('administrator.ekyc.card-log', [
             'title' => 'e-KYC Card Log'
         ]);
     }
@@ -254,9 +271,9 @@ class AdministratorController extends Controller
         $response = Http::withHeaders([
             'Authorization' => env("EKYC_API_KEY"),
         ])->withoutVerifying()
-        ->get(env('API_EKYC_URL').'/face-logs');
+            ->get(env('API_EKYC_URL') . '/face-logs');
         $data = $response->json();
- 
+
         if ($response->successful()) {
             $data = $response->json();
             // dd($data);
@@ -268,7 +285,7 @@ class AdministratorController extends Controller
         } else {
             $logs = [];
         }
-    
+
 
         if ($request->ajax()) {
             return DataTables::of($logs)
@@ -283,18 +300,18 @@ class AdministratorController extends Controller
                 })
                 ->addColumn('res', function ($row) {
                     if ($row['status'] == 'SUCCESS') {
-                        return '<span class="badge bg-light-success p-3 fw-bold">'.$row['response'].'</span>';
+                        return '<span class="badge bg-light-success p-3 fw-bold">' . $row['response'] . '</span>';
                     } elseif ($row['status'] == 'FAILED') {
-                        return '<span class="badge bg-light-danger p-3 fw-bold">'.$row['response'].'</span>';
+                        return '<span class="badge bg-light-danger p-3 fw-bold">' . $row['response'] . '</span>';
                     }
                     return '<span class="badge bg-danger fw-bold">ERROR</span>';
                 })
-                ->rawColumns(['status','res'])
+                ->rawColumns(['status', 'res'])
                 ->make(true);
         }
-    
-        
-        return view('administrator.ekyc.face-log',[
+
+
+        return view('administrator.ekyc.face-log', [
             'title' => 'e-KYC Face Log'
         ]);
     }

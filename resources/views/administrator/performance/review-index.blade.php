@@ -60,6 +60,7 @@ use Illuminate\Support\Facades\DB;
             </div>
 
             <!-- End Alert -->
+
             <div class="row">
                 <div class="col-md-6 col-xl-3">
                     <div class="card">
@@ -100,7 +101,14 @@ use Illuminate\Support\Facades\DB;
                             <h6 class="mb-2 f-w-400 text-muted">Total Unreview Booking</h6>
                             <h4 class="mb-3 text-danger">
                                 {{ $totalunreview }}</h4>
-                            <p class="mb-0 text-muted text-sm">users</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <p class="mb-0 text-muted text-sm">users</p>
+                                <div class="d-flex align-items-center">
+                                    <a href="#reviewTable" class="link link-primary text-sm" id="unreview_filter">View
+                                    </a>
+                                    <input type="hidden" id="unreview_filter_text">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -270,16 +278,19 @@ use Illuminate\Support\Facades\DB;
                                     <select id="tasker_filter" class="form-control">
                                         <option value="">All Taskers</option>
                                         @foreach ($data->unique('taskerID') as $b)
-                                            <option value="{{ $b->taskerID }}">{{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) . ' (' . $b->tasker_code . ')' }}</option>
+                                            <option value="{{ $b->taskerID }}">
+                                                {{ Str::headline($b->tasker_firstname . ' ' . $b->tasker_lastname) . ' (' . $b->tasker_code . ')' }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
                             <div class="row align-items-center">
-                                <div class="col-sm-9 mb-3">
+                                <div class="col-sm-10 mb-3">
                                     <label for="rating_filter" class="form-label">Filter by</label>
                                     <div class="d-block  d-md-flex justify-content-between align-items-center gap-2">
-                                        <select id="rating_filter" class="form-control mb-3 mb-md-0" name="rating_filter">
+                                        <select id="rating_filter" class="form-control mb-3 mb-md-0"
+                                            name="rating_filter">
                                             <option value="">Rating</option>
                                             <option value="1">Highest Rating</option>
                                             <option value="2">Lowest Rating</option>
@@ -296,9 +307,18 @@ use Illuminate\Support\Facades\DB;
                                             <option value="1">With Photo</option>
                                             <option value="2">Without Photo</option>
                                         </select>
+
+                                        <select id="service_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Service Type</option>
+                                            @foreach ($data->unique('typeID') as $b)
+                                                <option value="{{ $b->typeID }}">
+                                                    {{ Str::headline($b->servicetype_name) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-3 mb-3">
+                                <div class="col-sm-2 mb-3">
                                     <label for="endDate" class="form-label text-white">Action</label>
                                     <div class="d-flex justify-content-start align-items-end">
                                         <a href="" class="link-primary" id="clearAllBtn">Clear All</a>
@@ -307,7 +327,7 @@ use Illuminate\Support\Facades\DB;
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="dt-responsive table-responsive my-4 mx-0 mx-md-4">
+                            <div class="dt-responsive table-responsive my-4 mx-0 mx-md-4" id="reviewTable">
                                 <table class="table data-table table-hover nowrap">
                                     <thead>
                                         <tr>
@@ -400,6 +420,13 @@ use Illuminate\Support\Facades\DB;
                                     </div>
 
                                     <h5 class="mb-3 mt-2">C. Booking Details</h5>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Service</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ Str::headline($b->servicetype_name) }}" disabled />
+                                        </div>
+                                    </div>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
                                             <label class="form-label">Booking Date</label>
@@ -672,8 +699,6 @@ use Illuminate\Support\Facades\DB;
                     </div>
                 </div>
             </div>
-
-
         </div>
 
     </div>
@@ -716,8 +741,6 @@ use Illuminate\Support\Facades\DB;
         });
     </script>
 
-
-
     <script type="text/javascript">
         $(document).ready(function() {
 
@@ -737,6 +760,10 @@ use Illuminate\Support\Facades\DB;
                             d.rating_filter = $('#rating_filter').val();
                             d.status_filter = $('#status_filter').val();
                             d.media_filter = $('#media_filter').val();
+                            d.service_filter = $('#service_filter').val();
+                            d.unreview_filter = $('#unreview_filter_text').val();
+
+
                         }
                     },
                     columns: [{
@@ -813,7 +840,18 @@ use Illuminate\Support\Facades\DB;
                     table.ajax.reload();
                     table.draw();
                 });
-                
+
+                $('#service_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+                $('#unreview_filter').on('click', function() {
+                    $('#unreview_filter_text').val('T');
+                    table.ajax.reload();
+                    table.draw();
+                });
+
 
                 $('#clearAllBtn').on('click', function(e) {
                     e.preventDefault();
@@ -823,6 +861,8 @@ use Illuminate\Support\Facades\DB;
                     $('#rating_filter').val('');
                     $('#status_filter').val('');
                     $('#media_filter').val('');
+                    $('#service_filter').val('');
+                    $('#unreview_filter_text').val('');
                     table.ajax.reload();
                     table.draw();
                 });
@@ -834,3 +874,5 @@ use Illuminate\Support\Facades\DB;
     </script>
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
+<!--Updated By: Muhammad Zikri B. Kashim (12/01/2025)-->
+

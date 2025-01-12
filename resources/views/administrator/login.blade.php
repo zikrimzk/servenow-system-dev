@@ -78,16 +78,16 @@
                         @csrf
                         <div class="card-body">
 
-                            <div class="text-center mt-3 mb-3">
+                            <div class="text-center mt-3 mb-5">
                                 <h3 class="text-center f-w-500 mb-3">Login | <span
                                         class="text-danger">Administrator</span> </h3>
                                 <div class="text-muted">This portal is restricted to authorized administrators only.
                                     <span class="text-danger f-w-600">Unauthorized access is prohibited.</span> </div>
                             </div>
-                            <div class="saprator my-3 text-primary"></div>
+
                             <div class="form-floating mb-3">
                                 <input type="email" class="form-control" id="email" placeholder="Email"
-                                    name="email" />
+                                    name="email" value="{{ old('email') }}" />
                                 <label for="email">Email</label>
                             </div>
                             <div class="form-floating mb-3">

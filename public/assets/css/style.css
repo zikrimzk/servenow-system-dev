@@ -20364,13 +20364,13 @@ pre[class*=language-] > code {
   --pc-layout-2-color: linear-gradient(to right, #4680ff 0%, #79a3ff 100%);
 }
 [data-pc-layout=color-header] a.preset.preset-2 {
-  background: #6610f2;
+  background: #16325b;
 }
 [data-pc-layout=color-header] a.preset.preset-gradient-2 {
   background: linear-gradient(to right, #6610f2 0%, #8540f5 100%);
 }
 [data-pc-layout=color-header].preset-2 {
-  --pc-layout-2-color: #6610f2;
+  --pc-layout-2-color: #16325b;
 }
 [data-pc-layout=color-header].preset-gradient-2 {
   --pc-layout-2-color: linear-gradient(to right, #6610f2 0%, #8540f5 100%);

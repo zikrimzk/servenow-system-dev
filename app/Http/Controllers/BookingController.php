@@ -1012,7 +1012,8 @@ class BookingController extends Controller
     }
 
 
-    // Done by Muhammad Zikri (2/1/2025)
+    // Admin Update Booking Address & Status
+    // Check by : Zikri (12/01/2025)
     public function adminUpdateBooking(Request $request, $id)
     {
         try {
@@ -1029,7 +1030,6 @@ class BookingController extends Controller
                 $booking->booking_longitude = $result['lng'];
             }
             $booking->save();
-
 
             if ($booking->booking_status == 5) {
 
@@ -1085,7 +1085,8 @@ class BookingController extends Controller
         }
     }
 
-    // Done by Muhammad Zikri (2/1/2025)
+    // Admin Update Multiple Bookings Status
+    // Check by : Zikri (12/01/2025)
     public function adminChangeMultipleBookingStatus(Request $request)
     {
         try {
@@ -1154,7 +1155,8 @@ class BookingController extends Controller
         }
     }
 
-    // Done by Muhammad Zikri (2/1/2025)
+    // Admin | Tasker Send Refund Booking Status Email
+    // Check by : Zikri (12/01/2025)
     private function sendRefundStatusEmail($data, $userType)
     {
         // Booking Status
@@ -1205,12 +1207,12 @@ class BookingController extends Controller
             'cr_account_number' => $data->cr_account_number,
         ]));
     }
-    
-    // Done by Muhammad Zikri (2/1/2025)
+
+    // Admin Accept/Reject Refund
+    // Check by : Zikri (12/01/2025)
     public function adminBookingRefundProcess($bookingid, $refundid, $option)
     {
         try {
-
             if ($option == 1) {
                 Booking::where('id', $bookingid)->update(['booking_status' => 10]);
                 CancelRefundBooking::where('id', $refundid)->update(['cr_status' => 3]);

@@ -200,17 +200,30 @@ use Carbon\Carbon;
                                         <input type="date" id="endDate" name="endDate" class="form-control">
                                     </div>
                                 </div>
-                                <div class="col-sm-3 mb-3">
-                                    <label for="date_range" class="form-label">Filter by</label>
-                                    <select id="status_filter" class="form-select mb-3 mb-md-0">
-                                        <option value="">Status</option>
-                                        <option value="1">To Pay</option>
-                                        <option value="2">Paid</option>
-                                        <option value="3">Confirmed</option>
-                                        <option value="4">Rescheduled</option>
-                                        <option value="5">Cancelled</option>
-                                        <option value="6">Completed</option>
-                                    </select>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-sm-9 mb-3">
+                                    <label for="filter" class="form-label">Filter by</label>
+                                    <div class="d-block  d-md-flex justify-content-between align-items-center gap-2">
+                                        <select id="status_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Status</option>
+                                            <option value="1">To Pay</option>
+                                            <option value="2">Paid</option>
+                                            <option value="3">Confirmed</option>
+                                            <option value="4">Rescheduled</option>
+                                            <option value="5">Cancelled</option>
+                                            <option value="6">Completed</option>
+                                        </select>
+
+                                        <select id="service_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Service Type</option>
+                                            @foreach ($books->unique('typeID') as $b)
+                                                <option value="{{ $b->typeID }}">
+                                                    {{ Str::headline($b->servicetype_name) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="col-sm-3 mb-3">
                                     <label class="form-label text-white">Action</label>
@@ -225,7 +238,9 @@ use Carbon\Carbon;
                                 <table class="table data-table table-hover nowrap">
                                     <thead>
                                         <tr>
+                                            <th scope="col">#</th>
                                             <th scope="col">Booking ID</th>
+                                            <th scope="col">Service</th>
                                             <th scope="col">Client</th>
                                             <th scope="col">Booking Date</th>
                                             <th scope="col">Booking Time</th>
@@ -281,6 +296,13 @@ use Carbon\Carbon;
                                     </div>
 
                                     <h5 class="mb-3 mt-2">B. Booking Details</h5>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Service</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ Str::headline($b->servicetype_name) }}" disabled />
+                                        </div>
+                                    </div>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
                                             <label class="form-label">Booking Date</label>
@@ -475,15 +497,26 @@ use Carbon\Carbon;
                             d.startDate = $('#startDate').val();
                             d.endDate = $('#endDate').val();
                             d.status_filter = $('#status_filter').val();
+                            d.service_filter = $('#service_filter').val();
+
                         }
                     },
                     columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            searchable: false
+                        }, {
                             data: 'booking_order_id',
                             name: 'booking_order_id'
                         },
                         {
+                            data: 'servicetype_name',
+                            name: 'servicetype_name',
+                        },
+                        {
                             data: 'client',
-                            name: 'client'
+                            name: 'client',
+                            visible: false
                         },
                         {
                             data: 'booking_date',
@@ -530,11 +563,18 @@ use Carbon\Carbon;
                     table.draw();
                 });
 
+                $('#service_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
+
                 $('#clearAllBtn').on('click', function(e) {
                     e.preventDefault();
                     $('#startDate').val('');
                     $('#endDate').val('');
                     $('#status_filter').val('');
+                    $('#service_filter').val('');
                     table.ajax.reload();
                     table.draw();
                 });
@@ -545,4 +585,4 @@ use Carbon\Carbon;
     </script>
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
-<!--Updated By: Muhammad Zikri B. Kashim (11/01/2025)-->
+<!--Updated By: Muhammad Zikri B. Kashim (12/01/2025)-->

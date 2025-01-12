@@ -245,6 +245,14 @@ use Carbon\Carbon;
                                             <option value="6">Completed</option>
                                         </select>
 
+                                        <select id="service_filter" class="form-select mb-3 mb-md-0">
+                                            <option value="">Service Type</option>
+                                            @foreach ($books->unique('typeID') as $b)
+                                                <option value="{{ $b->typeID }}">
+                                                    {{ Str::headline($b->servicetype_name) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
 
                                     </div>
                                 </div>
@@ -272,6 +280,7 @@ use Carbon\Carbon;
                                         <tr>
                                             <th><input type="checkbox" id="select-all" class="form-check-input"></th>
                                             <th scope="col">Booking ID</th>
+                                            <th scope="col">Service</th>
                                             <th scope="col">Booking Date</th>
                                             <th scope="col">Booking Time</th>
                                             <th scope="col">Booking Status</th>
@@ -399,6 +408,13 @@ use Carbon\Carbon;
                                     <h5 class="mb-3 mt-2">C. Booking Details</h5>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
+                                            <label class="form-label">Service</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ Str::headline($b->servicetype_name) }}" disabled />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
                                             <label class="form-label">Booking Date</label>
                                             <input type="text" class="form-control"
                                                 value="{{ Carbon::parse($b->booking_date)->format('d F Y') }}" disabled />
@@ -524,7 +540,7 @@ use Carbon\Carbon;
                                 <div class="modal-footer">
                                     <button type="reset" class="btn btn-light btn-pc-default"
                                         data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    <button type="submit" class="btn btn-primary saveChangesBtn">Save Changes</button>
                                 </div>
                             </div>
                         </div>
@@ -722,6 +738,7 @@ use Carbon\Carbon;
                             d.tasker_filter = $('#tasker_filter').val();
                             d.status_filter = $('#status_filter').val();
                             d.state_filter = $('#state_filter').val();
+                            d.service_filter = $('#service_filter').val();
                         }
                     },
                     columns: [{
@@ -734,6 +751,10 @@ use Carbon\Carbon;
                         {
                             data: 'booking_order_id',
                             name: 'booking_order_id'
+                        },
+                        {
+                            data: 'servicetype_name',
+                            name: 'servicetype_name'
                         },
                         {
                             data: 'booking_date',
@@ -809,6 +830,11 @@ use Carbon\Carbon;
                     table.draw();
                 });
 
+                $('#service_filter').on('change', function() {
+                    table.ajax.reload();
+                    table.draw();
+                });
+
                 $('#clearAllBtn').on('click', function(e) {
                     e.preventDefault();
                     $('#startDate').val('');
@@ -816,8 +842,17 @@ use Carbon\Carbon;
                     $('#tasker_filter').val('');
                     $('#status_filter').val('');
                     $('#state_filter').val('');
+                    $('#service_filter').val('');
                     table.ajax.reload();
                     table.draw();
+                });
+
+                $('.saveChangesBtn').on('click', function() {
+                    const $buttonSave = $(this);
+
+                    $buttonSave.addClass('disabled', true).html(
+                        '<span class="spinner-border spinner-border-sm me-2"></span> Saving...'
+                    );
                 });
 
 
@@ -836,7 +871,7 @@ use Carbon\Carbon;
                     // Check the status of each selected row
                     $('.booking-checkbox:checked').each(function() {
                         const row = $(this).closest('tr'); // Get the row of the selected checkbox
-                        const status = row.find('td:nth-child(5)').text()
+                        const status = row.find('td:nth-child(6)').text()
                             .trim(); // Extract the booking status from the 5th column
 
                         if (status === 'Completed') {
@@ -904,7 +939,7 @@ use Carbon\Carbon;
 
                     $('.booking-checkbox:checked').each(function() {
                         const row = $(this).closest('tr');
-                        const status = row.find('td:nth-child(5)').text()
+                        const status = row.find('td:nth-child(6)').text()
                             .trim(); // Adjust column index for "status"
 
                         // Only add bookings that are not in excluded statuses
@@ -953,3 +988,5 @@ use Carbon\Carbon;
     </script>
 @endsection
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
+<!--Updated By: Muhammad Zikri B. Kashim (12/01/2025)-->
+

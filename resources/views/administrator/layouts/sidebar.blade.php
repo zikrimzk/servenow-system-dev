@@ -1,9 +1,10 @@
 <nav class="pc-sidebar">
     <div class="navbar-wrapper">
-        <div class="m-header">
-            <a href="../dashboard/index.html" class="b-brand text-primary">
+        <div class="m-header d-flex align-items-center justify-content-center mb-3 mt-3">
+            <a href="{{ route('admin-home') }}" class="b-brand text-primary">
                 <!-- ========   Change your logo from here   ============ -->
-                <img src="../assets/images/logo-test.png" class="img-fluid" width="140" height="70" alt="logo" />
+                <img src="../assets/images/logo-test-whites.png" class="img-fluid" width="140" height="70"
+                    alt="logo" />
             </a>
         </div>
         <div class="navbar-content">

@@ -250,18 +250,19 @@ $currentYear = Carbon::now()->year;
                                 <div class="col-sm-9 mb-3">
                                     <label for="rating_filter" class="form-label">Filter by</label>
                                     <div class="d-block d-md-flex justify-content-between align-items-center gap-2">
-                                        <select id="rating_filter" class="form-control mb-3 mb-md-0" name="rating_filter">
+                                        <select id="rating_filter" class="form-control mb-3 mb-md-0"
+                                            name="rating_filter">
                                             <option value="">Rating</option>
                                             <option value="1">Highest Rating</option>
                                             <option value="2">Lowest Rating</option>
                                         </select>
-                        
+
                                         <select id="status_filter" class="form-select mb-3 mb-md-0">
                                             <option value="">Status (All)</option>
                                             <option value="1">Show</option>
                                             <option value="2">Hide</option>
                                         </select>
-                        
+
                                         <select id="media_filter" class="form-select mb-3 mb-md-0">
                                             <option value="">Photo (All)</option>
                                             <option value="1">With Photo</option>
@@ -277,7 +278,7 @@ $currentYear = Carbon::now()->year;
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="card-body">
                             <div class="dt-responsive table-responsive my-4 mx-0 mx-md-4">
                                 <table class="table data-table table-hover nowrap">
@@ -299,6 +300,7 @@ $currentYear = Carbon::now()->year;
                 </div>
             </div>
 
+
             @foreach ($data as $b)
                 <!-- Modal View Booking Details Start Here-->
                 <div class="modal fade" id="viewBookingDetails-{{ $b->bookingID }}" data-bs-keyboard="false"
@@ -306,7 +308,7 @@ $currentYear = Carbon::now()->year;
                     <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="mb-0">Booking Details ({{ $b->booking_order_id }})</h5>
+                                <h5 class="mb-0">Booking Details</h5>
                                 <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default ms-auto"
                                     data-bs-dismiss="modal">
                                     <i class="ti ti-x f-20"></i>
@@ -314,7 +316,7 @@ $currentYear = Carbon::now()->year;
                             </div>
                             <div class="modal-body">
                                 <div class="row">
-                                    <h5 class="mb-3">A. Client Details</h5>
+                                    <h5 class="mb-3 mt-2">A. Client Details</h5>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
                                             <label class="form-label">Client Name</label>
@@ -341,6 +343,13 @@ $currentYear = Carbon::now()->year;
                                     <h5 class="mb-3 mt-2">B. Booking Details</h5>
                                     <div class="col-sm-12">
                                         <div class="mb-3">
+                                            <label class="form-label">Service</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ Str::headline($b->servicetype_name) }}" disabled />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
                                             <label class="form-label">Booking Date</label>
                                             <input type="text" class="form-control"
                                                 value="{{ Carbon::parse($b->booking_date)->format('d F Y') }}" disabled />
@@ -358,6 +367,13 @@ $currentYear = Carbon::now()->year;
                                         <div class="mb-3">
                                             <label class="form-label">Booking Address</label>
                                             <textarea class="form-control" cols="20" rows="4" disabled>{{ $b->booking_address }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Booking Amount (RM)</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ number_format($b->booking_rate, 2) }}" disabled />
                                         </div>
                                     </div>
                                     <div class="col-sm-12">

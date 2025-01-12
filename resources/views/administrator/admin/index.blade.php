@@ -5,14 +5,7 @@
         .alphabet-filter-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
-            /* Responsive grid */
             gap: 5px;
-            /* Spacing between items */
-            /* padding: 5px; */
-            /* background-color: #f8f9fa; */
-            /* Light background */
-            /* border: 1px solid #ddd; */
-            /* Subtle border */
             border-radius: 5px;
             /* Rounded corners */
         }
@@ -62,6 +55,7 @@
             border-left: 4px solid #838592;
         }
     </style>
+
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
@@ -74,7 +68,6 @@
                             <ul class="breadcrumb">
                                 <li class="breadcrumb-item">Users</li>
                                 <li class="breadcrumb-item" aria-current="page">Administrator Management</li>
-
                             </ul>
                         </div>
                         <div class="col-md-12">
@@ -182,7 +175,6 @@
                 </div>
             </div>
 
-
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card table-card">
@@ -267,7 +259,7 @@
                                             Malaysia).</li>
                                         <li>The default password is pre-set. Please update the password later for security
                                             purposes.</li>
-                                        <li>Review all entered data before clicking 'Save.'</li>
+                                        <li>Review all entered data before clicking 'Add Administrator'.</li>
                                     </ul>
                                 </div>
                                 <div class="row">
@@ -393,7 +385,7 @@
                                 <div class="flex-grow-1 text-end">
                                     <button type="reset" class="btn btn-link-danger btn-pc-default"
                                         data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Save</button>
+                                    <button type="submit" class="btn btn-primary">Add Administrator</button>
                                 </div>
                             </div>
                         </div>
@@ -819,7 +811,7 @@
                                 _token: "{{ csrf_token() }}"
                             },
                             success: function(response) {
-                                alert(response.message);
+                                // alert(response.message);
                                 window.location.reload();
                             },
                             error: function(xhr) {
@@ -838,5 +830,6 @@
         });
     </script>
 @endsection
-
 <!--Created By: Muhammad Zikri B. Kashim (6/11/2024)-->
+<!--Updated By: Muhammad Zikri B. Kashim (12/01/2025)-->
+

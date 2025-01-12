@@ -87,7 +87,7 @@
 
                             <div class="form-floating mb-3">
                                 <input type="email" class="form-control" id="email" placeholder="Email"
-                                    name="email" />
+                                    name="email"  value="{{ old('email') }}" />
                                 <label for="email">Email</label>
                             </div>
                             <div class="form-floating mb-3">
