@@ -136,24 +136,25 @@ class TaskerController extends Controller
 
         $ori = Tasker::whereId($id)->first();
 
-        if($ori->tasker_workingloc_state != $taskers['tasker_workingloc_state'] || $ori->tasker_workingloc_area != $taskers['tasker_workingloc_area']) {
-            $address=$taskers['tasker_workingloc_area'].','.$taskers['tasker_workingloc_state'];
+        if ($ori->tasker_workingloc_state != $taskers['tasker_workingloc_state'] || $ori->tasker_workingloc_area != $taskers['tasker_workingloc_area']) {
+            $address = $taskers['tasker_workingloc_area'] . ',' . $taskers['tasker_workingloc_state'];
             $result = $this->geocoder->getCoordinatesForAddress($address);
             $taskers['latitude'] = $result['lat'];
             $taskers['longitude'] = $result['lng'];
         }
-    
+
 
         Tasker::whereId($id)->update($taskers);
 
         return redirect(route('admin-tasker-management'))->with('success', 'The Tasker details has been successfully updated !');
     }
 
-    public function taskerUpdateProfile(Request $req, $id)
+    public function taskerUpdateProfilePersonal(Request $req)
     {
         if ($req->isUploadPhoto == 'true') {
             $taskers = $req->validate(
                 [
+                    'tasker_photo' => 'required|image|mimes:jpeg,png,jpg',
                     'tasker_firstname' => 'required|string',
                     'tasker_lastname' => 'required|string',
                     'tasker_phoneno' => 'required|string|min:10',
@@ -161,18 +162,12 @@ class TaskerController extends Controller
                     'tasker_bio' => '',
                     'tasker_icno' => 'required',
                     'tasker_dob' => 'required',
-                    'tasker_address_one' => 'required',
-                    'tasker_address_two' => 'required',
-                    'tasker_address_poscode' => 'required',
-                    'tasker_address_state' => 'required',
-                    'tasker_address_area' => 'required',
                     'tasker_status' => '',
-                    'tasker_photo' => 'required|image|mimes:jpeg,png,jpg',
 
                 ],
                 [],
                 [
-                    'tasker_code' => 'Tasker Code',
+                    'tasker_photo' => 'Profile Photo',
                     'tasker_firstname' => 'First Name',
                     'tasker_lastname' => 'Last Name',
                     'tasker_phoneno' => 'Phone Number',
@@ -180,22 +175,14 @@ class TaskerController extends Controller
                     'tasker_bio' => 'Tasker Bio',
                     'tasker_icno' => 'IC number',
                     'tasker_dob' => 'Date of Birth',
-                    'tasker_address_one' => 'Address Line 1',
-                    'tasker_address_two' => 'Address Line 2',
-                    'tasker_address_poscode' => 'Postal Code',
-                    'tasker_address_state' => 'State',
-                    'tasker_address_area' => 'Area',
                     'tasker_status' => 'Status',
-                    'tasker_photo' => 'Profile Photo',
-
-
                 ]
             );
-            $user = auth()->user();
+            $user = Auth::user();
 
             // Generate a custom name for the file
             $file = $req->file('tasker_photo');
-            $filename = $user->tasker_code . '_profile' . '.' . $file->getClientOriginalExtension();
+            $filename = time() . '_' . $user->tasker_code . '_profile' . '.' . $file->getClientOriginalExtension();
 
             // Store the file with the custom filename
             $path = $file->storeAs('profile_photos/taskers', $filename, 'public');
@@ -212,16 +199,11 @@ class TaskerController extends Controller
                     'tasker_bio' => '',
                     'tasker_icno' => 'required',
                     'tasker_dob' => 'required',
-                    'tasker_address_one' => 'required',
-                    'tasker_address_two' => 'required',
-                    'tasker_address_poscode' => 'required',
-                    'tasker_address_state' => 'required',
-                    'tasker_address_area' => 'required',
                     'tasker_status' => '',
+
                 ],
                 [],
                 [
-                    'tasker_code' => 'Tasker Code',
                     'tasker_firstname' => 'First Name',
                     'tasker_lastname' => 'Last Name',
                     'tasker_phoneno' => 'Phone Number',
@@ -229,30 +211,133 @@ class TaskerController extends Controller
                     'tasker_bio' => 'Tasker Bio',
                     'tasker_icno' => 'IC number',
                     'tasker_dob' => 'Date of Birth',
-                    'tasker_address_one' => 'Address Line 1',
-                    'tasker_address_two' => 'Address Line 2',
-                    'tasker_address_poscode' => 'Postal Code',
-                    'tasker_address_state' => 'State',
-                    'tasker_address_area' => 'Area',
                     'tasker_status' => 'Status',
-                    'tasker_photo' => 'Profile Photo',
-
                 ]
             );
         }
 
-        $ori = Tasker::whereId($id)->first();
-        if ($ori->tasker_status == 0 || $ori->tasker_status == 1) {
+        Tasker::whereId(Auth::user()->id)->update($taskers);
+        $ori = Tasker::whereId(Auth::user()->id)->first();
+
+        if (
+            $ori->tasker_firstname != null &&
+            $ori->tasker_lastname != null &&
+            $ori->tasker_phoneno != null &&
+            $ori->email != null &&
+            $ori->tasker_icno != null &&
+            $ori->tasker_dob != null &&
+            $ori->tasker_address_one != null &&
+            $ori->tasker_address_two != null &&
+            $ori->tasker_address_poscode != null &&
+            $ori->tasker_address_state != null &&
+            $ori->tasker_address_area != null &&
+            $ori->tasker_account_bank != null &&
+            $ori->tasker_account_number != null &&
+            $ori->tasker_status == 0
+        ) {
             $taskers['tasker_status'] = 1;
             $message = 'Tasker profile has been successfully updated. Please proceed to account verification to start earning.';
-        } elseif ($ori->tasker_status == 2 || $ori->tasker_status == 3) {
-            $taskers['tasker_status'] = 2;
-            $message = 'Tasker profile has been successfully updated !';
+            Tasker::whereId(Auth::user()->id)->update($taskers);
+        } else {
+            $message = 'Tasker personal details have been successfully updated!';
         }
 
-        Tasker::whereId($id)->update($taskers);
 
-        return redirect(route('tasker-profile'))->with('success', $message);
+        return back()->with('success', $message);
+    }
+
+    public function taskerUpdateProfileAddress(Request $req)
+    {
+        $taskers = $req->validate(
+            [
+                'tasker_address_one' => 'required',
+                'tasker_address_two' => 'required',
+                'tasker_address_poscode' => 'required',
+                'tasker_address_state' => 'required',
+                'tasker_address_area' => 'required',
+            ],
+            [],
+            [
+                'tasker_address_one' => 'Address Line 1',
+                'tasker_address_two' => 'Address Line 2',
+                'tasker_address_poscode' => 'Postal Code',
+                'tasker_address_state' => 'State',
+                'tasker_address_area' => 'Area',
+            ]
+        );
+        Tasker::whereId(Auth::user()->id)->update($taskers);
+
+        $ori = Tasker::whereId(Auth::user()->id)->first();
+
+        if (
+            $ori->tasker_firstname != null &&
+            $ori->tasker_lastname != null &&
+            $ori->tasker_phoneno != null &&
+            $ori->email != null &&
+            $ori->tasker_icno != null &&
+            $ori->tasker_dob != null &&
+            $ori->tasker_address_one != null &&
+            $ori->tasker_address_two != null &&
+            $ori->tasker_address_poscode != null &&
+            $ori->tasker_address_state != null &&
+            $ori->tasker_address_area != null &&
+            $ori->tasker_account_bank != null &&
+            $ori->tasker_account_number != null &&
+            $ori->tasker_status == 0
+        ) {
+            $taskers['tasker_status'] = 1;
+            $message = 'Tasker profile has been successfully updated. Please proceed to account verification to start earning.';
+            Tasker::whereId(Auth::user()->id)->update($taskers);
+        } else {
+            $message = 'Tasker address has been successfully updated !';
+        }
+
+        return back()->with('success', $message);
+    }
+
+    public function taskerUpdateProfileBank(Request $req)
+    {
+        $taskers = $req->validate(
+            [
+                'tasker_account_bank' => 'required',
+                'tasker_account_number' => 'required',
+            ],
+            [],
+            [
+                'tasker_account_bank' => 'Bank Name',
+                'tasker_account_number' => 'Account Number',
+            ]
+        );
+        Tasker::whereId(Auth::user()->id)->update($taskers);
+
+        $ori = Tasker::whereId(Auth::user()->id)->first();
+
+        if (
+            $ori->tasker_firstname != null &&
+            $ori->tasker_lastname != null &&
+            $ori->tasker_phoneno != null &&
+            $ori->email != null &&
+            $ori->tasker_icno != null &&
+            $ori->tasker_dob != null &&
+            $ori->tasker_address_one != null &&
+            $ori->tasker_address_two != null &&
+            $ori->tasker_address_poscode != null &&
+            $ori->tasker_address_state != null &&
+            $ori->tasker_address_area != null &&
+            $ori->tasker_account_bank != null &&
+            $ori->tasker_account_number != null &&
+            $ori->tasker_status == 0
+        ) {
+            $taskers['tasker_status'] = 1;
+            $message = 'Tasker profile has been successfully updated. Please proceed to account verification to start earning.';
+            Tasker::whereId(Auth::user()->id)->update($taskers);
+        } else {
+            $message = 'Tasker bank details has been successfully updated !';
+        }
+
+        Tasker::whereId(Auth::user()->id)->update($taskers);
+
+        return back()->with('success', $message);
     }
 
     public function taskerUpdatePassword(Request $req, $id)
@@ -318,7 +403,7 @@ class TaskerController extends Controller
         );
 
 
-        $address=$taskers['tasker_workingloc_area'].','.$taskers['tasker_workingloc_state'];
+        $address = $taskers['tasker_workingloc_area'] . ',' . $taskers['tasker_workingloc_state'];
         $result = $this->geocoder->getCoordinatesForAddress($address);
         $taskers['latitude'] = $result['lat'];
         $taskers['longitude'] = $result['lng'];
@@ -331,7 +416,7 @@ class TaskerController extends Controller
         return view('ekyc.card-verification', [
             'title' => 'Card Verification',
             'data' => $data
-        ]);    
+        ]);
     }
 
     public function taskerFaceVerification()

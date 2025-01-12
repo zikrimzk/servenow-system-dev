@@ -1,6 +1,20 @@
 @extends('tasker.layouts.main')
 
 @section('content')
+    <style>
+        @media (max-width: 768px) {
+            .nav-tabs.profile-tabs .nav-item {
+                flex: 1 1 auto;
+                text-align: center;
+            }
+
+            .nav-tabs.profile-tabs .nav-link {
+                display: block;
+                width: 100%;
+            }
+        }
+    </style>
+
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
@@ -30,14 +44,26 @@
                         <div class="card-body py-0">
                             <ul class="nav nav-tabs profile-tabs" id="myTab" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="profile-tab-2" data-bs-toggle="tab" href="#profile-2"
+                                    <a class="nav-link active" id="profile-tab-1" data-bs-toggle="tab" href="#profile-1"
                                         role="tab" aria-selected="true">
                                         <i class="ti ti-file-text me-2"></i>Personal Details
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a class="nav-link" id="profile-tab-2" data-bs-toggle="tab" href="#profile-2"
+                                        role="tab" aria-selected="false">
+                                        <i class="ti ti-map-pin me-2"></i>Tasker Address
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="profile-tab-3" data-bs-toggle="tab" href="#profile-3"
+                                        role="tab" aria-selected="false">
+                                        <i class="ti ti-building-bank me-2"></i>Bank Details
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link" id="profile-tab-4" data-bs-toggle="tab" href="#profile-4"
-                                        role="tab" aria-selected="true">
+                                        role="tab" aria-selected="false">
                                         <i class="ti ti-lock me-2"></i>Change Password
                                     </a>
                                 </li>
@@ -45,51 +71,45 @@
                         </div>
                     </div>
 
+                    <!-- Start Alert -->
+                    <div>
+                        @if (session()->has('success'))
+                            <div class="alert alert-success alert-dismissible" role="alert">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="alert-heading">
+                                        <i class="fas fa-check-circle"></i>
+                                        Success
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                                <p class="mb-0">{{ session('success') }}</p>
+                            </div>
+                        @endif
+                        @if (session()->has('error'))
+                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="alert-heading">
+                                        <i class="fas fa-info-circle"></i>
+                                        Error
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                                <p class="mb-0">{{ session('error') }}</p>
+                            </div>
+                        @endif
+                    </div>
+                    <!-- End Alert -->
+
                     <div class="tab-content">
-                        <div class="tab-pane show active" id="profile-2" role="tabpanel" aria-labelledby="profile-tab-2">
-                            <form action="{{ route('tasker-update-profile', Auth::user()->id) }}" method="POST"
+                        <!-- Personal Details Tab Start -->
+                        <div class="tab-pane show active" id="profile-1" role="tabpanel" aria-labelledby="profile-tab-1">
+                            <form action="{{ route('tasker-update-profile-personal') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-
                                 <div class="row">
                                     <div class="col-lg-12">
-                                        <!-- Start Alert -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
-                                            <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z">
-                                                </path>
-                                            </symbol>
-
-                                            <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z">
-                                                </path>
-                                            </symbol>
-                                        </svg>
-                                        @if (session()->has('success'))
-                                            <div class="alert alert-success alert-dismissible d-flex align-items-center"
-                                                role="alert">
-                                                <svg class="bi flex-shrink-0 me-2" width="24" height="24">
-                                                    <use xlink:href="#check-circle-fill"></use>
-                                                </svg>
-                                                <div> {{ session('success') }} </div>
-                                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                        @endif
-                                        @if (session()->has('error'))
-                                            <div class="alert alert-danger alert-dismissible d-flex align-items-center"
-                                                role="alert">
-                                                <svg class="bi flex-shrink-0 me-2" width="24" height="24">
-                                                    <use xlink:href="#exclamation-triangle-fill"></use>
-                                                </svg>
-                                                <div> {{ session('error') }} </div>
-                                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                        @endif
-                                        <!-- End Alert -->
                                         @if (Auth::user()->tasker_status == 0)
                                             <div class="alert alert-primary">
                                                 <div class="d-flex align-items-center">
@@ -114,9 +134,10 @@
                                                 </div>
                                             </div>
                                         @endif
+
                                         <div class="card">
                                             <div class="card-header d-flex justify-content-between align-items-center">
-                                                <h5>Profile</h5>
+                                                <h5>Personal Details</h5>
                                                 @if (Auth::user()->tasker_status == 0)
                                                     <span class="badge bg-warning">Incomplete Profile</span>
                                                 @elseif(Auth::user()->tasker_status == 1)
@@ -132,9 +153,9 @@
                                                 @endif
                                             </div>
                                             <div class="card-body">
-                                                <div class="row">
-                                                    <h5 class="mb-2 mt-2">A. Personal Information</h5>
-                                                    <div class="col-sm-12 text-center mb-3">
+                                                <div class="row justify-content-center mb-4">
+                                                    <!-- Profile Picture Section Start -->
+                                                    <div class="col-md-4 text-center">
                                                         <div class="user-upload">
                                                             <img src="{{ asset('storage/' . auth()->user()->tasker_photo) }}"
                                                                 alt="Profile Photo" width="150" height="150"
@@ -153,240 +174,117 @@
                                                         <input type="hidden" name="isUploadPhoto" id="isUploadPhoto"
                                                             value="false">
                                                     </div>
+                                                    <!-- Profile Picture Section End -->
 
-                                                    <!-- First Name Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">First Name</label>
-                                                            <input type="text"
-                                                                class="form-control @error('tasker_firstname') is-invalid @enderror"
-                                                                name="tasker_firstname"
-                                                                value="{{ Auth::user()->tasker_firstname }}"
-                                                                id="tasker_firstname" />
-                                                            @error('tasker_firstname')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Last Name Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Last Name</label>
-                                                            <input type="text"
-                                                                class="form-control @error('tasker_lastname') is-invalid @enderror"
-                                                                name="tasker_lastname"
-                                                                value="{{ Auth::user()->tasker_lastname }}" />
-                                                            @error('tasker_lastname')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- IC Number Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">IC Number <span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="text"
-                                                                class="form-control @error('tasker_icno') is-invalid @enderror"
-                                                                name="tasker_icno" id="tasker_icno"
-                                                                placeholder="IC Number" maxlength="12" pattern="^\d{12}$"
-                                                                value="{{ Auth::user()->tasker_icno }}"
-                                                                @if (Auth::user()->tasker_status == 2) readonly @endif />
-                                                            <div id="ic-error-message" class="text-danger"
-                                                                style="display: none;">IC Number must be exactly 12 digits!
-                                                            </div>
-                                                            @error('tasker_icno')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Date of Birth Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Date of Birth <span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="date"
-                                                                class="form-control @error('tasker_dob') is-invalid @enderror"
-                                                                name="tasker_dob" id="tasker_dob"
-                                                                value="{{ Auth::user()->tasker_dob }}" readonly />
-                                                            <div id="dob-error-message" class="text-danger"
-                                                                style="display: none;">You must be 18 years and above!
-                                                            </div>
-                                                            @error('tasker_dob')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-
-                                                    <!-- Phone Number Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Phone Number</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">+60</span>
+                                                    <!-- Personal Information Section Start -->
+                                                    <div class="col-md-8">
+                                                        <div class="row">
+                                                            <!-- First Name -->
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label">First Name</label>
                                                                 <input type="text"
-                                                                    class="form-control @error('tasker_phoneno') is-invalid @enderror"
-                                                                    placeholder="Phone No." name="tasker_phoneno"
-                                                                    id="tasker_phoneno" maxlength="13"
-                                                                    value="{{ Auth::user()->tasker_phoneno }}" />
-                                                                @error('tasker_phoneno')
+                                                                    class="form-control @error('tasker_firstname') is-invalid @enderror"
+                                                                    name="tasker_firstname"
+                                                                    value="{{ Auth::user()->tasker_firstname }}"
+                                                                    id="tasker_firstname" />
+                                                                @error('tasker_firstname')
                                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                                 @enderror
                                                             </div>
-                                                            <div id="phone-error-message" class="text-danger"
-                                                                style="display: none;">
-                                                                Phone number must be in a valid format (10 or 11 digits)!
+
+                                                            <!-- Last Name -->
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label">Last Name</label>
+                                                                <input type="text"
+                                                                    class="form-control @error('tasker_lastname') is-invalid @enderror"
+                                                                    name="tasker_lastname"
+                                                                    value="{{ Auth::user()->tasker_lastname }}" />
+                                                                @error('tasker_lastname')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                @enderror
+                                                            </div>
+
+                                                            <!-- IC Number -->
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label">IC Number <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="text"
+                                                                    class="form-control @error('tasker_icno') is-invalid @enderror"
+                                                                    name="tasker_icno" id="tasker_icno"
+                                                                    placeholder="IC Number" maxlength="12"
+                                                                    pattern="^\d{12}$"
+                                                                    value="{{ Auth::user()->tasker_icno }}"
+                                                                    @if (Auth::user()->tasker_status == 2) readonly @endif />
+                                                                <div id="ic-error-message" class="text-danger"
+                                                                    style="display: none;">IC Number must be exactly 12
+                                                                    digits!
+                                                                </div>
+                                                                @error('tasker_icno')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                @enderror
+                                                            </div>
+
+                                                            <!-- Date of Birth -->
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label">Date of Birth <span
+                                                                        class="text-danger">*</span></label>
+                                                                <input type="date"
+                                                                    class="form-control @error('tasker_dob') is-invalid @enderror"
+                                                                    name="tasker_dob" id="tasker_dob"
+                                                                    value="{{ Auth::user()->tasker_dob }}" readonly />
+                                                                <div id="dob-error-message" class="text-danger"
+                                                                    style="display: none;">You must be 18 years and above!
+                                                                </div>
+                                                                @error('tasker_dob')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                @enderror
+                                                            </div>
+
+                                                            <!-- Phone Number -->
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label">Phone Number</label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text">+60</span>
+                                                                    <input type="text"
+                                                                        class="form-control @error('tasker_phoneno') is-invalid @enderror"
+                                                                        placeholder="Phone No." name="tasker_phoneno"
+                                                                        id="tasker_phoneno" maxlength="13"
+                                                                        value="{{ Auth::user()->tasker_phoneno }}" />
+                                                                    @error('tasker_phoneno')
+                                                                        <div class="invalid-feedback">{{ $message }}
+                                                                        </div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Email -->
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label">Email</label>
+                                                                <input type="text"
+                                                                    class="form-control @error('email') is-invalid @enderror"
+                                                                    name="email" value="{{ Auth::user()->email }}"
+                                                                    readonly />
+                                                                @error('email')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                @enderror
+                                                            </div>
+
+                                                            <!-- Bio -->
+                                                            <div class="col-12 mb-3">
+                                                                <label class="form-label">Bio</label>
+                                                                <textarea class="form-control @error('tasker_bio') is-invalid @enderror" rows="4" name="tasker_bio"
+                                                                    placeholder="Enter your bio here ...">{{ Auth::user()->tasker_bio }}</textarea>
+                                                                @error('tasker_bio')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                @enderror
                                                             </div>
                                                         </div>
                                                     </div>
-
-
-                                                    <!-- Email Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Email</label>
-                                                            <input type="text"
-                                                                class="form-control @error('email') is-invalid @enderror"
-                                                                name="email" value="{{ Auth::user()->email }}"
-                                                                readonly />
-                                                            @error('email')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Bio Field -->
-                                                    <div class="col-sm-12">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Bio</label>
-                                                            <textarea class="form-control @error('tasker_bio') is-invalid @enderror" rows="4" cols="20"
-                                                                name="tasker_bio" placeholder="Enter your bio here ...">{{ Auth::user()->tasker_bio }}</textarea>
-                                                            @error('tasker_bio')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Tasker Address Section -->
-                                                    <h5 class="mb-2 mt-2">B. Tasker Address</h5>
-
-                                                    <!-- Address Line 1 Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Address Line 1 <span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="text"
-                                                                class="form-control @error('tasker_address_one') is-invalid @enderror"
-                                                                name="tasker_address_one"
-                                                                value="{{ Auth::user()->tasker_address_one }}"
-                                                                placeholder="Building number and street name" />
-                                                            @error('tasker_address_one')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Address Line 2 Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Address Line 2 <span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="text"
-                                                                class="form-control @error('tasker_address_two') is-invalid @enderror"
-                                                                name="tasker_address_two"
-                                                                value="{{ Auth::user()->tasker_address_two }}"
-                                                                placeholder="Building name" />
-                                                            @error('tasker_address_two')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Postal Code Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Postal Code <span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="text"
-                                                                class="form-control @error('tasker_address_poscode') is-invalid @enderror"
-                                                                name="tasker_address_poscode"
-                                                                value="{{ Auth::user()->tasker_address_poscode }}"
-                                                                placeholder="Postal Code" />
-                                                            @error('tasker_address_poscode')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- State Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">State <span
-                                                                    class="text-danger">*</span></label>
-                                                            <select name="tasker_address_state"
-                                                                class="form-control @error('tasker_address_state') is-invalid @enderror"
-                                                                id="addState">
-                                                                @if (Auth::user()->tasker_address_state == '')
-                                                                    <option value="" selected>Select State</option>
-                                                                    @foreach ($states['states'] as $state)
-                                                                        <option value="{{ strtolower($state['name']) }}">
-                                                                            {{ $state['name'] }}</option>
-                                                                    @endforeach
-                                                                @else
-                                                                    @foreach ($states['states'] as $state)
-                                                                        @if (Auth::user()->tasker_address_state == strtolower($state['name']))
-                                                                            <option
-                                                                                value="{{ strtolower($state['name']) }}"
-                                                                                selected>
-                                                                                {{ $state['name'] }}</option>
-                                                                        @else
-                                                                            <option
-                                                                                value="{{ strtolower($state['name']) }}">
-                                                                                {{ $state['name'] }}</option>
-                                                                        @endif
-                                                                    @endforeach
-                                                                @endif
-                                                            </select>
-
-                                                            @error('tasker_address_state')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Area Field -->
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Area <span
-                                                                    class="text-danger">*</span></label>
-                                                            <select name="tasker_address_area"
-                                                                class="form-control @error('tasker_address_area') is-invalid @enderror"
-                                                                id="addCity">
-                                                                @if (Auth::user()->tasker_address_area == '')
-                                                                    <option value="" selected>Select Area</option>
-                                                                @else
-                                                                    <option
-                                                                        value="{{ Auth::user()->tasker_address_area }}"
-                                                                        selected>{{ Auth::user()->tasker_address_area }}
-                                                                    </option>
-                                                                @endif
-                                                            </select>
-                                                            @error('tasker_address_area')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
+                                                    <!-- Personal Information Section End -->
                                                 </div>
                                             </div>
-
-
-
                                             <div class="card-footer text-end btn-page">
-                                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                                                <button type="submit" class="btn btn-primary">Save Changes</button>
                                             </div>
                                         </div>
 
@@ -395,7 +293,181 @@
                                 </div>
                             </form>
                         </div>
-                        <!-- Update Password Tab -->
+                        <!-- Personal Details Tab End -->
+
+                        <!-- Tasker Address Tab Start -->
+                        <div class="tab-pane" id="profile-2" role="tabpanel" aria-labelledby="profile-tab-2">
+                            <form action="{{ route('tasker-update-profile-address') }}" method="POST">
+                                @csrf
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Tasker Address</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Address Section -->
+                                        <div class="row">
+                                            <!-- Address Line 1 -->
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Address Line 1 <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text"
+                                                    class="form-control @error('tasker_address_one') is-invalid @enderror"
+                                                    name="tasker_address_one"
+                                                    value="{{ Auth::user()->tasker_address_one }}"
+                                                    placeholder="Building number and street name" />
+                                                @error('tasker_address_one')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <!-- Address Line 2 -->
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Address Line 2 <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text"
+                                                    class="form-control @error('tasker_address_two') is-invalid @enderror"
+                                                    name="tasker_address_two"
+                                                    value="{{ Auth::user()->tasker_address_two }}"
+                                                    placeholder="Building name" />
+                                                @error('tasker_address_two')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <!-- Postal Code -->
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Postal Code <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text"
+                                                    class="form-control @error('tasker_address_poscode') is-invalid @enderror"
+                                                    id="tasker_address_poscode" name="tasker_address_poscode"
+                                                    value="{{ Auth::user()->tasker_address_poscode }}"
+                                                    placeholder="Postal Code" maxlength="5" />
+                                                @error('tasker_address_poscode')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <!-- State -->
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">State <span class="text-danger">*</span></label>
+                                                <select name="tasker_address_state"
+                                                    class="form-control @error('tasker_address_state') is-invalid @enderror"
+                                                    id="addState">
+                                                    @if (Auth::user()->tasker_address_state == '')
+                                                        <option value="" selected>Select State</option>
+                                                        @foreach ($states['states'] as $state)
+                                                            <option value="{{ strtolower($state['name']) }}">
+                                                                {{ $state['name'] }}</option>
+                                                        @endforeach
+                                                    @else
+                                                        @foreach ($states['states'] as $state)
+                                                            @if (Auth::user()->tasker_address_state == strtolower($state['name']))
+                                                                <option value="{{ strtolower($state['name']) }}" selected>
+                                                                    {{ $state['name'] }}</option>
+                                                            @else
+                                                                <option value="{{ strtolower($state['name']) }}">
+                                                                    {{ $state['name'] }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                @error('tasker_address_state')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <!-- Area -->
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Area <span class="text-danger">*</span></label>
+                                                <select name="tasker_address_area"
+                                                    class="form-control @error('tasker_address_area') is-invalid @enderror"
+                                                    id="addCity">
+                                                    @if (Auth::user()->tasker_address_area == '')
+                                                        <option value="" selected>Select Area</option>
+                                                    @else
+                                                        <option value="{{ Auth::user()->tasker_address_area }}" selected>
+                                                            {{ Auth::user()->tasker_address_area }}
+                                                        </option>
+                                                    @endif
+                                                </select>
+                                                @error('tasker_address_area')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="card-footer text-end btn-page">
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                        <!-- Tasker Address Tab End -->
+
+                        <!-- Bank Details Tab Start -->
+                        <div class="tab-pane" id="profile-3" role="tabpanel" aria-labelledby="profile-tab-3">
+                            <form action="{{ route('tasker-update-profile-bank') }}" method="POST">
+                                @csrf
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Bank Details</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Bank Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <select name="tasker_account_bank"
+                                                        class="form-control @error('tasker_account_bank') is-invalid @enderror"
+                                                        id="cr_bank_name">
+                                                        <option value="">Select Bank</option>
+                                                        @foreach ($bank as $banks)
+                                                            @if ($banks['bank'] == Auth::user()->tasker_account_bank)
+                                                                <option value="{{ $banks['bank'] }}" selected>
+                                                                    {{ $banks['bank'] }}
+                                                                </option>
+                                                            @else
+                                                                <option value="{{ $banks['bank'] }}">
+                                                                    {{ $banks['bank'] }}
+                                                                </option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                    @error('tasker_account_bank')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label">Account Number <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                        class="form-control @error('tasker_account_number') is-invalid @enderror"
+                                                        id="tasker_account_number" name="tasker_account_number"
+                                                        placeholder="Account Number"
+                                                        value="{{ Auth::user()->tasker_account_number }}" />
+                                                    @error('tasker_account_number')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer text-end btn-page">
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                        <!-- Bank Details Tab End -->
+
+
+                        <!-- Update Password Tab Start -->
                         <div class="tab-pane" id="profile-4" role="tabpanel" aria-labelledby="profile-tab-4">
                             <form action="{{ route('tasker-update-password', Auth::user()->id) }}" method="POST">
                                 @csrf
@@ -472,6 +544,8 @@
                             </form>
 
                         </div>
+                        <!-- Update Password Tab End -->
+
                     </div>
 
                     <div id="verifyQrModal" class="modal fade" tabindex="-1" role="dialog"
@@ -525,30 +599,14 @@
                             </div>
                         </div>
                     </div>
-
-
-
                 </div>
             </div>
 
         </div>
     </div>
 
-    <header>
-        <style>
-            @media (max-width: 768px) {
-                .nav-tabs.profile-tabs .nav-item {
-                    flex: 1 1 auto;
-                    text-align: center;
-                }
 
-                .nav-tabs.profile-tabs .nav-link {
-                    display: block;
-                    width: 100%;
-                }
-            }
-        </style>
-    </header>
+
     <script>
         document.getElementById('tasker_phoneno').addEventListener('input', function() {
             const input = this.value.replace(/\D/g, ''); // Remove non-numeric characters
@@ -572,8 +630,6 @@
                 errorMessage.style.display = 'block';
             }
         });
-
-
 
         const icNoField = document.getElementById('tasker_icno');
         const dobField = document.getElementById('tasker_dob');
@@ -618,6 +674,111 @@
                 icErrorMessage.style.display = 'block'; // Show IC Number error message
             }
         });
+
+        document.getElementById('passwords').addEventListener('input', function() {
+            const password = this.value;
+            const submitbtn = document.getElementById('submit-btn');
+            const confirmPasswordInput = document.getElementById('cpassword');
+
+
+            // Regular expressions for each requirement
+            const minChar = /.{8,}/;
+            const lowerChar = /[a-z]/;
+            const upperChar = /[A-Z]/;
+            const numberChar = /[0-9]/;
+            const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+
+
+            // Function to update each requirement's status
+            function validateRequirement(regex, elementId) {
+                const element = document.getElementById(elementId);
+                if (regex.test(password)) {
+                    element.classList.remove('ti', 'ti-circle-x', 'text-danger', 'f-16', 'me-2');
+                    element.classList.add('ti', 'ti-circle-check', 'text-success', 'f-16', 'me-2');
+                } else {
+                    element.classList.remove('ti', 'ti-circle-check', 'text-success', 'f-16', 'me-2');
+                    element.classList.add('ti', 'ti-circle-x', 'text-danger', 'f-16', 'me-2');
+                }
+            }
+
+            // Validate each requirement
+            validateRequirement(minChar, 'min-char');
+            validateRequirement(lowerChar, 'lower-char');
+            validateRequirement(upperChar, 'upper-char');
+            validateRequirement(numberChar, 'number-char');
+            validateRequirement(specialChar, 'special-char');
+
+            // Check if all requirements are met
+            const allRequirementsMet = (
+                minChar.test(password) &&
+                lowerChar.test(password) &&
+                upperChar.test(password) &&
+                numberChar.test(password) &&
+                specialChar.test(password)
+            );
+
+            // Only check the confirm password if all new password requirements are met
+            if (allRequirementsMet) {
+                confirmPasswordInput.disabled = false;
+                checkPasswordsMatch();
+            } else {
+                submitbtn.classList.add('disabled');
+                confirmPasswordInput.disabled =
+                    true;
+            }
+
+            // Function to check if passwords match
+            function checkPasswordsMatch() {
+                const confirmPassword = confirmPasswordInput.value;
+                if (password === confirmPassword) {
+                    submitbtn.classList.remove(
+                        'disabled');
+                } else {
+                    submitbtn.classList.add(
+                        'disabled');
+                }
+            }
+        });
+
+        // Confirm Password Match Check
+        document.getElementById('cpassword').addEventListener('input', function() {
+            const newPassword = document.getElementById('passwords').value;
+            const confirmPassword = this.value;
+            const submitbtn = document.getElementById('submit-btn');
+
+            function checkPasswordsMatch() {
+                if (newPassword === confirmPassword) {
+                    submitbtn.classList.remove('disabled');
+                } else {
+                    submitbtn.classList.add('disabled');
+                }
+            }
+
+            checkPasswordsMatch();
+        });
+
+        function showpassword(buttonName, txtName, iconName) {
+            document.getElementById(buttonName).addEventListener('click', function() {
+                const passwordInput = document.getElementById(txtName);
+                const icon = document.getElementById(iconName);
+
+                // Toggle password visibility
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text'; // Change to text to show password
+                    icon.classList.remove('ti-eye'); // Remove eye icon
+                    icon.classList.add('ti-eye-off'); // Add eye-slash icon
+                } else {
+                    passwordInput.type = 'password'; // Change to password to hide it
+                    icon.classList.remove('ti-eye-off'); // Remove eye-slash icon
+                    icon.classList.add('ti-eye'); // Add eye icon
+                }
+            });
+        }
+
+        showpassword('show-old-password', 'oldpassword', 'toggle-icon-old-password');
+        showpassword('show-password', 'passwords', 'toggle-icon-password');
+        showpassword('show-password-confirm', 'cpassword', 'toggle-icon-confirm-password');
+
         $(document).ready(function() {
             $('#profilephoto').on('change', function() {
                 const file = event.target.files[0];
@@ -659,112 +820,18 @@
                 }
             });
 
-            document.getElementById('passwords').addEventListener('input', function() {
-                const password = this.value;
-                const submitbtn = document.getElementById('submit-btn');
-                const confirmPasswordInput = document.getElementById('cpassword');
-
-
-                // Regular expressions for each requirement
-                const minChar = /.{8,}/;
-                const lowerChar = /[a-z]/;
-                const upperChar = /[A-Z]/;
-                const numberChar = /[0-9]/;
-                const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
-
-
-                // Function to update each requirement's status
-                function validateRequirement(regex, elementId) {
-                    const element = document.getElementById(elementId);
-                    if (regex.test(password)) {
-                        element.classList.remove('ti', 'ti-circle-x', 'text-danger', 'f-16', 'me-2');
-                        element.classList.add('ti', 'ti-circle-check', 'text-success', 'f-16', 'me-2');
-                    } else {
-                        element.classList.remove('ti', 'ti-circle-check', 'text-success', 'f-16', 'me-2');
-                        element.classList.add('ti', 'ti-circle-x', 'text-danger', 'f-16', 'me-2');
-                    }
-                }
-
-                // Validate each requirement
-                validateRequirement(minChar, 'min-char');
-                validateRequirement(lowerChar, 'lower-char');
-                validateRequirement(upperChar, 'upper-char');
-                validateRequirement(numberChar, 'number-char');
-                validateRequirement(specialChar, 'special-char');
-
-                // Check if all requirements are met
-                const allRequirementsMet = (
-                    minChar.test(password) &&
-                    lowerChar.test(password) &&
-                    upperChar.test(password) &&
-                    numberChar.test(password) &&
-                    specialChar.test(password)
-                );
-
-                // Only check the confirm password if all new password requirements are met
-                if (allRequirementsMet) {
-                    confirmPasswordInput.disabled = false;
-                    checkPasswordsMatch();
-                } else {
-                    submitbtn.classList.add('disabled');
-                    confirmPasswordInput.disabled =
-                        true;
-                }
-
-                // Function to check if passwords match
-                function checkPasswordsMatch() {
-                    const confirmPassword = confirmPasswordInput.value;
-                    if (password === confirmPassword) {
-                        submitbtn.classList.remove(
-                            'disabled');
-                    } else {
-                        submitbtn.classList.add(
-                            'disabled');
-                    }
-                }
+            // Allow only numbers in Account Number input
+            $('#tasker_account_number').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
             });
 
-            // Confirm Password Match Check
-            document.getElementById('cpassword').addEventListener('input', function() {
-                const newPassword = document.getElementById('passwords').value;
-                const confirmPassword = this.value;
-                const submitbtn = document.getElementById('submit-btn');
-
-                function checkPasswordsMatch() {
-                    if (newPassword === confirmPassword) {
-                        submitbtn.classList.remove('disabled');
-                    } else {
-                        submitbtn.classList.add('disabled');
-                    }
+            // Allow only numbers and restrict Postal Code to max 5 digits
+            $('#tasker_address_poscode').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+                if (this.value.length > 5) {
+                    this.value = this.value.slice(0, 5); // Restrict to 5 characters
                 }
-
-                checkPasswordsMatch();
             });
-
-            function showpassword(buttonName, txtName, iconName) {
-                document.getElementById(buttonName).addEventListener('click', function() {
-                    const passwordInput = document.getElementById(txtName);
-                    const icon = document.getElementById(iconName);
-
-                    // Toggle password visibility
-                    if (passwordInput.type === 'password') {
-                        passwordInput.type = 'text'; // Change to text to show password
-                        icon.classList.remove('ti-eye'); // Remove eye icon
-                        icon.classList.add('ti-eye-off'); // Add eye-slash icon
-                    } else {
-                        passwordInput.type = 'password'; // Change to password to hide it
-                        icon.classList.remove('ti-eye-off'); // Remove eye-slash icon
-                        icon.classList.add('ti-eye'); // Add eye icon
-                    }
-                });
-            }
-
-            showpassword('show-old-password', 'oldpassword', 'toggle-icon-old-password');
-            showpassword('show-password', 'passwords', 'toggle-icon-password');
-            showpassword('show-password-confirm', 'cpassword', 'toggle-icon-confirm-password');
-
-
-
 
         });
     </script>

@@ -61,7 +61,6 @@ $currentYear = Carbon::now()->year;
                     </div>
                 @endif
             </div>
-
             <!-- End Alert -->
 
             <div class="row">

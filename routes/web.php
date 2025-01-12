@@ -195,7 +195,9 @@ Route::prefix('tasker')->middleware('auth:tasker')->group(function () {
 
     // Tasker - Account Profile
     Route::get('/profile', [RouteController::class, 'taskerprofileNav'])->name('tasker-profile');
-    Route::post('/update-profile-{id}', [TaskerController::class, 'taskerUpdateProfile'])->name('tasker-update-profile');
+    Route::post('/update-profile-personal', [TaskerController::class, 'taskerUpdateProfilePersonal'])->name('tasker-update-profile-personal');
+    Route::post('/update-address', [TaskerController::class, 'taskerUpdateProfileAddress'])->name('tasker-update-profile-address');
+    Route::post('/update-bank-details', [TaskerController::class, 'taskerUpdateProfileBank'])->name('tasker-update-profile-bank');
     Route::post('/update-password-{id}', [TaskerController::class, 'taskerUpdatePassword'])->name('tasker-update-password');
 
     // Tasker - Account Verification [e-KYC]

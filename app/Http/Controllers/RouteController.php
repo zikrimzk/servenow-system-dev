@@ -280,9 +280,6 @@ class RouteController extends Controller
 
     public function clientBookingHistoryNav()
     {
-
-
-
         $booking = DB::table('bookings as a')
             ->join('services as c', 'a.service_id', '=', 'c.id')
             ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
@@ -423,9 +420,11 @@ class RouteController extends Controller
     public function taskerprofileNav()
     {
         $states = json_decode(file_get_contents(public_path('assets/json/state.json')), true);
+        $bank = json_decode(file_get_contents(public_path('assets/json/bank.json')), true);
         return view('tasker.account.profile', [
             'title' => 'Tasker Profile',
-            'states' => $states
+            'states' => $states,
+            'bank'=> $bank
         ]);
     }
 
