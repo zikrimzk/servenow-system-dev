@@ -415,8 +415,219 @@ class RouteController extends Controller
     // Tasker - Dashboard Navigation
     public function taskerhomeNav()
     {
+
+        $totalearningsAll = 0;
+        $totalearningsThisMonth = 0;
+        $totalearningsThisYear = 0;
+        $totalBookingCount = 0;
+        $totalPenaltyCount = 0;
+        $totalAVGrating = 0;
+        $thismonthcompleted = 0;
+        $thismonthfloating = 0;
+        $thismonthCancelled = 0;
+        $thisyearcompleted = 0;
+        $thisyearfloating = 0;
+        $thisyearCancelled = 0;
+        $currMonth = Carbon::now()->month;
+        $currYear = Carbon::now()->year;
+
+
+        $totalearningsAll = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->where('b.tasker_id', Auth::user()->id)
+            ->where('booking_status', 6)
+            ->sum('booking_rate');
+
+        $totalearningsThisMonth = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->where('b.tasker_id', Auth::user()->id)
+            ->whereMonth('booking_date', $currMonth)
+            ->whereYear('booking_date', $currYear)
+            ->where('booking_status', 6)
+            ->sum('booking_rate');
+
+        $totalearningsThisYear = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->where('b.tasker_id', Auth::user()->id)
+            ->whereYear('booking_date', $currYear)
+            ->where('booking_status', 6)
+            ->sum('booking_rate');
+
+        $totalearningsAll = number_format($totalearningsAll * 0.97, 2);
+        $totalearningsThisMonth = number_format($totalearningsThisMonth * 0.97, 2);
+        $totalearningsThisYear = number_format($totalearningsThisYear * 0.97, 2);
+
+
+        $totalBookingCount = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->where('b.tasker_id', Auth::user()->id)
+            ->where('booking_status', 6)
+            ->count();
+
+        $totalPenaltyCount = DB::table('cancel_refund_bookings as a')
+            ->join('bookings as b', 'a.booking_id', 'b.id')
+            ->join('services as c', 'b.service_id', 'c.id')
+            ->where('c.tasker_id', Auth::user()->id)
+            ->where('cr_penalized', 1)
+            ->count();
+
+        $totalAVGrating = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->where('d.id', auth()->user()->id)
+            ->avg('f.review_rating');
+
+        $totalAVGrating = number_format($totalAVGrating, 1);
+
+        $confirmBookingData = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->where('b.tasker_id', Auth::user()->id)
+            ->where('booking_status', 3)
+            ->get();
+
+        $data = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->select(
+                'a.id as bookingID',
+                'b.id as serviceID',
+                'c.id as typeID',
+                'd.id as taskerID',
+                'a.booking_date',
+                'a.booking_address',
+                'a.booking_time_start',
+                'a.booking_time_end',
+                'a.booking_status',
+                'a.booking_note',
+                'a.booking_rate',
+                'a.booking_order_id',
+                'c.servicetype_name',
+                'e.client_firstname',
+                'e.client_lastname',
+                'e.client_phoneno',
+                'e.email as client_email',
+            )
+            ->whereNotIn('a.booking_status', [7, 8, 9, 10])
+            ->where('b.tasker_id', Auth::user()->id)
+            ->orderby('a.booking_date')
+            ->orderby('a.booking_time_start');
+
+
+        $thismonthcompleted = $data->whereYear('booking_date', $currYear)->whereMonth('booking_date', $currMonth)->where('booking_status', 6)->count();
+        $thismonthfloating =  $data->whereYear('booking_date', $currYear)->whereMonth('booking_date', $currMonth)->whereIn('booking_status', [1, 2, 3, 4])->count();
+        $thismonthCancelled =  $data->whereYear('booking_date', $currYear)->whereMonth('booking_date', $currMonth)->where('booking_status', 5)->count();
+
+        $thisyearcompleted =  $data->whereYear('booking_date', $currYear)->where('booking_status', 6)->count();
+        $thisyearfloating =  $data->whereYear('booking_date', $currYear)->whereIn('booking_status', [1, 2, 3, 4])->count();
+        $thisyearCancelled =  $data->whereYear('booking_date', $currYear)->where('booking_status', 5)->count();
+
+
+        // Monthly Chart Data
+        $monthlyData = Booking::selectRaw("
+            YEAR(booking_date) as year,
+            MONTH(booking_date) as month,
+            SUM(CASE WHEN booking_status = 6 THEN booking_rate ELSE 0 END) as completedAmount,
+            SUM(CASE WHEN booking_status IN (1, 2, 3, 4) THEN booking_rate ELSE 0 END) as floatingAmount,
+            SUM(CASE WHEN booking_status = 5 THEN booking_rate ELSE 0 END) as cancelledAmount
+        ")
+            ->join('services as b', 'bookings.service_id', '=', 'b.id')
+            ->where('b.tasker_id', Auth::user()->id)
+            ->groupBy('year', 'month')
+            ->get();
+
+        $monthlyChartData = [
+            'labels' => [],
+            'completed' => [],
+            'floating' => [],
+            'cancelled' => [],
+        ];
+
+        // Format monthly data for the chart
+        foreach ($monthlyData as $dataChartTwo) {
+            $monthYear = Carbon::create($dataChartTwo->year, $dataChartTwo->month)->format('F Y');
+            $monthlyChartData['labels'][] = $monthYear;
+            $monthlyChartData['completed'][] = $dataChartTwo->completedAmount;
+            $monthlyChartData['floating'][] = $dataChartTwo->floatingAmount;
+            $monthlyChartData['cancelled'][] = $dataChartTwo->cancelledAmount;
+        }
+
+        // Yearly Chart Data
+        $yearlyData = Booking::selectRaw("
+            YEAR(booking_date) as year,
+            SUM(CASE WHEN booking_status = 6 THEN booking_rate ELSE 0 END) as completedAmount,
+            SUM(CASE WHEN booking_status IN (1, 2, 3, 4) THEN booking_rate ELSE 0 END) as floatingAmount,
+            SUM(CASE WHEN booking_status = 5 THEN booking_rate ELSE 0 END) as cancelledAmount
+        ")
+            ->join('services as b', 'bookings.service_id', '=', 'b.id')
+            ->where('b.tasker_id', Auth::user()->id)
+            ->groupBy('year')
+            ->orderBy('year', 'asc')
+            ->get();
+
+        $yearlyChartData = [
+            'labels' => $yearlyData->pluck('year')->toArray() ?? [],
+            'completed' => $yearlyData->pluck('completedAmount')->toArray() ?? [],
+            'floating' => $yearlyData->pluck('floatingAmount')->toArray() ?? [],
+            'cancelled' => $yearlyData->pluck('cancelledAmount')->toArray() ?? [],
+        ];
+
+        $data =$data = DB::table('bookings as a')
+        ->join('services as b', 'a.service_id', 'b.id')
+        ->join('service_types as c', 'b.service_type_id', 'c.id')
+        ->join('taskers as d', 'b.tasker_id', 'd.id')
+        ->join('clients as e', 'a.client_Id', 'e.id')
+        ->select(
+            'a.id as bookingID',
+            'b.id as serviceID',
+            'c.id as typeID',
+            'd.id as taskerID',
+            'a.booking_date',
+            'a.booking_address',
+            'a.booking_time_start',
+            'a.booking_time_end',
+            'a.booking_status',
+            'a.booking_note',
+            'a.booking_rate',
+            'a.booking_order_id',
+            'c.servicetype_name',
+            'e.client_firstname',
+            'e.client_lastname',
+            'e.client_phoneno',
+            'e.email as client_email',
+        )
+        ->whereNotIn('a.booking_status', [7, 8, 9, 10])
+        ->where('b.tasker_id', Auth::user()->id)
+        ->orderby('a.booking_date')
+        ->orderby('a.booking_time_start')
+        ->get();
+
+
+
+
         return view('tasker.index', [
-            'title' => 'Tasker Dashboard'
+            'title' => 'Tasker Dashboard',
+            'books' =>  $data,
+            'totalearningsAll' => $totalearningsAll,
+            'totalearningsThisMonth' => $totalearningsThisMonth,
+            'totalearningsThisYear' => $totalearningsThisYear,
+            'totalBookingCount' =>  $totalBookingCount,
+            'totalPenaltyCount' => $totalPenaltyCount,
+            'totalAVGrating' => $totalAVGrating,
+            'confirmBookingData' => $confirmBookingData,
+            'thismonthcompleted' => $thismonthcompleted,
+            'thismonthfloating' => $thismonthfloating,
+            'thismonthCancelled' => $thismonthCancelled,
+            'thisyearcompleted' => $thisyearcompleted,
+            'thisyearfloating' => $thisyearfloating,
+            'thisyearCancelled' => $thisyearCancelled,
+            'monthlyChartData' => $monthlyChartData,
+            'yearlyChartData' => $yearlyChartData,
+
         ]);
     }
 
@@ -1587,8 +1798,184 @@ class RouteController extends Controller
     // Admin - Dashboard Navigation
     public function adminHomeNav()
     {
+        //Define all variable
+        $totalActiveAdmin = 0;
+        $totalActiveClient = 0;
+        $totalNewClient = 0;
+        $totalActiveTasker = 0;
+        $totalService = 0;
+        $totalCompletedBooking = 0;
+        $totalRefundedBooking = 0;
+        $thismonthcompleted = 0;
+        $thismonthfloating = 0;
+        $thismonthCancelled = 0;
+
+        $thisyearcompleted = 0;
+        $thisyearfloating = 0;
+        $thisyearCancelled = 0;
+        $totalrefundrequest = 0;
+        $totalunreleasedpayment = 0;
+        $totalunreview = 0;
+
+
+
+        $totalActiveAdmin = Administrator::where('admin_status', 1)->count();
+        $totalActiveClient = Client::where('client_status', 1)->count();
+        $totalNewClient = Client::where('client_status', 0)->count();
+        $totalActiveTasker = Tasker::where('tasker_status', 2)->count();
+        $totalService = ServiceType::count();
+        $totalCompletedBooking = Booking::where('booking_status', 6)->count();
+        $averageRating = 0.00;
+
+        $refundBookingData = DB::table('bookings as a')
+            ->join('cancel_refund_bookings as f', 'a.id', 'f.booking_id')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->select(
+                'a.id as bookingID',
+                'b.id as serviceID',
+                'c.id as typeID',
+                'd.id as taskerID',
+                'f.id as refundID',
+                'f.cr_reason',
+                'f.cr_status',
+                'f.cr_date',
+                'f.cr_amount',
+                'f.cr_penalized',
+                'f.cr_bank_name',
+                'f.cr_account_name',
+                'f.cr_account_number'
+            )
+            ->whereIn('a.booking_status', [8, 10])
+            ->orderbyDesc('a.booking_date');
+
+        $totalRefundedBooking = $refundBookingData->count();
+
+        $averageRating = DB::table('reviews')
+            ->avg('review_rating');
+        $averageRating = $averageRating ? number_format($averageRating, 2) : '0.00';
+
+        $currmonth = Carbon::now()->format('m');
+        $curryear = Carbon::now()->format('Y');
+
+
+        $thismonthcompleted = Booking::whereYear('booking_date', $curryear)->whereMonth('booking_date', $currmonth)->where('booking_status', 6)->count();
+        $thismonthfloating = Booking::whereYear('booking_date', $curryear)->whereMonth('booking_date', $currmonth)->whereIn('booking_status', [1, 2, 3, 4])->count();
+        $thismonthCancelled = Booking::whereYear('booking_date', $curryear)->whereMonth('booking_date', $currmonth)->where('booking_status', 5)->count();
+
+        $thisyearcompleted = Booking::whereYear('booking_date', $curryear)->where('booking_status', 6)->count();
+        $thisyearfloating = Booking::whereYear('booking_date', $curryear)->whereIn('booking_status', [1, 2, 3, 4])->count();
+        $thisyearCancelled = Booking::whereYear('booking_date', $curryear)->where('booking_status', 5)->count();
+
+
+        $totalrevenueAllTime = number_format(Booking::where('booking_status', 6)->sum('booking_rate'), 2);
+        $totalCommissionAllTime = number_format($totalrevenueAllTime * 0.03, 2);
+
+        $totalrefundrequest = CancelRefundBooking::whereIn('cr_status', [0, 1])->count();
+
+        $totalunreleasedpayment = MonthlyStatement::where('statement_status', 0)->count();
+
+        // Count total reviews by year
+        $totalreviewsbyyear = DB::table('bookings as a')
+            ->join('reviews as f', 'a.id', '=', 'f.booking_id')
+            ->whereYear('f.review_date_time', $curryear)
+            ->count();
+
+        // Count total completed bookings
+        $totalcompletedBooking = DB::table('bookings')
+            ->where('booking_status', 6)
+            ->count();
+
+        // Calculate total unreviewed bookings
+        $totalunreview = max(0, $totalcompletedBooking - $totalreviewsbyyear);
+
+
+
+        // Monthly Chart Data
+        $monthlyData = Booking::selectRaw("
+            YEAR(booking_date) as year,
+            MONTH(booking_date) as month,
+            SUM(CASE WHEN booking_status = 6 THEN booking_rate ELSE 0 END) as completedAmount,
+            SUM(CASE WHEN booking_status IN (1, 2, 3, 4) THEN booking_rate ELSE 0 END) as floatingAmount,
+            SUM(CASE WHEN booking_status = 5 THEN booking_rate ELSE 0 END) as cancelledAmount
+        ")
+            ->groupBy('year', 'month')
+            ->get();
+
+        $monthlyChartData = [
+            'labels' => [],
+            'completed' => [],
+            'floating' => [],
+            'cancelled' => [],
+        ];
+
+        // Format monthly data for the chart
+        foreach ($monthlyData as $dataChartTwo) {
+            $monthYear = Carbon::create($dataChartTwo->year, $dataChartTwo->month)->format('F Y');
+            $monthlyChartData['labels'][] = $monthYear;
+            $monthlyChartData['completed'][] = $dataChartTwo->completedAmount;
+            $monthlyChartData['floating'][] = $dataChartTwo->floatingAmount;
+            $monthlyChartData['cancelled'][] = $dataChartTwo->cancelledAmount;
+        }
+
+        // Yearly Chart Data
+        $yearlyData = Booking::selectRaw("
+            YEAR(booking_date) as year,
+            SUM(CASE WHEN booking_status = 6 THEN booking_rate ELSE 0 END) as completedAmount,
+            SUM(CASE WHEN booking_status IN (1, 2, 3, 4) THEN booking_rate ELSE 0 END) as floatingAmount,
+            SUM(CASE WHEN booking_status = 5 THEN booking_rate ELSE 0 END) as cancelledAmount
+        ")
+            ->groupBy('year')
+            ->orderBy('year', 'asc')
+            ->get();
+
+        $yearlyChartData = [
+            'labels' => $yearlyData->pluck('year')->toArray() ?? [],
+            'completed' => $yearlyData->pluck('completedAmount')->toArray() ?? [],
+            'floating' => $yearlyData->pluck('floatingAmount')->toArray() ?? [],
+            'cancelled' => $yearlyData->pluck('cancelledAmount')->toArray() ?? [],
+        ];
+
+        $commissionData = Booking::selectRaw("
+            YEAR(booking_date) as year,
+            MONTH(booking_date) as month,
+            SUM(CASE WHEN booking_status = 6 THEN booking_rate * 0.03 ELSE 0 END) as commission
+        ")
+            ->groupBy('year', 'month')
+            ->get();
+
+        $commisionchartData = [
+            'labels' => $commissionData->map(fn($item) => $item->month . '-' . $item->year), // Format as "MM-YYYY"
+            'commission' => $commissionData->pluck('commission'),
+        ];
+
         return view('administrator.index', [
-            'title' => 'Admin Dashboard'
+            'title' => 'Admin Dashboard',
+            'totalActiveAdmin' => $totalActiveAdmin,
+            'totalActiveClient' => $totalActiveClient,
+            'totalNewClient' => $totalNewClient,
+            'totalActiveTasker' => $totalActiveTasker,
+            'totalService' => $totalService,
+            'totalCompletedBooking' => $totalCompletedBooking,
+            'totalRefundedBooking' => $totalRefundedBooking,
+            'averageRating' => $averageRating,
+            'monthlyChartData' => $monthlyChartData,
+            'yearlyChartData' => $yearlyChartData,
+            'thismonthcompleted' => $thismonthcompleted,
+            'thismonthfloating' => $thismonthfloating,
+            'thismonthCancelled' => $thismonthCancelled,
+            'thisyearcompleted' => $thisyearcompleted,
+            'thisyearfloating' => $thisyearfloating,
+            'thisyearCancelled' => $thisyearCancelled,
+            'totalrevenueAllTime' => $totalrevenueAllTime,
+            'totalCommissionAllTime' => $totalCommissionAllTime,
+            'commisionchartData' => $commisionchartData,
+            'totalrefundrequest' => $totalrefundrequest,
+            'totalunreleasedpayment' => $totalunreleasedpayment,
+            'totalunreview' => $totalunreview
+
         ]);
     }
 
@@ -3112,8 +3499,8 @@ class RouteController extends Controller
                             <i class="ti ti-repeat f-20"></i>
                         </a>
                     ';
-                }else{
-                    $button ='';
+                } else {
+                    $button = '';
                 }
 
                 return $button;
