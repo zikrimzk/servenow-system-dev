@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\QueryException;
 
 
 class RouteController extends Controller
@@ -280,9 +281,15 @@ class RouteController extends Controller
 
     public function clientBookingHistoryNav()
     {
+        set_time_limit(120);
 
+        // Memastikan pengguna yang sedang log masuk
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Sila log masuk untuk melihat sejarah tempahan.');
+        }
 
-
+        // Pengambilan data tempahan
         $booking = DB::table('bookings as a')
             ->join('services as c', 'a.service_id', '=', 'c.id')
             ->join('service_types as d', 'c.service_type_id', '=', 'd.id')
@@ -319,38 +326,50 @@ class RouteController extends Controller
                 'e.tasker_phoneno',
                 'e.email'
             )
-            ->where('a.client_id', Auth::user()->id)
+            ->where('a.client_id', $user->id)
             ->orderBy('booking_date', 'desc')
             ->orderBy('booking_status', 'asc')
             ->get();
 
-        // Grouping berdasarkan booking_date
+        // Mengelompokkan tempahan berdasarkan tarikh
         $groupedBookings = $booking->groupBy('booking_date');
+
+        // Mengelompokkan tempahan berdasarkan status
         $toServeBookings = collect($booking)
             ->whereIn('booking_status', [1, 2, 3, 4])
             ->groupBy('booking_date');
 
-        $groupedBookings = $booking->groupBy('booking_date');
         $completed = collect($booking)
             ->whereIn('booking_status', [6])
             ->groupBy('booking_date');
 
-        $groupedBookings = $booking->groupBy('booking_date');
         $cancelled = collect($booking)
             ->whereIn('booking_status', [5])
             ->groupBy('booking_date');
 
-        $groupedBookings = $booking->groupBy('booking_date');
         $refund = collect($booking)
             ->whereIn('booking_status', [7, 8, 9, 10])
             ->groupBy('booking_date');
 
-        $review = Review::all();
+        // Mengelompokkan ulasan berdasarkan booking_id
+        $reviews = Review::all();
+        // dd($reviews);
+        $reviewReplies = ReviewReply::all();
+       // dd($reviewReplies);
+        // Mengambil data refund
         $refunds = DB::table('cancel_refund_bookings')->get();
-        // dd($refunds->booking_id);
 
-        $bank = json_decode(file_get_contents(public_path('assets/json/bank.json')), true);
+        // Mengambil data bank dari fail JSON
+        $bankPath = public_path('assets/json/bank.json');
+        if (file_exists($bankPath)) {
+            $bank = json_decode(file_get_contents($bankPath), true);
+        } else {
+            $bank = []; // Atau nilai lalai yang sesuai
+            // Log ralat jika perlu
 
+        }
+
+        // Memaparkan pandangan dengan data yang diambil
         return view('client.booking.booking-history', [
             'title' => 'My Booking History',
             'book' => $groupedBookings,
@@ -358,9 +377,15 @@ class RouteController extends Controller
             'completed' => $completed,
             'cancelled' => $cancelled,
             'refund' => $refund,
-            'review' => $review,
+            'reviews' => $reviews,
             'bank' => $bank,
-            'refunds' => $refunds
+            'refunds' => $refunds,
+            'reviewReplies' => $reviewReplies
+        ]);
+
+
+        return view('errors.general-error', [
+            'message' => 'Maaf, terdapat masalah. Sila cuba lagi kemudian.'
         ]);
     }
 
@@ -576,35 +601,35 @@ class RouteController extends Controller
             'cancelled' => $yearlyData->pluck('cancelledAmount')->toArray() ?? [],
         ];
 
-        $data =$data = DB::table('bookings as a')
-        ->join('services as b', 'a.service_id', 'b.id')
-        ->join('service_types as c', 'b.service_type_id', 'c.id')
-        ->join('taskers as d', 'b.tasker_id', 'd.id')
-        ->join('clients as e', 'a.client_Id', 'e.id')
-        ->select(
-            'a.id as bookingID',
-            'b.id as serviceID',
-            'c.id as typeID',
-            'd.id as taskerID',
-            'a.booking_date',
-            'a.booking_address',
-            'a.booking_time_start',
-            'a.booking_time_end',
-            'a.booking_status',
-            'a.booking_note',
-            'a.booking_rate',
-            'a.booking_order_id',
-            'c.servicetype_name',
-            'e.client_firstname',
-            'e.client_lastname',
-            'e.client_phoneno',
-            'e.email as client_email',
-        )
-        ->whereNotIn('a.booking_status', [7, 8, 9, 10])
-        ->where('b.tasker_id', Auth::user()->id)
-        ->orderby('a.booking_date')
-        ->orderby('a.booking_time_start')
-        ->get();
+        $data = $data = DB::table('bookings as a')
+            ->join('services as b', 'a.service_id', 'b.id')
+            ->join('service_types as c', 'b.service_type_id', 'c.id')
+            ->join('taskers as d', 'b.tasker_id', 'd.id')
+            ->join('clients as e', 'a.client_Id', 'e.id')
+            ->select(
+                'a.id as bookingID',
+                'b.id as serviceID',
+                'c.id as typeID',
+                'd.id as taskerID',
+                'a.booking_date',
+                'a.booking_address',
+                'a.booking_time_start',
+                'a.booking_time_end',
+                'a.booking_status',
+                'a.booking_note',
+                'a.booking_rate',
+                'a.booking_order_id',
+                'c.servicetype_name',
+                'e.client_firstname',
+                'e.client_lastname',
+                'e.client_phoneno',
+                'e.email as client_email',
+            )
+            ->whereNotIn('a.booking_status', [7, 8, 9, 10])
+            ->where('b.tasker_id', Auth::user()->id)
+            ->orderby('a.booking_date')
+            ->orderby('a.booking_time_start')
+            ->get();
 
 
 
@@ -847,11 +872,7 @@ class RouteController extends Controller
             if ($request->has('status_filter') && $request->input('status_filter') != '') {
                 $data->where('a.booking_status', $request->input('status_filter'));
             }
-
-            if ($request->has('service_filter') && $request->input('service_filter') != '') {
-                $data->where('c.id', $request->input('service_filter'));
-            }
-
+            
             $data = $data->get();
 
             if ($request->ajax()) {
@@ -896,7 +917,7 @@ class RouteController extends Controller
                     return $amount;
                 });
 
-                $table->rawColumns(['booking_order_id', 'client', 'booking_date', 'booking_time', 'booking_status', 'booking_amount']);
+            $table->rawColumns(['booking_order_id', 'client', 'booking_date', 'booking_time', 'booking_status', 'booking_amount']);
 
                 return $table->make(true);
             }

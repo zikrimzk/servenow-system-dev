@@ -15,4 +15,6 @@ class ReviewReply extends Model
         'reply_date_time',
         'review_id'
     ];
+
+    
 }

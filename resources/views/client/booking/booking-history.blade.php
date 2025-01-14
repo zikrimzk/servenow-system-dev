@@ -97,6 +97,52 @@
         .table-refund tr {
             border-bottom: 1px solid #ddd;
         }
+
+        .review-image {
+            width: 80px;
+            /* Tetapkan lebar yang lebih kecil */
+            height: 80px;
+            /* Tetapkan tinggi yang sama */
+            object-fit: cover;
+            /* Memastikan gambar mengisi ruang tanpa distorsi */
+            border-radius: 5px;
+            /* Opsional: Menambah kelengkungan pada sudut gambar */
+            margin-right: 8px;
+            /* Jarak antara gambar */
+            flex-shrink: 0;
+            /* Mengelakkan gambar mengecil lebih lanjut */
+        }
+
+        .review-images-container {
+            display: flex;
+            flex-wrap: nowrap;
+            /* Pastikan gambar berada dalam satu baris */
+            gap: 8px;
+            /* Jarak antara gambar */
+            overflow-x: auto;
+            /* Menambah skrol horizontal jika gambar melebihi ruang */
+            margin-top: 10px;
+        }
+
+        /* Opsional: Menambah efek bayangan saat hover */
+        .review-image:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .review-image {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .review-image {
+                width: 80px;
+                height: 80px;
+            }
+        }
     </style>
 
 
@@ -862,6 +908,8 @@
                                 </div>
                             </div>
                         @endif
+
+
                     </div>
 
                     <div class="tab-pane fade" id="completed" role="tabpanel">
@@ -903,7 +951,7 @@
                                                 <span class="fw-bold">Total:
                                                     <span class="text-danger">RM{{ $b->booking_rate }}</span>
                                                 </span>
-                                                @if ($review->where('booking_id', $b->bookingID)->count() == 0)
+                                                @if ($reviews->where('booking_id', $b->bookingID)->count() === 0)
                                                     <div>
                                                         <button class="btn btn-light-primary" data-bs-toggle="modal"
                                                             data-bs-target="#reviewModal-{{ $b->booking_order_id }}">
@@ -911,7 +959,12 @@
                                                         </button>
                                                     </div>
                                                 @else
-                                                    <div class="text-muted fst-italic">Review Submitted</div>
+                                                    <div class="text-muted fst-italic"> <button type="button"
+                                                            class="btn btn-primary" data-bs-toggle="modal"
+                                                            data-bs-target="#viewReviewModal-{{ $b->booking_order_id }}">
+                                                            View Review
+                                                        </button>
+                                                    </div>
                                                 @endif
                                             </div>
                                         </div>
@@ -1031,6 +1084,245 @@
                                                 </div>
                                             </div>
                                         </form>
+                                        {{-- @if ($reviews->has($b->bookingID))
+                                            @php
+                                                $currentReview = $reviews->get($b->bookingID);
+                                                $reviewId = $currentReview->id ?? 'ID not available';
+                                                // Filter replies based on the reviewId
+                                                $filteredReplies = $reviewReplies->get($reviewId) ?? [];
+                                            @endphp
+                                            <div id="viewReviewModal-{{ $b->booking_order_id }}" class="modal fade"
+                                                tabindex="-1" role="dialog"
+                                                aria-labelledby="viewReviewModalLabel-{{ $b->booking_order_id }}"
+                                                aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title"
+                                                                id="viewReviewModalLabel-{{ $b->booking_order_id }}">
+                                                                View Review (ID: {{ $reviewId }})
+                                                            </h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+
+                                                        <div class="modal-body">
+                                                            <div class="card-body">
+                                                                <h5 class="card-title">Your Review</h5>
+                                                                <p><strong>Rating:</strong>
+                                                                    {{ $currentReview->review_rating }}/5</p>
+                                                                <p><strong>Description:</strong>
+                                                                    {{ $currentReview->review_description }}</p>
+                                                                <p><strong>Date:</strong>
+                                                                    {{ \Carbon\Carbon::parse($currentReview->review_date_time)->format('d F Y, g:i A') }}
+                                                                </p>
+
+                                                                <p><strong>Review ID:</strong> {{ $reviewId }}</p>
+
+                                                                <div class="review-images-container">
+                                                                    @if ($currentReview->review_imageOne)
+                                                                        <img src="{{ asset('storage/' . $currentReview->review_imageOne) }}"
+                                                                            alt="Review Image 1" class="review-image">
+                                                                    @endif
+                                                                    @if ($currentReview->review_imageTwo)
+                                                                        <img src="{{ asset('storage/' . $currentReview->review_imageTwo) }}"
+                                                                            alt="Review Image 2" class="review-image">
+                                                                    @endif
+                                                                    @if ($currentReview->review_imageThree)
+                                                                        <img src="{{ asset('storage/' . $currentReview->review_imageThree) }}"
+                                                                            alt="Review Image 3" class="review-image">
+                                                                    @endif
+                                                                    @if ($currentReview->review_imageFour)
+                                                                        <img src="{{ asset('storage/' . $currentReview->review_imageFour) }}"
+                                                                            alt="Review Image 4" class="review-image">
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                            <div class="card">
+                                                                <div class="card-body">
+                                                                    @if (!empty($filteredReplies))
+                                                                        @foreach ($filteredReplies as $reply)
+                                                                            @if ($reply->review_id == $reviewId)
+                                                                                <p class="card-text"><strong>Reply
+                                                                                        by:</strong> {{ $reply->reply_by }}
+                                                                                </p>
+                                                                                <p class="card-text"><strong>Reply
+                                                                                        Message:</strong>
+                                                                                    {{ $reply->reply_message }}</p>
+                                                                                <p class="card-text"><strong>Reply
+                                                                                        Date:</strong>
+                                                                                    {{ \Carbon\Carbon::parse($reply->reply_date_time)->format('d F Y, g:i A') }}
+                                                                                </p>
+                                                                            @endif
+                                                                        @endforeach
+                                                                    @else
+                                                                        <p class="card-text">No reply from tasker.</p>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif --}}
+
+                                        <div id="viewReviewModal-{{ $b->booking_order_id }}" class="modal fade"
+                                            tabindex="-1" role="dialog"
+                                            aria-labelledby="viewReviewModalLabel-{{ $b->booking_order_id }}"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    @foreach ($reviews->where('booking_id', $b->bookingID) as $rw)
+                                                        <div class="modal-header border-0">
+                                                            <h5 class="modal-title text-dark fw-bold"
+                                                                id="viewReviewModalLabel-{{ $b->booking_order_id }}">
+                                                                Booking Code : ({{ $b->booking_order_id }})
+                                                            </h5>
+                                                        </div>
+
+                                                        <div class="modal-body">
+                                                            <div class="card shadow-sm border-0 mb-3">
+                                                                <div class="card-body px-3 py-2">
+                                                                   
+                                                                    <div class="card border bg-light shadow-sm p-3 mb-3">
+                                                                        <h5 class="card-title text-dark fw-bold mb-0 ">Your Review</h5>
+                                                                    </div>
+                                                                    
+
+                                                                    
+                                                                    <div class="d-flex align-items-center mb-3 p-3">
+                                                                        <span
+                                                                            class="me-2 fw-bold text-muted">Rating:</span>
+                                                                        <div class="star-rating d-inline-flex">
+                                                                            @for ($i = 1; $i <= 5; $i++)
+                                                                                @if ($rw->review_rating >= $i)
+                                                                                    <i
+                                                                                        class="fas fa-star text-warning"></i>
+                                                                                @elseif ($rw->review_rating >= $i - 0.5)
+                                                                                    <i
+                                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                                @else
+                                                                                    <i
+                                                                                        class="far fa-star text-warning"></i>
+                                                                                @endif
+                                                                            @endfor
+                                                                        </div>
+                                                                    </div>
+
+                                                                   
+                                                                    <div class="mb-3 pt-2 ps-3 d-flex flex-wrap align-items-start">
+                                                                        <p class="fw-bold mb-1 text-muted me-2">
+                                                                            Description:</p>
+                                                                        <p class="mb-0 flex-grow-1">
+                                                                            {{ $rw->review_description }}
+                                                                        </p>
+                                                                    </div>
+
+                                                                    <div
+                                                                        class="review-images-container d-flex flex-wrap gap-2 ps-3 mb-3">
+                                                                        @if ($rw->review_imageOne)
+                                                                            <img src="{{ asset('storage/' . $rw->review_imageOne) }}"
+                                                                                alt="Review Image 1"
+                                                                                class="review-image img-fluid rounded"
+                                                                                style="cursor: pointer; max-width: 100px;"
+                                                                                onclick="openModal(this)">
+                                                                        @endif
+                                                                        @if ($rw->review_imageTwo)
+                                                                            <img src="{{ asset('storage/' . $rw->review_imageTwo) }}"
+                                                                                alt="Review Image 2"
+                                                                                class="review-image img-fluid rounded"
+                                                                                style="cursor: pointer; max-width: 100px;"
+                                                                                onclick="openModal(this)">
+                                                                        @endif
+                                                                        @if ($rw->review_imageThree)
+                                                                            <img src="{{ asset('storage/' . $rw->review_imageThree) }}"
+                                                                                alt="Review Image 3"
+                                                                                class="review-image img-fluid rounded"
+                                                                                style="cursor: pointer; max-width: 100px;"
+                                                                                onclick="openModal(this)">
+                                                                        @endif
+                                                                        @if ($rw->review_imageFour)
+                                                                            <img src="{{ asset('storage/' . $rw->review_imageFour) }}"
+                                                                                alt="Review Image 4"
+                                                                                class="review-image img-fluid rounded"
+                                                                                style="cursor: pointer; max-width: 100px;"
+                                                                                onclick="openModal(this)">
+                                                                        @endif
+                                                                    </div>
+                                                                    <p class="pt-3 ps-3 font-weight-bold text-muted">
+                                                                       
+                                                                        {{ \Carbon\Carbon::parse($rw->review_date_time)->format('d F Y, g:i A') }}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <h5 class="mb-3 fw-bold text-muted ps-3">Replies</h5>
+                                                            <div class="row justify-content-center">
+                                                                <div class="col-12 col-md-10 col-lg-12">
+                                                                 
+                                                                    @php
+                                                                        $replies = $reviewReplies->where('review_id', $rw->id);
+                                                                    @endphp
+                                                            
+                                                                    @if ($replies->isEmpty())
+                                                                    <div class="card border-1 shadow-sm mb-3">
+                                                                        
+                                                                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+
+                                                                        </div>
+                                                    
+                                                                       
+                                                                        <div class="card-body text-align-center text-center justify-content-center">
+                                                                            <strong class="mb-0 ">
+                                                                                No Reply !
+                                                                            </strong>
+                                                                        </div>
+                                                                    </div>
+                                                                    @else
+                                                                        @foreach ($replies as $rr)
+                                                                            <div class="card border-1 shadow-sm mb-3">
+                                                                              
+                                                                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                                                                    <span class="fw-bold">
+                                                                                        @if ($rr->reply_by == 1)
+                                                                                            <span class="text-primary">ServeNow Team</span>
+                                                                                        @elseif($rr->reply_by == 2)
+                                                                                            <span class="text-success">Tasker</span>
+                                                                                        @else
+                                                                                            <span class="text-secondary">Unknown</span>
+                                                                                        @endif
+                                                                                    </span>
+                                                                                    <small class="text-muted">
+                                                                                        {{ \Carbon\Carbon::parse($rr->reply_date_time)->format('d F Y, g:i A') }}
+                                                                                    </small>
+                                                                                </div>
+                                                            
+                                                                               
+                                                                                <div class="card-body">
+                                                                                    <p class="mb-0">
+                                                                                        {{ $rr->reply_message }}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                        @endforeach
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                    @endforeach
+
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     @endforeach
                                 </div>
                             @endforeach
@@ -1050,6 +1342,28 @@
                                 </div>
                             </div>
                         @endif
+
+                        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Image Preview</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                       
+                                        <img src="" alt="Full Image" id="modalImage" class="img-fluid"
+                                            style="max-width: 100%; max-height: 80vh; object-fit: contain;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
                     </div>
 
 
@@ -1352,7 +1666,18 @@
             </div>
         </div>
     </div>
+    <script>
+        function openModal(image) {
+           
+            const modalImage = document.getElementById("modalImage");
+            
+            modalImage.src = image.src;
 
+           
+            const myModal = new bootstrap.Modal(document.getElementById('imageModal'));
+            myModal.show();
+        }
+    </script>
 
     <script src="../assets/js/plugins/star-rating.min.js"></script>
     <script>

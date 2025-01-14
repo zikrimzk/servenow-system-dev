@@ -17,8 +17,11 @@ class Review extends Model
         'review_imageTwo',
         'review_imageThree',
         'review_imageFour',
-        'f.review_status',
+        'review_status',
         'review_type',
         'booking_id'
      ];
+
+
+     
 }

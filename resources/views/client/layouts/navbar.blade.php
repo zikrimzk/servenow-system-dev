@@ -1,4 +1,11 @@
 <!-- [ Nav ] start -->
+
+<style>
+    .user-avtar {
+    margin: 0 auto; /* Gambar profil tetap di tengah */
+    display: block;
+}
+</style>
 <nav class="navbar navbar-expand-md navbar-light default"style="z-index: 1000;">
     <div class="container">
         <a class="navbar-brand" href="../index.html">

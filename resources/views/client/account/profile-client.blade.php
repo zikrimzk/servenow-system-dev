@@ -6,8 +6,6 @@
     <div class="pc-container">
         <div class="pc-content">
 
-
-
             <div class="row mx-3 ">
                 <h1 class="my-4">My Profile</h1>
                 <div class="col-sm-12">
@@ -169,15 +167,17 @@
                                                             @enderror
                                                         </div>
                                                     </div>
+
+                                                </div>
+                                                <div class="col-12 text-end btn-page">
+                                                    <button type="submit" class="btn btn-primary">Update Profile</button>
                                                 </div>
                                             </div>
                                         </div>
 
                                     </div>
-                                    <div class="col-12 text-end btn-page">
-                                        <button type="submit" class="btn btn-primary">Update Profile</button>
-                                    </div>
                                 </div>
+                                
                             </form>
                         </div>
 
@@ -339,15 +339,18 @@
                                                             @enderror
                                                         </div>
                                                     </div>
+
+                                                    <div class="col-12 text-end btn-page">
+                                                        <button type="submit" class="btn btn-primary">Update Address</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
                                     </div>
-                                    <div class="col-12 text-end btn-page">
-                                        <button type="submit" class="btn btn-primary">Update Address</button>
-                                    </div>
+                                    
                                 </div>
+                                
                             </form>
                         </div>
 
@@ -424,12 +427,10 @@
                                             Password</button>
                                     </div>
                                 </div>
-
                             </form>
 
                         </div>
                     </div>
-
 
 
                 </div>
@@ -438,7 +439,7 @@
         </div>
     </div>
 
-    <header>
+   
         <style>
             @media (max-width: 768px) {
                 .nav-tabs.profile-tabs .nav-item {
@@ -452,7 +453,7 @@
                 }
             }
         </style>
-    </header>
+    
 
     <script>
         function validatePostcode(input) {
