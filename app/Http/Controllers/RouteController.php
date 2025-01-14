@@ -2013,7 +2013,7 @@ class RouteController extends Controller
     public function adminManagementNav(Request $request)
     {
         $data = DB::table('administrators')
-            ->select('id', 'admin_firstname', 'admin_lastname', 'admin_phoneno', 'email', 'admin_status')
+            ->select('id','admin_code', 'admin_firstname', 'admin_lastname', 'admin_phoneno', 'email', 'admin_status')
             ->orderBy('created_at', 'desc');
 
         if ($request->has('status_filter') && $request->input('status_filter') != '') {

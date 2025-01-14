@@ -156,6 +156,7 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="row mb-4">
+
                                                     <!-- Profile Picture Section Start -->
                                                     <div class="col-md-4 text-center">
                                                         <div class="user-upload">
@@ -185,6 +186,19 @@
                                                     <!-- Personal Information Section Start -->
                                                     <div class="col-md-8">
                                                         <div class="row">
+
+                                                             <!-- Tasker Code Field -->
+                                                             <div class="row">
+                                                                <div class="col-sm-6">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">
+                                                                            Tasker Code
+                                                                        </label>
+                                                                        <input type="text" class="form-control" value="{{ Auth::user()->tasker_code }}" readonly/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
                                                             <!-- First Name -->
                                                             <div class="col-md-6 mb-3">
                                                                 <label class="form-label">First Name</label>
@@ -848,4 +862,4 @@
     </script>
     <!-- [ Main Content ] end -->
 @endsection
-<!--Updated By: Muhammad Zikri B. Kashim (12/01/2025)-->
+<!--Updated By: Muhammad Zikri B. Kashim (14/01/2025)-->

@@ -222,6 +222,7 @@
                                     <thead>
                                         <tr>
                                             <th><input type="checkbox" id="select-all" class="form-check-input"></th>
+                                            <th scope="col">Admin Code</th>
                                             <th scope="col">Full Name</th>
                                             <th scope="col">Phone No.</th>
                                             <th scope="col">Email</th>
@@ -638,6 +639,10 @@
                             orderable: false,
                             searchable: false,
 
+                        },
+                        {
+                            data: 'admin_code',
+                            name: 'admin_code'
                         },
                         {
                             data: 'admin_fullname',

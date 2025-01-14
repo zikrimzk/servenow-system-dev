@@ -25,7 +25,6 @@ return new class extends Migration
             $table->decimal('booking_rate', 8, 2); 
             $table->foreignId('client_id')->references('id')->on('clients');
             $table->foreignId('service_id')->references('id')->on('services');
-            
             $table->timestamps();
         });
     }

@@ -125,6 +125,18 @@
                                                     <div class="col-md-8">
                                                         <div class="row">
 
+                                                            <!-- Admin Code Field -->
+                                                            <div class="row">
+                                                                <div class="col-sm-6">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">
+                                                                            Admin Code
+                                                                        </label>
+                                                                        <input type="text" class="form-control" value="{{ Auth::user()->admin_code }}" readonly/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
                                                             <!-- First Name Field -->
                                                             <div class="col-sm-6">
                                                                 <div class="mb-3">
@@ -137,7 +149,8 @@
                                                                         value="{{ Auth::user()->admin_firstname }}"
                                                                         id="admin_firstname" />
                                                                     @error('admin_firstname')
-                                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                                        <div class="invalid-feedback">{{ $message }}
+                                                                        </div>
                                                                     @enderror
                                                                 </div>
                                                             </div>
@@ -430,5 +443,4 @@
     </script>
     <!-- [ Main Content ] end -->
 @endsection
-<!--Updated By: Muhammad Zikri B. Kashim (12/01/2025)-->
-
+<!--Updated By: Muhammad Zikri B. Kashim (14/01/2025)-->
