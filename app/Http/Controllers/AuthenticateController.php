@@ -79,13 +79,13 @@ class AuthenticateController extends Controller
             'password' => $credentials['password'],
             'tasker_status' => 0 //Tasker Incomplete Profile
         ])) {
-            return redirect()->route('tasker-home');
+            return redirect()->route('tasker-profile');
         } elseif (Auth::guard('tasker')->attempt([
             'email' => $credentials['email'],
             'password' => $credentials['password'],
             'tasker_status' => 1 //Tasker Not Verified
         ])) {
-            return redirect()->route('tasker-home');
+            return redirect()->route('tasker-profile');
         } elseif (Auth::guard('tasker')->attempt([
             'email' => $credentials['email'],
             'password' => $credentials['password'],

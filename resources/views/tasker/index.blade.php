@@ -34,78 +34,9 @@ use Carbon\Carbon;
             </div>
             <!-- [ breadcrumb ] end -->
 
-            {{-- <div class="row">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <h4 class="text-center mb-3">Total Earnings</h4>
-                                <div class="text-center mt-2">
-                                    <h1 class="mb-0 text-primary fs-1">RM 1209.00</h1>
-                                    <p class="text-muted text-sm">Since start</p>
-                                    <hr class="my-4 border border-secondary-subtle" />
-                                    <div class="row g-3">
-                                        <div class="col-6 mb-4 mt-4">
-                                            <h5 class="mb-0">RM 600.00</h5>
-                                            <small class="text-muted">This Month</small>
-                                        </div>
-                                        <div class="col-6 mb-4 mt-4">
-                                            <h5 class="mb-0">RM 629.80</h5>
-                                            <small class="text-muted">This Year</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <h4 class="text-center mb-3">Your Rank Level</h4>
-                                <div class="text-center mt-2">
-                                    <img src="{{ asset('assets/images/medal/medal_ons.png') }}" alt="Elite Tasker Icon"
-                                        class="img-fluid" style="max-width: 5rem;">
-                                    <p class="mb-0">
-                                        Elite Tasker
-                                    </p>
-                                    <hr class="my-4 border border-secondary-subtle" />
-                                    <div class="row g-3">
-                                        <div class="col-6">
-                                            <h5 class="mb-0">1 / 20</h5>
-                                            <small class="text-muted">Bookings Completed</small>
-                                        </div>
-                                        <div class="col-6">
-                                            <h5 class="mb-0 text-danger">5</h5>
-                                            <small class="text-muted">Penalty</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <h4 class="text-center mb-3">Customer Satisfaction</h4>
-                                <div class="text-center mt-2">
-                                    <div class="d-flex justify-content-center">
-                                        <i class="fas fa-star text-warning f-32"></i>
-                                        <i class="fas fa-star text-warning f-32"></i>
-                                        <i class="fas fa-star text-warning f-32"></i>
-                                        <i class="fas fa-star text-warning f-32"></i>
-                                        <i class="fas fa-star text-warning f-32"></i> 
-                                    </div>
-                                  
-                                    <hr class="my-4 border border-secondary-subtle" />
-                                    <div class="row g-3">
-                                        <div class="col-6">
-                                            <h5 class="mb-0">3.8/5.0</h5>
-                                            <small class="text-muted">Average Rating</small>
-                                        </div>
-                                        <div class="col-6">
-                                            <h5 class="mb-0 text-success">Happy</h5>
-                                            <small class="text-muted">Verdict</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            
 
-            </div> --}}
+       
 
             <div class="row">
                 <div class="col-md-12">

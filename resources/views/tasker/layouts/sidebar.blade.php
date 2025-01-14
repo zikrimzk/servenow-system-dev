@@ -43,103 +43,213 @@
             <!-- SideBar Menu Item Start -->
             <ul class="pc-navbar">
 
-                <li class="pc-item pc-caption">
-                    <label>Main</label>
-                </li>
-                <li class="pc-item">
-                    <a href="{{ route('tasker-home') }}" class="pc-link">
-                        <span class="pc-micon">
-                            <i class="fas fa-home pc-icon "></i>
-                        </span>
-                        <span class="pc-mtext">Dashboard</span>
-                    </a>
-                </li>
+                @if (Auth::user()->tasker_status == 2)
+                    <li class="pc-item pc-caption">
+                        <label>Main</label>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('tasker-home') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="fas fa-home pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">Dashboard</span>
+                        </a>
+                    </li>
 
-                <li class="pc-item pc-caption">
-                    <label>Manager</label>
-                </li>
+                    <li class="pc-item pc-caption">
+                        <label>Manager</label>
+                    </li>
 
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon">
-                            <i class="fas fa-hammer pc-icon "></i>
-                        </span>
-                        <span class="pc-mtext">Services</span>
-                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-service-enrollment') }}">Service
-                                Enrollment</a></li>
-                    </ul>
-                </li>
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="fas fa-hammer pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">Services</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-service-enrollment') }}">Service
+                                    Enrollment</a></li>
+                        </ul>
+                    </li>
 
 
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon">
-                            <i class="fas fa-calendar-check pc-icon "></i>
-                        </span>
-                        <span class="pc-mtext">Bookings</span>
-                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-booking-management') }}">My
-                                Booking</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-booking-list') }}">Booking
-                                List</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-refund-booking-list') }}">Refund
-                                Booking List</a></li>
-                    </ul>
-                </li>
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="fas fa-calendar-check pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">Bookings</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link" href="{{ route('tasker-booking-management') }}">My
+                                    Booking</a></li>
+                            <li class="pc-item"><a class="pc-link" href="{{ route('tasker-booking-list') }}">Booking
+                                    List</a></li>
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-refund-booking-list') }}">Refund
+                                    Booking List</a></li>
+                        </ul>
+                    </li>
 
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon">
-                            <i class="fas fa-tachometer-alt pc-icon "></i>
-                        </span>
-                        <span class="pc-mtext">Performance</span>
-                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-review-management') }}">Review
-                                Management</a></li>
-                        <li class="pc-item"><a class="pc-link"
-                                href="{{ route('tasker-performance-analysis') }}">Performance Analysis</a></li>
-                    </ul>
-                </li>
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="fas fa-tachometer-alt pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">Performance</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-review-management') }}">Review
+                                    Management</a></li>
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-performance-analysis') }}">Performance Analysis</a></li>
+                        </ul>
+                    </li>
 
-                <li class="pc-item pc-caption">
-                    <label>Finance</label>
-                </li>
+                    <li class="pc-item pc-caption">
+                        <label>Finance</label>
+                    </li>
 
-                <li class="pc-item">
-                    <a href="{{ route('tasker-e-statement') }}" class="pc-link">
-                        <span class="pc-micon">
-                            <i class="fas fa-file-invoice-dollar pc-icon "></i>
-                        </span>
-                        <span class="pc-mtext">e-Statement</span>
-                    </a>
-                </li>
+                    <li class="pc-item">
+                        <a href="{{ route('tasker-e-statement') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="fas fa-file-invoice-dollar pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">e-Statement</span>
+                        </a>
+                    </li>
 
-                <li class="pc-item pc-caption">
-                    <label>Tasker Setting</label>
-                </li>
+                    <li class="pc-item pc-caption">
+                        <label>Tasker Setting</label>
+                    </li>
 
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon">
-                            <i class="fas fa-cogs pc-icon "></i>
-                        </span>
-                        <span class="pc-mtext">Task Preferences</span>
-                        <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item"><a class="pc-link"
-                                href="{{ route('tasker-preferences') }}">Preferences</a></li>
-                        <li class="pc-item"><a class="pc-link" href="{{ route('tasker-timeslot-setting') }}">Time
-                                Slot</a></li>
-                    </ul>
-                </li>
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="fas fa-cogs pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">Task Preferences</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-preferences') }}">Preferences</a></li>
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-timeslot-setting') }}">Time
+                                    Slot</a></li>
+                        </ul>
+                    </li>
+                @else
+                    <li class="pc-item pc-caption">
+                        <label>Main</label>
+                    </li>
+                    <li class="pc-item opacity-50 disabled-a">
+                        <a href="{{ route('tasker-home') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="fas fa-home pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="pc-item pc-caption">
+                        <label>Manager</label>
+                    </li>
+
+                    <li class="pc-item pc-hasmenu opacity-50 disabled-a">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="fas fa-hammer pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">Services</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-service-enrollment') }}">Service
+                                    Enrollment</a></li>
+                        </ul>
+                    </li>
+
+
+                    <li class="pc-item pc-hasmenu opacity-50 disabled-a">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="fas fa-calendar-check pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">Bookings</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-booking-management') }}">My
+                                    Booking</a></li>
+                            <li class="pc-item"><a class="pc-link" href="{{ route('tasker-booking-list') }}">Booking
+                                    List</a></li>
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-refund-booking-list') }}">Refund
+                                    Booking List</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="pc-item pc-hasmenu opacity-50 disabled-a">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="fas fa-tachometer-alt pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">Performance</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-review-management') }}">Review
+                                    Management</a></li>
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-performance-analysis') }}">Performance Analysis</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="pc-item pc-caption">
+                        <label>Finance</label>
+                    </li>
+
+                    <li class="pc-item opacity-50 disabled-a">
+                        <a href="{{ route('tasker-e-statement') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="fas fa-file-invoice-dollar pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">e-Statement</span>
+                        </a>
+                    </li>
+
+                    <li class="pc-item pc-caption">
+                        <label>Tasker Setting</label>
+                    </li>
+
+                    <li class="pc-item pc-hasmenu opacity-50 disabled-a">
+                        <a href="#!" class="pc-link ">
+                            <span class="pc-micon">
+                                <i class="fas fa-cogs pc-icon "></i>
+                            </span>
+                            <span class="pc-mtext">Task Preferences</span>
+                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-preferences') }}">Preferences</a></li>
+                            <li class="pc-item"><a class="pc-link"
+                                    href="{{ route('tasker-timeslot-setting') }}">Time
+                                    Slot</a></li>
+                        </ul>
+                    </li>
+
+                @endif
 
             </ul>
             <!-- SideBar Menu Item End -->
