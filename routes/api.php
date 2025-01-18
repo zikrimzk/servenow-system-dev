@@ -144,6 +144,8 @@ Route::middleware('auth:sanctum')->get('/get-performance-analysis', [TaskerAPICo
 
 Route::middleware('auth:sanctum')->get('/get-e-statement', [TaskerAPIController::class, 'geteStatementAPI']);
 
+Route::middleware('auth:sanctum')->get('/get-tasker-dashboard', [TaskerAPIController::class, 'taskerGetDashboardAPI']);
+
 
 
 
