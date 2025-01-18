@@ -24,16 +24,19 @@ class PerformanceController extends Controller
     public function adminReplyReview(Request $request, $id)
     {
         try{
-            $data = [
-                'reply_by' => 1,
-                'reply_message'=> $request->reply_message,
-                'reply_date_time' => date('Y-m-d H:i:s'),
-                'review_id' => $id,
-            ];
-            ReviewReply::create($data);
+            $validated = $request->validate([
+                'reply_message' => 'required',
+            ],[],[
+                'reply_message' => 'Reply Message',
+            ]);
+            $validated['review_id'] = $id;
+            $validated['reply_by'] = 1;
+            $validated['reply_date_time'] = date('Y-m-d H:i:s');
+
+            ReviewReply::create($validated);
             return back()->with('success', 'Review reply sent successfully');
         }catch(Exception $e){
-            return back()->with('error', 'Opps, something went wrong. Please try again !');
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -53,16 +56,19 @@ class PerformanceController extends Controller
     public function taskerReplyReview(Request $request, $id)
     {
         try{
-            $data = [
-                'reply_by' => 2,
-                'reply_message'=> $request->reply_message,
-                'reply_date_time' => date('Y-m-d H:i:s'),
-                'review_id' => $id,
-            ];
-            ReviewReply::create($data);
+            $validated = $request->validate([
+                'reply_message' => 'required',
+            ],[],[
+                'reply_message' => 'Reply Message',
+            ]);
+            $validated['review_id'] = $id;
+            $validated['reply_by'] = 2;
+            $validated['reply_date_time'] = date('Y-m-d H:i:s');
+
+            ReviewReply::create($validated);
             return back()->with('success', 'Review reply sent successfully !');
         }catch(Exception $e){
-            return back()->with('error', 'Opps, something went wrong. Please try again !');
+            return back()->with('error', $e->getMessage());
         }
     }
 
