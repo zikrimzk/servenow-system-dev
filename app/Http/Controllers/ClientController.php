@@ -152,8 +152,6 @@ class ClientController extends Controller
     //Client Update Info
     public function clientUpdateProfile(Request $req, $clientId)
     {
-        // dd($req);
-
         if ($req->isUploadPhoto == 'true') {
             $data = $req->validate(
                 [

@@ -165,7 +165,8 @@ class ServiceController extends Controller
             Service::where('id', $id)->delete();
             return back()->with('success', 'Service has been deleted successfully !');
         } catch (Exception $e) {
-            return back()->with('error', 'The operation cannot be completed as it is restricted. You may only change the status to "Inactive".');
+            return back()->with('error', 'The operation cannot be completed as it is 
+            restricted. You may only change the status to "Inactive".');
         }
     }
 
