@@ -254,6 +254,7 @@ class BookingController extends Controller
                 ->where('a.slot_date', '=', $date)
                 ->where('a.slot_status', '=', 1)
                 ->select('a.id as taskerTimeSlotID', 'a.slot_date', 'b.id as timeSlotID', 'b.time')
+                ->orderBy('b.time')
                 ->get();
 
             return response()->json(['data' => $data], 200);

@@ -540,14 +540,17 @@ use App\Models\Tasker;
                                                                                         @endif
                                                                                         <div class="text-end">
                                                                                             @for ($i = 1; $i <= 5; $i++)
-                                                                                            @if ($r->review_rating >= $i)
-                                                                                                <i class="fas fa-star text-warning f-16"></i>
-                                                                                            @elseif ($r->review_rating >= $i - 0.5)
-                                                                                                <i class="fas fa-star-half-alt text-warning f-16"></i>
-                                                                                            @else
-                                                                                                <i class="far fa-star text-warning f-16"></i>
-                                                                                            @endif
-                                                                                        @endfor
+                                                                                                @if ($r->review_rating >= $i)
+                                                                                                    <i
+                                                                                                        class="fas fa-star text-warning f-16"></i>
+                                                                                                @elseif($r->review_rating >= $i - 0.5)
+                                                                                                    <i
+                                                                                                        class="fas fa-star-half-alt text-warning f-16"></i>
+                                                                                                @else
+                                                                                                    <i
+                                                                                                        class="far fa-star text-warning f-16"></i>
+                                                                                                @endif
+                                                                                            @endfor
                                                                                         </div>
                                                                                     </div>
                                                                                     <p>
@@ -838,7 +841,7 @@ use App\Models\Tasker;
         </div>
     </div>
 
-    
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var lightboxModal = new bootstrap.Modal(document.getElementById('lightboxModal'));
@@ -1407,6 +1410,81 @@ use App\Models\Tasker;
         /******************** AJAX: TASKER TIME SLOT START ********************/
         /******************** *************************** ********************/
 
+        // function getTaskerTimeSlots(date) {
+        //     const taskerid = localStorage.getItem('selectedTaskerId');
+        //     const duration = parseInt(localStorage.getItem('selectedHour')); // Duration in hours
+
+        //     if (!taskerid || !duration) {
+        //         return;
+        //     }
+
+        //     const urlTemplate = "{{ route('client-tasker-get-time', [':date', ':taskerid']) }}";
+        //     const url = urlTemplate
+        //         .replace(':date', encodeURIComponent(date))
+        //         .replace(':taskerid', encodeURIComponent(taskerid));
+
+        //     jQuery.ajax({
+        //         url: url,
+        //         type: "GET",
+        //         success: function(result) {
+        //             console.log("AJAX successke:", result); // Debug log
+        //             const data = result.data; // Assuming the server returns an array of time slots
+
+        //             // Reset dropdown
+        //             const taskTimeSelect = jQuery('.task-time');
+        //             taskTimeSelect.empty();
+
+        //             if (data.length > 0) {
+        //                 // Validate slots based on duration
+        //                 const validSlots = validateTimeSlots(data, duration);
+
+        //                 if (validSlots.length > 0) {
+        //                     taskTimeSelect.append(`<option value="" selected>-Select Time-</option>`);
+        //                     validSlots.forEach(function(time) {
+        //                         console.log("KEPUTUSAN:", time); // Debug log
+
+        //                         taskTimeSelect.append(`<option value="${time}">${time}</option>`);
+        //                     });
+        //                 } else {
+        //                     taskTimeSelect.append(
+        //                         '<option value="" selected>No valid times available</option>');
+        //                 }
+        //             } else {
+        //                 taskTimeSelect.append('<option value="" selected>No times available</option>');
+        //             }
+        //         },
+        //         error: function(xhr, status, error) {
+        //             console.error('AJAX Error:', error);
+        //             alert('Failed to fetch time slots. Please try again.');
+        //         }
+        //     });
+        // }
+
+        // function validateTimeSlots(slots, duration) {
+        //     const validSlots = [];
+        //     const timeFormat = "HH:mm:ss"; // Format your time as shown in your dropdown (e.g., "07:30:00")
+        //     const timeSlots = slots.map(slot => moment(slot.time, timeFormat)); // Convert to Moment.js objects
+
+        //     for (let i = 0; i < timeSlots.length; i++) {
+        //         let isValid = true;
+
+        //         // Check if consecutive slots exist for the required duration
+        //         for (let j = 1; j < duration; j++) {
+        //             const nextTime = timeSlots[i].clone().add(j, 'hours'); // Add 1 hour per step
+        //             if (!timeSlots.some(slot => slot.isSame(nextTime))) {
+        //                 isValid = false; // Invalidate if any required slot is missing
+        //                 break;
+        //             }
+        //         }
+
+        //         if (isValid) {
+        //             validSlots.push(slots[i].time); // Add valid starting times as string
+        //         }
+        //     }
+
+        //     return validSlots;
+        // }
+
         function getTaskerTimeSlots(date) {
             const taskerid = localStorage.getItem('selectedTaskerId');
             const duration = parseInt(localStorage.getItem('selectedHour')); // Duration in hours
@@ -1424,7 +1502,7 @@ use App\Models\Tasker;
                 url: url,
                 type: "GET",
                 success: function(result) {
-                    console.log("AJAX successke:", result); // Debug log
+                    console.log("AJAX success:", result); // Debug log
                     const data = result.data; // Assuming the server returns an array of time slots
 
                     // Reset dropdown
@@ -1432,19 +1510,20 @@ use App\Models\Tasker;
                     taskTimeSelect.empty();
 
                     if (data.length > 0) {
-                        // Validate slots based on duration
-                        const validSlots = validateTimeSlots(data, duration);
+                        // Validate slots based on duration and current time
+                        const validSlots = validateTimeSlots(data, duration, date);
 
                         if (validSlots.length > 0) {
                             taskTimeSelect.append(`<option value="" selected>-Select Time-</option>`);
                             validSlots.forEach(function(time) {
-                                console.log("KEPUTUSAN:", time); // Debug log
+                                console.log("Valid Time:", time); // Debug log
 
                                 taskTimeSelect.append(`<option value="${time}">${time}</option>`);
                             });
                         } else {
                             taskTimeSelect.append(
-                                '<option value="" selected>No valid times available</option>');
+                                '<option value="" selected>No valid times available</option>'
+                            );
                         }
                     } else {
                         taskTimeSelect.append('<option value="" selected>No times available</option>');
@@ -1457,13 +1536,20 @@ use App\Models\Tasker;
             });
         }
 
-        function validateTimeSlots(slots, duration) {
+        function validateTimeSlots(slots, duration, selectedDate) {
             const validSlots = [];
             const timeFormat = "HH:mm:ss"; // Format your time as shown in your dropdown (e.g., "07:30:00")
             const timeSlots = slots.map(slot => moment(slot.time, timeFormat)); // Convert to Moment.js objects
+            const now = moment(); // Current time
+            const isToday = moment(selectedDate).isSame(now, 'day'); // Check if selected date is today
 
             for (let i = 0; i < timeSlots.length; i++) {
                 let isValid = true;
+
+                // Skip slots before the current time if today
+                if (isToday && timeSlots[i].isBefore(now)) {
+                    continue;
+                }
 
                 // Check if consecutive slots exist for the required duration
                 for (let j = 1; j < duration; j++) {
