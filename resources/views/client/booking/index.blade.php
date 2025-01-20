@@ -1484,6 +1484,13 @@ use App\Models\Tasker;
 
         //     return validSlots;
         // }
+        function convertTo12HourFormat(time) {
+            const [hours, minutes, seconds] = time.split(":");
+            let hrs = parseInt(hours, 10);
+            const period = hrs >= 12 ? "PM" : "AM";
+            hrs = hrs % 12 || 12; // Convert 0 to 12 for midnight
+            return `${hrs}:${minutes} ${period}`;
+        }
 
         function getTaskerTimeSlots(date) {
             const taskerid = localStorage.getItem('selectedTaskerId');
@@ -1517,8 +1524,10 @@ use App\Models\Tasker;
                             taskTimeSelect.append(`<option value="" selected>-Select Time-</option>`);
                             validSlots.forEach(function(time) {
                                 console.log("Valid Time:", time); // Debug log
+                                var ctime = convertTo12HourFormat(time);
 
-                                taskTimeSelect.append(`<option value="${time}">${time}</option>`);
+                                taskTimeSelect.append(
+                                    `<option value="${time}">${ctime}</option>`);
                             });
                         } else {
                             taskTimeSelect.append(
@@ -1581,6 +1590,7 @@ use App\Models\Tasker;
         /******************** *************************** ******************************/
         /******************** AJAX: FETCH TASKER DETAILS [CHECKOUT] ********************/
         /******************** *************************** ******************************/
+
         function convertTo24HourFormat(time) {
             const [hours, minutes] = time.match(/\d+/g);
             const isPM = time.includes('PM');
