@@ -911,13 +911,13 @@ use App\Models\Tasker;
             navPill.addEventListener('click', function() {
 
                 if (this.href.includes('#contactDetail')) {
-                    updateButtons(); // Panggil fungsi untuk kemas kini butang
+                    updateButtons(); 
 
-                    // Lock all tabs
+                  
                     navPills.forEach(tab => {
-                        tab.classList.add('disabled'); // Tambah kelas 'disabled' ke semua tab
+                        tab.classList.add('disabled'); 
 
-                        // Disable further clicks for all tabs
+                        
                         tab.addEventListener('click', function(e) {
                             e.preventDefault();
                         });
@@ -940,10 +940,10 @@ use App\Models\Tasker;
             const addressFields = ['address', 'addState', 'addCity'];
             const differentAddressContent = document.getElementById('differentAddressContent');
 
-            // Initialize Button States
+           
             updateNextButtonState();
 
-            // Event Listeners
+           
 
             useDefaultAddress.addEventListener('change', function() {
                 updateNextButtonState();
@@ -983,7 +983,7 @@ use App\Models\Tasker;
 
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.nav-pills .nav-link');
-            const reverseTabButton = document.querySelector('.ti-edit'); // Target the button by its class
+            const reverseTabButton = document.querySelector('.ti-edit'); 
 
             reverseTabButton.addEventListener('click', function() {
                 const activeTab = document.querySelector('.nav-pills .nav-link.active');
@@ -1005,7 +1005,7 @@ use App\Models\Tasker;
                     tabContents[currentIndex - 1].classList.add('active', 'show');
                 }
 
-                updateButtons(); // Update navigation buttons and progress bar
+                updateButtons(); 
             });
         });
 
