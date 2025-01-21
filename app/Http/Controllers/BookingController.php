@@ -183,7 +183,17 @@ class BookingController extends Controller
                 ->join('reviews as e', 'd.id', '=', 'e.booking_id')
                 ->where('b.id', '=', $id)  // Optional: filter by a specific service type, can be removed if not needed
                 ->groupBy('c.id')  // Group by Tasker
-                ->select('c.id as tasker_id', DB::raw('avg(e.review_rating) as rating_count'))  // Count reviews for each Tasker
+                ->select('c.id as tasker_id', DB::raw('ROUND(avg(e.review_rating),1) as rating_count'))  // Count reviews for each Tasker
+                ->get();
+
+            $TaskCount = DB::table('services as a')
+                ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
+                ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
+                ->join('bookings as d', 'a.id', '=', 'd.service_id')
+                ->where('b.id', '=', $id)  // Optional: filter by a specific service type, can be removed if not needed
+                ->where('d.booking_status', '=', 6) 
+                ->groupBy('c.id')  // Group by Tasker
+                ->select('c.id as tasker_id', DB::raw('count(d.id) as task_count'))  // Count reviews for each Tasker
                 ->get();
 
 
@@ -191,6 +201,7 @@ class BookingController extends Controller
             // Step 3: Convert review count data into a key-value pair (tasker_id => review_count)
             $reviewCountMap = $reviewCount->pluck('review_count', 'tasker_id')->toArray();
             $ratingCountMap = $ratingCount->pluck('rating_count', 'tasker_id')->toArray();
+            $TaskCountMap = $TaskCount->pluck('task_count', 'tasker_id')->toArray();
 
 
             // Step 4: Merge review count into the tasker data
@@ -203,6 +214,12 @@ class BookingController extends Controller
             $svtasker = $svtasker->map(function ($tasker) use ($ratingCountMap) {
                 // Get review count or set to 0 if not available
                 $tasker->rating_count = isset($ratingCountMap[$tasker->taskerID]) ? $ratingCountMap[$tasker->taskerID] : 0;
+                return $tasker;
+            });
+
+            $svtasker = $svtasker->map(function ($tasker) use ($TaskCountMap) {
+                // Get review count or set to 0 if not available
+                $tasker->task_count = isset($TaskCountMap[$tasker->taskerID]) ? $TaskCountMap[$tasker->taskerID] : 0;
                 return $tasker;
             });
 

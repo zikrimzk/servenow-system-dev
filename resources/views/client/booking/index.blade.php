@@ -1290,7 +1290,7 @@ use App\Models\Tasker;
                                         <p class="mb-1">
                                             <span class="fw-bold"> ★ ${tasker.rating_count} </span> (${tasker.review_count} reviews)
                                         </p>                                       
-                                        <p class="mb-1">N/A ${tasker.servicetype_name} tasks</p>
+                                        <p class="mb-1">${tasker.task_count} ${tasker.servicetype_name} tasks</p>
                                         <p class="mb-1"> 
                                             <i class="fa fa-map-marker-alt text-danger me-2"></i>
                                             ${tasker.road_distance} KM away

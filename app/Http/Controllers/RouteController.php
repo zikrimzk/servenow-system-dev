@@ -152,8 +152,6 @@ class RouteController extends Controller
 
     public function clientBooking($id)
     {
-        // try {
-
         // Fetch taskers and calculate road distances
         $svtasker = DB::table('services as a')
             ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
@@ -196,6 +194,7 @@ class RouteController extends Controller
             ->join('taskers as d', 'c.tasker_id', '=', 'd.id')
             ->join('service_types as e', 'c.service_type_id', '=', 'e.id')
             ->join('clients as f', 'b.client_id', '=', 'f.id')
+            ->where('e.id','=',$id)
             ->select(
                 'a.id as reviewID',
                 'c.id as serviceID',
