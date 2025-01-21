@@ -70,29 +70,29 @@ use Carbon\Carbon;
                                     <h4 class="text-center mb-3">Your Rank Level</h4>
                                     <div class="text-center">
                                         @if ($totalBookingCount <= 20)
-                                            <img src="{{ asset('assets/images/medal/medal_ons.png') }}"
-                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 5rem;">
-                                            <p class="mb-0">Elite Tasker</p>
+                                            <img src="{{ asset('assets/images/medal/elite_badge_on.png') }}"
+                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 8rem;">
+                                            <p class="mb-0 fw-semibold">Elite Tasker</p>
                                         @elseif($totalBookingCount <= 80)
-                                            <img src="{{ asset('assets/images/medal/medal_ons.png') }}"
-                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 5rem;">
-                                            <p class="mb-0">Master Tasker</p>
+                                            <img src="{{ asset('assets/images/medal/master_badge_on.png') }}"
+                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 8rem;">
+                                            <p class="mb-0 fw-semibold">Master Tasker</p>
                                         @elseif($totalBookingCount <= 120)
-                                            <img src="{{ asset('assets/images/medal/medal_ons.png') }}"
-                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 5rem;">
-                                            <p class="mb-0">Grand Master Tasker</p>
+                                            <img src="{{ asset('assets/images/medal/grandmaster_badge_on.png') }}"
+                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 8rem;">
+                                            <p class="mb-0 fw-semibold">Grand Master Tasker</p>
                                         @elseif($totalBookingCount <= 160)
-                                            <img src="{{ asset('assets/images/medal/medal_ons.png') }}"
-                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 5rem;">
-                                            <p class="mb-0">Epic Tasker</p>
+                                            <img src="{{ asset('assets/images/medal/epic_badge_on.png') }}"
+                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 8rem;">
+                                            <p class="mb-0 fw-semibold">Epic Tasker</p>
                                         @elseif($totalBookingCount <= 200)
-                                            <img src="{{ asset('assets/images/medal/medal_ons.png') }}"
-                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 5rem;">
-                                            <p class="mb-0">Legend Tasker</p>
+                                            <img src="{{ asset('assets/images/medal/legend_badge_on.png') }}"
+                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 8rem;">
+                                            <p class="mb-0 fw-semibold">Legend Tasker</p>
                                         @else
-                                            <img src="{{ asset('assets/images/medal/medal_ons.png') }}"
-                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 5rem;">
-                                            <p class="mb-0">Mythic Tasker</p>
+                                            <img src="{{ asset('assets/images/medal/mythic_badge_on.png') }}"
+                                                alt="Elite Tasker Icon" class="img-fluid" style="max-width: 8rem;">
+                                            <p class="mb-0 fw-semibold">Mythic Tasker</p>
                                         @endif
 
                                     </div>

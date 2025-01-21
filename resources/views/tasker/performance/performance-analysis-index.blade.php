@@ -83,60 +83,60 @@
                             <div class="row text-center">
                                 <!-- Icons Section -->
                                 <div class="col-6 col-md-2 mb-4">
-                                    <img src="{{ $completedBookings > 0 && $completedBookings <= 20
-                                        ? asset('assets/images/medal/medal_ons.png')
-                                        : asset('assets/images/medal/medal_off.png') }}"
-                                        alt="Elite Tasker Icon" class="img-fluid" style="max-width: 5rem;">
+                                    <img src="{{ $completedBookings > 0 && $completedBookings <= 20 || $completedBookings >= 20
+                                        ? asset('assets/images/medal/elite_badge_on.png')
+                                        : asset('assets/images/medal/elite_badge_off.png') }}"
+                                        alt="Elite Tasker Icon" class="img-fluid" style="max-width: 8rem;">
                                     <p
-                                        class="mt-3 mb-0 {{ $completedBookings > 0 && $completedBookings <= 20 ? 'fw-bold' : '' }}">
+                                        class="mt-3 mb-0 {{ $completedBookings > 0 && $completedBookings <= 20 ? 'fw-semibold' : '' }}">
                                         Elite Tasker
                                     </p>
                                     <small>0 - 20</small>
                                 </div>
 
                                 <div class="col-6 col-md-2 mb-4">
-                                    <img src="{{ $completedBookings > 20 && $completedBookings <= 80
-                                        ? asset('assets/images/medal/medal_ons.png')
-                                        : asset('assets/images/medal/medal_off.png') }}"
-                                        alt="Master Tasker Icon" class="img-fluid" style="max-width: 5rem;">
+                                    <img src="{{ $completedBookings > 20 && $completedBookings <= 80 || $completedBookings >= 80
+                                        ? asset('assets/images/medal/master_badge_on.png')
+                                        : asset('assets/images/medal/master_badge_off.png') }}"
+                                        alt="Master Tasker Icon" class="img-fluid" style="max-width: 8rem;">
                                     <p
-                                        class="mt-3 mb-0 {{ $completedBookings > 20 && $completedBookings <= 80 ? 'fw-bold' : '' }}">
+                                        class="mt-3 mb-0 {{ $completedBookings > 20 && $completedBookings <= 80 ? 'fw-semibold' : '' }}">
                                         Master Tasker
                                     </p>
                                     <small>20 - 80</small>
                                 </div>
 
                                 <div class="col-6 col-md-2 mb-4">
-                                    <img src="{{ $completedBookings > 80 && $completedBookings <= 120
-                                        ? asset('assets/images/medal/medal_ons.png')
-                                        : asset('assets/images/medal/medal_off.png') }}"
-                                        alt="Grand Master Tasker Icon" class="img-fluid" style="max-width: 5rem;">
+                                    <img src="{{ $completedBookings > 80 && $completedBookings <= 120 || $completedBookings >= 120
+                                        ? asset('assets/images/medal/grandmaster_badge_on.png')
+                                        : asset('assets/images/medal/grandmaster_badge_off.png') }}"
+                                        alt="Grand Master Tasker Icon" class="img-fluid" style="max-width: 8rem;">
                                     <p
-                                        class="mt-3 mb-0 {{ $completedBookings > 80 && $completedBookings <= 120 ? 'fw-bold' : '' }}">
+                                        class="mt-3 mb-0 {{ $completedBookings > 80 && $completedBookings <= 120 ? 'fw-semibold' : '' }}">
                                         Grand Master Tasker
                                     </p>
                                     <small>80 - 120</small>
                                 </div>
 
                                 <div class="col-6 col-md-2 mb-4">
-                                    <img src="{{ $completedBookings > 120 && $completedBookings <= 160
-                                        ? asset('assets/images/medal/medal_ons.png')
-                                        : asset('assets/images/medal/medal_off.png') }}"
-                                        alt="Epic Tasker Icon" class="img-fluid" style="max-width: 5rem;">
+                                    <img src="{{ $completedBookings > 120 && $completedBookings <= 160 || $completedBookings >= 160
+                                        ? asset('assets/images/medal/epic_badge_on.png')
+                                        : asset('assets/images/medal/epic_badge_off.png') }}"
+                                        alt="Epic Tasker Icon" class="img-fluid" style="max-width: 8rem;">
                                     <p
-                                        class="mt-3 mb-0 {{ $completedBookings > 120 && $completedBookings <= 160 ? 'fw-bold' : '' }}">
+                                        class="mt-3 mb-0 {{ $completedBookings > 120 && $completedBookings <= 160 ? 'fw-semibold' : '' }}">
                                         Epic Tasker
                                     </p>
                                     <small>120 - 160</small>
                                 </div>
 
                                 <div class="col-6 col-md-2 mb-4">
-                                    <img src="{{ $completedBookings > 160 && $completedBookings <= 200
-                                        ? asset('assets/images/medal/medal_ons.png')
-                                        : asset('assets/images/medal/medal_off.png') }}"
-                                        alt="Legend Tasker Icon" class="img-fluid" style="max-width: 5rem;">
+                                    <img src="{{ $completedBookings > 160 && $completedBookings <= 200 || $completedBookings >= 200
+                                        ? asset('assets/images/medal/legend_badge_on.png')
+                                        : asset('assets/images/medal/legend_badge_off.png') }}"
+                                        alt="Legend Tasker Icon" class="img-fluid" style="max-width: 8rem;">
                                     <p
-                                        class="mt-3 mb-0 {{ $completedBookings > 160 && $completedBookings <= 200 ? 'fw-bold' : '' }}">
+                                        class="mt-3 mb-0 {{ $completedBookings > 160 && $completedBookings <= 200 ? 'fw-semibold' : '' }}">
                                         Legend Tasker
                                     </p>
                                     <small>160 - 200</small>
@@ -144,10 +144,10 @@
 
                                 <div class="col-6 col-md-2 mb-4">
                                     <img src="{{ $completedBookings > 200
-                                        ? asset('assets/images/medal/trophy_ons.png')
-                                        : asset('assets/images/medal/trophy_off.png') }}"
-                                        alt="Mythic Tasker Icon" class="img-fluid" style="max-width: 5rem;">
-                                    <p class="mt-3 mb-0 {{ $completedBookings > 200 ? 'fw-bold' : '' }}">
+                                        ? asset('assets/images/medal/mythic_badge_on.png')
+                                        : asset('assets/images/medal/mythic_badge_off.png') }}"
+                                        alt="Mythic Tasker Icon" class="img-fluid" style="max-width: 8rem;">
+                                    <p class="mt-3 mb-0 {{ $completedBookings > 200 ? 'fw-semibold' : '' }}">
                                         Mythic Tasker
                                     </p>
                                     <small>200+</small>
@@ -157,9 +157,9 @@
                             <!-- Progress Bar -->
                             <div>
                                 <p>Progress to Next Level</p>
-                                <div class="progress" style="height: 25px;">
-                                    <div class="progress-bar bg-primary" role="progressbar"
-                                        style="width: {{ min(($completedBookings / 200) * 100, 100) }}%;"
+                                <div class="progress border border-2" style="height: 25px;">
+                                    <div class="progress-bar" role="progressbar"
+                                        style="width: {{ min(($completedBookings / 200) * 100, 100) }}%;background-color: #16325b;"
                                         aria-valuenow="{{ $completedBookings }}" aria-valuemin="0" aria-valuemax="200">
                                         {{ $completedBookings }}
                                     </div>
