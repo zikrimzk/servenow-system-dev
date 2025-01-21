@@ -762,9 +762,10 @@ use App\Models\Tasker;
                                                                     <h5>Pay with Online Banking</h5>
                                                                     <p class="text-muted mb-3">Please click button below to
                                                                         continue your payment</p>
-                                                                    <button type="submit" class="btn btn-primary">Proceed
-                                                                        to
-                                                                        Payment</button>
+                                                                    <button type="submit" class="btn btn-primary"
+                                                                        id="paymentButton" onclick="disableButton()">
+                                                                        Proceed to Payment
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                             <div id="paypal-message" class="mt-4"
@@ -880,15 +881,109 @@ use App\Models\Tasker;
         });
     </script>
 
+    <script>
+        const paymentButton = document.getElementById('paymentButton');
+
+
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                window.location.href = "{{ route('clientBookHistory') }}";
+            }
+        });
+
+        document.getElementById('bookingForm').addEventListener('submit', function(event) {
+
+            paymentButton.disabled = true;
+            paymentButton.textContent = "Processing...";
+        });
+    </script>
+
+
+
 
     <script>
         /******************** *************************** ****************/
         /******************** TABPANE: TAB NAVIGATION ********************/
         /******************** *************************** ****************/
+        const navPills = document.querySelectorAll('.nav-pills .nav-link');
+
+        navPills.forEach(navPill => {
+            navPill.addEventListener('click', function() {
+
+                if (this.href.includes('#contactDetail')) {
+                    updateButtons(); 
+
+                  
+                    navPills.forEach(tab => {
+                        tab.classList.add('disabled'); 
+
+                        
+                        tab.addEventListener('click', function(e) {
+                            e.preventDefault();
+                        });
+                    });
+                } else if (this.href.includes('#jobOption')) {
+                    updateButtons();
+                } else if (this.href.includes('#jobDetail')) {
+                    updateButtons();
+                } else if (this.href.includes('#educationDetail')) {
+                    updateButtons();
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            const useDefaultAddress = document.getElementById('useProfileAddress');
+            const useDifferentAddress = document.getElementById('useDifferentAddress');
+            const addressFields = ['address', 'addState', 'addCity'];
+            const differentAddressContent = document.getElementById('differentAddressContent');
+
+           
+            updateNextButtonState();
+
+           
+
+            useDefaultAddress.addEventListener('change', function() {
+                updateNextButtonState();
+            });
+
+            useDifferentAddress.addEventListener('change', function() {
+                differentAddressContent.style.display = 'block';
+                updateNextButtonState();
+            });
+
+            addressFields.forEach((fieldId) => {
+                document.getElementById(fieldId).addEventListener('input', function() {
+                    updateNextButtonState();
+                });
+            });
+
+            function updateNextButtonState() {
+                if (useDefaultAddress.checked) {
+                    nextButton.disabled = false;
+                } else if (useDifferentAddress.checked) {
+                    nextButton.disabled = !validateDifferentAddressFields();
+                } else {
+                    nextButton.disabled = true;
+                }
+            }
+
+            function validateDifferentAddressFields() {
+                return addressFields.every((fieldId) => {
+                    const field = document.getElementById(fieldId);
+                    return field.value.trim() !== '';
+                });
+            }
+
+        });
+
+
 
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.nav-pills .nav-link');
-            const reverseTabButton = document.querySelector('.ti-edit'); // Target the button by its class
+            const reverseTabButton = document.querySelector('.ti-edit'); 
 
             reverseTabButton.addEventListener('click', function() {
                 const activeTab = document.querySelector('.nav-pills .nav-link.active');
@@ -910,7 +1005,7 @@ use App\Models\Tasker;
                     tabContents[currentIndex - 1].classList.add('active', 'show');
                 }
 
-                updateButtons(); // Update navigation buttons and progress bar
+                updateButtons(); 
             });
         });
 
@@ -982,6 +1077,12 @@ use App\Models\Tasker;
             const hourRadios = document.querySelectorAll('input[name="hour"]');
             const isHourSelected = Array.from(hourRadios).some(radio => radio.checked);
 
+            tabs.forEach(tab => {
+                tab.classList.remove('disabled'); 
+                tab.style.pointerEvents = ''; 
+                tab.style.opacity = ''; 
+            });
+
             if (currentIndex === 1) {
 
                 nextButton.style.display = 'none';
@@ -1023,8 +1124,6 @@ use App\Models\Tasker;
                     tab.removeAttribute('data-bs-toggle');
                 }
             });
-            updateButtons();
-
 
             tabs.forEach(tab => {
                 tab.addEventListener('click', (e) => {
