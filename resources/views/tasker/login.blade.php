@@ -37,62 +37,59 @@
     <div class="auth-main">
         <div class="auth-wrapper v1">
             <div class="auth-form">
-                <div class="card border border-0" style="background-color: transparent">
-                    <!-- Start Alert -->
-                    <div>
-                        @if (session()->has('success'))
-                            <div class="alert alert-success alert-dismissible" role="alert">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="alert-heading">
-                                        <i class="fas fa-check-circle"></i>
-                                        Success
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                        aria-label="Close"></button>
-                                </div>
-                                <p class="mb-0">{{ session('success') }}</p>
-                            </div>
-                        @endif
-                        @if (session()->has('error'))
-                            <div class="alert alert-danger alert-dismissible" role="alert">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="alert-heading">
-                                        <i class="fas fa-info-circle"></i>
-                                        Error
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                        aria-label="Close"></button>
-                                </div>
-                                <p class="mb-0">{{ session('error') }}</p>
-                            </div>
-                        @endif
-                    </div>
-                    <!-- End Alert -->
-                </div>
-
                 <div class="text-center">
                     <a href="{{ route('servenow-home') }}"><img src="../assets/images/logo-test.png" alt="img"
                             class="img-fluid" width="150" height="100" /></a>
                 </div>
 
                 <div class="card my-5 shadow shadow-lg">
-                    <form action="{{ route('auth-tasker') }}" method="POST">
+                    <form action="{{ route('auth-tasker') }}" method="POST" autocomplete="off">
                         @csrf
                         <div class="card-body">
-
                             <div class="text-center mt-3 mb-5 ">
                                 <h3 class="text-center f-w-500 mb-3">Login | <span
                                         class="hero-text-gradient">Tasker</span> </h3>
                             </div>
 
+                            <!-- Start Alert -->
+                            <div>
+                                @if (session()->has('success'))
+                                    <div class="alert alert-success alert-dismissible" role="alert">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="alert-heading">
+                                                <i class="fas fa-check-circle"></i>
+                                                Success
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <p class="mb-0">{{ session('success') }}</p>
+                                    </div>
+                                @endif
+                                @if (session()->has('error'))
+                                    <div class="alert alert-danger alert-dismissible" role="alert">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="alert-heading">
+                                                <i class="fas fa-info-circle"></i>
+                                                Error
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <p class="mb-0">{{ session('error') }}</p>
+                                    </div>
+                                @endif
+                            </div>
+                            <!-- End Alert -->
+
                             <div class="form-floating mb-3">
                                 <input type="email" class="form-control" id="email" placeholder="Email"
-                                    name="email"  value="{{ old('email') }}" />
+                                    name="email" value="{{ old('email') }}" autocomplete="off" required />
                                 <label for="email">Email</label>
                             </div>
                             <div class="form-floating mb-3">
                                 <input type="password" class="form-control" id="password" placeholder="Password"
-                                    name="password" />
+                                    name="password" autocomplete="off" required />
                                 <label for="password">Password</label>
 
                                 <!-- Show/Hide Button -->
@@ -104,23 +101,22 @@
                             <div class="d-flex mt-1 justify-content-between align-items-center">
                                 <div class="form-check">
                                     <input class="form-check-input input-primary" type="checkbox" id="customCheckc1"
-                                        checked="" />
+                                        name="remember" />
                                     <label class="form-check-label text-muted" for="customCheckc1">Remember
                                         me?</label>
                                 </div>
                                 <h6 class="f-w-400 mb-0">
-                                    <a href="##" class="link-primary"> Forgot Password? </a>
+                                    <a href="{{ route('reset-password',2) }}" class="link-primary"> Forgot Password? </a>
                                 </h6>
                             </div>
                             <div class="d-grid mt-4">
                                 <button type="submit" class="btn btn-primary btn-lg">Login</button>
                             </div>
                             <div class="mt-4 text-center">
-                                <h6 class="f-w-500 mb-0">Don't have an Account?
-                                    <a href="{{ route('tasker-register-form') }}"
-                                        class="link-primary text-decoration-underline">Create Account</a>
+                                <h6 class="f-w-500 mb-0">Want to become a Tasker?
+                                    <a href="{{ route('tasker-register-form') }}" class="link-primary">Create
+                                        Account</a>
                                 </h6>
-
                             </div>
                         </div>
                     </form>
