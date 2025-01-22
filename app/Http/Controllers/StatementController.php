@@ -75,7 +75,8 @@ class StatementController extends Controller
     public function triggerGenerateButton()
     {
         try {
-            $output = shell_exec('php ' . base_path('artisan') . ' generate:monthly-statements');
+            // $output = shell_exec('php ' . base_path('artisan') . ' generate:monthly-statements');
+            Artisan::call('generate:monthly-statements');
             return back()->with('success', 'Monthly statements refresh successfully!');
         } catch (Exception $e) {
             return back()->with('error', 'Oops! Something went wrong. Please try again.');
