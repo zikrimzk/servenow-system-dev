@@ -7,6 +7,8 @@ use Spatie\Geocoder\Geocoder;
 use GuzzleHttp\Client;
 use Illuminate\Pagination\Paginator;
 
+use Spatie\Browsershot\Browsershot;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -29,5 +31,6 @@ class AppServiceProvider extends ServiceProvider
         app()->instance(Geocoder::class, $geocoder);
 
         Paginator::useBootstrap();
+       
     }
 }

@@ -91,6 +91,8 @@ class GenerateMonthlyStatements extends Command
 
             // Generate PDF using Browsershot
             Browsershot::html($html)
+                ->setNodeBinary('/usr/bin/node') // Set the path to the Node.js binary
+                ->setChromePath(storage_path('puppeteer/chrome/chrome')) // Set the path to Chrome
                 ->margins(10, 10, 10, 10)
                 ->format('A4')
                 ->save(storage_path("app/public/{$filePath}"));

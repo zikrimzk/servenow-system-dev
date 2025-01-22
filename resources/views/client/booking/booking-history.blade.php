@@ -146,7 +146,7 @@
     </style>
 
 
-    <div class="pc-container">
+    <div class="pc-container mb-5">
         <div class="pc-content">
             <div>
                 <h1 class="my-4 mx-3">My Booking</h1>
@@ -1844,6 +1844,6 @@
     </script>
 
 @section('footer')
-    @include('client.layouts.footer')
+    {{-- @include('client.layouts.footer') --}}
 @endsection
 @endsection

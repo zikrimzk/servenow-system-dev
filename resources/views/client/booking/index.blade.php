@@ -100,14 +100,14 @@ use App\Models\Tasker;
 
 @section('content')
     <!-- [ Main Content ] start -->
-    <div class="pc-container mb-5" style="height: 150vh;">
+    <div class="pc-container mb-5">
         <div class="pc-content">
             <div class="row">
                 <!-- [ sample-page ] start -->
                 <div class="col-sm-8 col-md-12">
                     <div id="basicwizard" class="form-wizard row justify-content-center mx-3 my-1">
                         <div class="col-sm-8 col-md-12">
-                            
+
                             <!-- Start Alert -->
                             <div>
                                 @if (session()->has('success'))
@@ -1881,6 +1881,6 @@ use App\Models\Tasker;
 
 <!-- [ footer apps ] start -->
 @section('footer')
-    @include('client.layouts.footer')
+    {{-- @include('client.layouts.footer') --}}
 @endsection
 <!-- [ footer apps ] End -->
