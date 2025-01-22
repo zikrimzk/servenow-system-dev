@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('client_lastname');
             $table->string('client_phoneno');
             $table->string('email');
+            $table->boolean('email_verified')->default(false);
             $table->string('client_address_one')->nullable();
             $table->string('client_address_two')->nullable();
             $table->string('client_postcode')->nullable();

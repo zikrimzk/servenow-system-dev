@@ -32,38 +32,42 @@ class AuthenticateController extends Controller
 
             $remember = $request->boolean('remember');
 
-            if (Auth::guard('client')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'client_status' => 0
-            ], $remember)) {
+            if (Client::where('email', $credentials['email'])->where('email_verified', 1)->exists()) {
+                if (Auth::guard('client')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'client_status' => 0
+                ], $remember)) {
 
-                return redirect()->route('client-home');
-            } elseif (Auth::guard('client')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'client_status' => 1
-            ], $remember)) {
-                Auth::guard('client')->logout();
-                $client = Client::where('email', $credentials['email'])->first();
-                return redirect()->route('client-first-time', Crypt::encrypt($client->id));
-            } elseif (Auth::guard('client')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'client_status' => 2
-            ])) {
-                Auth::guard('admin')->logout();
-                return back()->with('error', 'Your account is currently inactive. For further assistance, please contact the administrator.');
-            } elseif (Auth::guard('client')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'client_status' => 3
-            ])) {
-                Auth::guard('client')->logout();
-                return back()->with('error', 'Your account has been deactivated. Please reach out to the administrator for further assistance.');
+                    return redirect()->route('client-home');
+                } elseif (Auth::guard('client')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'client_status' => 1
+                ], $remember)) {
+                    Auth::guard('client')->logout();
+                    $client = Client::where('email', $credentials['email'])->first();
+                    return redirect()->route('client-first-time', Crypt::encrypt($client->id));
+                } elseif (Auth::guard('client')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'client_status' => 2
+                ])) {
+                    Auth::guard('admin')->logout();
+                    return back()->with('error', 'Your account is currently inactive. For further assistance, please contact the administrator.');
+                } elseif (Auth::guard('client')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'client_status' => 3
+                ])) {
+                    Auth::guard('client')->logout();
+                    return back()->with('error', 'Your account has been deactivated. Please reach out to the administrator for further assistance.');
+                }
+
+                return back()->with('error', 'The provided credentials do not match our records. Please try again !');
+            } else {
+                return back()->with('error', 'Oops, looks like your account is not verified. Please check your email for futher steps.');
             }
-
-            return back()->with('error', 'The provided credentials do not match our records. Please try again !');
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -80,51 +84,54 @@ class AuthenticateController extends Controller
             ]);
             $remember = $request->boolean('remember');
 
+            if (Tasker::where('email', $credentials['email'])->where('email_verified', 1)->exists()) {
+                if (Auth::guard('tasker')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'tasker_status' => 4 // Tasker Password Need To Change
+                ], $remember)) {
 
-            if (Auth::guard('tasker')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'tasker_status' => 4 // Tasker Password Need To Change
-            ], $remember)) {
+                    Auth::guard('tasker')->logout();
+                    $tasker = Tasker::where('email', $credentials['email'])->first();
+                    return redirect()->route('tasker-first-time', Crypt::encrypt($tasker->id));
+                } elseif (Auth::guard('tasker')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'tasker_status' => 0 //Tasker Incomplete Profile
+                ], $remember)) {
+                    return redirect()->route('tasker-profile');
+                } elseif (Auth::guard('tasker')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'tasker_status' => 1 //Tasker Not Verified
+                ], $remember)) {
+                    return redirect()->route('tasker-profile');
+                } elseif (Auth::guard('tasker')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'tasker_status' => 2 //Tasker Active
+                ], $remember)) {
+                    return redirect()->route('tasker-home');
+                } elseif (Auth::guard('tasker')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'tasker_status' => 3 // Tasker Inactive
+                ])) {
+                    Auth::guard('tasker')->logout();
+                    return back()->with('error', 'The provided credentials are inactive. Please contact the administrator for further details.');
+                } elseif (Auth::guard('tasker')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'tasker_status' => 5 // Tasker Banned
+                ])) {
+                    Auth::guard('tasker')->logout();
+                    return back()->with('error', 'The provided credentials are banned. Please contact the administrator for further details.');
+                }
 
-                Auth::guard('tasker')->logout();
-                $tasker = Tasker::where('email', $credentials['email'])->first();
-                return redirect()->route('tasker-first-time', Crypt::encrypt($tasker->id));
-            } elseif (Auth::guard('tasker')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'tasker_status' => 0 //Tasker Incomplete Profile
-            ], $remember)) {
-                return redirect()->route('tasker-profile');
-            } elseif (Auth::guard('tasker')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'tasker_status' => 1 //Tasker Not Verified
-            ], $remember)) {
-                return redirect()->route('tasker-profile');
-            } elseif (Auth::guard('tasker')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'tasker_status' => 2 //Tasker Active
-            ], $remember)) {
-                return redirect()->route('tasker-home');
-            } elseif (Auth::guard('tasker')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'tasker_status' => 3 // Tasker Inactive
-            ])) {
-                Auth::guard('tasker')->logout();
-                return back()->with('error', 'The provided credentials are inactive. Please contact the administrator for further details.');
-            } elseif (Auth::guard('tasker')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'tasker_status' => 5 // Tasker Banned
-            ])) {
-                Auth::guard('tasker')->logout();
-                return back()->with('error', 'The provided credentials are banned. Please contact the administrator for further details.');
+                return back()->with('error', 'The provided credentials do not match our records. Please try again !');
+            } else {
+                return back()->with('error', 'Oops, looks like your account is not verified. Please check your email for futher steps.');
             }
-
-            return back()->with('error', 'The provided credentials do not match our records. Please try again !');
         } catch (Exception $e) {
 
             return back()->with('error', $e->getMessage());
@@ -141,78 +148,82 @@ class AuthenticateController extends Controller
             'password' => ['required'],
         ]);
 
-        // Attempt to authenticate the tasker
-        if (Auth::guard('tasker')->attempt([
-            'email' => $credentials['email'],
-            'password' => $credentials['password'],
-            'tasker_status' => 4 // Tasker Password Need To Change
-        ])) {
-            // Return a success response with the tasker's data
-            $tasker = Tasker::where('email', $credentials['email'])->first();
-            return response()->json([
-                'success' => true,
-                'tasker' => $tasker,
-                'token' => $tasker->createToken('tasker-token')->plainTextToken,
-            ]);
-        } elseif (Auth::guard('tasker')->attempt([
-            'email' => $credentials['email'],
-            'password' => $credentials['password'],
-            'tasker_status' => 0 //Tasker Incomplete Profile
-        ])) {
-            $tasker = Tasker::where('email', $credentials['email'])->first();
-            return response()->json([
-                'success' => true,
-                'tasker' => $tasker,
-                'token' => $tasker->createToken('tasker-token')->plainTextToken,
-            ]);
-        } elseif (Auth::guard('tasker')->attempt([
-            'email' => $credentials['email'],
-            'password' => $credentials['password'],
-            'tasker_status' => 1 //Tasker Not Verified
-        ])) {
-            $tasker = Tasker::where('email', $credentials['email'])->first();
-            return response()->json([
-                'success' => true,
-                'tasker' => $tasker,
-                'token' => $tasker->createToken('tasker-token')->plainTextToken,
-            ]);
-        } elseif (Auth::guard('tasker')->attempt([
-            'email' => $credentials['email'],
-            'password' => $credentials['password'],
-            'tasker_status' => 2 //Tasker Active
-        ])) {
-            $tasker = Tasker::where('email', $credentials['email'])->first();
-            return response()->json([
-                'success' => true,
-                'tasker' => $tasker,
-                'token' => $tasker->createToken('tasker-token')->plainTextToken,
-            ]);
-        } elseif (Auth::guard('tasker')->attempt([
-            'email' => $credentials['email'],
-            'password' => $credentials['password'],
-            'tasker_status' => 3 // Tasker Inactive
-        ])) {
-            Auth::guard('tasker')->logout();
-            return response()->json([
-                'success' => false,
-                'error' => 'The provided credentials are inactive. Please contact the administrator for further details.',
-            ], 401);
-        } elseif (Auth::guard('tasker')->attempt([
-            'email' => $credentials['email'],
-            'password' => $credentials['password'],
-            'tasker_status' => 5 // Tasker Banned
-        ])) {
-            Auth::guard('tasker')->logout();
-            return response()->json([
-                'success' => false,
-                'error' => 'The provided credentials are banned. Please contact the administrator for further details.',
-            ], 401);
+        if (Tasker::where('email', $credentials['email'])->where('email_verified', 1)->exists()) {
+            // Attempt to authenticate the tasker
+            if (Auth::guard('tasker')->attempt([
+                'email' => $credentials['email'],
+                'password' => $credentials['password'],
+                'tasker_status' => 4 // Tasker Password Need To Change
+            ])) {
+                // Return a success response with the tasker's data
+                $tasker = Tasker::where('email', $credentials['email'])->first();
+                return response()->json([
+                    'success' => true,
+                    'tasker' => $tasker,
+                    'token' => $tasker->createToken('tasker-token')->plainTextToken,
+                ]);
+            } elseif (Auth::guard('tasker')->attempt([
+                'email' => $credentials['email'],
+                'password' => $credentials['password'],
+                'tasker_status' => 0 //Tasker Incomplete Profile
+            ])) {
+                $tasker = Tasker::where('email', $credentials['email'])->first();
+                return response()->json([
+                    'success' => true,
+                    'tasker' => $tasker,
+                    'token' => $tasker->createToken('tasker-token')->plainTextToken,
+                ]);
+            } elseif (Auth::guard('tasker')->attempt([
+                'email' => $credentials['email'],
+                'password' => $credentials['password'],
+                'tasker_status' => 1 //Tasker Not Verified
+            ])) {
+                $tasker = Tasker::where('email', $credentials['email'])->first();
+                return response()->json([
+                    'success' => true,
+                    'tasker' => $tasker,
+                    'token' => $tasker->createToken('tasker-token')->plainTextToken,
+                ]);
+            } elseif (Auth::guard('tasker')->attempt([
+                'email' => $credentials['email'],
+                'password' => $credentials['password'],
+                'tasker_status' => 2 //Tasker Active
+            ])) {
+                $tasker = Tasker::where('email', $credentials['email'])->first();
+                return response()->json([
+                    'success' => true,
+                    'tasker' => $tasker,
+                    'token' => $tasker->createToken('tasker-token')->plainTextToken,
+                ]);
+            } elseif (Auth::guard('tasker')->attempt([
+                'email' => $credentials['email'],
+                'password' => $credentials['password'],
+                'tasker_status' => 3 // Tasker Inactive
+            ])) {
+                Auth::guard('tasker')->logout();
+                return response()->json([
+                    'success' => false,
+                    'error' => 'The provided credentials are inactive. Please contact the administrator for further details.',
+                ], 401);
+            } elseif (Auth::guard('tasker')->attempt([
+                'email' => $credentials['email'],
+                'password' => $credentials['password'],
+                'tasker_status' => 5 // Tasker Banned
+            ])) {
+                Auth::guard('tasker')->logout();
+                return response()->json([
+                    'success' => false,
+                    'error' => 'The provided credentials are banned. Please contact the administrator for further details.',
+                ], 401);
+            } else {
+                // Return an error response
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Please enter the correct credentials !',
+                ], 401);
+            }
         } else {
-            // Return an error response
-            return response()->json([
-                'success' => false,
-                'error' => 'Please enter the correct credentials !',
-            ], 401);
+            return back()->with('error', 'Oops, looks like your account is not verified. Please check your email for futher steps.');
         }
     }
 
@@ -222,41 +233,45 @@ class AuthenticateController extends Controller
     {
         try {
             $credentials = $request->validate([
-                'email' => 'required|email|exists:clients',
+                'email' => 'required|email|exists:administrators',
                 'password' => 'required',
             ]);
 
-            if (Auth::guard('admin')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'admin_status' => 0
-            ])) {
-                Auth::guard('admin')->logout();
-                $admin = Administrator::where('email', $credentials['email'])->first();
-                return redirect()->route('admin-first-time', Crypt::encrypt($admin->id));
-            } elseif (Auth::guard('admin')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'admin_status' => 1
-            ])) {
-                return redirect()->route('admin-home');
-            } elseif (Auth::guard('admin')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'admin_status' => 2
-            ])) {
-                Auth::guard('admin')->logout();
-                return back()->with('error', 'Your account is currently inactive. For further assistance, please contact the administrator.');
-            } elseif (Auth::guard('admin')->attempt([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'admin_status' => 3
-            ])) {
-                Auth::guard('admin')->logout();
-                return back()->with('error', 'Your account has been deactivated. Please reach out to the administrator for further assistance.');
-            }
+            if (Administrator::where('email', $credentials['email'])->where('email_verified', 1)->exists()) {
+                if (Auth::guard('admin')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'admin_status' => 0
+                ])) {
+                    Auth::guard('admin')->logout();
+                    $admin = Administrator::where('email', $credentials['email'])->first();
+                    return redirect()->route('admin-first-time', Crypt::encrypt($admin->id));
+                } elseif (Auth::guard('admin')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'admin_status' => 1
+                ])) {
+                    return redirect()->route('admin-home');
+                } elseif (Auth::guard('admin')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'admin_status' => 2
+                ])) {
+                    Auth::guard('admin')->logout();
+                    return back()->with('error', 'Your account is currently inactive. For further assistance, please contact the administrator.');
+                } elseif (Auth::guard('admin')->attempt([
+                    'email' => $credentials['email'],
+                    'password' => $credentials['password'],
+                    'admin_status' => 3
+                ])) {
+                    Auth::guard('admin')->logout();
+                    return back()->with('error', 'Your account has been deactivated. Please reach out to the administrator for further assistance.');
+                }
 
-            return back()->with('error', 'The provided credentials do not match our records. Please try again !');
+                return back()->with('error', 'The provided credentials do not match our records. Please try again !');
+            } else {
+                return back()->with('error', 'Oops, looks like your account is not verified. Please check your email for futher steps.');
+            }
         } catch (Exception $e) {
 
             return back()->with('error', $e->getMessage());
@@ -382,14 +397,8 @@ class AuthenticateController extends Controller
         }
     }
 
-    public function resetPasswordNav($option)
-    {
-        return view('resetpassword.forget-password-index', [
-            'title' => 'Reset Password',
-            'option' => $option
-        ]);
-    }
 
+    // User - Email Notification
     private function sendAccountNotification($data, $userType, $option, $link)
     {
         // Users Name
@@ -411,6 +420,47 @@ class AuthenticateController extends Controller
         ]));
     }
 
+    public function verifyEmail(Request $request, $option)
+    {
+        try {
+            $email = $request->input('email');
+            $email = Crypt::decrypt($email);
+            if ($option == 1) {
+                $user = Administrator::where('email', $email)->first();
+
+                Administrator::where('email', $user->email)->update([
+                    'email_verified' => 1
+                ]);
+
+                return redirect(route('admin-login'))->with('success', 'Your account has been successfully verified! Please log in with your credentials to access your account.');
+            } elseif ($option == 2) {
+                $user = Tasker::where('email', $email)->first();
+
+                Tasker::where('email', $user->email)->update([
+                    'email_verified' => 1
+                ]);
+
+                return redirect(route('tasker-login'))->with('success', 'Your account has been successfully verified! Please log in with your credentials to access your account.');
+            } elseif ($option == 3) {
+                $user = Client::where('email', $email)->first();
+
+                Client::where('email', $user->email)->update([
+                    'email_verified' => 1
+                ]);
+
+                return redirect(route('client-login'))->with('success', 'Your account has been successfully verified! Please log in with your credentials to access your account.');
+            } else {
+                return redirect(route('servenow-home'));
+            }
+            if (!$user) {
+                return redirect(route('servenow-home'));
+            }
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    // Reset Password - Verify Email
     public function resetPasswordEmailVerify(Request $request, $option)
     {
         $request->validate([
@@ -453,17 +503,7 @@ class AuthenticateController extends Controller
         }
     }
 
-    public function changePasswordNav($option, $token, $email)
-    {
-        return view('resetpassword.change-password', [
-            'title' => 'Change Your Password',
-            'option' => $option,
-            'token' => $token,
-            'email' => $email
-        ]);
-    }
-
-
+    // Reset Password - Change Password
     public function resetPasswordProcess(Request $request, $option)
     {
         try {
@@ -489,8 +529,7 @@ class AuthenticateController extends Controller
                     'password' => bcrypt($request->input('renewPass'))
                 ]);
 
-                $user = Administrator::where('email',$request->input('email'))->first();
-
+                $user = Administrator::where('email', $request->input('email'))->first();
             } elseif ($option == 2) {
                 $user_link = route('tasker-login');
 
@@ -506,8 +545,7 @@ class AuthenticateController extends Controller
                     'password' => bcrypt($request->input('renewPass'))
                 ]);
 
-                $user = Tasker::where('email',$request->input('email'))->first();
-
+                $user = Tasker::where('email', $request->input('email'))->first();
             } elseif ($option == 3) {
 
                 $user_link = route('client-login');
@@ -524,7 +562,7 @@ class AuthenticateController extends Controller
                     'password' => bcrypt($request->input('renewPass'))
                 ]);
 
-                $user = Client::where('email',$request->input('email'))->first();
+                $user = Client::where('email', $request->input('email'))->first();
             }
 
             DB::table('password_resets')->where('email', $request->input('email'))->delete();
@@ -532,7 +570,6 @@ class AuthenticateController extends Controller
             $this->sendAccountNotification($user, $option, 3, null);
 
             return redirect($user_link)->with('success', 'Password has been reset successfully');
-
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

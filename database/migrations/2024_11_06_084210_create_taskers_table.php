@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('tasker_lastname');
             $table->string('tasker_phoneno');
             $table->string('email')->unique();
+            $table->boolean('email_verified')->default(false);
             $table->string('password');
             $table->integer('tasker_status')->default(0);
             $table->string('tasker_icno')->nullable();

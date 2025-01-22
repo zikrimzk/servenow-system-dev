@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('admin_phoneno');
             $table->string('admin_photo')->nullable();
             $table->string('email')->unique();
+            $table->boolean('email_verified')->default(false);
             $table->integer('admin_status')->default(0);
             $table->string('password');
             $table->rememberToken();

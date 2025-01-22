@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
 use Exception;
+use Carbon\Carbon;
+use App\Models\Client;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Spatie\Geocoder\Geocoder;
+use App\Mail\AuthenticateMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Geocoder\Geocoder;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
 
 class ClientController extends Controller
 {
@@ -19,6 +24,27 @@ class ClientController extends Controller
         $this->geocoder = $geocoder;
     }
 
+    private function sendAccountNotification($data, $userType, $option, $link)
+    {
+        // Users Name
+        if ($userType == 1) {
+            $name = $data->admin_firstname . ' ' . $data->admin_lastname;
+        } elseif ($userType == 2) {
+            $name = $data->tasker_firstname . ' ' . $data->tasker_lastname;
+        } elseif ($userType == 3) {
+            $name = $data->client_firstname . ' ' . $data->client_lastname;
+        }
+
+        Mail::to($data->email)->send(new AuthenticateMail([
+            'users' => $userType,
+            'name' => Str::headline($name),
+            'date' => Carbon::now()->format('d F Y g:i A'),
+            'option' => $option,
+            'link' => $link
+
+        ]));
+    }
+
 
 
     public function adminCreateClient(Request $req)
@@ -28,7 +54,7 @@ class ClientController extends Controller
             [
                 'client_firstname' => 'required|string',
                 'client_lastname' => 'required|string',
-                'client_phoneno' => 'required|string|min:10|max:11',
+                'client_phoneno' => 'required|string|min:10|max:13',
                 'email' => 'required|email|unique:clients',
                 'password' => 'required|min:8',
                 'client_status' => 'required',
@@ -48,7 +74,13 @@ class ClientController extends Controller
         $clients['password'] = bcrypt($clients['password']);
 
         Client::create($clients);
-        return back()->with('success', 'The Client account has been successfully created! Please remind the client to update their password upon logging in.');
+
+        //Send Email Verification Link
+        $data = Client::where('email', $clients['email'])->first();
+        $verifyLink = route('user-verify-email', ['option' => 3, 'email' => Crypt::encrypt($data->email)]);
+        $this->sendAccountNotification($data, 3, 1, $verifyLink);
+
+        return back()->with('success', 'The Client account has been successfully created! Please remind the client to verify their account and update their password upon logging in.');
     }
 
     public function adminUpdateClient(Request $req, $id)
@@ -146,7 +178,12 @@ class ClientController extends Controller
         $client['client_photo'] = $path;
         Client::create($client);
 
-        return redirect(route('client-login'))->with('success', 'Your account has been successfully created! Please log in with your registered credentials.');
+        //Send Email Verification Link
+        $data = Client::where('email', $client['email'])->first();
+        $verifyLink = route('user-verify-email', ['option' => 3, 'email' => Crypt::encrypt($data->email)]);
+        $this->sendAccountNotification($data, 3, 1, $verifyLink);
+
+        return redirect(route('client-login'))->with('success', 'Your account has been successfully created! Please check your email to verify and activate your account.');
     }
 
     //Client Update Info

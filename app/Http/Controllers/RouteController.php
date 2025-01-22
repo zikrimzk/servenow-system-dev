@@ -63,6 +63,25 @@ class RouteController extends Controller
         return response()->json($result);
     }
 
+
+    public function resetPasswordNav($option)
+    {
+        return view('resetpassword.forget-password-index', [
+            'title' => 'Reset Password',
+            'option' => $option
+        ]);
+    }
+
+    public function changePasswordNav($option, $token, $email)
+    {
+        return view('resetpassword.change-password', [
+            'title' => 'Change Your Password',
+            'option' => $option,
+            'token' => $token,
+            'email' => $email
+        ]);
+    }
+
     /**** General Route Function - End ****/
 
 

@@ -61,10 +61,13 @@ Route::prefix('login')->group(function () {
     Route::get('/client-first-time-login-{id}', [RouteController::class, 'clientFirstTimeNav'])->name('client-first-time');
     Route::post('/client-first-time-login-process-{id}', [AuthenticateController::class, 'clientFirstTimeLogin'])->name('client-first-time-update');
 
+    //User - Verify Email
+    Route::get('/verify-email-{option}', [AuthenticateController::class, 'verifyEmail'])->name('user-verify-email');
+
     //User -Reset Password
-    Route::get('/reset-password-{option}', [AuthenticateController::class, 'resetPasswordNav'])->name('reset-password');
+    Route::get('/reset-password-{option}', [RouteController::class, 'resetPasswordNav'])->name('reset-password');
     Route::post('/reset-password-email-verify-{option}', [AuthenticateController::class, 'resetPasswordEmailVerify'])->name('reset-password-email-verify');
-    Route::get('/change-password-{option}-{token}-{email}', [AuthenticateController::class, 'changePasswordNav'])->name('reset-password-change-form');
+    Route::get('/change-password-{option}-{token}-{email}', [RouteController::class, 'changePasswordNav'])->name('reset-password-change-form');
     Route::post('/change-password-process-{option}', [AuthenticateController::class, 'resetPasswordProcess'])->name('reset-password-change-process');
 
 

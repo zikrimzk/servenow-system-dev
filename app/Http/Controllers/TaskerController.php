@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Tasker;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Spatie\Geocoder\Geocoder;
+use App\Mail\AuthenticateMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Geocoder\Geocoder;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
 
 class TaskerController extends Controller
 {
@@ -18,6 +22,27 @@ class TaskerController extends Controller
     public function __construct(Geocoder $geocoder)
     {
         $this->geocoder = $geocoder;
+    }
+
+    private function sendAccountNotification($data, $userType, $option, $link)
+    {
+        // Users Name
+        if ($userType == 1) {
+            $name = $data->admin_firstname . ' ' . $data->admin_lastname;
+        } elseif ($userType == 2) {
+            $name = $data->tasker_firstname . ' ' . $data->tasker_lastname;
+        } elseif ($userType == 3) {
+            $name = $data->client_firstname . ' ' . $data->client_lastname;
+        }
+
+        Mail::to($data->email)->send(new AuthenticateMail([
+            'users' => $userType,
+            'name' => Str::headline($name),
+            'date' => Carbon::now()->format('d F Y g:i A'),
+            'option' => $option,
+            'link' => $link
+
+        ]));
     }
 
 
@@ -49,7 +74,12 @@ class TaskerController extends Controller
         $taskers['tasker_photo'] = $path;
         Tasker::create($taskers);
 
-        return redirect(route('tasker-login'))->with('success', 'Your Tasker account has been successfully created! Please log in with your registered credentials.');
+        //Send Email Verification Link
+        $data = Tasker::where('email', $taskers['email'])->first();
+        $verifyLink = route('user-verify-email', ['option' => 2, 'email' => Crypt::encrypt($data->email)]);
+        $this->sendAccountNotification($data, 2, 1, $verifyLink);
+
+        return redirect(route('tasker-login'))->with('success', 'Your Tasker account has been successfully created! Please check your email to verify and activate your account.');
     }
 
     public function adminCreateTasker(Request $req)
@@ -83,7 +113,12 @@ class TaskerController extends Controller
 
         Tasker::create($taskers);
 
-        return redirect(route('admin-tasker-management'))->with('success', 'The Tasker account has been successfully created! Please remind the Tasker to complete their profile and update their password upon logging in.');
+        //Send Email Verification Link
+        $data = Tasker::where('email', $taskers['email'])->first();
+        $verifyLink = route('user-verify-email', ['option' => 2, 'email' => Crypt::encrypt($data->email)]);
+        $this->sendAccountNotification($data, 2, 1, $verifyLink);
+
+        return redirect(route('admin-tasker-management'))->with('success', 'The Tasker account has been successfully created! Please remind the Tasker to verify their email, complete their profile and update their password upon logging in.');
     }
 
     public function adminUpdateTasker(Request $req, $id)

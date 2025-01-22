@@ -3,16 +3,42 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Administrator;
+use App\Mail\AuthenticateMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
+use Yajra\DataTables\Facades\DataTables;
 
 class AdministratorController extends Controller
 {
+
+
+    private function sendAccountNotification($data, $userType, $option, $link)
+    {
+        // Users Name
+        if ($userType == 1) {
+            $name = $data->admin_firstname . ' ' . $data->admin_lastname;
+        } elseif ($userType == 2) {
+            $name = $data->tasker_firstname . ' ' . $data->tasker_lastname;
+        } elseif ($userType == 3) {
+            $name = $data->client_firstname . ' ' . $data->client_lastname;
+        }
+
+        Mail::to($data->email)->send(new AuthenticateMail([
+            'users' => $userType,
+            'name' => Str::headline($name),
+            'date' => Carbon::now()->format('d F Y g:i A'),
+            'option' => $option,
+            'link' => $link
+
+        ]));
+    }
 
     // Admin - Register Admin
     // Check by : Zikri (12/01/2025)
@@ -47,7 +73,12 @@ class AdministratorController extends Controller
         $data['password'] = bcrypt($data['password']);
         Administrator::create($data);
 
-        return back()->with('success', 'Administrator has been registered successfully !');
+        //Send Email Verification Link
+        $data = Administrator::where('email',$data['email'])->first();
+        $verifyLink = route('user-verify-email', ['option' => 1, 'email' => Crypt::encrypt($data->email)]); 
+        $this->sendAccountNotification($data,1,1,$verifyLink);
+
+        return back()->with('success', 'Administrator has been registered successfully! Please remind the administrator to verify their account and update their password upon logging in.');
     }
 
     // Admin - Update Admin
