@@ -79,7 +79,7 @@ class StatementController extends Controller
             Artisan::call('generate:monthly-statements');
             return back()->with('success', 'Monthly statements refresh successfully!');
         } catch (Exception $e) {
-            return back()->with('error', 'Oops! Something went wrong. Please try again.');
+            return back()->with('error', $e->getMessage());
         }
     }
 }
