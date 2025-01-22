@@ -279,6 +279,9 @@ session()->flash('error', 'Please login from a mobile device.');
 
         });
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const filename = urlParams.get("id");
+
         const video = document.getElementById("video");
         const snap = document.getElementById("snap");
         const canvas = document.getElementById("canvas");
@@ -399,7 +402,9 @@ session()->flash('error', 'Please login from a mobile device.');
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = "/verification-success?idno=" + filename;
+                    // Corrected redirection with proper string formatting
+                    window.location.href = `{{ route('tasker-ver-success') }}?idno=${filename}`;
+                    // Alternatively, using template literals:
                 } else if (result.isDenied) {
                     // Display the detailed verification information
                     displayVerificationDetails(data.detail);
@@ -520,8 +525,7 @@ session()->flash('error', 'Please login from a mobile device.');
             const dataUrl = canvas.toDataURL("image/png");
             const base64Image = dataUrl.split(",")[1];
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const filename = urlParams.get("id");
+          
 
             fetch("{{ env('API_EKYC_URL') }}/process-face", {
                     method: "POST",
