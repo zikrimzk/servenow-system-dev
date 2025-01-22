@@ -295,17 +295,11 @@ class RouteController extends Controller
             ]);
     }
 
-
     public function clientBookingHistoryNav()
     {
-        set_time_limit(120);
-
         // Memastikan pengguna yang sedang log masuk
         $user = Auth::user();
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'Sila log masuk untuk melihat sejarah tempahan.');
-        }
-
+    
         // Pengambilan data tempahan
         $booking = DB::table('bookings as a')
             ->join('services as c', 'a.service_id', '=', 'c.id')

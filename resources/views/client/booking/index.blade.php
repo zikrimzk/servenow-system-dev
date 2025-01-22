@@ -5,19 +5,14 @@ use App\Models\Tasker;
 @extends('client.layouts.main')
 
 <style>
-    /* .calendar-container {
-        padding: 16px;
-        max-width: 400px;
-        margin: auto;
-        background-color: #fff;
-       
-    }
-
-    .calendar-container label {
+    .no-taskers {
+        font-size: 18px;
+        color: #909090;
         font-weight: bold;
-        margin-bottom: 8px;
-        display: block;
-    } */
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
 
     .info {
         margin-top: 20px;
@@ -112,6 +107,7 @@ use App\Models\Tasker;
                 <div class="col-sm-8 col-md-12">
                     <div id="basicwizard" class="form-wizard row justify-content-center mx-3 my-1">
                         <div class="col-sm-8 col-md-12">
+                            
                             <!-- Start Alert -->
                             <div>
                                 @if (session()->has('success'))
@@ -142,10 +138,12 @@ use App\Models\Tasker;
                                 @endif
                             </div>
                             <!-- End Alert -->
-                            <h1 class="my-4">{{ $sv->servicetype_name }}</h1>
+
+                            <h1 class="mb-4 mt-4 mt-md-2">{{ $sv->servicetype_name }}</h1>
                         </div>
+
                         <div class="col-sm-8 col-md-12">
-                            <div class="card">
+                            <div class="card shadow">
                                 <div class="card-body p-3">
                                     <ul class="nav nav-pills nav-justified">
                                         <li class="nav-item" data-target-form="#contactDetailForm">
@@ -185,9 +183,10 @@ use App\Models\Tasker;
                             </div>
                             <form action="{{ route('clientBookService') }}" method="POST" id="bookingForm">
                                 @csrf
-                                <div class="card">
+                                <div class="card shadow">
                                     <div class="card-body">
                                         <div class="tab-content">
+
                                             <!-- START: Define your progress bar here -->
                                             <div id="bar" class="progress mb-3" style="height: 7px">
                                                 <div
@@ -1231,8 +1230,9 @@ use App\Models\Tasker;
                 },
                 success: function(response) {
                     if (response.status === 'success') {
-                        // Display tasker list
+
                         displayTaskers(response.taskers);
+
                     } else {
                         alert(response.message);
                     }
@@ -1246,114 +1246,120 @@ use App\Models\Tasker;
         function displayTaskers(taskers) {
             let taskerContainer = document.getElementById('taskerList'); // Assume this container exists
             taskerContainer.innerHTML = '';
-            let taskerArray = Object.values(taskers);
 
-            taskerArray.forEach(tasker => {
-                let badgeText = '';
-                let badgeClass = '';
-            
-
-                // Logik menentukan teks dan warna berdasarkan overall_book
-                if (tasker.overall_book >= 0 && tasker.overall_book <= 20) {
-                    badgeText = 'Elite Tasker';
-                    badgeClass = 'badge bg-primary text-white'; // Biru
-                } else if (tasker.overall_book > 20 && tasker.overall_book <= 80) {
-                    badgeText = 'Master Tasker';
-                    badgeClass = 'badge bg-success text-white'; // Hijau
-                } else if (tasker.overall_book > 80 && tasker.overall_book <= 120) {
-                    badgeText = 'Grand Master Tasker';
-                    badgeClass = 'badge bg-warning text-white'; // Kuning
-                } else if (tasker.overall_book > 120 && tasker.overall_book <= 160) {
-                    badgeText = 'Epic Tasker';
-                    badgeClass = 'badge bg-danger text-white'; // Merah
-                } else if (tasker.overall_book > 160 && tasker.overall_book <= 200) {
-                    badgeText = 'Legend';
-                    badgeClass = 'badge bg-dark text-white'; // Hitam
-                } else if (tasker.overall_book > 200) {
-                    badgeText = 'Mythic Tasker';
-                    badgeClass = 'badge bg-secondary text-white'; // Kelabu
-                }
-                taskerContainer.innerHTML += `
-                    <div class="card m-2 border border-0 mb-5">
-                        <!--Image Tasker Section [Start]-->
-                        <div class="row mt-4">
-                            <div class="col-sm-3 col-md-3 col-lg-3">
-                                <div class="d-flex justify-content-center align-items-center">
-                                    <div class="image-container">
-                                        <img src="{{ asset('storage') }}/${tasker.tasker_photo}"
-                                            alt="Profile Photo" 
-                                            class="user-avatar rounded-circle">
+            if (taskers.length > 0) {
+                let taskerArray = Object.values(taskers);
+                taskerArray.forEach(tasker => {
+                    let badgeText = '';
+                    let badgeClass = '';
+                    // Logik menentukan teks dan warna berdasarkan overall_book
+                    if (tasker.overall_book >= 0 && tasker.overall_book <= 20) {
+                        badgeText = 'Elite Tasker';
+                        badgeClass = 'badge bg-primary text-white'; // Biru
+                    } else if (tasker.overall_book > 20 && tasker.overall_book <= 80) {
+                        badgeText = 'Master Tasker';
+                        badgeClass = 'badge bg-success text-white'; // Hijau
+                    } else if (tasker.overall_book > 80 && tasker.overall_book <= 120) {
+                        badgeText = 'Grand Master Tasker';
+                        badgeClass = 'badge bg-warning text-white'; // Kuning
+                    } else if (tasker.overall_book > 120 && tasker.overall_book <= 160) {
+                        badgeText = 'Epic Tasker';
+                        badgeClass = 'badge bg-danger text-white'; // Merah
+                    } else if (tasker.overall_book > 160 && tasker.overall_book <= 200) {
+                        badgeText = 'Legend';
+                        badgeClass = 'badge bg-dark text-white'; // Hitam
+                    } else if (tasker.overall_book > 200) {
+                        badgeText = 'Mythic Tasker';
+                        badgeClass = 'badge bg-secondary text-white'; // Kelabu
+                    }
+                    taskerContainer.innerHTML += `
+                        <div class="card m-2 border border-0 mb-5">
+                            <!--Image Tasker Section [Start]-->
+                            <div class="row mt-4">
+                                <div class="col-sm-3 col-md-3 col-lg-3">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <div class="image-container">
+                                            <img src="{{ asset('storage') }}/${tasker.tasker_photo}"
+                                                alt="Profile Photo" 
+                                                class="user-avatar rounded-circle">
+                                        </div>
+                                        
                                     </div>
-                                    
-                                </div>
-                                <h4 class="mb-3 mt-2 d-lg-none text-center">
-                                        RM ${tasker.service_rate}/${tasker.service_rate_type}
-                                    </h4>
-                            </div>
-
-                            <div class="col-sm-9 col-md-9 col-lg-9">
-                                <div class="p-3">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <h6 class="mb-2 f-24">
-                                            ${tasker.tasker_firstname.split(' ')[0]}.
-                                        </h6>
-                                        <h5 class="mb-2 d-none d-lg-block">
+                                    <h4 class="mb-3 mt-2 d-lg-none text-center">
                                             RM ${tasker.service_rate}/${tasker.service_rate_type}
-                                        </h5>
-                                    </div>
+                                        </h4>
+                                </div>
 
-                                    <div class="d-flex align-items-center mb-2">
-                                        <span class="${badgeClass} me-2">${badgeText}</span>
-                                    </div>
-                                    <div>
-                                        <p class="mb-1">
-                                            <span class="fw-bold"> ★ ${tasker.rating_count.toFixed(1)} </span> (${tasker.review_count} reviews)
-                                        </p>                                       
-                                        <p class="mb-1">${tasker.task_count} ${tasker.servicetype_name} tasks</p>
-                                        <p class="mb-1"> 
-                                            <i class="fa fa-map-marker-alt text-danger me-2"></i>
-                                            ${tasker.road_distance.toFixed(2)} KM away
-                                        </p>
+                                <div class="col-sm-9 col-md-9 col-lg-9">
+                                    <div class="p-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="mb-2 f-24">
+                                                ${tasker.tasker_firstname.split(' ')[0]}.
+                                            </h6>
+                                            <h5 class="mb-2 d-none d-lg-block">
+                                                RM ${tasker.service_rate}/${tasker.service_rate_type}
+                                            </h5>
+                                        </div>
 
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="${badgeClass} me-2">${badgeText}</span>
+                                        </div>
+                                        <div>
+                                            <p class="mb-1">
+                                                <span class="fw-bold"> ★ ${tasker.rating_count.toFixed(1)} </span> (${tasker.review_count} reviews)
+                                            </p>                                       
+                                            <p class="mb-1">${tasker.task_count} ${tasker.servicetype_name} tasks</p>
+                                            <p class="mb-1"> 
+                                                <i class="fa fa-map-marker-alt text-danger me-2"></i>
+                                                ${tasker.road_distance.toFixed(2)} KM away
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row flex-sm-row  flex-column-reverse">
+                                <div class="col-sm-12 col-md-3 col-lg-3">
+                                    <div class="d-flex justify-content-center mt-2 mb-2">
+                                    <a href="#" 
+                                        class="btn btn-link text-decoration-none primary p-1 view-profile-btn" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#taskerReviewModal-${tasker.taskerID}">
+                                        View Profile & Review
+                                    </a>
+                                </div>
+                                    <div class="d-grid d-md-flex justify-content-md-center align-items-md-center ">
+                                        <button type="button"
+                                            class="btn btn-primary select-continue-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#selectdatetime-${tasker.taskerID}"
+                                            data-tasker-id="${tasker.taskerID}"
+                                            data-service-id="${tasker.svID}">
+                                            Select & Continue
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12 col-md-9 col-lg-9">
+                                    <div class=" bg-light p-3">
+                                        <h4> How I can help:</h4>
+                                            <p class="text-muted fw-normal f-16">
+                                                ${tasker.service_desc}
+                                            </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    `;
+                });
+            } else {
+                let noTaskersMessage = document.createElement('div');
+                noTaskersMessage.classList.add('no-taskers');
+                noTaskersMessage.textContent = 'Oops, there are no taskers around you. Sorry !';
+                taskerContainer.appendChild(noTaskersMessage);
+            }
 
-                        <div class="row flex-sm-row  flex-column-reverse">
-                            <div class="col-sm-12 col-md-3 col-lg-3">
-                                <div class="d-flex justify-content-center mt-2 mb-2">
-                                <a href="#" 
-                                    class="btn btn-link text-decoration-none primary p-1 view-profile-btn" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#taskerReviewModal-${tasker.taskerID}">
-                                    View Profile & Review
-                                </a>
-                            </div>
-                                <div class="d-grid d-md-flex justify-content-md-center align-items-md-center ">
-                                    <button type="button"
-                                        class="btn btn-primary select-continue-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#selectdatetime-${tasker.taskerID}"
-                                        data-tasker-id="${tasker.taskerID}"
-                                        data-service-id="${tasker.svID}">
-                                        Select & Continue
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-12 col-md-9 col-lg-9">
-                                <div class=" bg-light p-3">
-                                    <h4> How I can help:</h4>
-                                        <p class="text-muted fw-normal f-16">
-                                            ${tasker.service_desc}
-                                        </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
         }
 
         /******************** *************************** ***********************/

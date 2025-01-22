@@ -539,10 +539,15 @@ class BookingController extends Controller
                 $booking->save();
                 $message = 'Your refund request has been successfully processed. Please note, it may take up to 5 working days for the amount to reflect in your account.';
             } else if ($option == 3) {
-                // refund process here
+                // Confirm receive service here
                 $booking->booking_status = 6;
                 $booking->save();
+                if(Auth::user()->client_status == 0)
+                {
+                    Client::where('id',Auth::user()->id)->update(['client_status'=> 2]);
+                }
                 $message = 'You have confirmed that you have received the service. Please leave a review for the tasker.';
+
             }
             return back()->with('success', $message);
         } catch (Exception $e) {

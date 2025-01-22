@@ -631,8 +631,8 @@
                                                                 onclick="saveBookingIDToLocalStorage(this)">
                                                                 Request Refund
                                                             </button>
-                                                            <button class="btn btn-light-secondary">Contact
-                                                                Tasker</button>
+                                                            <a  href="tel:{{ $b->tasker_phoneno }}" class="btn btn-light-secondary">Contact
+                                                                Tasker</a>
                                                         </div>
                                                     @elseif($b->booking_status == 3)
                                                         <div
@@ -641,8 +641,8 @@
                                                                 type="button"
                                                                 data-bs-target="#completeBookingModalTwo-{{ $b->bookingID }}"
                                                                 data-bs-toggle="modal">Service Completed</button>
-                                                            <button class="btn btn-light-secondary">Contact
-                                                                Tasker</button>
+                                                            <a  href="tel:{{ $b->tasker_phoneno }}" class="btn btn-light-secondary">Contact
+                                                                Tasker</a>
                                                         </div>
                                                     @endif
                                                 </div>
@@ -842,7 +842,6 @@
                                                 </div>
                                             </div>
                                         </form>
-
 
                                         <div class="modal fade" id="completeBookingModalTwo-{{ $b->bookingID }}"
                                             data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
