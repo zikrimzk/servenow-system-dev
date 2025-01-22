@@ -401,8 +401,7 @@ session()->flash('error', 'Please login from a mobile device.');
                 if (result.isConfirmed) {
                     // Corrected redirection with proper string formatting
                     window.location.href = "{{ route('tasker-ver-success') }}?idno=" + filename;
-                    // Alternatively, using template literals:
-                    // window.location.href = `{{ route('VerificationSuccess') }}?idno=${filename}`;
+                    // Alternatively, using template literals
                 } else if (result.isDenied) {
                     // Display the detailed verification information
                     displayVerificationDetails(data.detail);
