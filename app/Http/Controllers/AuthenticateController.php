@@ -223,7 +223,11 @@ class AuthenticateController extends Controller
                 ], 401);
             }
         } else {
-            return back()->with('error', 'Oops, looks like your account is not verified. Please check your email for futher steps.');
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Oops, looks like your account is not verified. Please check your email for futher steps.',
+            ], 401);
         }
     }
 
@@ -432,6 +436,8 @@ class AuthenticateController extends Controller
                     'email_verified' => 1
                 ]);
 
+                $this->sendAccountNotification($user, $option, 4, null);
+
                 return redirect(route('admin-login'))->with('success', 'Your account has been successfully verified! Please log in with your credentials to access your account.');
             } elseif ($option == 2) {
                 $user = Tasker::where('email', $email)->first();
@@ -440,6 +446,8 @@ class AuthenticateController extends Controller
                     'email_verified' => 1
                 ]);
 
+                $this->sendAccountNotification($user, $option, 4, null);
+
                 return redirect(route('tasker-login'))->with('success', 'Your account has been successfully verified! Please log in with your credentials to access your account.');
             } elseif ($option == 3) {
                 $user = Client::where('email', $email)->first();
@@ -447,6 +455,7 @@ class AuthenticateController extends Controller
                 Client::where('email', $user->email)->update([
                     'email_verified' => 1
                 ]);
+                $this->sendAccountNotification($user, $option, 4, null);
 
                 return redirect(route('client-login'))->with('success', 'Your account has been successfully verified! Please log in with your credentials to access your account.');
             } else {

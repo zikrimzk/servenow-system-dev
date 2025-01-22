@@ -164,6 +164,20 @@
                         <a href="{{ route('client-login') }}">Login Now !</a>
                     @endif
                 </div>
+            @elseif ($data['option'] == 4)
+                <!-- Placeholder for After Email Verification -->
+                <p>
+                    Your account has been verified. You can continue login using your credential.
+                </p>
+                <div class="action-btn">
+                    @if($data['users'] == 1)
+                        <a href="{{ route('admin-login') }}">Login Now !</a>
+                    @elseif($data['users'] == 2)
+                        <a href="{{ route('tasker-login') }}">Login Now !</a>
+                    @elseif($data['users'] == 3)
+                        <a href="{{ route('client-login') }}">Login Now !</a>
+                    @endif
+                </div>
             @endif
             
             <p>If you have any questions, feel free to contact our support team.</p>
