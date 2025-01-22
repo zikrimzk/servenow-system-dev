@@ -319,6 +319,196 @@ session()->flash('error', 'Please login from a mobile device.');
             }
         }
 
+        /**
+         * Converts a JavaScript object into an HTML formatted list.
+         * @param {Object} detail - The detail object to format.
+         * @returns {string} - The HTML string representing the detail.
+         */
+        function convertDetailToList(detail) {
+            let list = '<ul style="text-align: left; list-style-type: disc; padding-left: 20px;">';
+            for (const [key, value] of Object.entries(detail)) {
+                if (typeof value === 'object' && value !== null) {
+                    if (Array.isArray(value)) {
+                        // Handle arrays
+                        list += `<li><strong>${capitalizeFirstLetter(key)}:</strong> ${value.join(', ')}</li>`;
+                    } else {
+                        // Handle nested objects
+                        list += `<li><strong>${capitalizeFirstLetter(key)}:</strong> ${convertDetailToList(value)}</li>`;
+                    }
+                } else {
+                    list += `<li><strong>${capitalizeFirstLetter(key)}:</strong> ${value}</li>`;
+                }
+            }
+            list += '</ul>';
+            return list;
+        }
+
+        /**
+         * Capitalizes the first letter of a string.
+         * @param {string} string - The string to capitalize.
+         * @returns {string} - The capitalized string.
+         */
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        /**
+         * Displays the verification details in a new SweetAlert.
+         * @param {Object} detail - The detail object containing verification information.
+         */
+        function displayVerificationDetails(detail) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Verification Details',
+                html: `
+                <div style="text-align: left;">
+                    ${convertDetailToList(detail)}
+                </div>
+            `,
+                confirmButtonText: 'Close',
+                allowOutsideClick: false, // Prevent closing by clicking outside
+                allowEscapeKey: false, // Prevent closing by pressing Esc
+                customClass: {
+                    title: 'custom-title',
+                    content: 'custom-content'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Reopen the initial verification success modal
+                    showVerificationSuccess(currentData);
+                }
+            });
+        }
+
+        /**
+         * Displays the initial verification success SweetAlert with "Finish" and "Detail" buttons.
+         * @param {Object} data - The data object containing message and detail.
+         */
+        function showVerificationSuccess(data) {
+            Swal.fire({
+                icon: 'success',
+                title: 'VERIFICATION SUCCESS: ' + data.message,
+                showDenyButton: true, // Enables the "Detail" button
+                confirmButtonText: 'Finish',
+                denyButtonText: 'Detail',
+                allowOutsideClick: false, // Prevent closing by clicking outside
+                allowEscapeKey: false, // Prevent closing by pressing Esc
+                customClass: {
+                    title: 'custom-title',
+                    content: 'custom-content'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Corrected redirection with proper string formatting
+                    window.location.href = "{{ route('tasker-ver-success') }}?idno=" + filename;
+                    // Alternatively, using template literals:
+                    // window.location.href = `{{ route('VerificationSuccess') }}?idno=${filename}`;
+                } else if (result.isDenied) {
+                    // Display the detailed verification information
+                    displayVerificationDetails(data.detail);
+                }
+            });
+        }
+
+
+        /**
+         * Menampilkan SweetAlert ralat dengan butang "Again" dan "Detail".
+         * @param {string} message - Mesej ralat utama.
+         * @param {Object} detail - Butiran ralat.
+         */
+        function showErrorAlert(message, detail) {
+            Swal.fire({
+                icon: 'error',
+                title: 'VERIFICATION FAILED: ' + message,
+                showDenyButton: true, // Menambah butang "Detail"
+                confirmButtonText: 'Again',
+                denyButtonText: 'Detail',
+                allowOutsideClick: false, // Prevent closing by clicking outside
+                allowEscapeKey: false, // Prevent closing by pressing Esc
+                customClass: {
+                    title: 'custom-title',
+                    content: 'custom-content'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Reload the page for another attempt
+                    location.reload();
+                } else if (result.isDenied) {
+                    // Paparkan butiran ralat
+                    displayErrorDetails(detail);
+                }
+            });
+        }
+
+        /**
+         * Menampilkan butiran ralat dalam SweetAlert baru.
+         * @param {Object} detail - Butiran ralat yang diterima dari server.
+         */
+        function displayErrorDetails(detail) {
+            // Ubah butiran ralat menjadi senarai HTML atau format yang diinginkan
+            let errorDetails = convertDetailToList(detail);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error Details',
+                html: `
+            <div style="text-align: left;">
+                ${errorDetails}
+            </div>
+        `,
+                confirmButtonText: 'Close',
+                allowOutsideClick: false, // Prevent closing by clicking outside
+                allowEscapeKey: false, // Prevent closing by pressing Esc
+                customClass: {
+                    title: 'custom-title',
+                    content: 'custom-content'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Kembali ke SweetAlert ralat utama
+                    showErrorAlert(detail.message, detail);
+                }
+            });
+        }
+
+        /**
+         * Fungsi pembantu untuk memaparkan butiran sebagai senarai HTML.
+         * @param {Object} detail - Butiran ralat.
+         * @returns {string} - Senarai HTML.
+         */
+        function convertDetailToList(detail) {
+            let list = '<ul style="text-align: left; list-style-type: disc; padding-left: 20px;">';
+            for (const [key, value] of Object.entries(detail)) {
+                if (typeof value === 'object' && value !== null) {
+                    if (Array.isArray(value)) {
+                        // Menangani array
+                        list += `<li><strong>${capitalizeFirstLetter(key)}:</strong> ${value.join(', ')}</li>`;
+                    } else {
+                        // Menangani objek bersarang
+                        list += `<li><strong>${capitalizeFirstLetter(key)}:</strong> ${convertDetailToList(value)}</li>`;
+                    }
+                } else {
+                    list += `<li><strong>${capitalizeFirstLetter(key)}:</strong> ${value}</li>`;
+                }
+            }
+            list += '</ul>';
+            return list;
+        }
+
+        /**
+         * Fungsi pembantu untuk menukar huruf pertama menjadi huruf besar.
+         * @param {string} string - String asal.
+         * @returns {string} - String dengan huruf pertama besar.
+         */
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+
+        // Variable to store the current data object for modal navigation
+        let currentData = {};
+
+
         document.addEventListener("DOMContentLoaded", startVideo);
 
         snap.addEventListener("click", function() {
@@ -349,54 +539,37 @@ session()->flash('error', 'Please login from a mobile device.');
                 })
                 .then((response) => response.json())
                 .then((data) => {
+                    // Hide loading and show video and buttons again
                     loadingElement.style.display = "none";
                     video.style.display = "block";
                     container.style.display = "block";
                     snap.style.display = "block";
 
-                    // alert(data.message);
+                    // Store the current data object for later use
+                    currentData = data;
+
+                    // Handle response based on status
                     if (data.status) {
-                        // Redirect or handle success case
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'VERIFICATION SUCCESS: ' + data.message,
-                            confirmButtonText: 'Finish',
-                            customClass: {
-                                title: 'custom-title',
-                                content: 'custom-content'
-                            }
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href =
-                                    `{{ route('tasker-ver-success') }}?idno=${filename}`;
-                            }
-                        });
+                        // Success case
+                        showVerificationSuccess(data);
                     } else {
-                        // Handle failure case
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'VERIFICATION FAILED: ' + data.message,
-                            confirmButtonText: 'Again',
-                            customClass: {
-                                title: 'custom-title',
-                                content: 'custom-content'
-                            }
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        });
+                        // Failure case
+                        showErrorAlert(data.message, data);
+
                     }
                 })
                 .catch((error) => {
                     console.error("Error:", error);
+                    // Hide loading and show video and buttons again
                     loadingElement.style.display = "none";
                     video.style.display = "block";
                     snap.style.display = "block";
                     container.style.display = "block";
                     Swal.fire({
                         icon: 'error',
-                        title: 'ERROR SENDING IMAGE TO SERVER. CONTACT US BY EMAIL AT [help-center@servenow.com.my] FOR INFORMATION OR REPORT',
+                        title: 'ERROR SENDING IMAGE TO SERVER. CONTACT US BY EMAIL AT [support@servenow.com.my] FOR INFORMATION OR REPORT',
+                        allowOutsideClick: false, // Prevent closing by clicking outside
+                        allowEscapeKey: false, // Prevent closing by pressing Esc
                         customClass: {
                             title: 'custom-title',
                             content: 'custom-content'
@@ -413,3 +586,72 @@ session()->flash('error', 'Please login from a mobile device.');
 <!-- [Body] end -->
 
 </html>
+
+
+{{-- fetch("{{ env('API_EKYC_URL') }}/process-face", {
+    method: "POST",
+    body: JSON.stringify({
+        image: base64Image,
+        filename
+    }),
+    headers: {
+        "Content-Type": "application/json",
+        'Authorization': '{{ env('EKYC_API_KEY') }}'
+    },
+})
+.then((response) => response.json())
+.then((data) => {
+    loadingElement.style.display = "none";
+    video.style.display = "block";
+    container.style.display = "block";
+    snap.style.display = "block";
+
+    // alert(data.message);
+    if (data.status) {
+        // Redirect or handle success case
+        Swal.fire({
+            icon: 'success',
+            title: 'VERIFICATION SUCCESS: ' + data.message,
+            confirmButtonText: 'Finish',
+            customClass: {
+                title: 'custom-title',
+                content: 'custom-content'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href =
+                    `{{ route('tasker-ver-success') }}?idno=${filename}`;
+            }
+        });
+    } else {
+        // Handle failure case
+        Swal.fire({
+            icon: 'error',
+            title: 'VERIFICATION FAILED: ' + data.message,
+            confirmButtonText: 'Again',
+            customClass: {
+                title: 'custom-title',
+                content: 'custom-content'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                location.reload();
+            }
+        });
+    }
+})
+.catch((error) => {
+    console.error("Error:", error);
+    loadingElement.style.display = "none";
+    video.style.display = "block";
+    snap.style.display = "block";
+    container.style.display = "block";
+    Swal.fire({
+        icon: 'error',
+        title: 'ERROR SENDING IMAGE TO SERVER. CONTACT US BY EMAIL AT [help-center@servenow.com.my] FOR INFORMATION OR REPORT',
+        customClass: {
+            title: 'custom-title',
+            content: 'custom-content'
+        }
+    });
+}); --}}
