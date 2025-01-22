@@ -189,13 +189,13 @@ class ClientController extends Controller
     //Client Update Info
     public function clientUpdateProfile(Request $req, $clientId)
     {
+        session()->flash('active_tab', 'profile-1');
         if ($req->isUploadPhoto == 'true') {
             $data = $req->validate(
                 [
                     'client_firstname' => 'required | string',
                     'client_lastname' => 'required | string',
                     'client_phoneno' => 'required | min:10',
-                    'email' => 'required',
                     'client_photo' => 'image|mimes:jpeg,png,jpg',
 
                 ],
@@ -204,7 +204,6 @@ class ClientController extends Controller
                     'client_firstname' => 'First Name',
                     'client_lastname' => 'Last Name',
                     'client_phoneno' => 'Phone Number',
-                    'email' => 'Email Address',
                     'client_status' => 'Account Status',
                     'client_photo' => 'Profile Photo',
 
@@ -215,7 +214,7 @@ class ClientController extends Controller
 
             // Generate a custom name for the file
             $file = $req->file('client_photo');
-            $filename = $user->id . '_profile' . '.' . $file->getClientOriginalExtension();
+            $filename = time().'_'.$user->id . '_profile' . '.' . $file->getClientOriginalExtension();
 
             // Store the file with the custom filename
             $path = $file->storeAs('profile_photos/clients', $filename, 'public');
@@ -228,15 +227,12 @@ class ClientController extends Controller
                     'client_firstname' => 'required | string',
                     'client_lastname' => 'required | string',
                     'client_phoneno' => 'required | min:10',
-                    'email' => 'required',
-
                 ],
                 [],
                 [
                     'client_firstname' => 'First Name',
                     'client_lastname' => 'Last Name',
                     'client_phoneno' => 'Phone Number',
-                    'email' => 'Email Address',
                     'client_status' => 'Account Status',
 
                 ]
@@ -248,34 +244,9 @@ class ClientController extends Controller
         return redirect(route('client-profile'))->with('success', 'Client profile has been updated successfully !');
     }
 
-    public function clientUpdatePassword(Request $req, $id)
-    {
-
-        $validated = $req->validate(
-            [
-                'oldPass' => 'required | min:8',
-                'newPass' => 'required | min:8',
-                'renewPass' => 'required | same:newPass',
-            ],
-            [],
-            [
-                'oldPass' => 'Old Password',
-                'newPass' => 'New Password',
-                'renewPass' => 'Comfirm Password',
-
-            ]
-        );
-        $check = Hash::check($validated['oldPass'], Auth::user()->password, []);
-        if ($check) {
-            Client::where('id', $id)->update(['password' => bcrypt($validated['renewPass'])]);
-            return back()->with('success', 'Password has been updated successfully !');
-        } else {
-            return back()->with('error', 'Please enter the correct password !');
-        }
-    }
-
     public function clientUpdateAddress(Request $req, $id)
     {
+        session()->flash('active_tab', 'profile-2');
         // Validate Data
         $validated = $req->validate(
             [
@@ -314,9 +285,35 @@ class ClientController extends Controller
 
             // Suceess Update Address
             return back()->with('success', 'Address was successfully updated!');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Failde Update address
             return back()->with('error', 'Address not updated: ' . $e->getMessage());
+        }
+    }
+
+    public function clientUpdatePassword(Request $req, $id)
+    {
+        session()->flash('active_tab', 'profile-3');
+        $validated = $req->validate(
+            [
+                'oldPass' => 'required | min:8',
+                'newPass' => 'required | min:8',
+                'renewPass' => 'required | same:newPass',
+            ],
+            [],
+            [
+                'oldPass' => 'Old Password',
+                'newPass' => 'New Password',
+                'renewPass' => 'Comfirm Password',
+
+            ]
+        );
+        $check = Hash::check($validated['oldPass'], Auth::user()->password, []);
+        if ($check) {
+            Client::where('id', $id)->update(['password' => bcrypt($validated['renewPass'])]);
+            return back()->with('success', 'Password has been updated successfully !');
+        } else {
+            return back()->with('error', 'Please enter the correct password !');
         }
     }
 }

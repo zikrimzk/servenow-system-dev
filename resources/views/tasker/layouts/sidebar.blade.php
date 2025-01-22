@@ -1,3 +1,17 @@
+<style>
+    .avatar-ss {
+        width: 45px;
+        height: 45px;
+        overflow: hidden;
+        border-radius: 50%;
+    }
+
+    .avatar-ss img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
 <nav class="pc-sidebar">
     <div class="navbar-wrapper">
         <div class="m-header d-flex align-items-center justify-content-center mb-3 mt-3">
@@ -11,7 +25,7 @@
             <div class="card pc-user-card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
+                        <div class="flex-shrink-0 avatar-ss">
                             <img src="{{ asset('storage/' . auth()->user()->tasker_photo) }}" alt="Profile Photo"
                                 width="45" height="45" class="user-avtar wid-45 rounded-circle">
                         </div>
@@ -248,7 +262,6 @@
                                     Slot</a></li>
                         </ul>
                     </li>
-
                 @endif
 
             </ul>

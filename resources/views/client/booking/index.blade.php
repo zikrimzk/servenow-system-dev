@@ -515,12 +515,7 @@ use App\Models\Tasker;
                                                                             </p>
 
                                                                         </div>
-                                                                        <div class="flex-shrink-0">
-                                                                            <a href="#"
-                                                                                class="avtar avtar-s btn-link-secondary">
-                                                                                <i class="ti ti-bookmarks f-18"></i>
-                                                                            </a>
-                                                                        </div>
+
                                                                     </div>
                                                                     <hr>
 
@@ -716,11 +711,12 @@ use App\Models\Tasker;
                                                                                     Banking</span>
                                                                                 <span class="d-flex align-items-center">
                                                                                     <span
-                                                                                        class="f-12 badge bg-success me-3">5%
-                                                                                        OFF</span>
-                                                                                    <img src="../assets/images/application/paypal.png"
+                                                                                        class="f-12 badge bg-success me-3">Great
+                                                                                        Deals</span>
+                                                                                    <img src="../assets/images/toyippay-logo.svg"
                                                                                         alt="img"
-                                                                                        class="img-fluid ms-1" />
+                                                                                        class="img-fluid ms-1"
+                                                                                        width="0px" />
                                                                                 </span>
                                                                             </span>
 
@@ -911,13 +907,13 @@ use App\Models\Tasker;
             navPill.addEventListener('click', function() {
 
                 if (this.href.includes('#contactDetail')) {
-                    updateButtons(); 
+                    updateButtons();
 
-                  
+
                     navPills.forEach(tab => {
-                        tab.classList.add('disabled'); 
+                        tab.classList.add('disabled');
 
-                        
+
                         tab.addEventListener('click', function(e) {
                             e.preventDefault();
                         });
@@ -940,10 +936,10 @@ use App\Models\Tasker;
             const addressFields = ['address', 'addState', 'addCity'];
             const differentAddressContent = document.getElementById('differentAddressContent');
 
-           
+
             updateNextButtonState();
 
-           
+
 
             useDefaultAddress.addEventListener('change', function() {
                 updateNextButtonState();
@@ -983,7 +979,7 @@ use App\Models\Tasker;
 
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.nav-pills .nav-link');
-            const reverseTabButton = document.querySelector('.ti-edit'); 
+            const reverseTabButton = document.querySelector('.ti-edit');
 
             reverseTabButton.addEventListener('click', function() {
                 const activeTab = document.querySelector('.nav-pills .nav-link.active');
@@ -1005,7 +1001,7 @@ use App\Models\Tasker;
                     tabContents[currentIndex - 1].classList.add('active', 'show');
                 }
 
-                updateButtons(); 
+                updateButtons();
             });
         });
 
@@ -1078,9 +1074,9 @@ use App\Models\Tasker;
             const isHourSelected = Array.from(hourRadios).some(radio => radio.checked);
 
             tabs.forEach(tab => {
-                tab.classList.remove('disabled'); 
-                tab.style.pointerEvents = ''; 
-                tab.style.opacity = ''; 
+                tab.classList.remove('disabled');
+                tab.style.pointerEvents = '';
+                tab.style.opacity = '';
             });
 
             if (currentIndex === 1) {
@@ -1253,6 +1249,30 @@ use App\Models\Tasker;
             let taskerArray = Object.values(taskers);
 
             taskerArray.forEach(tasker => {
+                let badgeText = '';
+                let badgeClass = '';
+            
+
+                // Logik menentukan teks dan warna berdasarkan overall_book
+                if (tasker.overall_book >= 0 && tasker.overall_book <= 20) {
+                    badgeText = 'Elite Tasker';
+                    badgeClass = 'badge bg-primary text-white'; // Biru
+                } else if (tasker.overall_book > 20 && tasker.overall_book <= 80) {
+                    badgeText = 'Master Tasker';
+                    badgeClass = 'badge bg-success text-white'; // Hijau
+                } else if (tasker.overall_book > 80 && tasker.overall_book <= 120) {
+                    badgeText = 'Grand Master Tasker';
+                    badgeClass = 'badge bg-warning text-white'; // Kuning
+                } else if (tasker.overall_book > 120 && tasker.overall_book <= 160) {
+                    badgeText = 'Epic Tasker';
+                    badgeClass = 'badge bg-danger text-white'; // Merah
+                } else if (tasker.overall_book > 160 && tasker.overall_book <= 200) {
+                    badgeText = 'Legend';
+                    badgeClass = 'badge bg-dark text-white'; // Hitam
+                } else if (tasker.overall_book > 200) {
+                    badgeText = 'Mythic Tasker';
+                    badgeClass = 'badge bg-secondary text-white'; // Kelabu
+                }
                 taskerContainer.innerHTML += `
                     <div class="card m-2 border border-0 mb-5">
                         <!--Image Tasker Section [Start]-->
@@ -1283,17 +1303,16 @@ use App\Models\Tasker;
                                     </div>
 
                                     <div class="d-flex align-items-center mb-2">
-                                        <span class="badge bg-success text-white me-2"> GREAT VALUE</span>
+                                        <span class="${badgeClass} me-2">${badgeText}</span>
                                     </div>
-
                                     <div>
                                         <p class="mb-1">
-                                            <span class="fw-bold"> ★ ${tasker.rating_count} </span> (${tasker.review_count} reviews)
+                                            <span class="fw-bold"> ★ ${tasker.rating_count.toFixed(1)} </span> (${tasker.review_count} reviews)
                                         </p>                                       
                                         <p class="mb-1">${tasker.task_count} ${tasker.servicetype_name} tasks</p>
                                         <p class="mb-1"> 
                                             <i class="fa fa-map-marker-alt text-danger me-2"></i>
-                                            ${tasker.road_distance} KM away
+                                            ${tasker.road_distance.toFixed(2)} KM away
                                         </p>
 
                                     </div>

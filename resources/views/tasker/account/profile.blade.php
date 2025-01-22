@@ -2,6 +2,19 @@
 
 @section('content')
     <style>
+        .avatar-s {
+            width: 150px;
+            height: 150px;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        .avatar-s img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         @media (max-width: 768px) {
             .nav-tabs.profile-tabs .nav-item {
                 flex: 1 1 auto;
@@ -13,7 +26,6 @@
                 width: 100%;
             }
         }
-
     </style>
 
     <!-- [ Main Content ] start -->
@@ -159,7 +171,7 @@
 
                                                     <!-- Profile Picture Section Start -->
                                                     <div class="col-md-4 text-center">
-                                                        <div class="user-upload">
+                                                        <div class="user-upload avatar-s">
                                                             <img src="{{ asset('storage/' . auth()->user()->tasker_photo) }}"
                                                                 alt="Profile Photo" width="150" height="150"
                                                                 id="previewImage">
@@ -175,10 +187,11 @@
                                                             @enderror
                                                         </div>
                                                         <input type="hidden" name="isUploadPhoto" id="isUploadPhoto"
-                                                        value="false">
+                                                            value="false">
                                                         <div class="col-md-12 mb-3">
                                                             <label for="profilephoto" class="fw-semibold"
-                                                                style="cursor:pointer; color:#16325b">Edit Profile Photo</label>
+                                                                style="cursor:pointer; color:#16325b">Edit Profile
+                                                                Photo</label>
                                                         </div>
                                                     </div>
                                                     <!-- Profile Picture Section End -->
@@ -187,14 +200,16 @@
                                                     <div class="col-md-8">
                                                         <div class="row">
 
-                                                             <!-- Tasker Code Field -->
-                                                             <div class="row">
+                                                            <!-- Tasker Code Field -->
+                                                            <div class="row">
                                                                 <div class="col-sm-6">
                                                                     <div class="mb-3">
                                                                         <label class="form-label">
                                                                             Tasker Code
                                                                         </label>
-                                                                        <input type="text" class="form-control" value="{{ Auth::user()->tasker_code }}" readonly/>
+                                                                        <input type="text" class="form-control"
+                                                                            value="{{ Auth::user()->tasker_code }}"
+                                                                            readonly />
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -503,36 +518,51 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Old Password</label>
                                                     <div class="input-group mb-3">
-                                                        <input type="password" class="form-control" name="oldPass"
-                                                            id="oldpassword" />
+                                                        <input type="password"
+                                                            class="form-control @error('oldPass') is-invalid @enderror"
+                                                            name="oldPass" id="oldpassword" />
                                                         <button class="btn btn-light border border-1 border-secondary"
                                                             type="button" id="show-old-password">
                                                             <i id="toggle-icon-old-password" class="ti ti-eye"></i>
                                                         </button>
+                                                        @error('oldPass')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
                                                     </div>
+
                                                 </div>
                                                 <div class="mb-3">
                                                     <label class="form-label">New Password</label>
                                                     <div class="input-group mb-3">
-                                                        <input type="password" class="form-control" id="passwords"
-                                                            name="newPass" />
+                                                        <input type="password"
+                                                            class="form-control @error('newPass') is-invalid @enderror"
+                                                            id="passwords" name="newPass" />
                                                         <button class="btn btn-light border border-1 border-secondary"
                                                             type="button" id="show-password">
                                                             <i id="toggle-icon-password" class="ti ti-eye"></i>
                                                         </button>
+                                                        @error('newPass')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
                                                     </div>
+
                                                 </div>
 
                                                 <div class="mb-3">
                                                     <label class="form-label">Confirm Password</label>
                                                     <div class="input-group mb-3">
-                                                        <input type="password" class="form-control" name="renewPass"
-                                                            id="cpassword" />
+                                                        <input type="password"
+                                                            class="form-control @error('cpassword') is-invalid @enderror"
+                                                            name="renewPass" id="cpassword" />
                                                         <button class="btn btn-light border border-1 border-secondary"
                                                             type="button" id="show-password-confirm">
                                                             <i id="toggle-icon-confirm-password" class="ti ti-eye"></i>
                                                         </button>
+                                                        @error('cpassword')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
                                                     </div>
+
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">

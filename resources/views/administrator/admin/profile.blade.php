@@ -1,6 +1,32 @@
 @extends('administrator.layouts.main')
 
 @section('content')
+    <style>
+        .avatar-s {
+            width: 150px;
+            height: 150px;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        .avatar-s img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs.profile-tabs .nav-item {
+                flex: 1 1 auto;
+                text-align: center;
+            }
+
+            .nav-tabs.profile-tabs .nav-link {
+                display: block;
+                width: 100%;
+            }
+        }
+    </style>
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
@@ -97,7 +123,7 @@
                                                 <div class="row">
                                                     <!-- Profile Picture Section Start -->
                                                     <div class="col-md-4 text-center">
-                                                        <div class="user-upload">
+                                                        <div class="user-upload avatar-s">
                                                             <img src="{{ asset('storage/' . auth()->user()->admin_photo) }}"
                                                                 alt="Profile Photo" width="150" height="150"
                                                                 id="previewImage" class="img-avtar">
@@ -132,7 +158,9 @@
                                                                         <label class="form-label">
                                                                             Admin Code
                                                                         </label>
-                                                                        <input type="text" class="form-control" value="{{ Auth::user()->admin_code }}" readonly/>
+                                                                        <input type="text" class="form-control"
+                                                                            value="{{ Auth::user()->admin_code }}"
+                                                                            readonly />
                                                                     </div>
                                                                 </div>
                                                             </div>

@@ -213,7 +213,6 @@ class RouteController extends Controller
             ->join('taskers as d', 'c.tasker_id', '=', 'd.id')
             ->join('service_types as e', 'c.service_type_id', '=', 'e.id')
             ->join('clients as f', 'b.client_id', '=', 'f.id')
-            ->where('e.id','=',$id)
             ->select(
                 'a.id as reviewID',
                 'c.id as serviceID',

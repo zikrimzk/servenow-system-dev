@@ -1063,7 +1063,7 @@
                                                                 <div class="form-check">
                                                                     <input type="checkbox" class="form-check-input"
                                                                         id="anonymousCheck" name="review_type"
-                                                                        value="2">
+                                                                        >
                                                                     <label class="form-check-label small"
                                                                         for="anonymousCheck">
                                                                         Leave your review anonymously

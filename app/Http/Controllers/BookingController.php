@@ -160,6 +160,7 @@ class BookingController extends Controller
                     'c.tasker_firstname',
                     'c.tasker_rating',
                     'c.tasker_photo',
+                    'c.working_radius',
                     'c.latitude as tasker_lat',
                     'c.longitude as tasker_lng'
                 )
@@ -196,13 +197,27 @@ class BookingController extends Controller
                 ->select('c.id as tasker_id', DB::raw('count(d.id) as task_count'))  // Count reviews for each Tasker
                 ->get();
 
+                $TotalOverallBookCount = DB::table('services as a')
+                ->join('service_types as b', 'a.service_type_id', '=', 'b.id')
+                ->join('taskers as c', 'a.tasker_id', '=', 'c.id')
+                ->join('bookings as d', 'a.id', '=', 'd.service_id') 
+                ->where('d.booking_status', '=', 6) // Optional: filter by a specific service type, can be removed if not needed
+                ->groupBy('c.id')  // Group by Tasker
+                ->select('c.id as tasker_id', DB::raw('count(d.id) as overall_book'))  // Count reviews for each Tasker
+                ->get();
+
 
 
             // Step 3: Convert review count data into a key-value pair (tasker_id => review_count)
             $reviewCountMap = $reviewCount->pluck('review_count', 'tasker_id')->toArray();
             $ratingCountMap = $ratingCount->pluck('rating_count', 'tasker_id')->toArray();
             $TaskCountMap = $TaskCount->pluck('task_count', 'tasker_id')->toArray();
-
+            $OverallBookCountMap = $TotalOverallBookCount->pluck('overall_book', 'tasker_id')->toArray();
+            $svtasker = $svtasker->map(function ($tasker) use ( $OverallBookCountMap) {
+                // Get review count or set to 0 if not available
+                $tasker->overall_book = isset( $OverallBookCountMap[$tasker->taskerID]) ? $OverallBookCountMap[$tasker->taskerID] : 0;
+                return $tasker;
+            });        
 
             // Step 4: Merge review count into the tasker data
             $svtasker = $svtasker->map(function ($tasker) use ($reviewCountMap) {
@@ -229,9 +244,9 @@ class BookingController extends Controller
                 $taskerLng = $tasker->tasker_lng;
 
                 // Call Google Directions API (assuming you want to use it)
-                // $url = "https://maps.googleapis.com/maps/api/directions/json?origin=$clientLat,$clientLng&destination=$taskerLat,$taskerLng&key=$apiKey";
-                // $response = file_get_contents($url);
-                // $data = json_decode($response, true);
+                $url = "https://maps.googleapis.com/maps/api/directions/json?origin=$clientLat,$clientLng&destination=$taskerLat,$taskerLng&key=$apiKey";
+                $response = file_get_contents($url);
+                $data = json_decode($response, true);
 
                 // Get road distance
                 if (!empty($data['routes']) && isset($data['routes'][0]['legs'][0]['distance']['value'])) {
@@ -245,9 +260,9 @@ class BookingController extends Controller
             });
 
             // Optional: You can filter taskers within a specific distance here
-            // $svtasker = $svtasker->filter(function ($tasker) {
-            //     return $tasker->road_distance !== null && $tasker->road_distance <= 40;  // Filter within 40 km
-            // });
+            $svtasker = $svtasker->filter(function ($tasker) {
+                return $tasker->road_distance !== null && $tasker->road_distance <= $tasker->working_radius;  // Filter within 40 km
+            });
 
             return response()->json([
                 'status' => 'success',
@@ -539,7 +554,6 @@ class BookingController extends Controller
     public function clientReviewBooking(Request $request)
     {
         try {
-
             $validated = $request->validate([
                 'review_rating' => 'required|integer|min:1|max:5',
                 'review_description' => 'max:1000',
