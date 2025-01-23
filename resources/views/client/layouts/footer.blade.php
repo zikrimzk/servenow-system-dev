@@ -6,7 +6,7 @@
                 <div class="d-flex flex-column align-items-start">
                     <img src="../assets/images/logo-test.png" alt="img" class="img-fluid mb-3"
                         style="max-width: 110px; filter: brightness(0) invert(1);" />
-                    <p class="text-white fade-in-right" padding-right:30px">
+                    <p class="text-white">
                         ServeNow has gained the trust of over 5.5K customers since 2024, thanks to our commitment to
                         delivering high-quality products. Our experienced team players are responsible for managing
                         ServeNow.
@@ -22,7 +22,7 @@
                         <h5 class="text-white mb-3" style="border-left: 3px solid orange; padding-left: 10px;">
                             Download
                             App</h5>
-                        <ul class="list-unstyled fade-in-right">
+                        <ul class="list-unstyled">
                             <li><a href="https://play.google.com" target="_blank"
                                     class="d-flex align-items-center mb-3" style="color:white;">
                                     <i class="fab fa-google-play" style=" color:#a0a0a0"></i>
@@ -40,7 +40,7 @@
                         <h5 class="text-white mb-3" style="border-left: 3px solid orange; padding-left: 10px;">
                             Contact
                             Info</h5>
-                        <ul class="list-unstyled text-white fade-in-right">
+                        <ul class="list-unstyled text-white">
                             <li style="margin-bottom: 10px;">
                                 <a href="mailto:servenow@mail.com" style="color:white;">servenow@mail.com</a>
                             </li>
@@ -55,7 +55,7 @@
                         <h5 class="text-white mb-3" style=" border-left: 3px solid orange; padding-left: 10px;">
                             Follow Us
                         </h5>
-                        <ul class="list-unstyled fade-in-right">
+                        <ul class="list-unstyled">
                             <li><a href="https://www.instagram.com" target="_blank"
                                     class="d-flex align-items-center mt-3" style="color:white;">
                                     <i class="fab fa-instagram" style="color:#E4405F;width:25px"></i>
