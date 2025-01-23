@@ -1903,7 +1903,7 @@ class RouteController extends Controller
 
 
         $totalrevenueAllTime = number_format(Booking::where('booking_status', 6)->sum('booking_rate'), 2);
-        $totalCommissionAllTime = $totalrevenueAllTime *0.03;
+        $totalCommissionAllTime = $totalrevenueAllTime ;
 
         $totalrefundrequest = CancelRefundBooking::whereIn('cr_status', [0, 1])->count();
 
